@@ -1,1 +1,1 @@
-# CIT 160 Professor Hoskins Open Sourse Class Materials
+# CIT 160 Professor Hoskins Course Materials
