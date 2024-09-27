@@ -37,6 +37,12 @@
             margin: 0 auto;
         }
 
+        .responsive-image {
+            width: 100%;      /* Make image take full width */
+            max-width: 600px; /* Set a max width to prevent it from getting too large */
+            height: auto;     /* Maintain the aspect ratio */
+            margin: 20px 0;   /* Add some spacing around the image */
+
         footer {
             text-align: center;
             padding: rem;
@@ -56,7 +62,7 @@
 
 <nav>
     <a href="#home">Home</a>
-    <a href="#coursebook">Network Simulator</a>
+    <a href="#coursebook">Course Book</a>
     <a href="#NetworkSimulator">Network Simulator</a>
 </nav>
 
@@ -73,11 +79,12 @@
     
     <section id="NetworkSimulator">
         <h2>Network Simulator</h2>
-        <a href="simulatorteacher.html">Network Simulator</a>
+        <a href="simulatorteacher.html" target="_blank">Network Simulator Link</a>
         <p>This project aims to provide secondary schools with a simulator in which students can practice and understand, among others, the following concepts:</p>
         <p>Basic networking components: hosts (clients and servers), routers and switches.</p>
         <p>The Network Simulator was created by: Jorge García Ochoa de Aspuru.</p>
-        <img src="img/networksimulatorschool.png" alt="Network Simulator" width="739" height="325">
+        <img src="img/networksimulatorschool.png" alt="Network Simulator" class="responsive-image">
+        <br><br>
     </section>
 </main>
 
