@@ -1,0 +1,860 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>22   Newer TCP Implementations &#8212; An Introduction to Computer Networks, desktop edition 2.0.11</title>
+    <link rel="stylesheet" href="_static/csbnetbook.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script type="text/javascript" src="_static/mobile.js"></script>
+    <script type="text/javascript" src="_static/rightsidebar.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="23   Queuing and Scheduling" href="fairqueuing.html" />
+    <link rel="prev" title="21   Further Dynamics of TCP" href="dynamicsB.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="fairqueuing.html" title="23   Queuing and Scheduling"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="dynamicsB.html" title="21   Further Dynamics of TCP"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, desktop edition 2.0.11</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">22&nbsp;&nbsp;&nbsp;Newer TCP Implementations</a><ul>
+<li><a class="reference internal" href="#choosing-a-tcp-on-linux">22.1&nbsp;&nbsp;&nbsp;Choosing a TCP on Linux</a></li>
+<li><a class="reference internal" href="#high-bandwidth-desiderata">22.2&nbsp;&nbsp;&nbsp;High-Bandwidth Desiderata</a></li>
+<li><a class="reference internal" href="#rtts">22.3&nbsp;&nbsp;&nbsp;RTTs</a></li>
+<li><a class="reference internal" href="#a-roadmap">22.4&nbsp;&nbsp;&nbsp;A Roadmap</a></li>
+<li><a class="reference internal" href="#highspeed-tcp">22.5&nbsp;&nbsp;&nbsp;Highspeed TCP</a></li>
+<li><a class="reference internal" href="#tcp-vegas">22.6&nbsp;&nbsp;&nbsp;TCP Vegas</a><ul>
+<li><a class="reference internal" href="#tcp-vegas-versus-tcp-reno">22.6.1&nbsp;&nbsp;&nbsp;TCP Vegas versus TCP Reno</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#fast-tcp">22.7&nbsp;&nbsp;&nbsp;FAST TCP</a></li>
+<li><a class="reference internal" href="#tcp-westwood">22.8&nbsp;&nbsp;&nbsp;TCP Westwood</a><ul>
+<li><a class="reference internal" href="#ack-compression-and-westwood">22.8.1&nbsp;&nbsp;&nbsp;ACK Compression and Westwood+</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#tcp-illinois">22.9&nbsp;&nbsp;&nbsp;TCP Illinois</a></li>
+<li><a class="reference internal" href="#compound-tcp">22.10&nbsp;&nbsp;&nbsp;Compound TCP</a></li>
+<li><a class="reference internal" href="#tcp-veno">22.11&nbsp;&nbsp;&nbsp;TCP Veno</a></li>
+<li><a class="reference internal" href="#tcp-hybla">22.12&nbsp;&nbsp;&nbsp;TCP Hybla</a></li>
+<li><a class="reference internal" href="#dctcp">22.13&nbsp;&nbsp;&nbsp;DCTCP</a><ul>
+<li><a class="reference internal" href="#tcp-incast">22.13.1&nbsp;&nbsp;&nbsp;TCP Incast</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#h-tcp">22.14&nbsp;&nbsp;&nbsp;H-TCP</a></li>
+<li><a class="reference internal" href="#tcp-cubic">22.15&nbsp;&nbsp;&nbsp;TCP CUBIC</a></li>
+<li><a class="reference internal" href="#tcp-bbr">22.16&nbsp;&nbsp;&nbsp;TCP BBR</a></li>
+<li><a class="reference internal" href="#epilog">22.17&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li><a class="reference internal" href="#exercises">22.18&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="dynamicsB.html"
+                        title="previous chapter">21&nbsp;&nbsp;&nbsp;Further Dynamics of TCP</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fairqueuing.html"
+                        title="next chapter">23&nbsp;&nbsp;&nbsp;Queuing and Scheduling</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="newer-tcp-implementations">
+<span id="newtcps"></span><h1>22&nbsp;&nbsp;&nbsp;Newer TCP Implementations<a class="headerlink" href="#newer-tcp-implementations" title="Permalink to this headline">¶</a></h1>
+<p>Since the rise of TCP Reno, several TCP alternatives to Reno have been developed; each attempts to address some perceived shortcoming of Reno. While many of them are very specific attempts to address the high-bandwidth problem we considered in <a class="reference internal" href="dynamicsB.html#high-bandwidth-tcp-problem"><span class="std std-ref">21.6&nbsp;&nbsp;&nbsp;The High-Bandwidth TCP Problem</span></a>, some focus primarily or entirely on other TCP Reno foibles. One such issue is TCP Reno’s “greediness” in terms of queue utilization; another is the lossy-link problem (<a class="reference internal" href="dynamicsB.html#lossy-link-tcp-problem"><span class="std std-ref">21.7&nbsp;&nbsp;&nbsp;The Lossy-Link TCP Problem</span></a>) experienced by, say, Wi-Fi users.</p>
+<p>Generally speaking, a TCP implementation can respond to congestion at the cliff – that is, it can respond to packet losses – or can respond to congestion at the knee – that is, it can detect the increase in RTT associated with the filling of the queue. These strategies are sometimes referred to as <strong>loss-based</strong> and <strong>delay-based</strong>, respectively; the latter term because of the rise in RTT. TCP implementers can tweak both the loss response – the multiplicative decrease of TCP Reno – and also the way TCP increases its <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> in the absence of loss. There is a rich variety of options available.</p>
+<p>The concept of monitoring the RTT to avoid congestion at the knee was first introduced in TCP Vegas (<a class="reference internal" href="#tcp-vegas"><span class="std std-ref">22.6&nbsp;&nbsp;&nbsp;TCP Vegas</span></a>). One striking feature of TCP Vegas is that, in the absence of competition, the queue may never fill, and thus there may not be any congestive losses. The TCP sawtooth, in other words, is not inevitable.</p>
+<p>When losses do occur, most of the mechanisms reviewed here continue to use the TCP NewReno recovery strategy. As most of the implementations here are relatively recent, the senders can generally expect that the receiving end will support SACK TCP, which allows more rapid recovery from multiple losses.</p>
+<div class="section" id="choosing-a-tcp-on-linux">
+<span id="choosing-a-tcp"></span><span id="index-0"></span><h2>22.1&nbsp;&nbsp;&nbsp;Choosing a TCP on Linux<a class="headerlink" href="#choosing-a-tcp-on-linux" title="Permalink to this headline">¶</a></h2>
+<p>On Linux systems, the TCP congestion-control mechanism can be set by writing an appropriate string to <code class="docutils literal notranslate"><span class="pre">/proc/sys/net/ipv4/tcp_congestion_control</span></code> (or, equivalently, by passing the string as a parameter to the <code class="docutils literal notranslate"><span class="pre">sysctl</span> <span class="pre">net.ipv4.tcp_congestion_control</span></code> command). The standard options on the author’s system as of 2013 are listed below (as of 2016, several are now only available if loaded explicitly, <em>eg</em> with <code class="docutils literal notranslate"><span class="pre">modprobe</span></code>). The list comes from <code class="docutils literal notranslate"><span class="pre">/proc/sys/net/ipv4/tcp_available_congestion_control</span></code>.</p>
+<ul class="simple">
+<li>highspeed</li>
+<li>htcp</li>
+<li>hybla</li>
+<li>illinois</li>
+<li>vegas</li>
+<li>veno</li>
+<li>westwood</li>
+<li>bic</li>
+<li>cubic</li>
+</ul>
+<p>We review several of these below; see <a class="reference internal" href="#roadmap"><span class="std std-ref">22.4&nbsp;&nbsp;&nbsp;A Roadmap</span></a> for an overview.  TCP Cubic is currently (2013) the default Linux congestion-control implementation; TCP Bic was a precursor.</p>
+<p>The TCP congestion-control mechanism can also be set on a per-connection basis. Non-root users can select any mechanism listed in <code class="docutils literal notranslate"><span class="pre">/proc/sys/net/ipv4/tcp_allowed_congestion_control</span></code>; entries in tcp_available_congestion_control can be copied to this by the root user.</p>
+<p>Many TCP flavors are not available by default, but can be loaded via <code class="docutils literal notranslate"><span class="pre">modprobe</span></code>. The modules containing the TCP implementations are generally in /lib/modules/$(uname -r)/kernel/net/ipv4. Executing <code class="docutils literal notranslate"><span class="pre">ls</span> <span class="pre">tcp_*</span></code> in this directory yields (on the author’s system in 2017) the following:</p>
+<ul class="simple">
+<li>tcp_bic.ko</li>
+<li>tcp_cdg.ko</li>
+<li>tcp_dctcp.kp</li>
+<li>tcp_highspeed.ko</li>
+<li>tcp_htcp.ko</li>
+<li>tcp_hybla.ko</li>
+<li>tcp_illinois.ko</li>
+<li>tcp_scalable.ko</li>
+<li>tcp_vegas.ko</li>
+<li>tcp_veno.ko</li>
+<li>tcp_westwood.ko</li>
+<li>tcp_yeah.ko</li>
+</ul>
+<p>To load, <em>eg</em>, TCP Vegas, use <code class="docutils literal notranslate"><span class="pre">modprobe</span> <span class="pre">tcp_vegas</span></code> (without the “.ko”). This will last until the next reboot (or until the module is manually unloaded). At this point /proc/sys/net/ipv4/tcp_available_congestion_control will contain “vegas” (not tcp_vegas).</p>
+<p>In the C language, we can select the Linux congestion control mechanism, after socket creation but before connection, by including the <code class="docutils literal notranslate"><span class="pre">setsockopt()</span></code> call below; see <a class="reference internal" href="security.html#stack-overflow-example"><span class="std std-ref">28.2.2&nbsp;&nbsp;&nbsp;An Actual Stack-Overflow Example</span></a> and <a class="reference internal" href="publickey.html#tls-programming"><span class="std std-ref">29.5.3&nbsp;&nbsp;&nbsp;A TLS Programming Example</span></a> for complete C examples (though without this call).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#include &lt;netinet/in.h&gt;</span>
+<span class="c1">#include &lt;netinet/tcp.h&gt;</span>
+<span class="o">...</span>
+<span class="n">char</span> <span class="o">*</span> <span class="n">cong_algorithm</span> <span class="o">=</span> <span class="s2">&quot;vegas&quot;</span><span class="p">;</span>
+<span class="nb">int</span> <span class="n">slen</span> <span class="o">=</span> <span class="n">strlen</span><span class="p">(</span> <span class="n">cong_algorithm</span> <span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+<span class="nb">int</span> <span class="n">rc</span> <span class="o">=</span> <span class="n">setsockopt</span><span class="p">(</span> <span class="n">sock</span><span class="p">,</span> <span class="n">IPPROTO_TCP</span><span class="p">,</span> <span class="n">TCP_CONGESTION</span><span class="p">,</span> <span class="n">cong_algorithm</span><span class="p">,</span> <span class="n">slen</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">rc</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="o">/*</span> <span class="n">error</span> <span class="o">*/</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Checking the return code is essential to determine if the algorithm request succeeded.</p>
+<p>In Python3 (and Python2) we can do this as well; the file below is also available at  <a class="reference external" href="auxiliary_files/stalk/tcp_stalkc_cong.py">tcp_stalkc_cong.py</a>. See also <a class="reference internal" href="mininet.html#sender"><span class="std std-ref">30.7.3.1&nbsp;&nbsp;&nbsp;sender.py</span></a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/python3</span>
+<span class="c1"># stalk client allowing specification of the TCP congestion algorithm</span>
+
+<span class="kn">from</span> <span class="nn">socket</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">argv</span>
+
+<span class="n">default_host</span> <span class="o">=</span> <span class="s2">&quot;localhost&quot;</span>
+<span class="n">portnum</span> <span class="o">=</span> <span class="mi">5431</span>
+
+<span class="n">cong_algorithm</span> <span class="o">=</span> <span class="s1">&#39;vegas&#39;</span>
+
+<span class="k">def</span> <span class="nf">talk</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">cong_algorithm</span>
+    <span class="n">rhost</span> <span class="o">=</span> <span class="n">default_host</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">rhost</span> <span class="o">=</span> <span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">cong_algorithm</span> <span class="o">=</span> <span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Looking up address of &quot;</span> <span class="o">+</span> <span class="n">rhost</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">dest</span> <span class="o">=</span> <span class="n">gethostbyname</span><span class="p">(</span><span class="n">rhost</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">gaierror</span> <span class="k">as</span> <span class="n">mesg</span><span class="p">:</span>    <span class="c1"># host not found</span>
+        <span class="n">errno</span><span class="p">,</span><span class="n">errstr</span><span class="o">=</span><span class="n">mesg</span><span class="o">.</span><span class="n">args</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">   &quot;</span><span class="p">,</span> <span class="n">errstr</span><span class="p">);</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;got it: &quot;</span> <span class="o">+</span> <span class="n">dest</span><span class="p">)</span>
+    <span class="n">addr</span><span class="o">=</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">portnum</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">socket</span><span class="p">()</span>
+
+    <span class="n">TCP_CONGESTION</span> <span class="o">=</span> <span class="mi">13</span>   <span class="c1"># defined in /usr/include/netinet/tcp.h</span>
+    <span class="n">cong</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">cong_algorithm</span><span class="p">,</span> <span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+       <span class="n">s</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">IPPROTO_TCP</span><span class="p">,</span> <span class="n">TCP_CONGESTION</span><span class="p">,</span> <span class="n">cong</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">mesg</span><span class="p">:</span>
+       <span class="n">errno</span><span class="p">,</span> <span class="n">errstr</span> <span class="o">=</span> <span class="n">mesg</span><span class="o">.</span><span class="n">args</span>
+       <span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;congestion mechanism </span><span class="si">{}</span><span class="s1"> not available: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cong_algorithm</span><span class="p">,</span> <span class="n">errstr</span><span class="p">))</span>
+       <span class="k">return</span>
+
+    <span class="n">res</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">connect_ex</span><span class="p">(</span><span class="n">addr</span><span class="p">)</span>      <span class="c1"># make the actual connection</span>
+    <span class="k">if</span> <span class="n">res</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;connect to port &quot;</span><span class="p">,</span> <span class="n">portnum</span><span class="p">,</span> <span class="s2">&quot; failed&quot;</span><span class="p">)</span>
+        <span class="n">exit</span><span class="p">()</span>
+
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">buf</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;&gt; &quot;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="n">buf</span> <span class="o">=</span> <span class="n">buf</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+
+<span class="n">talk</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>As of version 3.5, Python did not define the constant <code class="docutils literal notranslate"><span class="pre">TCP_CONGESTION</span></code>; the value 13 above was found in the C include file mentioned in the comment. Fortunately, Python simply passes the parameters of <code class="docutils literal notranslate"><span class="pre">s.setsockopt()</span></code> to the underlying C call, and everything works. Supposedly <code class="docutils literal notranslate"><span class="pre">TCP_CONGESTION</span></code> is pre-defined in Python 3.6.</p>
+</div>
+<div class="section" id="high-bandwidth-desiderata">
+<span id="desiderata"></span><h2>22.2&nbsp;&nbsp;&nbsp;High-Bandwidth Desiderata<a class="headerlink" href="#high-bandwidth-desiderata" title="Permalink to this headline">¶</a></h2>
+<p>One goal of all TCP implementations that attempt to fix the high-bandwidth problem is to be <strong>un</strong>fair to TCP Reno: the whole point is to allow <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> to increase more aggressively than is permitted by Reno. Beyond that, let us review what else a TCP version should do.</p>
+<p id="index-1">First is the <strong>backwards-compatibility</strong> constraint: any new TCP should exhibit reasonable <strong>fairness</strong> with TCP Reno at lower bandwidth×delay products. In particular, it should not ever have a significantly lower <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> than a competing TCP Reno would get. But also it should not take bandwidth unfairly from a TCP Reno connection: the above comment about unfairness to Reno notwithstanding, the new TCP, when competing with TCP Reno, should leave the Reno connection with about the same bandwidth it would have if it were competing with another Reno connection. This is possible because at higher bandwidth×delay products TCP Reno does not efficiently use the available bandwidth; the new TCP should to the extent possible restrict itself to consuming this previously unavailable bandwidth rather than eating significantly into the bandwidth of a competing TCP Reno connection.</p>
+<p>There is also the <strong>self-fairness</strong> issue: multiple connections using the new TCP should receive similar bandwidth allocations, at least with similar RTTs. For dissimilar RTTs, the bandwidth proportions should ideally be no worse than they would be under TCP Reno.</p>
+<p id="index-2">Ideally, we also want relatively <strong>rapid convergence</strong> to fairness; fairness is something of a hollow promise if only connections transferring more than a gigabyte will benefit from it. For TCP Reno, two connections halve the difference in their respective <code class="docutils literal notranslate"><span class="pre">cwnds</span></code> at each shared loss event; as we saw in <a class="reference internal" href="dynamicsB.html#aimd-and-convergence-to-fairness"><span class="std std-ref">21.4.1&nbsp;&nbsp;&nbsp;AIMD and Convergence to Fairness</span></a>, slower convergence is possible.</p>
+<p>It is harder to hope for fairness between competing new implementations. However, at the very least, if new implementations tcp1 and tcp2 are competing, then neither should get less than TCP Reno would get.</p>
+<p>Some new TCPs make use of careful RTT measurements, and, as we shall see below, such measurements are subject to a considerable degree of noise. Any new TCP implementation should be reasonably <strong>robust</strong> in the face of inaccuracies in RTT measurement; a modest or transient measurement error should not make the protocol behave badly, in either the direction of low <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> or of high.</p>
+<p id="index-3">Finally, a new TCP should ideally try to avoid clusters of <strong>multiple losses</strong> at each loss event. Such multiple losses, for example, are a problem for TCP NewReno without SACK: as we have seen, it takes one RTT to retransmit each lost packet. Even with SACK, multiple losses complicate recovery. Yet if a new TCP increments <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> by an amount N&gt;1 after each RTT, then there is potential for the network ceiling to be exceeded by N within one RTT, making a cluster of N losses reasonably likely to occur. These losses are likely distributed among all connections, not just the new-TCP one.</p>
+<p>All TCPs addressing the high-bandwidth issue will need a <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>-increment N that is fairly large, at least some of the time, apparently conflicting with this no-multiple-losses ideal. One trick is to reduce N when packet loss appears to be imminent. TCP Illinois and TCP Cubic do have mechanisms in place to reduce multiple losses.</p>
+</div>
+<div class="section" id="rtts">
+<h2>22.3&nbsp;&nbsp;&nbsp;RTTs<a class="headerlink" href="#rtts" title="Permalink to this headline">¶</a></h2>
+<p>The exact performance of some of the faster TCPs we consider – for that matter, the exact performance of TCP Reno – is influenced by the RTT. This may affect individual TCP performance and also competition between different TCPs. For reference, here are a few typical RTTs from Chicago to various other places:</p>
+<ul class="simple">
+<li>US West Coast: 50-100 ms</li>
+<li>Europe: 100-150 ms</li>
+<li>Southeast Asia: 100-200 ms</li>
+</ul>
+</div>
+<div class="section" id="a-roadmap">
+<span id="roadmap"></span><h2>22.4&nbsp;&nbsp;&nbsp;A Roadmap<a class="headerlink" href="#a-roadmap" title="Permalink to this headline">¶</a></h2>
+<p>We start with Highspeed TCP, an early and relatively simple attempt to address the high-bandwidth-TCP problem.</p>
+<p>After that is the group TCP Vegas, FAST TCP, TCP Westwood, TCP Illinois and Compound TCP. These all involve so-called <strong>delay-based</strong> congestion control, in which the sender carefully monitors the RTT for the minute increases that signal queuing. TCP Vegas, which dates from 1995, is the earliest TCP here and in fact predates widespread recognition of the high-bandwidth-TCP problem. Its goal – then and now – was to prove that one could build a TCP that, in the absence of competition, could transfer arbitrarily long streams of data with no losses and with 100% bottleneck-link utilization.</p>
+<p>The next group, consisting of TCP Veno, TCP Hybla and DCTCP, represent special-purpose TCPs. While TCP Veno may be a reasonable high-bandwidth TCP candidate, its primary goal is to improve TCP performance over lossy links such as Wi-Fi. TCP Hybla is targeted at satellite-Internet users with very long RTTs while DCTCP is for internal connections within a datacenter (which, among other things, have very short RTTs).</p>
+<p>The last triad represents newer, non-delay-based attempts to solve the high-bandwidth-TCP problem: H-TCP, TCP Cubic and TCP BBR. TCP Cubic has become the default TCP on Linux.</p>
+</div>
+<div class="section" id="highspeed-tcp">
+<span id="index-4"></span><span id="id1"></span><h2>22.5&nbsp;&nbsp;&nbsp;Highspeed TCP<a class="headerlink" href="#highspeed-tcp" title="Permalink to this headline">¶</a></h2>
+<p>An early proposed fix for the high-bandwidth-TCP problem is HighSpeed TCP, documented in <span class="target" id="index-5"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3649.html"><strong>RFC 3649</strong></a> (Floyd, 2003). Highspeed TCP is sometimes called HS-TCP, but we use the longer name here to avoid confusion with the entirely unrelated H-TCP, below.</p>
+<p>Highspeed TCP adjusts the additive-increase and multiplicative-decrease parameters 𝛼 and 𝛽 so that, for larger values of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>, the rate of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> increase between losses is much faster, and the <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> decrease at loss events is much smaller. This allows efficient use of all the available bandwidth for large bandwidth×delay products. Correspondingly, when <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is in the range where TCP Reno works well, Highspeed TCP’s throughput is only modestly larger than TCP Reno’s, so the two compete relatively fairly.</p>
+<p>The threshold for Highspeed TCP diverging from TCP Reno is a loss rate less than 10<sup>−3</sup>, which for TCP Reno occurs when <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = 38. Beyond that point, Highspeed TCP gradually increases 𝛼 and decreases 𝛽. The overall effect is to outperform TCP Reno by a factor N = N(<code class="docutils literal notranslate"><span class="pre">cwnd</span></code>) according to the table below. This N can also be interpreted as the “unfairness” of Highspeed TCP with respect to TCP Reno; fairness is arguably “close to” 1.0 until <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>≥1000, at which point TCP Reno is likely not using the full bandwidth available due to the high-bandwidth TCP problem.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="80%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">cwnd</th>
+<th class="head">N(<code class="docutils literal notranslate"><span class="pre">cwnd</span></code>)</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1</td>
+<td>1.0</td>
+</tr>
+<tr class="row-odd"><td>10</td>
+<td>1.0</td>
+</tr>
+<tr class="row-even"><td>100</td>
+<td>1.4</td>
+</tr>
+<tr class="row-odd"><td>1,000</td>
+<td>3.6</td>
+</tr>
+<tr class="row-even"><td>10,000</td>
+<td>9.2</td>
+</tr>
+<tr class="row-odd"><td>100,000</td>
+<td>23.0</td>
+</tr>
+</tbody>
+</table>
+<p>An algebraic expression for N(<code class="docutils literal notranslate"><span class="pre">cwnd</span></code>), for N≥38, is</p>
+<blockquote>
+<div>N(<code class="docutils literal notranslate"><span class="pre">cwnd</span></code>) = 0.23×<code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sup>0.4</sup></div></blockquote>
+<p>At <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>=38 this is about 1.0; for smaller <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> we stick with N=1.</p>
+<p>To specify the details of Highspeed TCP, we start by considering a 10 Gbps link, which was the fastest generally available at the time Highspeed TCP was developed. If the RTT is 100 ms, then the bandwidth×delay product works out to 83,000 packets. The central strategy of Highspeed TCP is to <em>choose</em> the desired loss rate for an average <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> of 83,000 to be 1 packet in 10<sup>7</sup>; this number was empirically determined. This is quite a bit larger than the corresponding TCP Reno loss rate of 1 packet in 5×10<sup>9</sup> (<a class="reference internal" href="dynamicsB.html#high-bandwidth-tcp-problem"><span class="std std-ref">21.6&nbsp;&nbsp;&nbsp;The High-Bandwidth TCP Problem</span></a>); in this context, a larger congestion loss rate is better. The loss rate is the reciprocal of the tooth area; it turns out (below) that we have a great deal of latitude in choosing the tooth area by adjusting the 𝛼 and 𝛽 window-growth parameters. After determining 𝛼 and 𝛽 for <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = 83,000, Highspeed TCP then uses interpolation to cover <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> values in between 38 and 83,000. (The Highspeed TCP rules do extend to larger <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>s too, but there is not necessarily an expectation that they will work well there.)</p>
+<p>We start with the TCP Reno relationship <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = 1.225×p<sup>−0.5</sup>, from <a class="reference internal" href="dynamicsB.html#tcp-loss-rate-versus-cwnd"><span class="std std-ref">21.2&nbsp;&nbsp;&nbsp;TCP Reno loss rate versus cwnd</span></a> (<span class="target" id="index-6"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3649.html"><strong>RFC 3649</strong></a> uses a numerator of 1.20 in this formula.) We fit the relationship <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = k×p<sup>−𝛼</sup> to the above two pairs of (<code class="docutils literal notranslate"><span class="pre">cwnd</span></code>,p) values, (38,10<sup>−3</sup>) and (83000,10<sup>−7</sup>). This turns out to yield</p>
+<blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = 0.12 × p<sup>−0.835</sup></div></blockquote>
+<p>From this we can derive the TCP Reno multiplier N(<code class="docutils literal notranslate"><span class="pre">cwnd</span></code>) above, by using the TCP Reno relationship <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = 1.2×N×p<sup>−0.5</sup> for N synchronized connections, eliminating p and then solving for N.</p>
+<p>The next step is to define the additive-increase and multiplicative-decrease values 𝛼 = 𝛼(<code class="docutils literal notranslate"><span class="pre">cwnd</span></code>) and 𝛽 = 𝛽(<code class="docutils literal notranslate"><span class="pre">cwnd</span></code>), thus allowing us to build an actual implementation. While 𝛼 and 𝛽 are allowed to vary with <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>, we will assume they do so only slowly, so that for any given steady-state connection the 𝛼 values are relatively constant (the 𝛽 value is that at the maximum <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>). This gives us a standard AIMD tooth:</p>
+<img alt="_images/aimd_tooth.svg" src="_images/aimd_tooth.svg" /><p>When <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is 83,000 we want the loss rate to be 10<sup>−7</sup>, meaning that the area of the tooth, w×<code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = w×h×(1-𝛽/2), should be 10<sup>7</sup>. From this we get w = 10<sup>7</sup>/83,000 = 120.5 RTTs. We also have, very generally, 𝛼w = 𝛽h, and combining this with <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = h×(1-𝛽/2), we get 𝛼 = 𝛽h/w = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>×(2𝛽/(1-𝛽/2))/w ≃ 1378×𝛽/(1-𝛽/2). <span class="target" id="index-7"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3649.html"><strong>RFC 3649</strong></a> suggests 𝛽=0.1 at this <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>, making 𝛼 = 73. The value of 𝛽 for values of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> between 38 and 83,000 is determined by logarithmic interpolation between 0.5 and 0.1; the corresponding value of 𝛼(<code class="docutils literal notranslate"><span class="pre">cwnd</span></code>) is then set by the formula.</p>
+<p>The 1-in-10<sup>7</sup> loss rate – corresponding to a bit error rate of about one in 1.2×10<sup>11</sup> – is large enough that it is at least two orders of magnitude higher than the rate of noise-induced non-congestive packet losses. On the other hand, it is small enough that the Highspeed TCP derived from it competes reasonably fairly with TCP Reno, at least with bandwidth×delay products small enough that TCP Reno alone performs reasonably well.</p>
+<p id="index-8">It may be helpful to view Highspeed TCP in terms of the <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> graph between losses. For ordinary TCP, the graph increases linearly. For Highspeed TCP, the graph is slightly <strong>convex</strong> (lying above its tangent). This means that there is a modest increase in the <em>rate</em> of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> increase, as time goes on (up to the point of packet loss).</p>
+<img alt="_images/hs_tcp.svg" id="index-9" src="_images/hs_tcp.svg" /><p>This might be an appropriate time to point out that in TCP Reno, the <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>-versus-<strong>time</strong> graph between losses is actually slightly <strong>concave</strong> (lying below its tangent). We do get a strictly linear graph if we plot <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> as a function of the count of elapsed RTTs, but the RTTs are themselves slowly increasing as a function of time once the queue starts filling up. At that point, the <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>-versus-time graph bends slightly down. If the bottleneck queue capacity matches the total path transit capacity, the RTTs for a full queue are about double the RTTs for an empty queue.</p>
+<p>In general, when Highspeed-TCP competes with a new TCP Reno flow it is N times as aggressive, and grabs N times the bandwidth, where N = N(<code class="docutils literal notranslate"><span class="pre">cwnd</span></code>) is as above. For <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = 83,000, the formula above yields N = 21. This may be surprising, as for this value of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> Highspeed TCP is AIMD(73,0.1), which is equivalent to AIMD(459,0.5) (either via the formula above or by <a class="reference internal" href="dynamicsB.html#dynamicsb-exercises"><span class="std std-ref">21.10&nbsp;&nbsp;&nbsp;Exercises</span></a>, exercise 2.0). We might naively suppose that AIMD(459,0.5) would out-compete TCP Reno – AIMD(1,0.5) – by a factor of 459, by the reasoning of <a class="reference internal" href="dynamicsA.html#faster-additive-increase"><span class="std std-ref">20.3.1&nbsp;&nbsp;&nbsp;Example 2: Faster additive increase</span></a>. But this is true only if losses are synchronized, which, for such lopsided differences in 𝛼, is manifestly not the case. Because Highspeed TCP uses the lion’s share of the queue, it encounters the lion’s share of loss events, and TCP Reno is able to do much better than the 𝛼 values alone would suggest.</p>
+<p>Finally, with a little math we can compare Highspeed TCP with an AIMD-type flavor of TCP with an additive-increase rule (per RTT) of the form</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">cwnd</span></code> += 𝛼×<code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sup>k</sup></div>
+</div>
+</div></blockquote>
+<p>For TCP Reno, k=0, and in the example of exercises 12.0 and 13.0 of <a class="reference internal" href="dynamicsB.html#dynamicsb-exercises"><span class="std std-ref">21.10&nbsp;&nbsp;&nbsp;Exercises</span></a> we have k=1/2. For compatibility with Highspeed TCP, it turns out what we need is k=0.8. We will return to this in <a class="reference internal" href="#compound-tcp"><span class="std std-ref">22.10&nbsp;&nbsp;&nbsp;Compound TCP</span></a>, which intentionally mimics the behavior of Highspeed TCP when queue utilization is low.</p>
+</div>
+<div class="section" id="tcp-vegas">
+<span id="id2"></span><h2>22.6&nbsp;&nbsp;&nbsp;TCP Vegas<a class="headerlink" href="#tcp-vegas" title="Permalink to this headline">¶</a></h2>
+<p>TCP Vegas, introduced in <a class="reference internal" href="bibliography.html#bp95" id="id3">[BP95]</a>, is the only new TCP version we consider here that dates from the previous century. The goal was not directly to address the high-bandwidth problem, but rather to improve TCP throughput generally; indeed, in 1995 the high-bandwidth problem had not yet surfaced as a practical concern. The ambitious goal of TCP Vegas is essentially to eliminate congestive losses, and to try to keep the bottleneck link 100% utilized at all times. Recall from <a class="reference internal" href="reno.html#bottleneck-link-utilization"><span class="std std-ref">19.7&nbsp;&nbsp;&nbsp;TCP and Bottleneck Link Utilization</span></a> that, with a large queue, the average bottleneck-link utilization for TCP Reno can be as low as 75%.</p>
+<p id="index-10">TCP Vegas achieves this improvement by, like DECbit, recognizing TCP congestion at the <em>knee</em>, that is, at the point where the bottleneck link has become saturated and further <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> increases simply result in RTT increases. A TCP Vegas sender alone or in competition only with other TCP Vegas connections will seldom if ever approach the “cliff” where packet losses occur.</p>
+<p>To accomplish this, no special router cooperation – or even receiver cooperation – is necessary. Instead, the sender uses careful monitoring of the RTT to keep track of the number of “extra packets” (<em>ie</em> packets sitting in queues) it has injected into the network. In the absence of competition, the RTT will remain constant, equal to RTT<sub>noLoad</sub>, until <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> has increased to the point when the bottleneck link has become saturated and the queue begins to fill (<a class="reference internal" href="slidingwindows.html#rtt-calculations"><span class="std std-ref">8.3.2&nbsp;&nbsp;&nbsp;RTT Calculations</span></a>). By monitoring the bandwidth as well, a TCP sender can even determine the actual number of packets in the bottleneck queue, as bandwidth × (RTT − RTT<sub>noLoad</sub>). TCP Vegas uses this information to attempt to maintain at all times a small but positive number of packets in the bottleneck queue.</p>
+<p id="index-11">This TCP Vegas strategy is now often referred to as <strong>delay-based congestion control</strong>, as opposed to TCP Reno’s <strong>loss-based</strong> congestion control. TCP Reno’s periodic losses followed by the halving of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is what leads to the “TCP sawtooth”; TCP Vegas, however, has no sawtooth.</p>
+<p>A TCP sender can readily measure its throughput. The simplest measurement is <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>/RTT as in <a class="reference internal" href="slidingwindows.html#rtt-calculations"><span class="std std-ref">8.3.2&nbsp;&nbsp;&nbsp;RTT Calculations</span></a>; this amounts to averaging throughput over an entire RTT. Let us denote this bandwidth estimate by BWE; for the time being we will accept BWE as accurate, though see <a class="reference internal" href="#ack-compression"><span class="std std-ref">22.8.1&nbsp;&nbsp;&nbsp;ACK Compression and Westwood+</span></a> below. TCP Vegas estimates RTT<sub>noLoad</sub> by the minimum RTT (RTT<sub>min</sub>) encountered during the connection. The “ideal” <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> that just saturates the bottleneck link is BWE×RTT<sub>noLoad</sub>. Note that BWE will be much more volatile than RTT<sub>min</sub>; the latter will typically reach its final value early in the connection, while BWE will fluctuate up and down with congestion (which will also act on RTT, but by increasing it).</p>
+<p>As in <a class="reference internal" href="slidingwindows.html#rtt-calculations"><span class="std std-ref">8.3.2&nbsp;&nbsp;&nbsp;RTT Calculations</span></a>, any TCP sender can estimate queue utilization as</p>
+<blockquote>
+<div>queue_use = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> − BWE×RTT<sub>noLoad</sub> = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> × (1 − RTT<sub>noLoad</sub>/RTT<sub>actual</sub>)</div></blockquote>
+<p>TCP Vegas then adjusts <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> regularly to maintain the following:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">𝛼  ≤ queue_use ≤ 𝛽</div>
+</div>
+</div></blockquote>
+<p>which is the same as</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">BWE×RTT<sub>noLoad</sub> + 𝛼  ≤ <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> ≤ BWE×RTT<sub>noLoad</sub> + 𝛽</div>
+</div>
+</div></blockquote>
+<p>Typically 𝛼 = 2-3 packets and 𝛽 = 4-6 packets. We increment <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> by 1 if <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> falls below the lower limit (<em>eg</em> if BWE has increased). Similarly, we decrement <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> by 1 if BWE drops and <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> exceeds BWE×RTT<sub>noLoad</sub> + 𝛽. These adjustments are conceptually done once per RTT. Typically a TCP Vegas sender would also set <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>/2 if a packet were actually lost, though this does not necessarily happen nearly as often as with TCP Reno.</p>
+<p>TCP Vegas achieves its goal quite well. If one monitors the number of packets in queues, through real measurement or in simulation, the number does indeed stay between 𝛼 and 𝛽. In the absence of competition from TCP Reno, a single TCP Vegas connection will <em>never</em> experience congestive packet loss. This is a remarkable achievement.</p>
+<p>The use of returning ACKs to determine BWE is subject to errors due to “ACK compression”, <a class="reference internal" href="#ack-compression"><span class="std std-ref">22.8.1&nbsp;&nbsp;&nbsp;ACK Compression and Westwood+</span></a>. This is generally not a major problem with TCP Vegas, however.</p>
+<div class="section" id="tcp-vegas-versus-tcp-reno">
+<span id="vegas-v-reno"></span><h3>22.6.1&nbsp;&nbsp;&nbsp;TCP Vegas versus TCP Reno<a class="headerlink" href="#tcp-vegas-versus-tcp-reno" title="Permalink to this headline">¶</a></h3>
+<p>Despite its striking ability to avoid congestive losses in the absence of competition, TCP Vegas encounters a potentially serious fairness problem when competing with TCP Reno, at least for the case when queue capacity exceeds or is close to the transit capacity (<a class="reference internal" href="reno.html#bottleneck-link-utilization"><span class="std std-ref">19.7&nbsp;&nbsp;&nbsp;TCP and Bottleneck Link Utilization</span></a>). TCP Vegas will try to minimize its queue use, while TCP Reno happily fills the queue. And whoever has more packets in the queue has a proportionally greater share of bandwidth.</p>
+<p>To make this precise, suppose we have two TCP connections sharing a bottleneck router R, the first using TCP Vegas and the second using TCP Reno. Suppose further that both connections have a path transit capacity of 10 packets, and R’s queue capacity is 40 packets. If 𝛼=3 and 𝛽=5, TCP Vegas might keep an average of four packets in the queue. Unfortunately, TCP Reno then gobbles up most of the rest of the queue space, as follows. There are 40-4 = 36 spaces left in the queue after TCP Vegas takes its quota, and 10 in the TCP Reno connection’s path, for a total of 46. This represents the TCP Reno connection’s network ceiling, and is the point at which TCP Reno halves <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>; therefore <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> will vary from 23 to 46 with an average of about 34. Of these 34 packets, if 10 are in transit then 24 are in R’s queue. If on average R has 24 packets from the Reno connection and 4 from the Vegas connection, then the bandwidth available to these connections will also be in this same 6:1 proportion. The TCP Vegas connection will get 1/7 the bandwidth, because it occupies 1/7 the queue, and the TCP Reno connection will take the other 6/7.</p>
+<p>To put it another way, TCP Vegas is potentially too “civil” to compete with TCP Reno.</p>
+<p>Even worse, Reno’s aggressive queue filling will eventually force the TCP Vegas <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> to decrease; see Exercise 4.0 below.</p>
+<p>This Vegas-Reno fairness problem is most significant when the queue size is an appreciable fraction of the path transit capacity. During periods when the queue is empty, TCPs Vegas and Reno increase <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> at the same rate, so when the queue size is small compared to the path capacity, TCP Vegas and TCP Reno are much closer to being fair.</p>
+<p>In <a class="reference internal" href="ns2.html#reno-versus-vegas"><span class="std std-ref">31.5&nbsp;&nbsp;&nbsp;TCP Reno versus  TCP Vegas</span></a> we compare TCP Vegas with TCP Reno in simulation. With a transit capacity of 220 packets and a queue capacity of 10 packets, TCPs Vegas and Reno receive almost exactly the same bandwidth.</p>
+<p>TCP Reno’s advantage here assumes a router with a single FIFO queue. That advantage can disappear if a different queuing discipline is in effect. For example, if the bottleneck router used fair queuing (to be introduced in <a class="reference internal" href="fairqueuing.html#fair-queuing"><span class="std std-ref">23.5&nbsp;&nbsp;&nbsp;Fair Queuing</span></a>) on a per-connection basis, then the TCP Reno connection’s queue greediness would not be of any benefit, and both connections would get similar shares of bandwidth with the TCP Vegas connection experiencing lower delay. See <a class="reference internal" href="fairqueuing.html#fqbufferbloat"><span class="std std-ref">23.6.1&nbsp;&nbsp;&nbsp;Fair Queuing and Bufferbloat</span></a>.</p>
+<p>Let us next consider how TCP Vegas behaves when there is an increase in RTT due to the kind of cross traffic shown in <a class="reference internal" href="dynamicsA.html#cross-traffic"><span class="std std-ref">20.2.4&nbsp;&nbsp;&nbsp;Example 4: cross traffic and RTT variation</span></a> and again in the diagram below. Let A–B be the TCP Vegas connection and assume that its queue-size target is 4 packets (<em>eg</em> 𝛼=3, 𝛽=5). We will also assume that the RTT<sub>noLoad</sub> for the A–B path is about 5ms and the RTT for the C–D path is also low. As before, the link labels represent bandwidths in packets/ms, meaning that the round-trip A–B transit capacity is 10 packets.</p>
+<img alt="_images/cross_traffic1.svg" src="_images/cross_traffic1.svg" /><p>Initially, in the absence of C–D traffic, the A–B connection will send at a rate of 2 packets/ms (the R2–R3 bottleneck), and maintain a queue of four packets at R2. Because the RTT transit capacity is 10 packets, this will be achieved with a window size of 10+4 = 14.</p>
+<p>Now let the C–D traffic start up, with a winsize so as to keep about four times as many packets in R1’s queue as A, once the new steady-state is reached. If all four of the A–B connection’s “queue” packets end up now at R1 rather than R2, then C would need to contribute at least 16 packets. These 16 packets will add a delay of about 16/5 ≃ 3ms; the A–B path will see a more-or-less-fixed 3ms increase in RTT. A will also see a decrease in bandwidth due to competition; with C consuming 80% of R1’s queue, A’s share wll fall to 20% and thus its bandwidth will fall to 20% of the R1–R2 link bandwidth, that is, 1 packet/ms.  Denote this new value by BWE<sub>new</sub>. TCP Vegas will attempt to decrease <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> so that</p>
+<blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">cwnd</span></code> ≃ BWE<sub>new</sub>×RTT<sub>noLoad</sub> + 4</div></blockquote>
+<p>A’s estimate of RTT<sub>noLoad</sub>, as RTT<sub>min</sub>, will not change; the RTT has gotten larger, not smaller. So we have BWE<sub>new</sub>×RTT<sub>noLoad</sub> ≃ 1 packet/ms × 5 ms = 5 packets; adding the 4 reserved for the queue, the new value of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is now about 9, down from 14.</p>
+<p>On the one hand, this new value of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> does represent 5 packets now in transit, plus 4 in R1’s queue; this is indeed the correct response. But note that this division into transit and queue packets is an average. The actual physical A–B round-trip transit capacity remains about 10 packets, meaning that if the new packets were all appropriately spaced then <em>none</em> of them might be in any queue.</p>
+</div>
+</div>
+<div class="section" id="fast-tcp">
+<h2>22.7&nbsp;&nbsp;&nbsp;FAST TCP<a class="headerlink" href="#fast-tcp" title="Permalink to this headline">¶</a></h2>
+<p>FAST TCP is closely related to TCP Vegas; the idea is to keep the fixed-queue-utilization feature of TCP Vegas to the extent possible, but to provide overall improved performance, in particular in the face of competition with TCP Reno. Details can be found in <a class="reference internal" href="bibliography.html#jwl04" id="id4">[JWL04]</a> and <a class="reference internal" href="bibliography.html#wjlh06" id="id5">[WJLH06]</a>. FAST TCP is patented; see patent <a class="reference external" href="https://patents.google.com/patent/US7974195B2/en">7,974,195</a>.</p>
+<p>As with TCP Vegas, the sender estimates RTT<sub>noLoad</sub> as RTT<sub>min</sub>. At regular short <strong>fixed</strong> intervals (<em>eg</em> 20ms) <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is updated via the following weighted average:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>new</sub> = (1-𝛾)×<code class="docutils literal notranslate"><span class="pre">cwnd</span></code> + 𝛾×((RTT<sub>noLoad</sub>/RTT)×<code class="docutils literal notranslate"><span class="pre">cwnd</span></code> + 𝛼)</div>
+</div>
+</div></blockquote>
+<p>where 𝛾 is a constant between 0 and 1 determining how “volatile” the <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> update is (𝛾≃1 is the most volatile) and 𝛼 is a fixed constant, which, as we will verify shortly, represents the number of packets the sender tries to keep in the bottleneck queue, as in TCP Vegas. Note that the <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> update frequency is <em>not</em> tied to the RTT.</p>
+<p>If RTT is constant for multiple consecutive update intervals, and is larger than RTT<sub>noLoad</sub>, the above will converge to a constant <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>, in which case we can solve for it. Convergence implies <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>new</sub> = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = ((RTT<sub>noLoad</sub>/RTT)×<code class="docutils literal notranslate"><span class="pre">cwnd</span></code> + 𝛼), and from there we get <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>×(RTT−RTT<sub>noLoad</sub>)/RTT = 𝛼. As we saw in <a class="reference internal" href="slidingwindows.html#rtt-calculations"><span class="std std-ref">8.3.2&nbsp;&nbsp;&nbsp;RTT Calculations</span></a>, <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>/RTT is the throughput, and so 𝛼 = throughput × (RTT−RTT<sub>noLoad</sub>) is then the number of packets in the queue. In other words, FAST TCP, when it reaches a steady state, leaves 𝛼 packets in the queue. As long as this is the case, the queue will not overflow (assuming 𝛼 is less than the queue capacity).</p>
+<p>Whenever the queue is not full, though, we have RTT = RTT<sub>noLoad</sub>, in which case FAST TCP’s <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>-update strategy reduces to <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>new</sub> = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> + 𝛾×𝛼. For 𝛾=0.5 and 𝛼=10, this increments <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> by 5. Furthermore, FAST TCP performs this increment at a specific rate independent of the RTT, <em>eg</em> every 20ms; for long-haul links this is much less than the RTT. FAST TCP will, in other words, increase <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> very aggressively until the point when queuing delays occur and RTT begins to increase.</p>
+<p>When FAST TCP is competing with TCP Reno, it does not directly address the queue-utilization competition problem experienced by TCP Vegas. FAST TCP will try to limit its queue utilization to 𝛼; TCP Reno, however, will continue to increase its <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> until the queue is full. Once the queue begins to fill, TCP Reno will pull ahead of FAST TCP just as it did with TCP Vegas. However, FAST TCP does not <em>reduce</em> its <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> in the face of TCP Reno competition as quickly as TCP Vegas.</p>
+<p>Additionally, FAST TCP can often offset this Reno-competition problem in other ways as well. First, the value of 𝛼 can be increased from the value of around 4 packets originally proposed for TCP Vegas; in <a class="reference internal" href="bibliography.html#twhl05" id="id7">[TWHL05]</a> the value 𝛼=30 is suggested. Second, for high bandwidth×delay products, the queue-filling phase of a TCP Reno sawtooth (see <a class="reference internal" href="reno.html#bottleneck-link-utilization"><span class="std std-ref">19.7&nbsp;&nbsp;&nbsp;TCP and Bottleneck Link Utilization</span></a>) becomes relatively smaller. In the earlier link-unsaturated phase of each sawtooth,  TCP Reno increases <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> by 1 each RTT. As noted above, however, FAST TCP is allowed to increase <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> much more rapidly in this earlier phase, and so FAST TCP can get substantially ahead of TCP Reno. It may fall back somewhat during the queue-filling phase, but overall the FAST and Reno flows may compete reasonably fairly.</p>
+<img alt="_images/fast_tcp.svg" src="_images/fast_tcp.svg" /><p>The diagram above illustrates a FAST TCP graph of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> versus time, in blue; it is superimposed over one sawtooth of TCP Reno with the same network ceiling. Note that <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> rises rapidly when it is below the path transit capacity, and then levels off sharply.</p>
+</div>
+<div class="section" id="tcp-westwood">
+<span id="westwood"></span><span id="index-12"></span><h2>22.8&nbsp;&nbsp;&nbsp;TCP Westwood<a class="headerlink" href="#tcp-westwood" title="Permalink to this headline">¶</a></h2>
+<p>TCP Westwood represents an attempt to use the RTT-monitoring strategies of TCP Vegas to address the high-bandwidth problem; recall that the issue there is to distinguish between congestive and non-congestive losses. TCP Westwood can also be viewed as a refinement of TCP Reno’s <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>=<code class="docutils literal notranslate"><span class="pre">cwnd</span></code>/2 strategy, which is a greater drop than necessary if the queue capacity at the bottleneck router is less than the transit capacity. It remains a form of loss-based congestion control.</p>
+<p>As in TCP Vegas, the sender keeps a continuous estimate of bandwidth, BWE, and estimates RTT<sub>noLoad</sub> by RTT<sub>min</sub>. The minimum window size to keep the bottleneck link busy is, again as in TCP Vegas, BWE × RTT<sub>noLoad</sub>. In TCP Vegas, BWE was calculated as <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>/RTT; we will continue to use this for the time being but in fact TCP Westwood has used a wide variety of other algorithms, some of which are discussed in the following subsection, to infer the available average bandwidth from the returning ACKs.</p>
+<p>The core TCP Westwood innovation is to, on loss, reduce <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> as follows:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = max(<code class="docutils literal notranslate"><span class="pre">cwnd</span></code>/2, BWE×RTT<sub>noLoad</sub>)    if <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> &gt; BWE×RTT<sub>noLoad</sub></div>
+<div class="line">no change, if <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> ≤ BWE×RTT<sub>noLoad</sub></div>
+</div>
+</div></blockquote>
+<p>The product BWE×RTT<sub>noLoad</sub> represents what the sender believes is its current share of the “transit capacity” of the path. This product represents how many packets can be in transit (rather than in queues) at the current bandwidth BWE. The RTT<sub>noLoad</sub> estimate as RTT<sub>min</sub> is relatively constant, but BWE may be markedly reduced in the presence of competing traffic. A TCP Westwood sender never drops <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> below what it believes to be the current transit capacity for the path.</p>
+<p>Consider again the classic TCP Reno sawtooth behavior:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">cwnd</span></code> alternates between <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>min</sub> and <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>max</sub> = 2×<code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>min</sub>.</li>
+<li><code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>max</sub> ≃ transit_capacity + queue_capacity (or at least the sender’s share of these)</li>
+</ul>
+<p>As we saw in <a class="reference internal" href="reno.html#bottleneck-link-utilization"><span class="std std-ref">19.7&nbsp;&nbsp;&nbsp;TCP and Bottleneck Link Utilization</span></a>, if transit_capacity &lt; <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>min</sub>, then Reno does a reasonably good job keeping the bottleneck link saturated. However, if transit_capacity &gt; <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>min</sub>, then when Reno drops to <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>min</sub>, the bottleneck link is not saturated until <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> climbs to transit_capacity. For high-speed networks, this latter case is the more likely one.</p>
+<p>Westwood, on the other hand, would in that situation reduce <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> only to transit_capacity, a smaller reduction. Thus TCP Westwood potentially better handles a wide range of router queue capacities. For bottleneck routers where the queue capacity is small compared to the transit capacity, TCP Westwood would in theory have a higher, finer-pitched sawtooth than TCP Reno: the teeth would oscillate between the network ceiling (= queue+transit) and the transit_capacity, versus Reno’s oscillation between the network ceiling and half the ceiling.</p>
+<p>In the event of a non-congestive (noise-related) packet loss, if it happens that <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is less than transit_capacity then TCP Westwood does not reduce the window size at all. That is, non-congestive losses with <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> &lt; transit_capacity have no effect. When <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> &gt; transit_capacity, losses reduce <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> only to transit_capacity, and thus the link stays saturated. This can be useful in lossy wireless environments; see <a class="reference internal" href="bibliography.html#mcgsw01" id="id8">[MCGSW01]</a>.</p>
+<p>In the large-<code class="docutils literal notranslate"><span class="pre">cwnd</span></code>, high-bandwidth case, non-congestive packet losses can easily lower the TCP Reno <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> to well below what is necessary to keep the bottleneck link saturated. In TCP Westwood, on the other hand, the average <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> may be lower than it would be without the non-congestive losses, but it will be high enough to keep the bottleneck link saturated.</p>
+<p>TCP Westwood uses BWE×RTT<sub>noLoad</sub> as a <em>floor</em> for reducing <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>. TCP Vegas shoots to have the actual <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> be just a few packets <em>above</em> this.</p>
+<p>TCP Westwood is not any more aggressive than TCP Reno at increasing <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> in no-loss situations. So while it handles the non-congestive-loss part of the high-bandwidth TCP problem very well, it does not particularly improve the ability of a sender to take advantage of a sudden large rise in the network ceiling.</p>
+<p>TCP Westwood is also potentially very effective at addressing the lossy-link problem, as most non-congestive losses would result in no change to <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>.</p>
+<div class="section" id="ack-compression-and-westwood">
+<span id="ack-compression"></span><span id="index-13"></span><h3>22.8.1&nbsp;&nbsp;&nbsp;ACK Compression and Westwood+<a class="headerlink" href="#ack-compression-and-westwood" title="Permalink to this headline">¶</a></h3>
+<p>So far, we have been assuming that ACKs never encounter queuing delays. They in fact will not, <em>if</em> they are traveling in the reverse direction from all <em>data</em> packets. But while this scenario covers any single-sender model and also systems of two or more competing senders, real networks have more complicated traffic patterns, and returning ACKs from an A⟶B data flow can indeed experience queuing delays if there is third-party traffic along some link in the B⟶A path.</p>
+<p>Delay in the delivery of ACKs, leading to clustering of their arrival, is known as <strong>ACK compression</strong>; see <a class="reference internal" href="bibliography.html#zsc91" id="id9">[ZSC91]</a> and <a class="reference internal" href="bibliography.html#jm92" id="id10">[JM92]</a> for examples. ACK compression causes two problems. First, arriving clusters of ACKs trigger corresponding bursts of data transmissions in sliding-windows senders; the end result is an uneven data-transmission rate. Normally the bottleneck-router queue can absorb an occasional burst; however, if the queue is nearly full such bursts can lead to premature or otherwise unexpected losses.</p>
+<p>The second problem with late-arriving ACKs is that they can lead to inaccurate or fluctuating measurements of bandwidth, upon which both TCP Vegas and TCP Westwood depend. For example, if bandwidth is estimated as <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>/RTT, late-arriving ACKs can lead to inaccurate calculation of RTT. The original TCP Westwood strategy was to estimate bandwidth from the spacing between consecutive ACKs, much as is done with the packet-pairs technique (<a class="reference internal" href="dynamicsA.html#packet-pairs"><span class="std std-ref">20.2.6&nbsp;&nbsp;&nbsp;Packet Pairs</span></a>) but smoothed with a suitable running average. This strategy turned out to be particularly vulnerable to ACK-compression errors.</p>
+<p>For TCP Vegas, ACK compression means that occasionally the sender’s <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> may fail to be decremented by 1; this does not appear to be a significant impact, perhaps because <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is changed by at most ±1 each RTT. For Westwood, however, if ACK compression happens to be occurring at the instant of a packet loss, then a resultant transient overestimation of BWE may mean that the new post-loss <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is too large; at a point when <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> was supposed to fall to the transit capacity, it may fail to do so. This means that the sender has essentially taken a congestion loss to be non-congestive, and ignored it. The influence of this ignored loss will persist – through the much-too-high value of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> – until the following loss event.</p>
+<p>To fix these problems, TCP Westwood has been amended to <strong>Westwood+</strong>, by increasing the time interval over which bandwidth measurements are made and by inclusion of an averaging mechanism in the calculation of BWE. Too much smoothing, however, will lead to an inaccurate BWE just as surely as too little.</p>
+<p>Suitable smoothing mechanisms are given in <a class="reference internal" href="bibliography.html#fgmpc02" id="id11">[FGMPC02]</a> and <a class="reference internal" href="bibliography.html#gm03" id="id12">[GM03]</a>; the latter paper in particular examines several smoothing algorithms in terms of their resistance to <em>aliasing effects</em>: the tendency for intermittent measurement of a periodic signal (the returning ACKs) to lead to much greater inaccuracy than might initially be expected. One smoothing filter suggested by <a class="reference internal" href="bibliography.html#gm03" id="id13">[GM03]</a> is to measure BWE only over entire RTTs, and then to keep a cumulative running average as follows, where BWM<sub>k</sub> is the measured bandwidth over the kth RTT:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">BWE<sub>k</sub> = 𝛼×BWE<sub>k-1</sub> +   (1−𝛼)×BWM<sub>k</sub></div>
+</div>
+</div></blockquote>
+<p>A suggested value of 𝛼 is 0.9. For Westwood+ simulations, see <a class="reference internal" href="bibliography.html#gm04" id="id14">[GM04]</a>.</p>
+</div>
+</div>
+<div class="section" id="tcp-illinois">
+<span id="illinois"></span><span id="index-14"></span><h2>22.9&nbsp;&nbsp;&nbsp;TCP Illinois<a class="headerlink" href="#tcp-illinois" title="Permalink to this headline">¶</a></h2>
+<p>The general idea behind TCP Illinois, described in <a class="reference internal" href="bibliography.html#lbs06" id="id15">[LBS06]</a>, is to use the usual AIMD(𝛼,𝛽) strategy but to have 𝛼 = 𝛼(RTT) be a decreasing function of the current RTT, rather than a constant. When the queue is empty and RTT is equal to RTT<sub>noLoad</sub>, then 𝛼 will be large, and <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> will increase rapidly. Once RTT starts to increase, however, 𝛼 will decrease rapidly, and the <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> growth will level off. This leads to the same kind of concave <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> graph as we saw above in FAST TCP; a consequence of this is that for most of the time between consecutive loss events <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is large enough to keep the bottleneck link close to saturated, and so to keep throughput high.</p>
+<p>The actual 𝛼() function is not of RTT, but rather of <code class="docutils literal notranslate"><span class="pre">delay</span></code>, defined to be RTT − RTT<sub>noLoad</sub>. As with TCP Vegas, RTT<sub>noLoad</sub> is estimated by RTT<sub>min</sub>. As a connection progresses, the sender maintains continually updated values not only for RTT<sub>min</sub> but also for RTT<sub>max</sub>. The sender then sets delay<sub>max</sub> to be RTT<sub>max</sub> − RTT<sub>min</sub>.</p>
+<p id="index-15">We are now ready to define 𝛼(delay). We first specify the highest value of 𝛼, 𝛼<sub>max</sub>, and the lowest, 𝛼<sub>min</sub>. In <a class="reference internal" href="bibliography.html#lbs06" id="id16">[LBS06]</a> these are 10.0 and 0.1 respectively; in the Linux 3.5 kernel they are 10.0 and 0.3. We also define delay<sub>thresh</sub> to be 0.01×delay<sub>max</sub> (the 0.01 is another tunable parameter). We then define 𝛼(delay) as follows</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">𝛼(delay) = 𝛼<sub>max</sub> if delay ≤ delay<sub>thresh</sub></div>
+<div class="line">𝛼(delay) = k<sub>1</sub>/(delay+k<sub>2</sub>) if delay<sub>thresh</sub> ≤ delay ≤ delay<sub>max</sub></div>
+</div>
+</div></blockquote>
+<p>where k<sub>1</sub> and k<sub>2</sub> are chosen so that, for the lower formula, 𝛼(delay<sub>thresh</sub>) = 𝛼<sub>max</sub> and 𝛼(delay<sub>max</sub>) = 𝛼<sub>min</sub>. In case there is a sudden spike in delay, delay<sub>max</sub> is updated before the above is evaluated, so we always have delay ≤ delay<sub>max</sub>. Here is a graph:</p>
+<img alt="_images/illinois_alpha.svg" src="_images/illinois_alpha.svg" /><p>Whenever RTT = RTT<sub>noLoad</sub>, delay=0 and so 𝛼(delay) = 𝛼<sub>max</sub>. However, as soon as queuing delay just barely starts to begin, we will have delay &gt; delay<sub>thresh</sub> and so 𝛼(delay) begins to fall – rather precipitously – to 𝛼<sub>min</sub>. The value of 𝛼(delay) is always positive, though, so <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> will continue to increase (unlike TCP Vegas) until a congestive loss eventually occurs. However, at that point the change in <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is very small, which minimizes the probability that multiple packets will be lost.</p>
+<p>Note that, as with FAST TCP, the increase in delay is used to trigger the reduction in 𝛼.</p>
+<p>TCP Illinois also supports having 𝛽 be a decreasing function of delay, so that 𝛽(small_delay) might be 0.2 while 𝛽(larger_delay) might match TCP Reno’s 0.5. However, the authors of <a class="reference internal" href="bibliography.html#lbs06" id="id17">[LBS06]</a> explain that “the adaptation of 𝛽 as a function of average queuing delay is only relevant in networks where there are non-congestion-related losses, such as wireless networks or extremely high speed networks”.</p>
+</div>
+<div class="section" id="compound-tcp">
+<span id="id18"></span><h2>22.10&nbsp;&nbsp;&nbsp;Compound TCP<a class="headerlink" href="#compound-tcp" title="Permalink to this headline">¶</a></h2>
+<p>Compound TCP, or <strong>CTCP</strong>, is Microsoft’s entry into the advanced-TCP field, although it is now available for Linux as well; see <a class="reference internal" href="bibliography.html#tszs06" id="id19">[TSZS06]</a>. The idea behind Compound TCP is to add a delay-based component to TCP Reno. To this end, CTCP supplements TCP Reno’s <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> with a delay-based contribution to the window size known as <code class="docutils literal notranslate"><span class="pre">dwnd</span></code>; the total window size is then</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">winsize = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> + <code class="docutils literal notranslate"><span class="pre">dwnd</span></code></div>
+</div>
+</div></blockquote>
+<p>(As usual, winsize is also not allowed to exceed the receiver’s advertised window size.) The per-RTT increment of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is now 1/winsize (though note that <code class="docutils literal notranslate"><span class="pre">dwnd</span></code> has a separate per-RTT increment).</p>
+<p>As in TCP Vegas, CTCP maintains RTT<sub>min</sub> as a stand-in for RTT<sub>noLoad</sub>, and also maintains a bandwidth estimate BWE = winsize/RTT<sub>actual</sub>. These allow estimation of the current number of packets in the queue, denoted <code class="docutils literal notranslate"><span class="pre">diff</span></code> in <a class="reference internal" href="bibliography.html#tszs06" id="id20">[TSZS06]</a>, as <code class="docutils literal notranslate"><span class="pre">diff</span></code> = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> × (1 − RTT<sub>noLoad</sub>/RTT<sub>actual</sub>).</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">diff</span></code> is less than 𝛾 packets, where the parameter 𝛾 is configurable but 𝛾=30 is a good starting point, CTCP increases winsize (per RTT) according to the rule</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">winsize += 𝛼×winsize<sup>k</sup></div>
+</div>
+</div></blockquote>
+<p>where the exponent k is chosen to be 0.8. (In <a class="reference internal" href="bibliography.html#tszs06" id="id21">[TSZS06]</a> this increase is achieved by having <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> be incremented by 1, and <code class="docutils literal notranslate"><span class="pre">dwnd</span></code> by 𝛼×winsize<sup>k</sup> − 1.) This amounts to a fairly aggressive increase; for TCP Reno we have k=0. The choice of k=0.8 is intended to make CTCP competitive with Highspeed TCP; we will return to the justification of this below. We will also choose 𝛼=1/8, which we will take as given. The value 𝛾=30 here plays very roughly a similar role as Fast TCP’s 𝛼, also 30, in that both represent a threshold for queue utilization.</p>
+<p>When CTCP encounters a loss, we set</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">winsize = winsize×(1−𝛽)</div>
+</div>
+</div></blockquote>
+<p>While 𝛽  is potentially configurable, typically we will have the usual 𝛽=1/2.</p>
+<p>Finally we have the case where <code class="docutils literal notranslate"><span class="pre">diff</span></code> &gt; 𝛾; that is, the queue has grown “significantly”. If <code class="docutils literal notranslate"><span class="pre">dwnd</span></code> is also positive, it is decremented. The variable <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> continues to increase, but <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> and <code class="docutils literal notranslate"><span class="pre">dwnd</span></code> will cancel each other out over the short term, leading to a roughly constant value for winsize. When <code class="docutils literal notranslate"><span class="pre">dwnd</span></code> drops to 0, however, this cancellation ends, and TCP Reno’s <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> += 1 per RTT takes over; <code class="docutils literal notranslate"><span class="pre">dwnd</span></code> has no more effect until after the next packet loss. Considering all these cases, a rough graph of the growth of CTCP’s winsize is the following:</p>
+<img alt="_images/ctcp.svg" src="_images/ctcp.svg" /><p>We next derive k=0.8 as the value that leads to fair competition with Highspeed TCP. To do this we need a modest bit of calculus; the derivation can be skipped if preferred.
+We start with a hypothetical TCP adjusting <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> according to the rule <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> += 𝛼  × <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sup>0.8</sup>, per RTT, and show this TCP does indeed compete fairly with Highspeed TCP. If we measure time in RTTs, and denote <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> by c = c(t), and extend c(t) to a continuous function of t, this increment rule becomes dc/dt = 𝛼×c<sup>0.8</sup>. Taking reciprocals, we get dt/dc = (1/𝛼) × c<sup>−0.8</sup>. We can now integrate both sides, which yields t = k<sub>1</sub>×c<sup>0.2</sup> (ignoring the constant of integration), or c = k<sub>2</sub>×t<sup>5</sup>. Integrating again, we get the number of packets in one tooth (the area) to be proportional to T<sup>6</sup>, where T is the time at the right edge of the tooth. (We are inappropriately ignoring the left edge of the tooth, but by the argument of exercise 14.0 in <a class="reference internal" href="dynamicsB.html#dynamicsb-exercises"><span class="std std-ref">21.10&nbsp;&nbsp;&nbsp;Exercises</span></a> this turns out not to matter.) This area is the reciprocal of the loss rate p. Solving for T, we get T proportional to (1/p)<sup>1/6</sup>. As the average <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is proportional to T<sup>5</sup> (the area divided by T), by substitution we can conclude that <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is proportional to p<sup>−5/6</sup> = p<sup>−0.833</sup> (versus the original exponent in <a class="reference internal" href="#highspeed-tcp"><span class="std std-ref">22.5&nbsp;&nbsp;&nbsp;Highspeed TCP</span></a> of −0.835).</p>
+<p>Calculating winsize<sup>0.8</sup> is hard to do rapidly, so in practice the exponent 0.75 is used. With that value the exponentiation can be done with two applications of a fast square-root algorithm.</p>
+<p>CTCP turns out to compete reasonably fairly one-on-one with Highspeed TCP, by virtue of the choice of k=0.8. However, when competing with a set of TCP Reno connections, CTCP leaves the Reno connections with nearly the same bandwidth they would have had if they were competing with one more TCP Reno connection instead. That is, CTCP resists “stealing” bandwidth. CTCP does, however, make effective use of the bandwidth that TCP Reno leaves unclaimed due to the high-bandwidth TCP problem.</p>
+</div>
+<div class="section" id="tcp-veno">
+<span id="id22"></span><h2>22.11&nbsp;&nbsp;&nbsp;TCP Veno<a class="headerlink" href="#tcp-veno" title="Permalink to this headline">¶</a></h2>
+<p>TCP Veno (<a class="reference internal" href="bibliography.html#fl03" id="id23">[FL03]</a>) is a synthesis of TCP Vegas and TCP Reno, which attempts to use the RTT-monitoring ideas of TCP Vegas while at the same time remaining about as “aggressive” as TCP Reno in using queue capacity. TCP Veno has generally been presented as an option to address TCP’s lossy-link problem, rather than the high-bandwidth problem <em>per se</em>.</p>
+<p>A TCP Veno sender estimates the number N of packets likely in the bottleneck queue as N<sub>queue</sub> = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> - BWE×RTT<sub>noLoad</sub>, like TCP Vegas. TCP Veno then modifies the TCP Reno congestion-avoidance rule as follows, where the parameter 𝛽, representing the queue-utilization value at which TCP Veno slows down, might be around 5.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">if N<sub>queue</sub>&lt;𝛽, <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> + 1 each RTT</div>
+<div class="line">if N<sub>queue</sub>≥𝛽, <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> + 0.5 each RTT</div>
+</div>
+</div></blockquote>
+<p>The above strategy makes <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> growth less aggressive once link saturation is reached, but does continue to increase <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> (half as fast as TCP Reno) until the queue is full and congestive losses occur.</p>
+<p>When a packet loss does occur, TCP Veno uses its current value of N<sub>queue</sub> to attempt to distinguish between non-congestive and congestive loss, as follows:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">if N<sub>queue</sub>&lt;𝛽, the loss is probably <em>not</em> due to congestion; set <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = (4/5)×<code class="docutils literal notranslate"><span class="pre">cwnd</span></code></div>
+<div class="line">if N<sub>queue</sub>≥𝛽, the loss probably <em>is</em> due to congestion; set <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = (1/2)×<code class="docutils literal notranslate"><span class="pre">cwnd</span></code> as usual</div>
+</div>
+</div></blockquote>
+<p>The idea here is that most router queues will have a total capacity much larger than 𝛽, so a loss with fewer than 𝛽 likely does not represent a queue overflow. Note that, by comparison, TCP Westwood leaves <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> unchanged if it thinks the loss is not due to congestion, and its threshold for making that determination is N<sub>queue</sub>=0.</p>
+<p>If TCP Veno encounters a series of non-congestive losses, the above rules make it behave like AIMD(1,0.8). Per the analysis in <a class="reference internal" href="dynamicsB.html#aimd-revisited"><span class="std std-ref">21.4&nbsp;&nbsp;&nbsp;AIMD Revisited</span></a>, this is equivalent to AIMD(2,0.5); this means TCP Veno will be about twice as aggressive as TCP Reno in recovering from non-congestive losses. This would provide a definite improvement in lossy-link situations with modest bandwidth×delay products, but may not be enough to make a major dent in the high-bandwidth problem.</p>
+</div>
+<div class="section" id="tcp-hybla">
+<span id="hybla"></span><span id="index-16"></span><h2>22.12&nbsp;&nbsp;&nbsp;TCP Hybla<a class="headerlink" href="#tcp-hybla" title="Permalink to this headline">¶</a></h2>
+<p>TCP Hybla (<a class="reference internal" href="bibliography.html#cf04" id="id24">[CF04]</a>) has one very specific focus: to address the TCP satellite problem (<a class="reference internal" href="wireless.html#satellite-internet"><span class="std std-ref">4.4.2&nbsp;&nbsp;&nbsp;Satellite Internet</span></a>) of very long RTTs. TCP Hybla selects a more-or-less arbitrary “reference” RTT, called RTT<sub>0</sub>, and attempts to scale TCP Reno so as to behave like a TCP Reno connection with an RTT of RTT<sub>0</sub>. In the paper <a class="reference internal" href="bibliography.html#cf04" id="id25">[CF04]</a> the authors suggest RTT<sub>0</sub> = 25ms.</p>
+<p>Suppose a TCP Reno connection has, at a loss event at time t<sub>0</sub>, reduced <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> to <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>min</sub>. TCP Reno will then increment <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> by 1 for each RTT, until the next loss event. This Reno behavior can be equivalently expressed in terms of the current time t as follows:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = (t−t<sub>0</sub>)/RTT + <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>min</sub></div>
+</div>
+</div></blockquote>
+<p>What TCP Hybla does is to use the above formula after replacing the actual RTT (or RTT<sub>noLoad</sub>) with RTT<sub>0</sub>. Equivalently, TCP Hybla defines the ratio of the two RTTs as 𝜌 = RTT/RTT<sub>0</sub>, and then after each windowful (each time interval of length RTT) increments <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> by 𝜌<sup>2</sup> instead of by 1. In the event that RTT &lt; RTT<sub>0</sub>, 𝜌 is set to 1, so that short-RTT connections are not penalized.</p>
+<p>Because <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> now increases each RTT by 𝜌<sup>2</sup>, which can be relatively large, there is a good chance that when the network ceiling is reached there will be a burst of losses of size ~𝜌<sup>2</sup>. Therefore, TCP Hybla strongly recommends that the receiving end support SACK TCP, so as to allow faster recovery from multiple packet losses. Another recommended feature is the use of TCP Timestamps; this is a standard TCP option that allows the sender to include its own timestamp in each data packet. The receiver is to echo back the timestamp in the corresponding ACK, thus allowing more accurate measurement by the receiver of the actual RTT.</p>
+<p>Finally, to further avoid having these relatively large increments to <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> result in multiple packet losses, TCP Hybla recommends some form of <strong>pacing</strong> to smooth out the actual transmission times. Rather than sending out four packets upon receipt of an ACK, for example, we might estimate the time T to the next transmission batch (<em>eg</em> when the next ACK arrives) and send the packets at intervals of T/4. At the time TCP Hybla was developed, pacing was poorly supported, but see <a class="reference internal" href="#tcp-bbr"><span class="std std-ref">22.16&nbsp;&nbsp;&nbsp;TCP BBR</span></a> below, where pacing is essential.</p>
+<p>TCP Hybla applies a similar 𝜌-fold scaling mechanism to threshold slow start, when a value for <code class="docutils literal notranslate"><span class="pre">ssthresh</span></code> is known. But the initial unbounded slow start is much more difficult to scale. Scaling at that point would mean repeatedly doubling <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> and sending out flights of packets, <em>before</em> any ACKs have been received; this would likely soon lead to congestive collapse.</p>
+</div>
+<div class="section" id="dctcp">
+<span id="index-17"></span><span id="id26"></span><h2>22.13&nbsp;&nbsp;&nbsp;DCTCP<a class="headerlink" href="#dctcp" title="Permalink to this headline">¶</a></h2>
+<p>Unlike the other TCP flavors in this chapter, <strong>Data Center TCP</strong> (DCTCP) is intended for use only by connections starting and ending within the same datacenter. DCTCP is <em>not</em> meant to be used on the Internet at large, as it makes no pretense of competing fairly with TCP Reno. DCTCP was first described in <a class="reference internal" href="bibliography.html#agmps10" id="id27">[AGMPS10]</a>, and is now also specified in <span class="target" id="index-18"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc8257.html"><strong>RFC 8257</strong></a>.</p>
+<p>A datacenter is a highly specialized networking environment. Round-trip times on the Internet at large might be 50-100 ms, but round-trip times in a datacenter are usually well under 1 ms. Communicating nodes in a datacenter are under common management, and so there is no “chicken and egg” problem regarding software installation: if a new TCP feature is desired, it can be made available everywhere. Finally, cost-saving is an issue: datacenters have lots of switches and routers, and cheaper models generally have smaller queue capacities. Even with a 1-ms RTT, though, a 10 Gbps connection can have a bandwidth×delay product of 1.25 MB (800 packets); we would like to have queues be much smaller than this.</p>
+<p>Recall that TCP Reno can be categorized as AIMD(1,0.5) (<a class="reference internal" href="dynamicsB.html#aimd-revisited"><span class="std std-ref">21.4&nbsp;&nbsp;&nbsp;AIMD Revisited</span></a>). The basic idea of DCTCP is to use AIMD(1,𝛽) for values of 𝛽 much smaller than 0.5. As the window-size reduction on packet loss is 1−𝛽, this means that <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is relatively constant. If the transit capacity of a path is M, then the queue space needed to keep the minimum <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> at M (and thus to keep the bottleneck link 100% utilized) is M×𝛽/(1-𝛽) ≃ M×𝛽 if 𝛽≃0.</p>
+<p>This small 𝛽 comes at the price of out-competing TCP Reno by a large margin. By Exercise 3.0 of <a class="reference internal" href="dynamicsB.html#dynamicsb-exercises"><span class="std std-ref">21.10&nbsp;&nbsp;&nbsp;Exercises</span></a>, AIMD(1,𝛽) is equivalent in terms of fairness to AIMD(𝛼,0.5) for 𝛼 = (2−𝛽)/3𝛽, and by the argument in <a class="reference internal" href="dynamicsA.html#faster-additive-increase"><span class="std std-ref">20.3.1&nbsp;&nbsp;&nbsp;Example 2: Faster additive increase</span></a> an AIMD(𝛼,0.5) connection out-competes TCP Reno by a factor of 𝛼. For 𝛽 = 1/8 we have 𝛼 = 5. For connections within a datacenter we can achieve fairness by implementing DCTCP everywhere, but introduction of DCTCP in the outside world DCTCP would be highly uncooperative.</p>
+<p>The next step is to specify 𝛽. For the moment, we will make a simplifying assumption that there is only one connection, and no other traffic; in this case, the queue utilization increases by 1 for each RTT (once the queue becomes nonempty). We now determine 𝛽 dynamically: we simply count the number D of RTTs before the queue is sufficiently full, and let 𝛽 = 1/2D. (In <a class="reference internal" href="bibliography.html#agmps10" id="id28">[AGMPS10]</a> and <span class="target" id="index-19"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc8257.html"><strong>RFC 8257</strong></a>, 1/D is denoted by 𝛼, making 𝛽 = 𝛼/2, but to avoid confusion with the 𝛼 in AIMD(𝛼,𝛽) we will write out the DCTCP 𝛼 as <code class="docutils literal notranslate"><span class="pre">alpha</span></code> when we return to it below.)</p>
+<img alt="_images/dctcp.svg" src="_images/dctcp.svg" /><p>We can now relate D to <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> and to the amplitude of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> variation. Let W<sub>max</sub> denote the maximum <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>, and W<sub>min</sub> the minimum. Making the usual large-window simplifying assumptions, we have</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">W<sub>min</sub> + D = W<sub>max</sub>, because <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> increases by 1 each RTT</div>
+<div class="line">W<sub>min</sub> = W<sub>max</sub> × (1−1/2D)</div>
+</div>
+</div></blockquote>
+<p>Eliminating W<sub>min</sub> and solving, we get W<sub>max</sub> = 2D<sup>2</sup>, or D = √(W<sub>max</sub>/2).  Note that D is also the amplitude of the queue variation, assuming we keep the bottleneck link saturated, and so is the absolute minimum queue capacity needed. If the goal is keeping the queue small, this compares quite favorably to TCP Reno, in which D = W<sub>min</sub> = W<sub>max</sub>/2.</p>
+<p>Now let K represent the maximum queue capacity; the next step is to relate K and D. We need to ensure that we can avoid having K be much larger than D. We have W<sub>max</sub> = TC + K, where TC is the transit capacity of the link, that is, bandwidth×delay. We can express the minimum queue utilization as Q<sub>min</sub> = K − D = K − √((TC+K)/2. If we choose K = TC, which is necessary with TCP Reno to avoid underutilized bandwidth, we certainly will have K much larger than D. However, to ensure Q<sub>min</sub> ≥ 0 we need K = √((TC+K)/2, or K<sup>2</sup> = TC/2 + K/2, which, because TC is relatively large (perhaps 800 packets), simply requires K just a bit larger than √(TC/2). That is, K need not be much larger than D. At this point, we can afford to be more concerned with K’s being too small, and thereby allowing intervals where the bottleneck link is idle.</p>
+<p>Empirically, a workable value for the queue capacity K is around 65 for 10 Gbps Ethernet, which is moderately above √(TC/2) but still very affordable. It is large enough that link utilization remains near 100%.</p>
+<p>We now need to address the simplifying assumption that there was only one connection. First, there might be N connections, quite possibly synchronized. This means that the queue variation is N×D. It also means D will be somewhat smaller, though, as the total <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> will be increasing N times faster.</p>
+<p>A more serious issue is that there is also a <em>lot</em> of other traffic in a datacenter, so much so that queue utilization is dominated by a more-or-less random component. Instead of measuring when the queue utilization reaches a set level, we must measure when the <em>average</em> utilization reaches that level. DCTCP achieves this with a clever application of ECN (<a class="reference internal" href="dynamicsB.html#ecn"><span class="std std-ref">21.5.3&nbsp;&nbsp;&nbsp;Explicit Congestion Notification (ECN)</span></a>). The use of ECN to detect queue fullness, rather than packet drops, has the added advantage of avoiding packet losses and timeouts. Within a datacenter, DCTCP may very well rely on switch-based ECN rather than router-based.</p>
+<p>In normal ECN, once the receiver has seen a packet with the CE bit, it is supposed to mark ECE (CE echo) in all returning ACKs until the sender acknowledges having responded to the congestion through the use of the CWR bit. DCTCP modifies this by having the receiver mark <em>only</em> ACKs to packets that arrive with CE set. This allows the sender to gauge the severity of congestion: if every other data packet has its CE bit set, then half the returning ACKs will be marked. (Delayed ACKs may complicate this, as the two data packets being acknowledged may have different CE marks, but mostly this is both infrequent and not serious, and in any event DCTCP recommends sending two separate ACKs with different ECE marks in such a case.)</p>
+<p>Classically, having every other data packet marked should never happen: all data packets arriving at the router before the queue capacity K is reached should be unmarked, and all packets arriving after K is reached should be marked. But due to the random queue fluctuations described in the previous paragraph, this all-unmarked-then-all-marked pattern may be riddled with exceptions. What the DCTCP sender does is to measure the <em>average</em> marking rate, using an averaging interval at least as long as one “tooth”. If there are D−1 unmarked RTTs and 1 marked RTT, then the average marking rate should be 1/D.</p>
+<p>This is exactly what DCTCP looks for: once a significant number of marked ACKs arrives, indicating that congestion is experienced, the DCTCP sender looks at its running average of the marked fraction, and takes that to be 1/D. (More precisely, DCTCP denotes by <code class="docutils literal notranslate"><span class="pre">alpha</span></code> the marked fraction, and sets D = 1/<code class="docutils literal notranslate"><span class="pre">alpha</span></code>, and then 𝛽 = 1/2D = <code class="docutils literal notranslate"><span class="pre">alpha</span></code>/2.) DCTCP then reduces its <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> by 1−𝛽 as above. The actual algorithm does not involve the queue capacity K, as a TCP sender is unlikely to know K.</p>
+<p id="index-20">While it is not part of DCTCP proper, another common configuration choice for intra-data-center connections is to reduce the minimum TCP retransmission timeout (RTO). The RTO value is computed adaptively, as in <a class="reference internal" href="tcpB.html#tcp-rto"><span class="std std-ref">18.12&nbsp;&nbsp;&nbsp;TCP Timeout and Retransmission</span></a>, but is subject to a minimum. As late as 2011, <span class="target" id="index-21"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc6298.html"><strong>RFC 6298</strong></a> recommended (but did not require) a minimum RTO of 1.0 seconds, which is three orders of magnitude too large for a datacenter.</p>
+<p>There is no global Linux minimum-RTO configuration setting, but this can be altered on a per-destination basis using the <code class="docutils literal notranslate"><span class="pre">ip</span> <span class="pre">route</span></code> command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ip</span> <span class="n">route</span> <span class="n">change</span> <span class="n">to</span> <span class="mf">10.1.2.0</span><span class="o">/</span><span class="mi">24</span> <span class="n">via</span> <span class="mf">10.0.2.1</span> <span class="n">dev</span> <span class="n">eth0</span> <span class="n">rto_min</span> <span class="mi">20</span><span class="n">ms</span>
+</pre></div>
+</div>
+<p>The actual RTO values of current TCP connections can be viewed using the Linux command <code class="docutils literal notranslate"><span class="pre">ss</span> <span class="pre">--info</span></code>. On recent versions of Windows, a global minimum RTO can be set, for the <code class="docutils literal notranslate"><span class="pre">custom</span></code> template, using <code class="docutils literal notranslate"><span class="pre">netsh</span> <span class="pre">interface</span> <span class="pre">tcp</span> <span class="pre">set</span> <span class="pre">supplemental</span> <span class="pre">template=custom</span> <span class="pre">minRto=20</span></code></p>
+<div class="section" id="tcp-incast">
+<span id="index-22"></span><span id="id29"></span><h3>22.13.1&nbsp;&nbsp;&nbsp;TCP Incast<a class="headerlink" href="#tcp-incast" title="Permalink to this headline">¶</a></h3>
+<p>There is one particular congestion issue, mostly but not entirely exclusive to datacenters, that DCTCP does not handle directly: the <strong>TCP incast</strong> problem. Imagine one node sending out multiple simultaneous queries to “helper” nodes, and expecting more-or-less-simultaneous responses. One example might be a request for a large data block that has been distributed over multiple file-server systems; another might be a <a class="reference external" href="https://en.wikipedia.org/wiki/MapReduce">MapReduce</a> request for calculation results. Either way, all the respondents may reply at about the same time, and all the responses may arrive together at the router and lead to queue overflow and packet loss. DCTCP (and any other TCP) cannot be of much help if each individual connection may be sending only one packet. This is one reason for having a slightly larger queue capacity than the DCTCP analysis alone might suggest.</p>
+<p>The TCP incast problem is made much worse when (as is often the case) the helper-node requests must be executed serially; we saw this issue before with RPC in <a class="reference internal" href="udp.html#serialization"><span class="std std-ref">16.5.3&nbsp;&nbsp;&nbsp;Serial Execution</span></a>. Sometimes serialization requirements can be eliminated through careful design; sometimes they cannot.</p>
+</div>
+</div>
+<div class="section" id="h-tcp">
+<span id="htcp"></span><span id="index-23"></span><h2>22.14&nbsp;&nbsp;&nbsp;H-TCP<a class="headerlink" href="#h-tcp" title="Permalink to this headline">¶</a></h2>
+<p>H-TCP, or TCP-Hamilton, is described in <a class="reference internal" href="bibliography.html#lsl05" id="id30">[LSL05]</a>. Like Highspeed-TCP it primarily allows for faster growth of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>; unlike Highspeed-TCP, the <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> increment is determined not by the size of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> but by the elapsed time since the previous loss event. The threshold for accelerated <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> growth is generally set to be 1.0 seconds after the most recent loss event. Using an RTT of 50 ms, that amounts to 20 RTTs, suggesting that when <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>min</sub> is less than 20 then H-TCP behaves very much like TCP Reno.</p>
+<p>The specific H-TCP acceleration rule first defines a time threshold t<sub>L</sub>. If t is the elapsed time in seconds since the previous loss event, then for t≤t<sub>L</sub> the per-RTT window-increment 𝛼 is 1. However, for t&gt;t<sub>L</sub> we define</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">𝛼(t) = 1 + 10(t−t<sub>L</sub>) + (t−t<sub>L</sub>)<sup>2</sup>/4</div>
+</div>
+</div></blockquote>
+<p>We then increment <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> by 𝛼(t) after each RTT, or, equivalently, by 𝛼(t)/<code class="docutils literal notranslate"><span class="pre">cwnd</span></code> after each received ACK.</p>
+<p>At t=t<sub>L</sub>+1 seconds (nominally 2 seconds), 𝛼 is 12. The quadratic term dominates the linear term when t−t<sub>L</sub> &gt; 40. If RTT = 50 ms, that is 800 RTTs.</p>
+<p>Even if <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is very large, growth is at the same rate as for TCP Reno until t&gt;t<sub>L</sub>; one consequence of this is that, at least in the first second after a loss event, H-TCP competes fairly with TCP Reno, in the sense that both increase <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> at the same absolute rate. H-TCP starts “from scratch” after each packet loss, and does not re-enter its “high-speed” mode, even if <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is large, until after time t<sub>L</sub>.</p>
+<p>A full H-TCP implementation also adjusts the multiplicative factor 𝛽 as follows (the paper <a class="reference internal" href="bibliography.html#lsl05" id="id31">[LSL05]</a> uses 𝛽 to represent what we denote by 1−𝛽). The RTT is monitored, as with TCP Vegas. However, the RTT increase is not used for per-packet or per-RTT adjustments; instead, these measurements are used after each loss event to update 𝛽 so as to have</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">1−𝛽 = RTT<sub>min</sub>/RTT<sub>max</sub></div>
+</div>
+</div></blockquote>
+<p>The value 1−𝛽 is capped at a maximum of 0.8, and at a minimum of 0.5. To see where the ratio above comes from, first note that RTT<sub>min</sub> is the usual stand-in for RTT<sub>noLoad</sub>, and RTT<sub>max</sub> is, of course, the RTT when the bottleneck queue is full. Therefore, by the reasoning in <a class="reference internal" href="slidingwindows.html#rtt-calculations"><span class="std std-ref">8.3.2&nbsp;&nbsp;&nbsp;RTT Calculations</span></a>, equation 5, 1−𝛽 is the ratio transit_capacity / (transit_capacity + queue_capacity). At a congestion event involving a single uncontested flow we have <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = transit_capacity + queue_capacity, and so after reducing <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> to (1−𝛽)×<code class="docutils literal notranslate"><span class="pre">cwnd</span></code>, we have <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>new</sub> = transit_capacity, and hence (as in <a class="reference internal" href="reno.html#bottleneck-link-utilization"><span class="std std-ref">19.7&nbsp;&nbsp;&nbsp;TCP and Bottleneck Link Utilization</span></a>) the bottleneck link will remain 100% utilized after a loss. The cap on 1−𝛽 of 0.8 means that if the queue capacity is smaller than a quarter of the transit capacity then the bottleneck link <em>will</em> experience some idle moments.</p>
+<p>When 𝛽 is changed, H-TCP also adjusts 𝛼 to 𝛼ʹ = 2𝛽𝛼(t) so as to improve fairness with other H-TCP connections with different current values of 𝛽.</p>
+</div>
+<div class="section" id="tcp-cubic">
+<span id="cubic"></span><span id="index-24"></span><span id="id32"></span><h2>22.15&nbsp;&nbsp;&nbsp;TCP CUBIC<a class="headerlink" href="#tcp-cubic" title="Permalink to this headline">¶</a></h2>
+<p>TCP Cubic attempts, like Highspeed TCP, to solve the problem of efficient TCP transport when bandwidth×delay is large.  TCP Cubic allows very fast window expansion; however, it also makes attempts to slow the growth of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> sharply as <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> approaches the current network ceiling, and to treat other TCP connections fairly. Part of TCP Cubic’s strategy to achieve this is for the window-growth function to slow down (become concave) as the previous network ceiling is approached, and then to increase rapidly again (become convex) if this ceiling is surpassed without losses. This concave-then-convex behavior mimics the graph of the cubic polynomial <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = t<sup>3</sup>, hence the name (TCP Cubic also improves an earlier TCP version known as TCP BIC).</p>
+<img alt="_images/cubic.svg" src="_images/cubic.svg" /><p id="index-25">As mentioned above, TCP Cubic is currently (2013) the default Linux congestion-control implementation.  TCP Cubic was originally documented in <a class="reference internal" href="bibliography.html#hrx08" id="id33">[HRX08]</a>; it is now specified in <span class="target" id="index-26"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc8312.html"><strong>RFC 8312</strong></a>.</p>
+<p>TCP Cubic has a number of interrelated features, in an attempt to address several TCP issues:</p>
+<ul class="simple">
+<li>Reduction in RTT bias</li>
+<li>TCP Friendliness when most appropriate</li>
+<li>Rapid recovery of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> following its decrease due to a loss event, maximizing throughput</li>
+<li>Optimization for an unchanged network ceiling (corresponding to <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>max</sub>)</li>
+<li>Rapid expansion of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> when a raised network ceiling is detected</li>
+</ul>
+<p>The eponymous cubic polynomial y=x<sup>3</sup>, appropriately shifted and scaled, is used to determine changes in <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>. No special algebraic properties of this polynomial are used; the point is that the curve, while steadily increasing, is first concave and then convex; the authors of <a class="reference internal" href="bibliography.html#hrx08" id="id34">[HRX08]</a> write “[t]he choice for a cubic function is incidental and out of convenience”. This y=x<sup>3</sup> polynomial has an <em>inflection point</em> at x=0 where the tangent line is horizontal; this is the point where the graph changes from concave to convex.</p>
+<p>We start with the basic outline of TCP Cubic and then consider some of the bells and whistles. We assume a loss has just occurred, and let W<sub>max</sub> denote the value of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> at the point when the loss was discovered. TCP Cubic then sets <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> to 0.7×W<sub>max</sub>; that is, TCP Cubic uses 𝛽 = 0.3 (originally 𝛽 was 0.2, but it has been adjusted to improve convergence to equilibrium between two flows). The corresponding 𝛼 for TCP-Friendly AIMD(𝛼,𝛽) would be 𝛼=0.529, but TCP Cubic uses this 𝛼 only in its TCP-Friendly adjustment, below.</p>
+<p>We now define a cubic polynomial W(t), a shifted and scaled version of w=t<sup>3</sup>. The parameter t represents the elapsed time since the most recent loss, in seconds. At time t&gt;0 we set <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = W(t). The polynomial W(t), and thus the <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> rate of increase, as in TCP Hybla, <em>is no longer tied to the connection’s RTT</em>; this is done to reduce the RTT bias that is so deeply ingrained in TCP Reno.</p>
+<p>We want the function W(t) to pass through the point representing the <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> just after the loss, that is, ⟨t,W⟩ = ⟨0,0.7×W<sub>max</sub>⟩. We also want the inflection point to lie on the horizontal line y=W<sub>max</sub>. To fully determine the curve, it is at this point sufficient to specify the value of t at this inflection point; that is, how far horizontally W(t) must be stretched. This horizontal distance from t=0 to the inflection point is represented by the constant K in the following equation; W(t) returns to its pre-loss value W<sub>max</sub> at t=K. C is a second constant.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">W(t) = C×(t−K)<sup>3</sup> + W<sub>max</sub></div>
+</div>
+</div></blockquote>
+<p>It suffices algebraically to specify either C or K; the two constants are related by the equation obtained by plugging in t=0. K changes with each loss event, but it turns out that the value of C can be constant, not only for any one connection but for all TCP Cubic connections. TCP Cubic specifies for C the <em>ad hoc</em> value 0.4; we can then set t=0 and, with a bit of algebra, solve to obtain</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">K = (W<sub>max</sub>/2)<sup>1/3</sup> seconds</div>
+</div>
+</div></blockquote>
+<p>If W<sub>max</sub> = 250, for example, K=5; if RTT = 100 ms, this is 50 RTTs.</p>
+<p>When each ACK arrives, TCP Cubic records the arrival time t, calculates W(t), and sets <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = W(t). At the next packet loss the parameters of W(t) are updated.</p>
+<p>If the network ceiling does not change, the next packet loss will occur when <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> again reaches the same W<sub>max</sub>; that is, at time t=K after the previous loss. As t approaches K and the value of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> approaches W<sub>max</sub>, the curve W(t) flattens out, so <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> increases slowly.</p>
+<p>This concavity of the cubic curve, increasing rapidly but flattening near W<sub>max</sub>, achieves two things. First, throughput is boosted by keeping <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> close to the available path transit capacity. In <a class="reference internal" href="reno.html#bottleneck-link-utilization"><span class="std std-ref">19.7&nbsp;&nbsp;&nbsp;TCP and Bottleneck Link Utilization</span></a> we argued that if the path transit capacity is large compared to the bottleneck queue capacity (and this is the case for which TCP Cubic was designed), then TCP Reno averages 75% utilization of the available bandwidth. The bandwidth utilization increases linearly from 50% just after a loss event to 100% just before the next loss. In TCP Cubic, the initial rapid rise in <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> following a loss means that the average will be much closer to 100%. Another important advantage of the flattening is that when <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is finally incremented to the point of loss, it likely is just over the network ceiling; the connection has an excellent chance that only one or two packets are lost rather than a large burst. This facilitates the NewReno Fast Recovery algorithm, which TCP Cubic still uses if the receiver does not support SACK TCP.</p>
+<p>Once t&gt;K, W(t) becomes convex, and in fact begins to increase rapidly. In this region, <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> &gt; W<sub>max</sub>, and so the sender knows that the network ceiling has increased since the previous loss. The TCP Cubic strategy here is to probe aggressively for additional capacity, increasing <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> very rapidly until the new network ceiling is encountered. The cubic increase function is in fact quite aggressive when compared to any of the other TCP variants discussed here, and time will tell what strategy works best. As an example in which the TCP Cubic approach seems to pay off, let us suppose the current network ceiling is 2,000 packets, and then (because competing connections have ended) increases to 3,000. TCP Reno would take 1,000 RTTs for <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> to reach the new ceiling, starting from 2,000; if one RTT is 50 ms that is 50 seconds.  To find the time t-K that TCP Cubic will need to increase <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> from 2,000 to 3,000, we solve 3000 = W(t) = C×(t−K)<sup>3</sup> + 2000, which works out to t-K ≃ 13.57 seconds (recall 2000 = W(K) here).</p>
+<p>The constant C=0.4 is determined empirically. The cubic inflection point occurs at t = K = (W<sub>max</sub>×𝛽/C)<sup>1/3</sup>. A larger C reduces the time K between the a loss event and the next inflection point, and thus the time between consecutive losses. If W<sub>max</sub> = 2000, we get K=10 seconds when 𝛽=0.2 and C=0.4. If the RTT were 50 ms, 10 seconds would be 200 RTTs.</p>
+<p>For TCP Reno, on the other hand, the interval between adjacent losses is W<sub>max</sub>/2 RTTs. If we assume a specific value for the RTT, we can compare the Reno and Cubic time intervals between losses; for an RTT of 50 ms we get</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="30%" />
+<col width="39%" />
+<col width="30%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">W<sub>max</sub></th>
+<th class="head">Reno</th>
+<th class="head">Cubic</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>2000</td>
+<td>50 sec</td>
+<td>10 sec</td>
+</tr>
+<tr class="row-odd"><td>250</td>
+<td>6.2 sec</td>
+<td>5 sec</td>
+</tr>
+<tr class="row-even"><td>54</td>
+<td>1.35 sec</td>
+<td>3 sec</td>
+</tr>
+</tbody>
+</table>
+<p>For smaller RTTs, the basic TCP Cubic strategy above runs the risk of being at a competitive disadvantage compared to TCP Reno. For this reason, TCP Cubic makes a <strong>TCP-Friendly adjustment</strong> in the window-size calculation: on each arriving ACK, <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is set to the maximum of W(t) and the window size that TCP Reno would compute. The TCP Reno calculation can be based on an actual count of incoming ACKs, or be based on the formula (1-𝛽)×W<sub>max</sub> + 𝛼×t/RTT.</p>
+<p>Note that this adjustment is only “half-friendly”: it guarantees that TCP Cubic will not choose a window size smaller than TCP Reno’s, but places no restraints on the choice of a larger window size. Broadly speaking, however, in the range of smaller bandwidth×delay products where TCP Reno performs well, TCP Cubic relies on its TCP-Friendly adjustment to keep up; that is, its “native” window increase is less aggressive than TCP Reno’s. TCP Cubic is only supposed to be more aggressive than TCP Reno in settings where the latter is not aggressive enough.</p>
+<p>A consequence of the TCP-Friendly adjustment is that, on networks with modest bandwidth×delay products, TCP Cubic behaves exactly like TCP Reno.</p>
+<p>TCP Cubic also has a provision to detect if a given W<sub>max</sub> is <em>lower</em> than the previous value, suggesting increasing congestion; in this situation, <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is lowered by an additional factor of 1−𝛽/2. This is known as <strong>fast convergence</strong>, and helps TCP Cubic adapt more quickly to reductions in available bandwidth.</p>
+<p>Another way to gain a sense of how TCP Cubic compares with TCP Reno is to look at the rate of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> increase, per unit time. If W is the current window size, we can express this rate as 𝚫W/𝚫t. For TCP Reno, if we take 𝚫t to be the time between successive ACKs (as determined by the bottleneck bandwidth), 𝚫W is 1/W. For TCP Cubic, we will estimate 𝚫W/𝚫t by the derivative (from calculus) dW/dt of the formula W(t) = C×(t−K)<sup>3</sup> + W<sub>max</sub>,  as above. This means dW/dt = 3C(t-K)<sup>2</sup>. In order to get numbers we can actually compare, we need to look at specific scenarios in which we can evaluate K. At the left edge of the Cubic tooth, t=0.</p>
+<p>For the first scenario, suppose the bandwidth is 1 packet/ms, and the delay is 50 ms, making the bandwidth×delay product 50 packets. We will also assume a queue capacity of 50 packets, so W<sub>max</sub> = 100. This means that for TCP Reno, W increases by 1/50 per ms at the left edge of the tooth, where W = 50; the window growth rate 𝚫W/𝚫t is then (1/50)/(1/1000) = 20 packets/sec. At the right edge of the tooth, where W = 100, 𝚫W/𝚫t = (1/100)/(1/1000) = 10 packets/sec. For TCP Cubic, we use the formula above, and recall C = 0.4, so 𝚫W/𝚫t ≃ 1.2(t-K)<sup>2</sup>. At the left edge of the tooth, where t=0, this evaluates to 1.2K<sup>2</sup>.
+Recalling that K = (W<sub>max</sub>/2)<sup>1/3</sup>, we get K=3.68, and so 𝚫W/𝚫t ≃ 16 packets/sec. This is comparable to TCP Reno. (At the inflection point of the cubic curve, though, where t=K, we always get 𝚫W/𝚫t = 0.)</p>
+<p>Now let’s switch to a second, higher-bandwidth scenario, where the bottleneck bandwidth is increased to 100 packets/ms, the delay is again 50 ms, and the queue capacity is 3000 packets. The bandwidth×delay product is now 5000 packets, and so W<sub>max</sub> = 5000 + 3000 = 8,000. As before, for TCP Reno 𝚫W/𝚫t ranges from (1/4,000)/(1/100,000) = 25 at the left edge of the tooth to 12.5 at the right edge; that is, the rate of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> growth is not much different from what it was in the first scenario. For TCP Cubic, on the other hand, we now have K = 4000<sup>1/3</sup> ≃ 16, and so, at the left edge of the tooth where t=0, we have 𝚫W/𝚫t ≃ 1.2(K)<sup>2</sup> ≃ 300. That is, <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is increasing at a rate of 300 packets/sec, which is twelve times more aggressive than TCP Reno.</p>
+<p>The following graph is taken from <a class="reference internal" href="bibliography.html#rx05" id="id35">[RX05]</a>, and shows TCP Cubic connections competing with each other and with TCP Reno.</p>
+<img alt="_images/rhee_xu_cubic_graph2.png" src="_images/rhee_xu_cubic_graph2.png" />
+<p>The diagram shows four connections, all with the same RTT. Two are TCP Cubic and two are TCP Reno. The red connection, cubic-1, was established and with a maximum <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> of about 4000 packets when the other three connections started. Over the course of 200 seconds the two TCP Cubic connections reach a fair equilibrium; the two TCP Reno connections reach a reasonably fair equilibrium with one another, but it is much lower than that of the TCP Cubic connections.</p>
+<p>On the other hand, here is a graph from <a class="reference internal" href="bibliography.html#lsm07" id="id36">[LSM07]</a>, showing the result of competition between two flows using an earlier version of TCP Cubic over a low-speed connection. One connection has an RTT of 160ms and the other has an RTT a tenth that. The bottleneck bandwidth is 1 Mbit/sec, meaning that the bandwidth×delay product for the 160ms connection is 13-20 packets (depending on the packet size used).</p>
+<img alt="_images/LSM_cubic_small_bdp2.png" src="_images/LSM_cubic_small_bdp2.png" />
+<p>Note that the longer-RTT connection (the solid line) is almost completely starved, once the shorter-RTT connection starts up at T=100. This is admittedly an extreme case, and there have been more recent fixes to TCP Cubic, but it does serve as an example of the need for testing a wide variety of competition scenarios.</p>
+</div>
+<div class="section" id="tcp-bbr">
+<span id="index-27"></span><span id="id37"></span><h2>22.16&nbsp;&nbsp;&nbsp;TCP BBR<a class="headerlink" href="#tcp-bbr" title="Permalink to this headline">¶</a></h2>
+<p>TCP BBR returns to the central idea of TCP Vegas: to measure the available bandwidth and RTT<sub>min</sub>, and to base the number of in-flight packets on the measured bandwidth×delay product. “BBR” here stands for <strong>B</strong>ottleneck <strong>B</strong>andwidth and <strong>R</strong>TT; it is described in <a class="reference internal" href="bibliography.html#cgyj16" id="id38">[CGYJ16]</a> and in an <a class="reference external" href="https://tools.ietf.org/html/draft-cardwell-iccrg-bbr-congestion-control-00">Internet Draft</a>. There are some large differences from TCP Vegas, however; ultimately, these differences enable TCP BBR to compete reasonably fairly with TCP Reno. One important difference is that TCP BBR does not engage in the high-precision monitoring of RTT for increases above RTT<sub>noLoad</sub>. As a result, TCP BBR does not fit the TCP Vegas delay-based congestion-control model; it is for that reason sometimes referred to as <strong>congestion-based</strong> congestion control.</p>
+<p>TCP BBR is, in practice, <strong>rate-based</strong> rather than window-based; that is, at any one time, TCP BBR sends at a given calculated <strong>rate</strong>, instead of sending new data in direct response to each received ACK. Each arriving ACK does potentially update the current rate, much as each arriving ACK in TCP Reno slides the sender’s window forwards; however, the connection between arriving ACKs and new data transmissions is decidedly indirect.</p>
+<p>Rate-based sending requires some form of <strong>pacing support</strong> by the underlying LAN layer, so that packets can be sent at equal time intervals. On a 10 Gbps link, this time interval can be as small as a microsecond; conventional timers don’t work well at these time scales. Linux TCP BBR implementations generally use the pacing support built into the so-called Fair Queuing (<a class="reference external" href="http://manpages.ubuntu.com/manpages/xenial/man8/tc-fq.8.html">FQ</a>) queuing discipline (which is not actually a true Fair Queuing implementation in the sense of <a class="reference internal" href="fairqueuing.html#fair-queuing"><span class="std std-ref">23.5&nbsp;&nbsp;&nbsp;Fair Queuing</span></a>).</p>
+<p>Throughout the lifetime of a connection, TCP BBR maintains an estimate for RTT<sub>min</sub>, which is nominally the stand-in for RTT<sub>noLoad</sub> except that it may go up in the presence of competition; see below. TCP BBR also maintains a current bandwidth estimate, which we denote BWE. As with TCP Vegas, BWE is much more volatile than RTT<sub>min</sub> as it better reflects the current degree of bandwidth competition. After each RTT, TCP BBR records the throughput during that RTT; BWE is then the maximum of the last ten per-RTT throughput measurements. That BWE is the <em>maximum</em> rate recorded over the past ten RTTs, rather than the <em>average</em>, will be important below.</p>
+<p id="index-28">The fundamental congestion indicators for TCP BBR are changes to its BWE and RTT<sub>min</sub> estimates; packet losses are not used directly as evidence of congestion. As we shall see below, TCP BBR reduces its sending rate in response to decreases in BWE; this is TCP BBR’s primary congestion response. When losses do occur, TCP BBR does enter a recovery mode, but it is much less conservative than TCP Reno’s halving of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>. TCP BBR’s initial response to a loss is to limit the number of packets in flight (FlightSize) to the number currently in flight, which allows it to continue to send new data at the rate of arriving ACKs. This is not necessarily a reduction in FlightSize, and, if it is, FlightSize may be allowed to grow, even if additional losses are discovered. Overall, this strategy is quite effective at handling non-congestive losses without losing throughput.</p>
+<p>In its core state, known as <strong>PROBE_BW</strong>, TCP BBR continually updates BWE as above and then sets its base sending rate to BWE. It then sets its <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> target (or, more properly, its FlightSize target, as losses may have occurred) to 2 × BWE × RTT<sub>min</sub>. This results in a bottleneck queue utilization equal to the transit capacity. If the actual available bandwidth does not change, then sending at rate BWE will send new packets at exactly the rate of returning ACKs and so FlightSize will not change. TCP BBR does allow for faster initial growth (see STARTUP mode, below) to reach the FlightSize target.</p>
+<p>If the actual available bandwidth falls, BWE will not reflect that for ten RTTs. As a result, TCP BBR may for a while send faster than the rate of returning ACKs. If this happens, the bottleneck queue utilization will rise. Eventually, BWE will fall to match the rate of returning ACKs. Similarly, if the actual available bandwidth rises, queue utilization will fall. However, it will not fall to zero – and so cause sending to starve – in a single RTT unless the bandwidth doubles, and after that the increased bandwidth will be reflected in the updated BWE.</p>
+<p>TCP BBR must, like every TCP flavor, regularly probe to see if additional bandwidth is available. TCP BBR does this by periodically (currently every eight RTTs, where RTT is measured as RTT<sub>min</sub>) increasing its sending rate by an additional factor of 1.25; that is, it sets a variable <code class="docutils literal notranslate"><span class="pre">pacing_gain</span></code> to 1.25 and sends at the new rate <code class="docutils literal notranslate"><span class="pre">pacing_gain</span></code> × BWE. The increase lasts one RTT interval. <em>If</em> there was no competition, and if the bottleneck link was fully utilized, this <code class="docutils literal notranslate"><span class="pre">pacing_gain</span></code> increase results in no change to BWE. All that happens is that the queue builds up, and the 1.25-fold larger flight of packets results in an RTT that is also 1.25 times larger. In the next RTT interval, TCP BBR sets <code class="docutils literal notranslate"><span class="pre">pacing_gain</span></code> to 0.75, which causes the newly created additional queue to dissipate. After that it resumes its regular rate, that is, with <code class="docutils literal notranslate"><span class="pre">pacing_gain</span></code> = 1.0, for the next six RTT intervals.</p>
+<p>Consider, however, what happens if TCP BBR is <em>competing</em>, perhaps with TCP Reno. Increasing the sending rate by a factor of 1.25 now results in greater queue (or bottleneck link) utilization, which results in an immediate increase in BWE for that RTT. At this point, recall that BWE is the maximum of the last ten per-RTT measurements; the end result is that BWE is set to this elevated value for the next ten RTTs. In the following RTT, <code class="docutils literal notranslate"><span class="pre">pacing_gain</span></code> drops to 0.75 as before, but this time TCP BBR has measured a larger BWE, and this change to BWE persists.</p>
+<p>Here is a concrete example of BWE increase. To simplify the analysis, we will assume TCP BBR’s FlightSize is BWE × RTT<sub>min</sub>, dropping the factor of 2. Suppose a TCP BBR connection and a TCP Reno connection share a bottleneck link with a bandwidth of 2 packets/ms. The RTT<sub>min</sub> (= RTT<sub>noLoad</sub>) of each connection is 80 ms, making the transit capacity 160 packets. Finally, suppose that each connection has 80 packets in flight, exactly filling the transit capacity but with no queue utilization (so RTT<sub>min</sub> = RTT<sub>actual</sub>). Over the course of the eight-RTT <code class="docutils literal notranslate"><span class="pre">pacing_gain</span></code> cycle, the Reno connection’s <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> rises by 8, to 88 packets. This means the total queue utilization is now 8 packets, divided on average between BBR and Reno in the proportion 80 to 88.</p>
+<p>Now the BBR cycle with <code class="docutils literal notranslate"><span class="pre">pacing_gain</span></code>=1.25 arrives; for the next RTT, the BBR connection has 80×1.25 = 100 packets in flight. The total number of packets in flight is now 188.  The RTT climbs to 188/2 = 94 ms, and the next BBR BWE measurement is 100 packets in 94 ms, or 1.064 packets/ms (the precise value may depend on exactly when the measurement is recorded). For the following RTT, <code class="docutils literal notranslate"><span class="pre">pacing_gain</span></code> drops to 0.75, but the higher BWE persists. For the rest of the <code class="docutils literal notranslate"><span class="pre">pacing_gain</span></code> cycle, TCP BBR calculates a base rate corresponding to 1.064 × 80 = 85 packets in flight per RTT, which is close to the TCP Reno <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>. See also exercise 14.0.</p>
+<p>TCP BBR also has another mechanism, arguably more important in the long run, for maintaining its fair share of the bandwidth. Periodically (every ~10 seconds), TCP BBR connections re-measure RTT<sub>min</sub>, entering <strong>PROBE_RTT</strong> mode. In this state the number of packets in flight drops to four, and stays there for at least one RTT<sub>actual</sub> as measured for these four packets (with a minimum of 200 ms). Afterwards the connection returns to PROBE_<strong>BW</strong> mode with a freshly estimated RTT<sub>min</sub>. The value of BWE is picked up where it was left off, so that if RTT<sub>min</sub> increases, then so does the sending rate BWE × RTT<sub>min</sub>. A certain amount of potential throughput is “wasted” during these PROBE_RTT intervals, but as they amount to ~200 ms out of every 10 sec, or 2%, the impact is negligible.</p>
+<p>If, during the PROBE_RTT mode, competing connections keep some packets in the bottleneck queue, then the queuing delay corresponding to those packets will be incorporated into the new RTT<sub>min</sub> measurement; because of this, RTT<sub>min</sub> may significantly exceed RTT<sub>noLoad</sub> and thus cause TCP BBR to send at a more competitive rate. Suppose, for example, that in the BBR-vs-Reno scenario above, Reno has gobbled up a total of 240 spots in the bottleneck queue, thus increasing the RTT for both connections to (240+80)/2 = 160. During a PROBE_RTT cycle, TCP BBR will drop its link utilization essentially to zero, but TCP Reno will still have 240 packets in transit, so TCP BBR will measure RTT<sub>min</sub> as 240/2 = 120 ms. After the PROBE_RTT phase is over, TCP BBR will increase its sending rate by 50% over what it had been when RTT<sub>min</sub> was 80.</p>
+<p>Note that, in any one RTT, we can either measure bottleneck bandwidth <em>or</em> RTT, but not both. If the number of packets in flight is larger than the transit capacity then the packet return rate reflects the bottleneck bandwidth. Conversely, we can measure RTT<sub>min</sub> only if the number of packets in flight is smaller than the transit capacity.</p>
+<p>When a connection is first opened, a  TCP BBR connection is in <strong>STARTUP</strong> mode, which is similar to TCP Reno’s slow start. In this mode, <code class="docutils literal notranslate"><span class="pre">pacing_gain</span></code> is 2.89 (2/log(2)) consistently, which leads to exponential growth of the number of packets in flight. STARTUP mode ends when an additional RTT yields no improvement in BWE. At this point TCP BBR has overfilled the queue substantially (just as a TCP Reno connection does in slow start), and so the connection enters <strong>DRAIN</strong> mode to reduce the queue. This is accomplished by setting <code class="docutils literal notranslate"><span class="pre">pacing_gain</span></code> = 1/2.89. The connection transitions from DRAIN to PROBE_RTT when the number of packets in flight drops to 2 × BWE × RTT<sub>min</sub>.</p>
+<p>Below is a diagram of TCP BBR competing with TCP Reno in a setting where the bottleneck queue capacity is eight times the bandwidth×delay product, which is 40 ms × 10 Mbps = 50 KB. It was produced using the Mininet network emulator, <a class="reference internal" href="mininet.html#mininet-reno-v-bbr"><span class="std std-ref">30.7.6&nbsp;&nbsp;&nbsp;TCP Competition: Reno vs BBR</span></a>. The large queue capacity was contrived specifically to be beneficial to TCP Reno, in that in a similar setting with a queue capacity approximately equal to the bandwidth×delay product TCP BBR often ends up quite a bit ahead of TCP Reno. Such large queues are, however, a not-uncommon real-world situation on high-capacity backbone links (<a class="reference internal" href="dynamicsB.html#bufferbloat1"><span class="std std-ref">21.5.1&nbsp;&nbsp;&nbsp;Bufferbloat</span></a>). Acting alone, Reno’s <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> would range between 4.5 and 9 times the bandwidth×delay product, which works out to keeping the queue over 70% full on average.</p>
+<p>The lower part of the diagram shows each connection’s share of the 10 Mbps (1.25 MBps) bottleneck bandwidth. The upper part shows the number of packets “in flight” (for TCP Reno, outside of Fast Recovery, that is of course <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>). The Reno sawtooth pattern is clearly visible.</p>
+<p>A dominant feature of the graph is the spikes every 10 seconds (down for BBR, correspondingly up for Reno) caused by TCP BBR’s periodic PROBE_RTT mode.</p>
+<img alt="_images/reno_bbr.final.ink.svg" src="_images/reno_bbr.final.ink.svg" /><p>For the first ten seconds, TCP Reno does indeed run away with all the bandwidth. But after the first PROBE_RTT event TCP BBR begins to catch up, and the two tie at around T=60 seconds. After that Reno mostly stays a little ahead of TCP BBR, typically with about 58% of the bandwidth versus BBR’s 42%, but the point here is that, even in circumstances favorable to Reno, BBR does not collapse.</p>
+<p>It is evident from the graph, particularly during the first 60 seconds, that the PROBE_RTT intervals do not lead to sudden jumps in throughput. Almost all of the change in throughput occurs during the PROBE_BW intervals. That said, it is the PROBE_RTT interval at T=10 that triggers the ensuing turnaround in throughput.</p>
+<p>In addition to the sharp PROBE_RTT spikes every 10 seconds, we also see smaller spikes at a rate of about 6 every 10 seconds. These represent the pacing-gain cycling within BBR’s PROBE_BW phase. If eight RTT<sub>min</sub> times amount to 10/6 seconds, then RTT<sub>min</sub> must be about 200 ms. When the queue is completely full, RTT<sub>actual</sub> is 9 × 40 ms = 360 ms, but during TCP BBR’s PROBE_RTT cycles RTT<sub>actual</sub> does indeed drop considerably, which accounts for the 200 ms value. This value is then used as RTT<sub>min</sub> for the next ten seconds.</p>
+<p>Experimental results in <a class="reference internal" href="bibliography.html#cgyj16" id="id39">[CGYJ16]</a> indicate that TCP BBR has been much more successful than TCP Cubic in addressing the high-bandwidth TCP problem on parts of Google’s network. This is presumably because TCP BBR does not necessarily reduce throughput at all when faced with occasional non-congestive losses.</p>
+</div>
+<div class="section" id="epilog">
+<h2>22.17&nbsp;&nbsp;&nbsp;Epilog<a class="headerlink" href="#epilog" title="Permalink to this headline">¶</a></h2>
+<p>TCP Reno’s core congestion algorithm is based on algorithms in Jacobson and Karel’s 1988 paper <a class="reference internal" href="bibliography.html#jk88" id="id40">[JK88]</a>, now (2017) approaching thirty years old. There are concerns both that TCP Reno uses too much bandwidth (the greediness issue) and that it does not use enough (the high-bandwidth-TCP problem).</p>
+<p>There are also broad changes in TCP usage patterns. Twenty years ago, the vast majority of all TCP traffic represented downloads from “major” servers. Today, over half of all Internet TCP traffic is peer-to-peer rather than server-to-client. The rise in online video streaming creates new demands for excellent TCP real-time performance.</p>
+<p>So which TCP version to use? That depends on circumstances; some of the TCPs above are primarily intended for relatively specific environments; for example, TCP Hybla for satellite links and TCP Veno for mobile devices (including wireless laptops). If the sending and receiving hosts are under common management, and especially if intervening traffic patterns are relatively stable,  one can run a few simple throughput-comparison experiments to find which TCP version works best.</p>
+<p>But there are two problems with this experimental approach. First, intervening traffic patterns are often <em>not</em> stable; a TCP version that worked well in one traffic environment might perform poorly in another. TCP Vegas, after all, does well in a Vegas-only environment; problems arise only when there is competing TCP Reno traffic, or the equivalent. Second, and perhaps more seriously, the best-performing TCP version might achieve its throughput at the expense of other users’ TCP traffic. As a simple example, consider the effect of simply increasing the TCP Reno additive-increase value, perhaps from AIMD(1,0.5) to AIMD(<strong>10</strong>,0.5). As we saw in <a class="reference internal" href="dynamicsA.html#faster-additive-increase"><span class="std std-ref">20.3.1&nbsp;&nbsp;&nbsp;Example 2: Faster additive increase</span></a>, this gives the faster-incrementing TCP an unfair (in fact tenfold) advantage. If the goal is to find a TCP version that <em>all</em> users will be happy with, this will not be effective.</p>
+<p>Then there is the question of what TCP to use on a server that is serving up large volumes of data, to a range of disparate hosts and with a wide variety of competing-traffic scenarios. Here, experimentation is even more difficult. Many trials will be needed to determine reliably which TCP version works best in the most cases, even ignoring the impact on competing traffic. These issues suggest a need for continued research into how to update and improve TCP, and Internet congestion-management generally.</p>
+<p>Finally, while most new TCPs are designed to hold their own in a Reno world, there is some question that perhaps we would all be better off with a radical rather than incremental change. Might TCP Vegas be a better choice, if only the queue-grabbing greediness of TCP Reno could be restrained? Questions like these are today entirely hypothetical, but it is not impossible to envision an Internet backbone that implemented non-FIFO queuing mechanisms (<a class="reference internal" href="fairqueuing.html#queuing-alternatives"><span class="std std-ref">23&nbsp;&nbsp;&nbsp;Queuing and Scheduling</span></a>) that fundamentally changed the rules of the game.</p>
+</div>
+<div class="section" id="exercises">
+<h2>22.18&nbsp;&nbsp;&nbsp;Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<p>1.0. How would TCP Vegas respond if it estimated RTT<sub>noLoad</sub> = 100ms, with a bandwidth of 1 packet/ms, and then due to a routing change the RTT<sub>noLoad</sub> increased to 200ms without changing the bandwidth? What <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> would be chosen? Assume no competition from other senders.</p>
+<p>2.0. Suppose a TCP Vegas connection from A to B passes through a bottleneck router R. The RTT<sub>noLoad</sub> is 50 ms and the bottleneck bandwidth is 1 packet/ms.</p>
+<div class="line-block">
+<div class="line">(a). If the connection keeps 4 packets in the queue (<em>eg</em> 𝛼=3, 𝛽=5), what will RTT<sub>actual</sub> be?  What value of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> will the connection choose? What will be the value of BWE?</div>
+<div class="line">(b). Now suppose a competing (non-Vegas) connection keeps 6 packets in the queue to the Vegas connection’s 4, eventually meaning that the other connection will have 60% of the bandwidth. What will be the Vegas connection’s steady-state values for RTT<sub>actual</sub>, <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> and BWE?</div>
+</div>
+<p>3.0. Suppose a TCP Vegas connection has R as its bottleneck router. The transit capacity is M, and the queue utilization is currently Q&gt;0 (meaning that the transit path is 100% utilized, although not necessarily by the TCP Vegas packets). The current TCP Vegas <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>V</sub>. Using the formulas from <a class="reference internal" href="slidingwindows.html#rtt-calculations"><span class="std std-ref">8.3.2&nbsp;&nbsp;&nbsp;RTT Calculations</span></a>, show that the number of packets TCP Vegas calculates are in the queue, <strong>queue_use</strong>, is</p>
+<blockquote>
+<div><strong>queue_use</strong> = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>V</sub>×Q/(Q+M)</div></blockquote>
+<p>4.0. Suppose that at time T=0 a TCP Vegas connection and a TCP Reno connection share the same path, and each has 100 packets in the bottleneck queue, exactly filling the transit capacity of 200. TCP Vegas uses 𝛼=1, 𝛽=2.
+By the previous exercise, in any RTT with <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>V</sub> TCP Vegas packets and <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>R</sub> TCP Reno packets in flight and <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>V</sub>+<code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>R</sub>&gt;200, N<sub>queue</sub> is  <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>V</sub>/(<code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>V</sub>+<code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>R</sub>)
+multiplied by the total queue utilization <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>V</sub>+<code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>R</sub>−200.</p>
+<p>Continue the following table, where T is measured in RTTs, up through the next two RTTs where <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>V</sub> is <em>not</em> decremented; that is, find the next two rows where the TCP Vegas queue share is less than 2. (After each of these RTTs, <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>V</sub> is not decremented.) This can be done either with a spreadsheet or by simple algebra. Note that the TCP Reno <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>R</sub> will always increment.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="7%" />
+<col width="7%" />
+<col width="79%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">T</th>
+<th class="head"><code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>V</sub></th>
+<th class="head"><code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>R</sub></th>
+<th class="head">TCP Vegas queue share</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>100</td>
+<td>100</td>
+<td>0</td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td>101</td>
+<td>101</td>
+<td>1</td>
+</tr>
+<tr class="row-even"><td>2</td>
+<td>102</td>
+<td>102</td>
+<td>2</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td>101</td>
+<td>103</td>
+<td>(101/204)x4 = 1.980 &lt; 𝛽</td>
+</tr>
+<tr class="row-even"><td>4</td>
+<td>101</td>
+<td>104</td>
+<td>Vegas has (101/205)×5 = 2.463 packets in queue</td>
+</tr>
+<tr class="row-odd"><td>5</td>
+<td>100</td>
+<td>105</td>
+<td>Vegas has (100/205)×5 = 2.435 packets in queue</td>
+</tr>
+<tr class="row-even"><td>6</td>
+<td>99</td>
+<td>106</td>
+<td>(99/205)×5 = 2.439</td>
+</tr>
+</tbody>
+</table>
+<p>This exercise attempts to explain the <em>linear decrease</em> in the TCP Vegas graph in the diagram in <a class="reference internal" href="ns2.html#reno-versus-vegas"><span class="std std-ref">31.5&nbsp;&nbsp;&nbsp;TCP Reno versus  TCP Vegas</span></a>. Competition with TCP Reno means not only that <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>V</sub> stops increasing, but in fact it decreases by 1 most RTTs.</p>
+<p>5.0. Suppose that, as in the previous exercise, a FAST TCP connection and a TCP Reno connection share the same path, and at T=0 each has 100 packets in the bottleneck queue, exactly filling the transit capacity of 200. The FAST TCP parameter 𝛾 is 0.5. The FAST TCP and TCP Reno connections have respective <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>s of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>F</sub> and <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>R</sub>.
+You may use the fact that, as long as the queue is nonempty, RTT/RTT<sub>noLoad</sub> = (<code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>F</sub>+<code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>R</sub>)/200.</p>
+<p>Find the value of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>F</sub> at T=40, where T is counted in units of 20 ms until T = 40, using 𝛼=4, 𝛼=10 and 𝛼=30. Assume RTT ≃ 20 ms as well. Use of a spreadsheet is recommended. The table here uses 𝛼=10.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="41%" />
+<col width="29%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">T</th>
+<th class="head"><code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>F</sub></th>
+<th class="head"><code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>R</sub></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>100</td>
+<td>100</td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td>105</td>
+<td>101</td>
+</tr>
+<tr class="row-even"><td>2</td>
+<td>108.47</td>
+<td>102</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td>110.77</td>
+<td>103</td>
+</tr>
+<tr class="row-even"><td>4</td>
+<td>112.20</td>
+<td>104</td>
+</tr>
+</tbody>
+</table>
+<p>6.0. Suppose A sends to B as in the layout below. The packet size is 1 kB and the bandwidth of the bottleneck R–B link is 1 packet / 10 ms; returning ACKs are thus normally spaced 10 ms apart. The RTT<sub>noLoad</sub> for the A–B path is 200 ms.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>A───R───B
+    │
+    C
+</pre></div>
+</div>
+<p>However, large amounts of traffic are also being sent from C to A; the bottleneck link for that path is R–A with bandwidth 1 kB / 5 ms. The queue at R for the R–A link has a capacity of 40 kB. ACKs are 50 bytes.</p>
+<div class="line-block">
+<div class="line">(a). What is the maximum possible arrival time difference on the A–B path for ACK[0] and ACK[20], if there are no queuing delays at R in the A→B direction? ACK[0] should be forwarded immediately by R; ACK[20] should have to wait for 40 kB at R</div>
+<div class="line">(b). What is the minimum possible arrival time difference for the same ACK[0] and ACK[20]?</div>
+</div>
+<p>7.0. Suppose a TCP Veno and a TCP Reno connection compete along the same path; there is no other traffic. Both start at the same time with <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>s of 50; the total transit capacity is 160. Both share the next loss event. The bottleneck router’s queue capacity is 60 packets; sometimes the queue fills and at other times it is empty. TCP Veno’s parameter 𝛽 is zero, meaning that it shifts to a slower <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> increment as soon as the queue just begins filling.</p>
+<div class="line-block">
+<div class="line">(a). In how many RTTs will the queue begin filling?</div>
+<div class="line">(b). At the point the queue is completely filled, how much larger will the Reno <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> be than the Veno <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>?</div>
+</div>
+<p>8.0. Suppose two connections use TCP Hybla. They do not compete. The first connection has an RTT of 100 ms, and the second has an RTT of 1000 ms. Both start with <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>min</sub> = 0 (literally meaning that nothing is sent the first RTT).</p>
+<div class="line-block">
+<div class="line">(a). How many packets are sent by each connection in four RTTs (involving three <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> increases)?</div>
+<div class="line">(b). How many packets are sent by each connection in four seconds? Recall 1+2+3+…+N = N(N+1)/2.</div>
+</div>
+<p>9.0. Suppose that at time T=0 a TCP Illinois connection and a TCP Reno connection share the same path, and each has 100 packets in the bottleneck queue, exactly filling the transit capacity of 200. The respective <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>s are <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>I</sub> and <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>R</sub>. The bottleneck queue capacity is 100.</p>
+<p>Find the value of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>I</sub> at T=50, where T is the number of elapsed RTTs. At this point <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>R</sub> is, of course, 150.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="41%" />
+<col width="29%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">T</th>
+<th class="head"><code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>I</sub></th>
+<th class="head"><code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>R</sub></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>100</td>
+<td>100</td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td>101</td>
+<td>101</td>
+</tr>
+<tr class="row-even"><td>2</td>
+<td>?</td>
+<td>102</td>
+</tr>
+</tbody>
+</table>
+<p>You may assume that the delay, RTT − RTT<sub>noLoad</sub>, is proportional to queue_utilization = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>I</sub>+<code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>R</sub>−200𝛼. Using this expression to represent delay, delay<sub>max</sub> = 100 and so delay<sub>thresh</sub> = 1. When calculating 𝛼(delay), assume 𝛼<sub>max</sub> = 10 and 𝛼<sub>min</sub> = 0.1.</p>
+<p>10.0. Assume that a TCP connection has an RTT of 50 ms, and the time between loss events is 10 seconds.</p>
+<div class="line-block">
+<div class="line">(a). For a TCP Reno connection, what is the bandwidth×delay product?</div>
+<div class="line">(b). For an H-TCP connection, what is the bandwidth×delay product?</div>
+</div>
+<p>11.0. For each of the values of W<sub>max</sub> below, find the <em>change</em> in TCP Cubic’s <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> over one 100 ms RTT at each of the following points:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">i. Immediately after the previous loss event, when t = 0.</div>
+<div class="line">ii. At the midpoint of the tooth, when t=K/2</div>
+<div class="line">iii. At the point when <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> has returned to W<sub>max</sub>, at t=K</div>
+</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line">(a). W<sub>max</sub> = 250 (making K=5)</div>
+<div class="line">(b). W<sub>max</sub> = 2000 (making K=10)</div>
+</div>
+<p>12.0. Suppose a TCP Reno connection is competing with a TCP Cubic connection. There is no other traffic. All losses are synchronized. In this setting, once the steady state is reached, the <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> graphs for one tooth will look like this:</p>
+<img alt="_images/reno_v_cubic_tooth.svg" src="_images/reno_v_cubic_tooth.svg" /><p>Let c be the maximum <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> of the TCP Cubic connection (c=W<sub>max</sub>) and let r be the maximum of the TCP Reno connection. Let M be the network ceiling, so a loss occurs when c+r reaches M. The width of the tooth for TCP Reno is (r/2)×RTT, where RTT is measured in seconds; the width of the TCP Cubic tooth is (c/2)<sup>1/3</sup>. For the examples here, ignore the TCP-Friendly feature of TCP Cubic.</p>
+<div class="line-block">
+<div class="line">(a). If M = 200 and RTT = 50 ms = 0.05 sec, show that at the steady state r ≃ 130.4 and c = M−r ≃ 69.6.</div>
+<div class="line">(b). Find equilibrium r and c (to the nearest integer) for M=1000 and RTT = 50 ms. Hint: use of a spreadsheet or scripting language makes trial-and-error quite practical.</div>
+<div class="line">(c). Find equilibrium r and c for M = 1000 and RTT = 100 ms.</div>
+</div>
+<p>13.0. Suppose a TCP Westwood connection has the path A───R1───R2───B. The R1–R2 link is the bottleneck, with bandwidth 1 packet/ms, and RTT<sub>noLoad</sub> is 200 ms. At T=0, with <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = 300 so the queue at R1 has 100 A–B packets, the R1─R2 throughput for A’s packets falls to 1 packet / 2 ms, perhaps due to competition. At that same time, and perhaps also due to competition, a single A–B packet is lost at R1.</p>
+<div class="line-block">
+<div class="line">(a). Suppose A responds to the loss using the original BWE of 1 packet/ms. What transit capacity will A calculate, and how will A update its <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>?</div>
+</div>
+<div class="line-block">
+<div class="line">(b). Now suppose A uses the new throughput of 1 packet / 2 ms as its BWE. What transit capacity will A calculate, and how will A update its <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>?</div>
+</div>
+<div class="line-block">
+<div class="line">(c). Suppose A calculates BWE as <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>/RTT. What value of BWE does A obtain by measuring the RTT of the packet just before the one that was lost?</div>
+</div>
+<p>14.0. In <a class="reference internal" href="#tcp-bbr"><span class="std std-ref">22.16&nbsp;&nbsp;&nbsp;TCP BBR</span></a> we estimated the impact on TCP BBR’s BWE value during the interval when <code class="docutils literal notranslate"><span class="pre">pacing_gain</span></code>=1.25. Suppose now that the BBR and Reno connections each have 800 packets in transit, instead of 80. Assume the bottleneck bandwidth rises tenfold to 20 packets/ms, so RTT<sub>noLoad</sub> is still 80 ms. During the 8-RTT pacing-gain cycle, Reno increases its <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> to 808. <em>If</em> BWE is measured at the optimum point after BBR’s <code class="docutils literal notranslate"><span class="pre">pacing_gain</span></code>=1.25 rate increase, what is the new value of BWE?</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="fairqueuing.html" title="23   Queuing and Scheduling"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="dynamicsB.html" title="21   Further Dynamics of TCP"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, desktop edition 2.0.11</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012-2022, Peter L Dordal.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

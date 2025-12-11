@@ -1,0 +1,836 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>13   Routing-Update Algorithms &#8212; An Introduction to Computer Networks, desktop edition 2.0.11</title>
+    <link rel="stylesheet" href="_static/csbnetbook.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script type="text/javascript" src="_static/mobile.js"></script>
+    <script type="text/javascript" src="_static/rightsidebar.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="14   Large-Scale IP Routing" href="bigrouting.html" />
+    <link rel="prev" title="12   IPv6 Additional Features" href="ipv6b.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="bigrouting.html" title="14   Large-Scale IP Routing"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ipv6b.html" title="12   IPv6 Additional Features"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, desktop edition 2.0.11</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">13&nbsp;&nbsp;&nbsp;Routing-Update Algorithms</a><ul>
+<li><a class="reference internal" href="#distance-vector-routing-update-algorithm">13.1&nbsp;&nbsp;&nbsp;Distance-Vector Routing-Update Algorithm</a><ul>
+<li><a class="reference internal" href="#distance-vector-update-rules">13.1.1&nbsp;&nbsp;&nbsp;Distance-Vector Update Rules</a></li>
+<li><a class="reference internal" href="#example-1">13.1.2&nbsp;&nbsp;&nbsp;Example 1</a></li>
+<li><a class="reference internal" href="#example-2">13.1.3&nbsp;&nbsp;&nbsp;Example 2</a></li>
+<li><a class="reference internal" href="#example-3">13.1.4&nbsp;&nbsp;&nbsp;Example 3</a></li>
+<li><a class="reference internal" href="#example-4">13.1.5&nbsp;&nbsp;&nbsp;Example 4</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#distance-vector-slow-convergence-problem">13.2&nbsp;&nbsp;&nbsp;Distance-Vector Slow-Convergence Problem</a><ul>
+<li><a class="reference internal" href="#slow-convergence-fixes">13.2.1&nbsp;&nbsp;&nbsp;Slow-Convergence Fixes</a><ul>
+<li><a class="reference internal" href="#split-horizon">13.2.1.1&nbsp;&nbsp;&nbsp;Split Horizon</a></li>
+<li><a class="reference internal" href="#triggered-updates">13.2.1.2&nbsp;&nbsp;&nbsp;Triggered Updates</a></li>
+<li><a class="reference internal" href="#hold-down">13.2.1.3&nbsp;&nbsp;&nbsp;Hold Down</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#observations-on-minimizing-route-cost">13.3&nbsp;&nbsp;&nbsp;Observations on Minimizing Route Cost</a></li>
+<li><a class="reference internal" href="#loop-free-distance-vector-algorithms">13.4&nbsp;&nbsp;&nbsp;Loop-Free Distance Vector Algorithms</a><ul>
+<li><a class="reference internal" href="#dsdv">13.4.1&nbsp;&nbsp;&nbsp;DSDV</a></li>
+<li><a class="reference internal" href="#aodv">13.4.2&nbsp;&nbsp;&nbsp;AODV</a></li>
+<li><a class="reference internal" href="#hwmp">13.4.3&nbsp;&nbsp;&nbsp;HWMP</a></li>
+<li><a class="reference internal" href="#eigrp">13.4.4&nbsp;&nbsp;&nbsp;EIGRP</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#link-state-routing-update-algorithm">13.5&nbsp;&nbsp;&nbsp;Link-State Routing-Update Algorithm</a><ul>
+<li><a class="reference internal" href="#shortest-path-first-algorithm">13.5.1&nbsp;&nbsp;&nbsp;Shortest-Path-First Algorithm</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#routing-on-other-attributes">13.6&nbsp;&nbsp;&nbsp;Routing on Other Attributes</a><ul>
+<li><a class="reference internal" href="#reverse-path-filtering">13.6.1&nbsp;&nbsp;&nbsp;Reverse-Path Filtering</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ecmp">13.7&nbsp;&nbsp;&nbsp;ECMP</a></li>
+<li><a class="reference internal" href="#epilog">13.8&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li><a class="reference internal" href="#exercises">13.9&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="ipv6b.html"
+                        title="previous chapter">12&nbsp;&nbsp;&nbsp;IPv6 Additional Features</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="bigrouting.html"
+                        title="next chapter">14&nbsp;&nbsp;&nbsp;Large-Scale IP Routing</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="routing-update-algorithms">
+<span id="routing-update"></span><span id="index-0"></span><h1>13&nbsp;&nbsp;&nbsp;Routing-Update Algorithms<a class="headerlink" href="#routing-update-algorithms" title="Permalink to this headline">¶</a></h1>
+<p>How do IP routers build and maintain their forwarding tables?</p>
+<p>Ethernet bridges always have the option of fallback-to-flooding for unknown destinations, so they can afford to build their forwarding tables “incrementally”, putting a host into the forwarding table only when that host is first seen as a <em>sender</em>. For IP, there is no fallback delivery mechanism: forwarding tables must be built <em>before</em> delivery can succeed. While manual table construction is possible, it is not practical.</p>
+<p>In the literature it is common to refer to router-table construction as “routing algorithms”. We will avoid that term, however, to avoid confusion with the fundamental datagram-forwarding algorithm; instead, we will call these “routing-update algorithms”.</p>
+<p id="index-1">The two classes of algorithms we will consider here are <strong>distance-vector</strong> and <strong>link-state</strong>. In the distance-vector approach, often used at smaller sites, routers exchange information with their immediately neighboring routers; tables are built up this way through a sequence of such periodic exchanges. In the link-state approach, routers rapidly propagate information about the state of each link; all routers in the organization receive this link-state information and each one uses it to build and maintain a map of the entire network. The forwarding table is then constructed (sometimes on demand) from this map.</p>
+<p>Both approaches assume that consistent information is available as to the <strong>cost</strong> of each link (<em>eg</em> that the two routers at opposite ends of each link know this cost, and agree on how the cost is determined). This requirement classifies these algorithms as <strong>interior</strong> routing-update algorithms: the routers involved are internal to a larger organization or other common administrative regime that has an established policy on how to assign link weights. The set of routers following a common policy is known as a <strong>routing domain</strong> or (from the BGP protocol) an <strong>autonomous system</strong>.</p>
+<p>The simplest link-weight strategy is to give each link a cost of 1; link costs can also be based on bandwidth, propagation delay, financial cost, or administrative preference value. Careful assignment of link costs often plays a major role in herding traffic onto the faster or “better” links.</p>
+<p>In the following chapter we will look at the Border Gateway Protocol, or BGP, in which no link-cost calculations are made. BGP is used to select routes that traverse other organizations, and financial rather than technical factors may therefore play the dominant role in making routing choices.</p>
+<p>Generally, all these algorithms apply to IPv6 as well as IPv4, though specific protocols of course may need modification.</p>
+<p id="index-2">Finally, we should point out that from the early days of the Internet, routing was allowed to depend not just on the destination, but also on the “quality of service” (QoS) requested; thus, forwarding table entries are strictly speaking not ⟨destination, next_hop⟩ but rather ⟨destination, QoS, next_hop⟩. Originally, the Type of Service field in the IPv4 header (<a class="reference internal" href="ipv4.html#ipv4-header"><span class="std std-ref">9.1&nbsp;&nbsp;&nbsp;The IPv4 Header</span></a>) could be used to specify QoS (often then called ToS). Packets could request low delay, high throughput or high reliability, and could be routed accordingly. In practice, the Type of Service field was rarely used, and was eventually taken over by the DS field and ECN bits. The first three bits of the Type of Service field, known as the precedence bits, remain available, however, and can still be used for QoS routing purposes (see the Class Selector PHB of <a class="reference internal" href="realtime.html#diffserv"><span class="std std-ref">25.7&nbsp;&nbsp;&nbsp;Differentiated Services</span></a> for examples of these bits). See also <span class="target" id="index-3"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2386.html"><strong>RFC 2386</strong></a>.</p>
+<p>In much of the following, we are going to ignore QoS information, and assume that routing decisions are based only on the destination. See, however, the first paragraph of <a class="reference internal" href="#link-state"><span class="std std-ref">13.5&nbsp;&nbsp;&nbsp;Link-State Routing-Update Algorithm</span></a>, and also <a class="reference internal" href="#lartc-use"><span class="std std-ref">13.6&nbsp;&nbsp;&nbsp;Routing on Other Attributes</span></a>.</p>
+<div class="section" id="distance-vector-routing-update-algorithm">
+<span id="dv-algorithm"></span><span id="index-4"></span><h2>13.1&nbsp;&nbsp;&nbsp;Distance-Vector Routing-Update Algorithm<a class="headerlink" href="#distance-vector-routing-update-algorithm" title="Permalink to this headline">¶</a></h2>
+<p>Distance-vector is the simplest routing-update algorithm, used by the Routing Information Protocol, or RIP. Version 2 of the protocol is specified in <span class="target" id="index-5"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2453.html"><strong>RFC 2453</strong></a>.</p>
+<p>Routers identify their router neighbors (through some sort of neighbor-discovery mechanism), and add a third column to their forwarding tables representing the total <strong>cost</strong> for delivery to the corresponding destination. These costs are the “distance” of the algorithm name. Forwarding-table entries are now of the form ⟨destination,next_hop,cost⟩.</p>
+<p>Costs are administratively assigned to each link, and the algorithm then calculates the total cost to a destination as the sum of the link costs along the path. The simplest case is to assign a cost of 1 to each link, in which case the total cost to a destination will be the number of links to that destination. This is known as the “hopcount” metric; it is also possible to assign link costs that reflect each link’s bandwidth, or delay, or whatever else the network administrators wish. Thoughtful cost assignments are a form of traffic engineering and sometimes play a large role in network performance.</p>
+<p>At this point, each router then <strong>reports</strong> the ⟨destination,cost⟩ portion of its table to its neighboring routers at regular intervals; these table portions are the “vectors” of the algorithm name. It does not matter if neighbors exchange reports at the same time, or even at the same rate.</p>
+<p>Each router also monitors its continued connectivity to each neighbor; if neighbor N becomes unreachable then its reachability cost is set to infinity.</p>
+<p>In a real IP network, actual destinations would be <em>subnets</em> attached to routers; one router might be directly connected to several such destinations. In the following, however, we will identify all a router’s directly connected subnets with the router itself. That is, we will build forwarding tables to reach every <em>router</em>. While it is possible that one destination subnet might be reachable by two or more routers, thus breaking our identification of a router with its set of attached subnets, in practice this is of little concern. See exercise 6.0 for an example in which subnets are <em>not</em> identified with adjacent routers.</p>
+<p>In <a class="reference internal" href="mininet.html#simple-rip"><span class="std std-ref">30.5&nbsp;&nbsp;&nbsp;IP Routers With Simple Distance-Vector Implementation</span></a> we present a simplified working implementation of RIP using the Mininet network emulator.</p>
+<div class="section" id="distance-vector-update-rules">
+<span id="dv-rules"></span><h3>13.1.1&nbsp;&nbsp;&nbsp;Distance-Vector Update Rules<a class="headerlink" href="#distance-vector-update-rules" title="Permalink to this headline">¶</a></h3>
+<p>Let A be a router receiving a report ⟨D,c<sub>D</sub>⟩ from neighbor N at cost c<sub>N</sub>. Note that this means A can reach D <em>via N</em> with cost c = c<sub>D</sub> + c<sub>N</sub>. A updates its own table according to the following three rules:</p>
+<ol class="arabic simple">
+<li><strong>New destination</strong>: D is a previously unknown destination. A adds ⟨D,N,c⟩ to its forwarding table.</li>
+<li><strong>Lower cost</strong>: D is a known destination with entry ⟨D,M,c<sub>old</sub>⟩, but the new total cost c is less than c<sub>old</sub>. A switches to the cheaper route, updating its entry for D to ⟨D,N,c⟩. It is possible that M=N, meaning that N is now reporting a cost decrease to D. (If c = c<sub>old</sub>, A ignores the new report; see exercise 8.0.)</li>
+<li><strong>Next_hop increase</strong>: A has an existing entry ⟨D,<strong>N</strong>,c<sub>old</sub>⟩, and the new total cost c is <em>greater</em> than c<sub>old</sub>. Because this is a cost increase from the neighbor N that A is currently using to reach D, A must incorporate the increase in its table. A updates its entry for D to  ⟨D,N,c⟩.</li>
+</ol>
+<p id="index-6">The first two rules are for new destinations and a shorter path to existing destinations. In these cases, the cost to each destination monotonically decreases (at least if we consider all unreachable destinations as being at cost ∞). Convergence is automatic, as the costs cannot decrease forever.</p>
+<p>The third rule, however, introduces the possibility of instability, as a cost may also go up. It represents the <strong>bad-news</strong> case, in that neighbor N has learned that some link failure has driven up its own cost to reach D, and is now passing that “bad news” on to A, which routes to D <em>via</em> N.</p>
+<p>The next_hop-increase case only passes bad news along; the very first cost increase must always come from a router discovering that a neighbor N is unreachable, and thus updating its cost to N to ∞. Similarly, if router A learns of a next_hop increase to destination D from neighbor B, then we can follow the next_hops back until we reach a router C which is either the originator of the cost=∞ report, or which has learned of an alternative route through one of the first two rules.</p>
+</div>
+<div class="section" id="example-1">
+<h3>13.1.2&nbsp;&nbsp;&nbsp;Example 1<a class="headerlink" href="#example-1" title="Permalink to this headline">¶</a></h3>
+<p>For our first example, no links will break and thus only the first two rules above will be used. We will start out with the network below with empty forwarding tables; all link costs are 1.</p>
+<img alt="_images/fivenodes1.svg" src="_images/fivenodes1.svg" /><p>After initial neighbor discovery, here are the forwarding tables. Each node has entries only for its directly connected neighbors:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">A: ⟨B,B,1⟩  ⟨C,C,1⟩  ⟨D,D,1⟩</div>
+<div class="line">B: ⟨A,A,1⟩  ⟨C,C,1⟩</div>
+<div class="line">C: ⟨A,A,1⟩  ⟨B,B,1⟩  ⟨E,E,1⟩</div>
+<div class="line">D: ⟨A,A,1⟩  ⟨E,E,1⟩</div>
+<div class="line">E: ⟨C,C,1⟩  ⟨D,D,1⟩</div>
+</div>
+</div></blockquote>
+<p>Now let D report to A; it sends records  ⟨A,1⟩  and ⟨E,1⟩. A ignores D’s ⟨A,1⟩ record, but ⟨E,1⟩ represents a new destination; A therefore adds ⟨E,D,<strong>2</strong>⟩ to its table. Similarly, let A now report to D, sending  ⟨B,1⟩  ⟨C,1⟩  ⟨D,1⟩  ⟨E,2⟩ (the last is the record we just added).  D ignores A’s records ⟨D,1⟩ and ⟨E,2⟩ but A’s records ⟨B,1⟩ and ⟨C,1⟩ cause D to create entries ⟨B,A,2⟩ and ⟨C,A,2⟩. A and D’s tables are now, in fact, complete.</p>
+<p>Now suppose C reports to B; this gives B an entry ⟨E,C,2⟩. If C also reports to E, then E’s table will have ⟨A,C,2⟩ and ⟨B,C,2⟩. The tables are now:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">A: ⟨B,B,1⟩  ⟨C,C,1⟩  ⟨D,D,1⟩  ⟨E,D,2⟩</div>
+<div class="line">B: ⟨A,A,1⟩  ⟨C,C,1⟩  ⟨E,C,2⟩</div>
+<div class="line">C: ⟨A,A,1⟩  ⟨B,B,1⟩  ⟨E,E,1⟩</div>
+<div class="line">D: ⟨A,A,1⟩  ⟨E,E,1⟩  ⟨B,A,2⟩  ⟨C,A,2⟩</div>
+<div class="line">E: ⟨C,C,1⟩  ⟨D,D,1⟩  ⟨A,C,2⟩  ⟨B,C,2⟩</div>
+</div>
+</div></blockquote>
+<p>We have two missing entries: B and C do not know how to reach D. If A reports to B and C, the tables will be complete; B and C will each reach D via A at cost 2. However, the following sequence of reports might also have occurred:</p>
+<ul class="simple">
+<li>E reports to C, causing C to add ⟨D,E,2⟩</li>
+<li>C reports to B, causing B to add ⟨D,C,<strong>3</strong>⟩</li>
+</ul>
+<p>In this case we have 100% reachability but B routes to D via the longer-than-necessary path B–C–E–D. However, one more report will fix this: suppose A reports to B. B will received ⟨D,1⟩ from A, and will update its entry ⟨D,C,3⟩ to ⟨D,A,2⟩.</p>
+<p>Note that A routes to E via D while E routes to A via C; this asymmetry was due to indeterminateness in the order of initial table exchanges.</p>
+<p>If all link weights are 1, and if each pair of neighbors exchange tables once before any pair starts a second exchange, then the above process will discover the routes in order of length, <em>ie</em> the shortest paths will be the first to be discovered. This is not, however, a particularly important consideration.</p>
+</div>
+<div class="section" id="example-2">
+<h3>13.1.3&nbsp;&nbsp;&nbsp;Example 2<a class="headerlink" href="#example-2" title="Permalink to this headline">¶</a></h3>
+<p>The next example illustrates link weights other than 1. The first route discovered between A and B is the direct route with cost 8; eventually we discover the longer A–C–D–B route with cost 2+1+3=6.</p>
+<img alt="_images/2831.svg" src="_images/2831.svg" /><p>The initial tables are these:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">A:  ⟨C,C,2⟩  ⟨B,B,8⟩</div>
+<div class="line">B:  ⟨A,A,8⟩  ⟨D,D,3⟩</div>
+<div class="line">C:  ⟨A,A,2⟩  ⟨D,D,1⟩</div>
+<div class="line">D:  ⟨B,B,3⟩  ⟨C,C,1⟩</div>
+</div>
+</div></blockquote>
+<p>After A and C exchange, A has ⟨D,C,3⟩ and C has ⟨B,A,10⟩. After C and D exchange, C updates its ⟨B,A,10⟩ entry to ⟨B,D,4⟩ and D adds ⟨A,C,3⟩; D receives C’s report of ⟨B,10⟩ but ignores it.</p>
+<p>Now finally suppose B and D exchange. D ignores B’s route to A, as it has a better one. B, however, gets D’s report ⟨A,3⟩ and updates its entry for A to ⟨A,D,6⟩. D also reports ⟨C,1⟩ and so B creates an entry ⟨C,D,4⟩ for C. At this point the tables are as follows:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">A:  ⟨C,C,2⟩  ⟨B,B,8⟩  ⟨D,C,3⟩</div>
+<div class="line">B:  ⟨A,D,6⟩  ⟨D,D,3⟩  ⟨C,D,4⟩</div>
+<div class="line">C:  ⟨A,A,2⟩  ⟨D,D,1⟩  ⟨B,D,4⟩</div>
+<div class="line">D:  ⟨B,B,3⟩  ⟨C,C,1⟩  ⟨A,C,3⟩</div>
+</div>
+</div></blockquote>
+<p>We have one more thing to fix before we are done: A has an inefficient route to B. This will be fixed when C reports ⟨B,4⟩ to A; A will replace its route to B with ⟨B,C,6⟩. If we look only at the A–B route, B discovers the lower-cost route to A when, first, C reports to D and, second, <em>after</em> that, D reports to B; a similar sequence leads to A’s discovering the lower-cost route.</p>
+</div>
+<div class="section" id="example-3">
+<span id="id1"></span><h3>13.1.4&nbsp;&nbsp;&nbsp;Example 3<a class="headerlink" href="#example-3" title="Permalink to this headline">¶</a></h3>
+<p>Our third example will illustrate how the algorithm proceeds when a link <strong>breaks</strong>. We return to the first diagram, with all tables completed, and then suppose the D–E link breaks.  This is the “bad-news” case: a link has broken, and is no longer available; this will bring the third rule into play.</p>
+<img alt="_images/fivenodes_break.svg" src="_images/fivenodes_break.svg" /><p>We shall assume, as above, that A reaches E via D, but we will here assume – contrary to Example 1 – that C reaches D via A (see exercise 5.0 for the original case).</p>
+<p>Initially, upon discovering the break, D and E update their tables to ⟨E,-,∞⟩ and ⟨D,-,∞⟩ respectively (whether or not they actually enter ∞ into their tables is implementation-dependent; we may consider this as equivalent to <em>removing</em> their entries for one another; the “-” as next_hop indicates there is no next_hop).</p>
+<p>Eventually D and E will report the break to their respective neighbors A and C. A will apply the “bad-news” rule above and update its entry for E to ⟨E,-,∞⟩. We have assumed that C, however, routes to D via A, and so it will ignore E’s report.</p>
+<p>We will suppose that the next steps are for C to report to E and to A. When C reports its route ⟨D,2⟩ to E, E will add the entry ⟨D,C,3⟩, and will again be able to reach D. When C reports to A, A will add the route ⟨E,C,2⟩. The final step will be when A next reports to D, and D will have ⟨E,A,3⟩. Connectivity is restored.</p>
+</div>
+<div class="section" id="example-4">
+<span id="dv-example-4"></span><h3>13.1.5&nbsp;&nbsp;&nbsp;Example 4<a class="headerlink" href="#example-4" title="Permalink to this headline">¶</a></h3>
+<p>The previous examples have had a “global” perspective in that we looked at the entire network. In the next example, we look at how one specific router, R, responds when it receives a distance-vector report from its neighbor S. Neither R nor S nor we have any idea of what the entire network looks like. Suppose R’s table is initially as follows, and the S–R link has cost 1:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="40%" />
+<col width="27%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">destination</th>
+<th class="head">next_hop</th>
+<th class="head">cost</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>A</td>
+<td>S</td>
+<td>3</td>
+</tr>
+<tr class="row-odd"><td>B</td>
+<td>T</td>
+<td>4</td>
+</tr>
+<tr class="row-even"><td>C</td>
+<td>S</td>
+<td>5</td>
+</tr>
+<tr class="row-odd"><td>D</td>
+<td>U</td>
+<td>6</td>
+</tr>
+</tbody>
+</table>
+<p>S now sends R the following report, containing only destinations and its costs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="67%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">destination</th>
+<th class="head">cost</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>A</td>
+<td>2</td>
+</tr>
+<tr class="row-odd"><td>B</td>
+<td>3</td>
+</tr>
+<tr class="row-even"><td>C</td>
+<td>5</td>
+</tr>
+<tr class="row-odd"><td>D</td>
+<td>4</td>
+</tr>
+<tr class="row-even"><td>E</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p>R then updates its table as follows:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="14%" />
+<col width="9%" />
+<col width="11%" />
+<col width="66%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">destination</th>
+<th class="head">next_hop</th>
+<th class="head">cost</th>
+<th class="head">reason</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>A</td>
+<td>S</td>
+<td>3</td>
+<td>No change; S probably sent this report before</td>
+</tr>
+<tr class="row-odd"><td>B</td>
+<td>T</td>
+<td>4</td>
+<td>No change; R’s cost via S is tied with R’s cost via T</td>
+</tr>
+<tr class="row-even"><td>C</td>
+<td>S</td>
+<td>6</td>
+<td>Next_hop increase</td>
+</tr>
+<tr class="row-odd"><td>D</td>
+<td>S</td>
+<td>5</td>
+<td>Lower-cost route via S</td>
+</tr>
+<tr class="row-even"><td>E</td>
+<td>S</td>
+<td>3</td>
+<td>New destination</td>
+</tr>
+</tbody>
+</table>
+<p>Whatever S’s cost to a destination, R’s cost to that destination via S is one greater.</p>
+</div>
+</div>
+<div class="section" id="distance-vector-slow-convergence-problem">
+<span id="dvscp"></span><span id="index-7"></span><h2>13.2&nbsp;&nbsp;&nbsp;Distance-Vector Slow-Convergence Problem<a class="headerlink" href="#distance-vector-slow-convergence-problem" title="Permalink to this headline">¶</a></h2>
+<p>There is a significant problem with distance-vector table updates in the presence of broken links. Not only can routing loops form, but the loops can persist indefinitely! As an example, suppose we have the following arrangement, with all links having cost 1:</p>
+<img alt="_images/slow_convergence.svg" src="_images/slow_convergence.svg" /><p>Now suppose the D–A link breaks:</p>
+<img alt="_images/slow_convergence_break.svg" src="_images/slow_convergence_break.svg" /><p>If A immediately reports to B that D is no longer reachable (cost = ∞), then all is well. However, it is possible that B reports to A first, telling A that <em>it</em> has a route to D, with cost 2, which B still believes it has.</p>
+<p id="index-8">This means A now installs the entry ⟨D,B,3⟩. At this point we have what we called in <a class="reference internal" href="intro.html#routing-loops"><span class="std std-ref">1.6&nbsp;&nbsp;&nbsp;Routing Loops</span></a> a linear routing loop: if a packet is addressed to D, A will forward it to B and B will forward it back to A.</p>
+<p>Worse, this loop will be with us a while. At some point A will report ⟨D,3⟩ to B, at which point B will update its entry to ⟨D,A,4⟩. Then B will report ⟨D,4⟩ to A, and A’s entry will be ⟨D,B,5⟩, <em>etc</em>. This process is known as <strong>slow convergence to infinity</strong>. If A and B each report to the other once a minute, it will take 2,000 years for the costs to overflow an ordinary 32-bit integer.</p>
+<div class="section" id="slow-convergence-fixes">
+<h3>13.2.1&nbsp;&nbsp;&nbsp;Slow-Convergence Fixes<a class="headerlink" href="#slow-convergence-fixes" title="Permalink to this headline">¶</a></h3>
+<p>The simplest fix to this problem is to use a small value for infinity.
+Most flavors of the RIP protocol use infinity=16, with updates every 30 seconds. The drawback to so small an infinity is that no path through the network can be longer than this; this makes paths with weighted link costs difficult. Cisco IGRP uses a variable value for infinity up to a maximum of 256; the default infinity is 100.</p>
+<p>There are several well-known other fixes:</p>
+<div class="section" id="split-horizon">
+<span id="index-9"></span><span id="id2"></span><h4>13.2.1.1&nbsp;&nbsp;&nbsp;Split Horizon<a class="headerlink" href="#split-horizon" title="Permalink to this headline">¶</a></h4>
+<p>Under split horizon, if A uses N as its next_hop for destination D, then A simply does not report to N that it can reach D; that is, in preparing its report to N it first deletes all entries that have N as next_hop. In the example above, split horizon would mean B would never report to A about the reachability of D because A is B’s next_hop to D.</p>
+<p>Split horizon prevents all linear routing loops. However, there are other topologies where it cannot prevent loops. One is the following:</p>
+<img alt="_images/split_horizon_loop.svg" src="_images/split_horizon_loop.svg" /><p>Suppose the A-D link breaks, and A updates to ⟨D,-,∞⟩. A then reports ⟨D,∞⟩ to B, which updates its table to ⟨D,-,∞⟩. But then, before A can also report ⟨D,∞⟩ to C, C reports ⟨D,2⟩ to B. B then updates to ⟨D,C,3⟩, and reports ⟨D,3⟩ back to A; neither this nor the previous report violates split-horizon. Now A’s entry is ⟨D,B,4⟩. Eventually A will report to C, at which point C’s entry becomes ⟨D,A,5⟩, and the numbers keep increasing as the reports circulate counterclockwise. The actual routing proceeds in the other direction, clockwise.</p>
+<p id="index-10">Split horizon often also includes <strong>poison reverse</strong>: if A uses N as its next_hop to D, then A in fact reports ⟨D,∞⟩ to N, which is a more definitive statement that A cannot reach D by itself. However, coming up with a scenario where poison reverse actually affects the outcome is not trivial.</p>
+</div>
+<div class="section" id="triggered-updates">
+<span id="index-11"></span><span id="id3"></span><h4>13.2.1.2&nbsp;&nbsp;&nbsp;Triggered Updates<a class="headerlink" href="#triggered-updates" title="Permalink to this headline">¶</a></h4>
+<p>In the original example, if A was first to report to B then the loop resolved immediately; the loop occurred if B was first to report to A. Nominally each outcome has probability 50%. Triggered updates means that any router should report immediately to its neighbors whenever it detects any change for the worse. If A reports first to B in the first example, the problem goes away. Similarly, in the second example, if A reports to both B and C before B or C report to one another, the problem goes away.
+There remains, however, a small window where B could send its report to A just as A has discovered the problem, before A can report to B.</p>
+</div>
+<div class="section" id="hold-down">
+<span id="index-12"></span><span id="id4"></span><h4>13.2.1.3&nbsp;&nbsp;&nbsp;Hold Down<a class="headerlink" href="#hold-down" title="Permalink to this headline">¶</a></h4>
+<p>Hold down is sort of a receiver-side version of triggered updates: the receiver does not use new alternative routes for a period of time (perhaps two router-update cycles) following discovery of unreachability. This gives time for bad news to arrive. In the first example, it would mean that when A received B’s report ⟨D,2⟩, it would set this aside. It would then report ⟨D,∞⟩ to B as usual, at which point B would now report ⟨D,∞⟩ back to A, at which point B’s earlier report ⟨D,2⟩ would be discarded. A significant drawback of hold down is that legitimate new routes are also delayed by the hold-down period.</p>
+<p>These mechanisms for preventing slow convergence are, in the real world, quite effective. The Routing Information Protocol (RIP, <span class="target" id="index-13"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2453.html"><strong>RFC 2453</strong></a>) implements all but hold-down, and has been widely adopted at smaller installations.</p>
+<p>However, the potential for routing loops and the limited value for infinity led to the development of alternatives. One alternative is the link-state strategy, <a class="reference internal" href="#link-state"><span class="std std-ref">13.5&nbsp;&nbsp;&nbsp;Link-State Routing-Update Algorithm</span></a>. Another alternative is Cisco’s Enhanced Interior Gateway Routing Protocol, or EIGRP, <a class="reference internal" href="#eigrp"><span class="std std-ref">13.4.4&nbsp;&nbsp;&nbsp;EIGRP</span></a>. While part of the distance-vector family, EIGRP is provably loop-free, though to achieve this it must sometimes suspend forwarding to some destinations while tables are in flux.</p>
+</div>
+</div>
+</div>
+<div class="section" id="observations-on-minimizing-route-cost">
+<span id="minimizing-route-cost"></span><span id="index-14"></span><h2>13.3&nbsp;&nbsp;&nbsp;Observations on Minimizing Route Cost<a class="headerlink" href="#observations-on-minimizing-route-cost" title="Permalink to this headline">¶</a></h2>
+<p>Does distance-vector routing actually achieve minimum costs? For that matter, does each packet incur the cost its sender expects? Suppose node A has a forwarding entry ⟨D,B,c⟩, meaning that A forwards packets to destination D via next_hop B, and expects the total cost to be c. If A sends a packet to D, and we follow it on the actual path it takes, must the total link cost be c? If so, we will say that the network has <strong>accurate costs</strong>.</p>
+<p>The answer to the accurate-costs question, as it turns out, is <em>yes</em> for the distance-vector algorithm, if we follow the rules carefully, and the network is stable (meaning that no routing reports are changing, or, more concretely, that every update report now circulating is based on the current network state); a proof is below. However, if there is a routing loop, the answer is of course no: the actual cost is now infinite. The answer would also be no if A’s neighbor B has just switched to using a longer route to D than it last reported to A.</p>
+<p>It turns out, however, that we seek the shortest route not because we are particularly trying to save money on transit costs; a route 50% longer would generally work just fine. (AT&amp;T, back when they were the Phone Company, once ran a series of print advertisements claiming longer routes as a <em>feature</em>: if the direct path was congested, they could still complete your call by routing you the long way ‘round.) However, we <em>are</em> guaranteed that if all routers seek the shortest route – and if the network is stable – then all paths are loop-free, because in this case the network will have accurate costs.</p>
+<p>Here is a simple example illustrating the importance of global cost-minimization in preventing loops. Suppose we have a network like this one:</p>
+<img alt="_images/cost_minimization.svg" src="_images/cost_minimization.svg" /><p>Now suppose that A and B use distance-vector but are allowed to choose the shortest route <em>to within 10%</em>. A would get a report from C that D could be reached with cost 1, for a total cost of 21. The forwarding entry via C would be ⟨D,C,21⟩. Similarly, A would get a report from B that D could be reached with cost 21, for a total cost of 22: ⟨D,B,22⟩. Similarly, B has choices ⟨D,C,21⟩ and ⟨D,A,22⟩.</p>
+<p>If A and B both choose the minimal route, no loop forms. But if A and B both use the 10%-overage rule, they would be allowed to choose the other route: A could choose ⟨D,B,22⟩ and B could choose ⟨D,A,22⟩. If this happened, we would have a routing loop: A would forward packets for D to B, and B would forward them right back to A.</p>
+<p>As we apply distance-vector routing, each router independently builds its tables. A router might have some notion of the path its packets would take to their destination; for example, in the case above A might believe that with forwarding entry ⟨D,B,22⟩ its packets would take the path A–B–C–D (though in distance-vector routing, routers do not particularly worry about the big picture). Consider again the accurate-cost question above. This <em>fails</em> in the 10%-overage example, because the actual path is now infinite.</p>
+<p>We now prove that, in distance-vector routing, the network will have accurate costs, provided</p>
+<ul class="simple">
+<li>each router selects what it believes to be the shortest path to the final destination, and</li>
+<li>the network is stable, meaning that further dissemination of any reports would not result in changes</li>
+</ul>
+<p>To see this, suppose the actual route taken by some packet from source to destination, as determined by application of the distributed distance-vector algorithm, is longer than the cost calculated by the source. Choose an example of such a path with the <strong>fewest number of links</strong>, among all such paths in the network. Let S be the source, D the destination, and k the number of links in the actual path P. Let S’s forwarding entry for D be ⟨D,N,c⟩, where N is S’s next_hop neighbor.</p>
+<p>To have obtained this route through the distance-vector algorithm, S must have received report ⟨D,c<sub>D</sub>⟩ from N, where we also have the cost of the S–N link as c<sub>N</sub> and  c = c<sub>D</sub> + c<sub>N</sub>. If we follow a packet from N to D, it must take the same path P with the first link deleted; this sub-path has length k-1 and so, by our hypothesis that k was the length of the shortest path with non-accurate costs, the cost from N to D is c<sub>D</sub>. But this means that the cost along path P, from S to D via N, must be  c<sub>D</sub> + c<sub>N</sub> = c, contradicting our selection of P as a path longer than its advertised cost.</p>
+<p id="index-15">There is one final observation to make about route costs: any cost-minimization can occur only within a single routing domain, where full information about all links is available. If a path traverses multiple routing domains, each separate routing domain may calculate the optimum path traversing that domain. But these “local minimums” do not necessarily add up to a globally minimal path length, particularly when one domain calculates the minimum cost from one of its routers only to the other <em>domain</em> rather than to a router within that other domain. Here is a simple example. Routers BR1 and BR2 are the <strong>border routers</strong> connecting the domain LD to the left of the vertical dotted line with domain RD to the right. From A to B, LD will choose the shortest path to RD (not to B, because LD is not likely to have information about links within RD). This is the path of length 3 through BR2. But this leads to a total path length of 3+8=11 from A to B; the global minimum path length, however, is 4+1=5, through BR1.</p>
+<img alt="_images/border.svg" src="_images/border.svg" /><p>In this example, domains LD and RD join at two points. For a route across two domains joined at only a single point, the domain-local shortest paths do add up to the globally shortest path.</p>
+</div>
+<div class="section" id="loop-free-distance-vector-algorithms">
+<span id="index-16"></span><h2>13.4&nbsp;&nbsp;&nbsp;Loop-Free Distance Vector Algorithms<a class="headerlink" href="#loop-free-distance-vector-algorithms" title="Permalink to this headline">¶</a></h2>
+<p>It is possible for routing-update algorithms based on the distance-vector idea to eliminate routing loops – and thus the slow-convergence problem – entirely. We present brief descriptions of two such algorithms.</p>
+<div class="section" id="dsdv">
+<span id="index-17"></span><span id="id5"></span><h3>13.4.1&nbsp;&nbsp;&nbsp;DSDV<a class="headerlink" href="#dsdv" title="Permalink to this headline">¶</a></h3>
+<p>DSDV, or <strong>Destination-Sequenced Distance Vector</strong>, was proposed in <a class="reference internal" href="bibliography.html#pb94" id="id6">[PB94]</a>. It avoids routing loops by the introduction of <strong>sequence numbers</strong>: each router will always prefer routes with the most recent sequence number, and bad-news information will always have a lower sequence number then the next cycle of corrected information.</p>
+<p>DSDV was originally proposed for MANETs (<a class="reference internal" href="wireless.html#manets"><span class="std std-ref">4.2.8&nbsp;&nbsp;&nbsp;MANETs</span></a>) and has some additional features for traffic minimization that, for simplicity, we ignore here. It is perhaps best suited for wired networks and for small, relatively stable MANETs.</p>
+<p>DSDV forwarding tables contain entries for every other reachable node in the system. One successor of DSDV, Ad Hoc On-Demand Distance Vector routing or AODV, <a class="reference internal" href="#aodv"><span class="std std-ref">13.4.2&nbsp;&nbsp;&nbsp;AODV</span></a>, allows forwarding tables to contain only those destinations in active use; a mechanism is provided for discovery of routes to newly active destinations.</p>
+<p>Under DSDV, each forwarding table entry contains, in addition to the destination, cost and next_hop, the current sequence number for that destination. When neighboring nodes exchange their distance-vector reachability reports, the reports include these per-destination sequence numbers.</p>
+<p>When a router R receives a report from neighbor N for destination D, and the report contains a sequence number larger than the sequence number for D currently in R’s forwarding table, then R always updates to use the new information. The three cost-minimization rules of <a class="reference internal" href="#dv-rules"><span class="std std-ref">13.1.1&nbsp;&nbsp;&nbsp;Distance-Vector Update Rules</span></a> above are used only when the incoming and existing sequence numbers are equal.</p>
+<p>Each time a router R sends a report to its neighbors, it includes a new value for its <em>own</em> sequence number, which it always increments by 2. This number is then entered into each neighbor’s forwarding-table entry for R, and is then propagated throughout the network via continuing report exchanges. Any sequence number originating this way will be even, and whenever another node’s forwarding-table sequence number for R is even, then its cost for R will be finite.</p>
+<p>Infinite-cost reports are generated in the usual way when former neighbors discover they can no longer reach one another; however, in this case each node increments the sequence number for its former neighbor by 1, thus generating an odd value. Any forwarding-table entry with infinite cost will thus always have an odd sequence number. If A and B are neighbors, and A’s current sequence number is s, and the A–B link breaks, then B will start reporting A at cost ∞ with sequence number s+1 while A will start reporting its own new sequence number s+2. Any other node now receiving a report originating with B (with sequence number s+1) will mark A as having cost ∞, but will obtain a valid route to A upon receiving a report originating from A with new (and larger) sequence number s+2.</p>
+<p>The triggered-update mechanism is used: if a node receives a report with some destinations newly marked with infinite cost, it will in turn forward this information immediately to its other neighbors, and so on. This is, however, not essential; “bad” and “good” reports are distinguished by sequence number, not by relative arrival time.</p>
+<p>It is now straightforward to verify that the slow-convergence problem is solved. After a link break, if there is some alternative path from router R to destination D, then R will eventually receive D’s latest even sequence number, which will be greater than any sequence number associated with any report listing D as unreachable. If, on the other hand, the break partitioned the network and there is no longer any path to D from R, then the highest sequence number circulating in R’s half of the original network will be odd and the associated table entries will all list D at cost ∞. One way or another, the network will quickly settle down to a state where every destination’s reachability is accurately described.</p>
+<p>In fact, a stronger statement is true: not even transient routing loops are created. We outline a proof. First, whenever router R has next_hop N for a destination D, then N’s sequence number for D must be greater than or equal to R’s, as R must have obtained its current route to D from one of N’s reports. A consequence is that all routers participating in a loop for destination D must have the same (even) sequence number s for D throughout. This means that the loop would have been created if only the reports with sequence number s were circulating. As we noted in <a class="reference internal" href="#dv-rules"><span class="std std-ref">13.1.1&nbsp;&nbsp;&nbsp;Distance-Vector Update Rules</span></a>, any application of the next_hop-increase rule must trace back to a broken link, and thus must involve an odd sequence number. Thus, the loop must have formed from the sequence-number-s reports by the application of the first two rules only. But this violates the claim in Exercise 10.0.</p>
+<p>There is one drawback to DSDV: nodes may sometimes briefly switch to routes that are longer than optimum (though still correct). This is because a router is required to use the route with the newest sequence number, even if that route is longer than the existing route. If A and B are two neighbors of router R, and B is closer to destination D but slower to report, then every time D’s sequence number is incremented R will receive A’s longer route first, and switch to using it, and B’s shorter route shortly thereafter.</p>
+<p>DSDV implementations usually address this by having each router R keep track of the time interval between the <em>first</em> arrival at R of a new route to a destination D with a given sequence number, and the arrival of the <em>best</em> route with that sequence number. During this interval following the arrival of the first report with a new sequence number, R will use the new route, but will refrain from including the route in the reports it sends to its neighbors, anticipating that a better route will soon arrive.</p>
+<p>This works best when the hopcount cost metric is being used, because in this case the best route is likely to arrive first (as the news had to travel the fewest hops), and at the very least will arrive soon after the first route. However, if the network’s cost metric is unrelated to the hop count, then the time interval between first-route and best-route arrivals can involve multiple update cycles, and can be substantial.</p>
+</div>
+<div class="section" id="aodv">
+<span id="index-18"></span><span id="id7"></span><h3>13.4.2&nbsp;&nbsp;&nbsp;AODV<a class="headerlink" href="#aodv" title="Permalink to this headline">¶</a></h3>
+<p>AODV, or Ad-hoc On-demand Distance Vector routing, is another routing mechanism often proposed for MANETs, though it is suitable for some wired networks as well. Unlike DSDV, above, AODV messages circulate only if a link breaks, or when a node is looking for a route to some other node; this second case is the rationale for the “on-demand” in the name. For larger MANETs, this may result in a significant reduction in routing-management traffic. AODV is described in <a class="reference internal" href="bibliography.html#pr99" id="id8">[PR99]</a> and <span class="target" id="index-19"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3561.html"><strong>RFC 3561</strong></a>.</p>
+<p>The “ad hoc” in the name was intended to suggest that the protocol is well-suited for mobile nodes forming an ad hoc network (<a class="reference internal" href="wireless.html#access-point"><span class="std std-ref">4.2.4&nbsp;&nbsp;&nbsp;Access Points</span></a>). It is, but the protocol is also works well with infrastructure (those with access points) Wi-Fi networks.</p>
+<p>AODV has three kinds of messages: <em>RouteRequest</em> or RREQ, for nodes that are looking for a path to a destination, <em>RouteReply</em> or RREP, as the response, and <em>RouteError</em> or RERR for the reporting of broken links.</p>
+<p>AODV performs reasonably well for MANETs in which the nodes are highly mobile, though it does assume all routing nodes are trustworthy.</p>
+<p>AODV is loop-free, due to the way it uses sequence numbers. However, it does not always find the <em>shortest</em> route right away, and may in fact not find the shortest route for an arbitrarily long interval.</p>
+<p>Each AODV node maintains a node <em>sequence number</em> and also a <em>broadcast counter</em>. Every routing message contains a sequence number for the destination, and every routing record kept by a node includes a field for the destination’s sequence number. Copies of a node’s sequence number held by other nodes may not be the most current; however, nodes always discard routes with an older (smaller) sequence number as soon as they hear about a route with a newer sequence number.</p>
+<p>AODV nodes also keep track of other nodes that are directly reachable; in the diagram below we will assume these are the nodes connected by a line.</p>
+<p>If node A wishes to find a route to node F, as in the diagram below, the first step is for A to increment its sequence number and send out a <em>RouteRequest</em>. This message contains the addresses of A and F, A’s just-incremented sequence number, the highest sequence number of any previous route to F that is known to A (if any), a hopcount field set initially to 1, and A’s broadcast counter. The end result should be a route from A to F, entered at each node along the path, and also a return route from F back to A.</p>
+<img alt="_images/aodv1.svg" src="_images/aodv1.svg" /><p>The <em>RouteRequest</em> is sent initially to A’s direct neighbors, B and C in the diagram above, using UDP. We will assume for the moment that the <em>RouteRequest</em> reaches all the way to F before a <em>RouteReply</em> is generated. This is always the case if the “destination only” flag is set, though if not then it is possible for an intermediate node to generate the <em>RouteReply</em>.</p>
+<p>A node that receives a <em>RouteRequest</em>  must flood it (“broadcast” it) out all its interfaces to all its directly reachable neighbors, after incrementing the hopcount field. B therefore sends A’s message to C and D, and C sends it to B and E. For this example, we will assume that C is a bit slow sending the message to E.</p>
+<p>Each node receiving a <em>RouteRequest</em> must hang on to it for a short interval (typically 3 seconds). During this period, if it sees a duplicate of the <em>RouteRequest</em>, identified by having the same source and the same broadcast counter, it discards it. This discard rule ensures that <em>RouteRequest</em> messages do not circulate endlessly around loops; it may be compared to the reliable-flooding algorithm in <a class="reference internal" href="#link-state"><span class="std std-ref">13.5&nbsp;&nbsp;&nbsp;Link-State Routing-Update Algorithm</span></a>.</p>
+<p>A node receiving a new <em>RouteRequest</em> also records (or updates) a routing-table entry for reaching the source of the <em>RouteRequest</em>. Unless there was a pre-existing newer route (that is, with larger sequence number), the entry is marked with the sequence number contained in the message, and with next_hop the neighbor from which the <em>RouteRequest</em> was received. This process ensures that, as part of each node’s processing of a <em>RouteRequest</em> message, it installs a return route back to the originator.</p>
+<p>We will suppose that the following happen in the order indicated:</p>
+<ul class="simple">
+<li>B forwards the <em>RouteRequest</em> to D*</li>
+<li>D forwards the <em>RouteRequest</em> to E and G</li>
+<li>C forwards the <em>RouteRequest</em> to E</li>
+<li>E forwards the <em>RouteRequest</em> to F</li>
+</ul>
+<p>Because E receives D’s copy of the <em>RouteRequest</em> first, it ignores C’s copy. This will mean that, at least initially, the return path will be longer than necessary. Variants of AODV (such as HWMP below) sometimes allow E to accept C’s message on the grounds that C has a shorter path back to A. This does mean that initial <em>RouteRequest</em> messages farther on in the network now have incorrect hopcount values, though these will be corrected by later <em>RouteRequest</em> messages.</p>
+<p>After the above messages have been received, each node has a path back to A as indicated by the blue arrows below:</p>
+<img alt="_images/aodv2.svg" src="_images/aodv2.svg" /><p>F now increments its own sequence number and creates a <em>RouteReply</em> message; F then sends it to A by following the highlighted (unicast) arrows above, F→E→D→B→A. As each node on the path processes the message, it creates (or updates) its route to the final destination, F; the return route to A had been created earlier when the node processed the corresponding <em>RouteRequest</em>.</p>
+<p>At this point, A and F can communicate bidirectionally. (Each <em>RouteRequest</em> is acknowledged to ensure bidirectionality of each individual link.)</p>
+<p>This F→E→D→B→A is longer than necessary; a shorter path is F→E→C→A. The shorter path will be adopted if, at some future point, E learns that E→C→A is a better path, though there is no mechanism to seek out this route.</p>
+<p>If the “destination only” flag were not set, any intermediate node reached by the <em>RouteRequest</em> flooding could have answered with a route to F, if it had one. Such a node would generate the <em>RouteReply</em> on its own, without involving F. The sequence number of the intermediate node’s route to F must be greater than the sequence number in the <em>RouteRequest</em> message.</p>
+<p>If two neighboring nodes can no longer reach one another, each sends out a <em>RouteError</em> message, to invalidate the route. Nodes keep track of what routes pass through them, for just this purpose. One node’s message will reach the source and the other’s the destination, at which point the route is invalidated.</p>
+<p>In larger networks, it is standard for the originator of a <em>RouteRequest</em> to set the IPv4 header TTL value (or the IPv6 Hop_Limit) to a smallish value (<span class="target" id="index-20"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3561.html"><strong>RFC 3561</strong></a> recommends an intial value of 1) to limit the scope of the <em>RequestRoute</em> messages. If no answer is received, the originator tries again, with a slightly larger TTL value. In a large network, this reduces the volume of <em>RouteRequest</em> messages that have gone too far and therefore cannot be of use in finding a route.</p>
+<p>AODV cannot form even short-term loops. To show this, we start with the observation that whenever a ⟨destination,next_hop⟩ forwarding entry installed at a node, due either to a <em>RouteRequest</em> or to a <em>RouteReply</em>, the next_hop is always the node from which the <em>RouteRequest</em> or <em>RouteReply</em> was received, and therefore the destination sequence number cannot get smaller as we move from the original node to its next_hop. That is, as we follow any route to a destination, the destination sequence numbers are nondecreasing. It immediately follows that, for a routing loop, the destination sequence number is constant along the loop. This means that each node on the route must have heard of the route via the same <em>RouteRequest</em> or <em>RouteReply</em> message, as forwarded.</p>
+<p>The second observation, completing the argument, is that the hopcount field must strictly decrease as we travel along the route to the destination; the processing rules for <em>RouteRequests</em> and <em>RouteReplies</em> mean that each node installs a hopcount of one more than that of the neighboring node from which the route was received. This is impossible for a route that returns to the same node.</p>
+</div>
+<div class="section" id="hwmp">
+<span id="index-21"></span><span id="id9"></span><h3>13.4.3&nbsp;&nbsp;&nbsp;HWMP<a class="headerlink" href="#hwmp" title="Permalink to this headline">¶</a></h3>
+<p>The Hybrid Wireless Mesh Protocol is based on AODV, and has been chosen for the IEEE 802.11s Wi-Fi mesh networking standard (<a class="reference internal" href="wireless.html#wifi-mesh"><span class="std std-ref">4.2.4.4&nbsp;&nbsp;&nbsp;Mesh Networks</span></a>). In the discussion here, we will assume HWMP is being used in a Wi-Fi network, though the protocol applies to any type of network. A set of nodes is designated as the routing (or forwarding) nodes; ordinary Wi-Fi stations may or may not be included here.</p>
+<p>HWMP replaces the hopcount metric used in AODV with an “airtime link metric” which decreases as the link throughput increases and as the link error rate decreases. This encourages the use of higher-quality wireless links.</p>
+<p id="index-22">HWMP has two route-generating modes: an <strong>on-demand mode</strong> very similar to AODV, and a <strong>proactive mode</strong> used when there is at least one identified “root” node that connects to the Internet. In this case, the route-generating protocol determines a loop-free subset of the relevant routing links (that is, a spanning tree) by which each routing node can reach the root (or one of the roots). This tree-building process does not attempt to find best paths between pairs of non-root nodes, though such nodes can use the on-demand mode as necessary.</p>
+<p>In the first, on-demand, mode, HWMP implements a change to classic AODV in that if a node receives a <em>RouteRequest</em> message and then later receives a second <em>RouteRequest</em> message with the same sequence number but a lower-cost route, then the second route replaces the first.</p>
+<p>In the proactive mode, the designated root node – typically the node with wired Internet access – periodically sends out specially marked <em>RouteRequest</em> messages. These are sent to the broadcast address, rather than to any specific destination, but otherwise propagate in the usual way. Routing nodes receiving two copies from two different neighbors pick the one with the shortest path. Once this process stabilizes, each routing node knows the best path to the root (or to <em>a</em> root); the fact that each routing node chooses the best path from among all <em>RouteRequest</em> messages received ensures eventual route optimality. Routing nodes that have traffic to send can at any time generate a <em>RouteReply</em>, which will immediately set up a reverse route from the root to the node in question. Finally, reversing each link to the root allows the root to send broadcast messages.</p>
+<p>HWMP has yet another mode: the root nodes can send out <em>RootAnnounce</em> (RANN) messages. These let other routing nodes know what the root is, but are not meant to result in the creation of routes to the root.</p>
+</div>
+<div class="section" id="eigrp">
+<span id="index-23"></span><span id="id10"></span><h3>13.4.4&nbsp;&nbsp;&nbsp;EIGRP<a class="headerlink" href="#eigrp" title="Permalink to this headline">¶</a></h3>
+<p>EIGRP, or the <strong>Enhanced Interior Gateway Routing Protocol</strong>, is a once-proprietary Cisco distance-vector protocol that was released as an Internet Draft in February 2013. As with DSDV, it eliminates the risk of routing loops, even ephemeral ones. It is based on the “distributed update algorithm” (DUAL) of <a class="reference internal" href="bibliography.html#jg93" id="id11">[JG93]</a>. EIGRP is an actual protocol; we present here only the general algorithm. Our discussion follows <a class="reference internal" href="bibliography.html#ch99" id="id12">[CH99]</a>.</p>
+<p id="index-24">Each router R keeps a list of neighbor routers N<sub>R</sub>, as with any distance-vector algorithm. Each R also maintains a data structure known (somewhat misleadingly) as its <strong>topology table</strong>. It contains, for each destination D and each N in N<sub>R</sub>, an indication of whether N has reported the ability to reach D and, if so, the reported cost c(D,N). The router also keeps, for each N in N<sub>R</sub>, the cost c<sub>N</sub> of the link from R to N. Finally, the forwarding-table entry for any destination can be marked “passive”, meaning safe to use, or “active”, meaning updates are in process and the route is temporarily unavailable.</p>
+<p>Initially, we expect that for each router R and each destination D, R’s next_hop to D in its forwarding table is the neighbor N for which the following total cost is a minimum:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">c(D,N) + c<sub>N</sub></div>
+</div>
+</div></blockquote>
+<p>Now suppose R receives a distance-vector report from neighbor N<sub>1</sub> that it can reach D with cost c(D,N<sub>1</sub>). This is processed in the usual distance-vector way, unless it represents an increased cost and N<sub>1</sub> is R’s next_hop to D; this is the third case in <a class="reference internal" href="#dv-rules"><span class="std std-ref">13.1.1&nbsp;&nbsp;&nbsp;Distance-Vector Update Rules</span></a>. In this case, let C be R’s current cost to D, and let us say that neighbor N of R is a <strong>feasible</strong> next_hop (feasible successor in Cisco’s terminology) if N’s cost to D (that is, c(D,N)) is strictly less than C. R then updates its route to D to use the feasible neighbor N for which c(D,N) + c<sub>N</sub> is a minimum. Note that this may not in fact be the shortest path; it is possible that there is another neighbor M for which c(D,M)+c<sub>M</sub> is smaller, but c(D,M)≥C. However, because N’s path to D is loop-free, and because c(D,N) &lt; C, this new path through N must also be loop-free; this is sometimes summarized by the statement “one cannot create a loop by adopting a shorter route”.</p>
+<p>If no neighbor N of R is feasible – which would be the case in the D—A—B example of <a class="reference internal" href="#dvscp"><span class="std std-ref">13.2&nbsp;&nbsp;&nbsp;Distance-Vector Slow-Convergence Problem</span></a>, then R invokes the “DUAL” algorithm. This is sometimes called a “diffusion” algorithm as it invokes a diffusion-like spread of table changes proceeding away from R.</p>
+<p>Let C in this case denote the new cost from R to D as based on N<sub>1</sub>’s report. R marks destination D as “active” (which suppresses forwarding to D) and sends a special query to each of its neighbors, in the form of a distance-vector report indicating that its cost to D has now increased to C. The algorithm terminates when all R’s neighbors reply back with their own distance-vector reports; at that point R marks its entry for D as “passive” again.</p>
+<p>Some neighbors may be able to process R’s report without further diffusion to other nodes, remain “passive”, and reply back to R immediately. However, other neighbors may, like R, now become “active” and continue the DUAL algorithm. In the process, R may receive other queries that elicit its distance-vector report; as long as R is “active” it will report its cost to D as C. We omit the argument that this process – and thus the network – must eventually converge.</p>
+</div>
+</div>
+<div class="section" id="link-state-routing-update-algorithm">
+<span id="link-state"></span><span id="index-25"></span><h2>13.5&nbsp;&nbsp;&nbsp;Link-State Routing-Update Algorithm<a class="headerlink" href="#link-state-routing-update-algorithm" title="Permalink to this headline">¶</a></h2>
+<p>Link-state routing is an alternative to distance-vector. It is often – though certainly not always – considered to be the routing-update algorithm class of choice for networks that are “sufficiently large”, such as those of ISPs. There are two specific link-state protocols: the IETF’s Open Shortest Path First (<strong>OSPF</strong>, <span class="target" id="index-26"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2328.html"><strong>RFC 2328</strong></a>), and OSI’s Intermediate Systems to Intermediate Systems (<strong>IS-IS</strong>, documented unofficially in <span class="target" id="index-27"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1142.html"><strong>RFC 1142</strong></a>).</p>
+<p>In distance-vector routing, each node knows a bare minimum of network topology: it knows nothing about links beyond those to its immediate neighbors. In the link-state approach, each node keeps a <em>maximum</em> amount of network information: a full map of all nodes and all links. Routes are then computed locally from this map, using the shortest-path-first algorithm. The existence of this map allows, in theory, the calculation of different routes for different quality-of-service requirements. The map also allows calculation of a new route as soon as news of the failure of the existing route arrives; distance-vector protocols on the other hand must wait for news of a new route after an existing route fails.</p>
+<p id="index-28">Link-state protocols distribute network map information through a modified form of broadcast of the status of each individual link. Whenever either side of a link notices the link has died (or if a node notices that a new link has become available), it sends out <strong>link-state packets</strong> (LSPs) that “flood” the network. This broadcast process is called <strong>reliable flooding</strong>. In general, broadcast mechanisms are not compatible with networks that have topological looping (that is, redundant paths); broadcast packets may circulate around the loop endlessly. Link-state protocols must be carefully designed to ensure that both every router sees every LSP, and also that no LSPs circulate repeatedly. (The acronym LSP is used by IS-IS; the preferred acronym used by OSPF is LSA, where A is for advertisement.) LSPs are sent immediately upon link-state changes, like triggered updates in distance-vector protocols except there is no “race” between “bad news” and “good news”.</p>
+<p id="index-29">It is possible for ephemeral routing loops to exist; for example, if one router has received a LSP but another has not, they may have an inconsistent view of the network and thus route to one another. However, as soon as the LSP has reached all routers involved, the loop should vanish. There are no “race conditions”, as with distance-vector routing, that can lead to persistent routing loops.</p>
+<p>The link-state flooding algorithm avoids the usual problems of broadcast in the presence of loops by having each node keep a database of all LSP messages. The originator of each LSP includes its identity, information about the link that has changed status, and also a <strong>sequence number</strong>. Other routers need only keep in their databases the LSP packet with the largest sequence number; older LSPs can be discarded. When a router receives a LSP, it first checks its database to see if that LSP is old, or is current but has been received before; in these cases, no further action is taken. If, however, an LSP arrives with a sequence number not seen before, then in typical broadcast fashion the LSP is retransmitted over all links except the arrival interface.</p>
+<p>As an example, consider the following arrangement of routers:</p>
+<img alt="_images/loop_plus_E.svg" src="_images/loop_plus_E.svg" /><p>Suppose the A–E link status changes. A sends LSPs to C and B. Both these will forward the LSPs to D; suppose B’s arrives first. Then D will forward the LSP to C; the LSP traveling C→D and the LSP traveling D→C might even cross on the wire. D will ignore the second LSP copy that it receives from C and C will ignore the second copy it receives from D.</p>
+<p id="index-30">It is important that LSP sequence numbers not wrap around. (Protocols that <em>do</em> allow a numeric field to wrap around usually have a clear-cut idea of the “active range” that can be used to conclude that the numbering has wrapped rather than restarted; this is harder to do in the link-state context.) OSPF uses <strong>lollipop sequence-numbering</strong> here: sequence numbers begin at -2<sup>31</sup> and increment to 2<sup>31</sup>-1. At this point they wrap around back to 0. Thus, as long as a sequence number is less than zero, it is guaranteed unique; at the same time, routing will not cease if more than 2<sup>31</sup> updates are needed. Other link-state implementations use 64-bit sequence numbers.</p>
+<p>Actual link-state implementations often give link-state records a maximum lifetime; entries <em>must</em> be periodically renewed.</p>
+<div class="section" id="shortest-path-first-algorithm">
+<span id="shortest-path-first"></span><span id="spf"></span><span id="index-31"></span><h3>13.5.1&nbsp;&nbsp;&nbsp;Shortest-Path-First Algorithm<a class="headerlink" href="#shortest-path-first-algorithm" title="Permalink to this headline">¶</a></h3>
+<p>The next step is to compute routes from the network map, using the shortest-path-first (SPF) algorithm. This algorithm computes shortest paths from a given node, A in the example here, to all other nodes.  Below is our example network; we are interested in the shortest paths from A to B, C and D.</p>
+<img alt="_images/SPFexample.svg" src="_images/SPFexample.svg" /><p>Before starting the algorithm, we note the shortest path from A to D is A-B-C-D, which has cost 3+4+2=9.</p>
+<p>The algorithm builds the set <strong>R</strong> of all shortest-path routes iteratively. Initially, <strong>R</strong> contains only the 0-length route to the start node; one new destination and route is added to <strong>R</strong> at each stage of the iteration. At each stage we have a <strong>current</strong> node, representing the node most recently added to <strong>R</strong>. The initial <strong>current</strong> node is our starting node, in this case, A.</p>
+<p>We will also maintain a set <strong>T</strong>, for tentative, of routes to other destinations. This is also initialized to empty.</p>
+<p>At each stage, we find all nodes which are immediate neighbors of the <strong>current</strong> node and which do not already have routes in the set <strong>R</strong>. For each such node N, we calculate the cost of the route from the start node to N that goes through the <strong>current</strong> node. We see if this is our first route to N, or if the route improves on any route to N already in <strong>T</strong>; if so, we add or update the route in <strong>T</strong> accordingly. Doing this, the routes will be discovered in order of increasing (or nondecreasing) cost.</p>
+<p>At the end of this process, we choose the shortest path in <strong>T</strong>, and move the route and destination node to <strong>R</strong>. The destination node of this shortest path becomes the next <strong>current</strong> node. Ties can be resolved arbitrarily, but note that, as with distance-vector routing, we must choose the minimum or else the accurate-costs property will fail.</p>
+<p>We repeat this process until all nodes have routes in the set <strong>R</strong>.</p>
+<p>For the example above, we start with <strong>current</strong> = A and <strong>R</strong> = {⟨A,A,0⟩}. The set <strong>T</strong> will be {⟨B,B,3⟩, ⟨C,C,10⟩, ⟨D,D,11⟩}. The lowest-cost entry is ⟨B,B,3⟩, so we move that to <strong>R</strong> and continue with <strong>current</strong> = B. No path through C or D can possibly have lower cost.</p>
+<p>For the next stage, the neighbors of B without routes in <strong>R</strong> are C and D; the routes from A to these through B are ⟨C,B,7⟩ and ⟨D,B,12⟩. The former is an improvement on the existing <strong>T</strong> entry ⟨C,C,10⟩ and so replaces it; the latter is not an improvement over ⟨D,D,11⟩. <strong>T</strong> is now {⟨C,B,7⟩, ⟨D,D,11⟩}. The lowest-cost route in <strong>T</strong> is that to C, so we move this node and route to <strong>R</strong> and set C to be <strong>current</strong>.</p>
+<p>Again, ⟨C,B,7⟩ must be the shortest path to C. If any lower-cost path to C existed, then we would be selecting that shorter path – or a prefix of it – at this point, instead of the ⟨C,B,7⟩ path; see the proof below.</p>
+<p>For the next stage, D is the only non-<strong>R</strong> neighbor; the path from A to D via C has entry ⟨D,B,9⟩, an improvement over the existing ⟨D,D,11⟩ in <strong>T</strong>. The only entry in <strong>T</strong> is now ⟨D,B,9⟩; this has the lowest cost and thus we move it to <strong>R</strong>.</p>
+<p>We now have routes in <strong>R</strong> to all nodes, and are done.</p>
+<p>Here is another example, again with links labeled with costs:</p>
+<img alt="_images/SPF2a.svg" src="_images/SPF2a.svg" /><p>We start with <strong>current</strong> = A. At the end of the first stage, ⟨B,B,3⟩ is moved into <strong>R</strong>, <strong>T</strong> is {⟨D,D,8⟩}, and <strong>current</strong> is B. The second stage adds ⟨C,B,5⟩ to <strong>T</strong>, and then moves this to <strong>R</strong>; <strong>current</strong> then becomes C. The third stage introduces the route (from A) ⟨D,B,6⟩; this is an improvement over ⟨D,D,8⟩ and so replaces it in <strong>T</strong>; at the end of the stage this route to D is moved to <strong>R</strong>.</p>
+<p>In both the examples above, the <strong>current</strong> nodes progressed along a path, A→B→C→D. This is not generally the case; here is a similar example but with different lengths in which <strong>current</strong> jumps from B to D:</p>
+<img alt="_images/SPF2b.svg" src="_images/SPF2b.svg" /><p>As in the previous example, at the end of the first stage ⟨B,B,3⟩ is moved into <strong>R</strong>, with <strong>T</strong> = {⟨D,D,4⟩}, and B becomes <strong>current</strong>. The second stage adds ⟨C,B,6⟩ to <strong>T</strong>. However, the shortest path in <strong>T</strong> is now ⟨D,D,4⟩, and so it is D that becomes the next <strong>current</strong>. The final stage replaces ⟨C,B,6⟩ in T with ⟨C,D,5⟩. At that point this route is added to <strong>R</strong> and the algorithm is completed.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><strong>Proof that SPF paths are shortest</strong>: suppose, by contradiction, that, for some node, a shorter path exists than the one generated by SPF. Let A be the start node, and let U be the <em>first</em> node generated for which the SPF path is not shortest. Let <strong>T</strong> be the Tentative set and let <strong>R</strong> be the set of completed routes at the point when we choose U as <strong>current</strong>, and let d be the cost of the new route to U. Let <strong>P</strong> = ⟨A,…,X,Y,…,U⟩ be the shorter path to U, with cost c&lt;d, where Y is the first node along the path <em>not</em> to have a route in <strong>R</strong> (it is possible Y=U).</div>
+</div>
+</div></blockquote>
+<img alt="_images/spfproof.svg" src="_images/spfproof.svg" /><blockquote>
+<div><div class="line-block">
+<div class="line">At some strictly earlier stage in the algorithm, we must have added a route to node X, as the route to X is in <strong>R</strong>. In the following stage, we would have included the prefix ⟨A,…,X,Y⟩ of <strong>P</strong> in Tentative. This path to Y has cost ≤c. This route must still be in <strong>T</strong> at the point we chose U as <strong>current</strong>, as there is no route to Y in <strong>R</strong>, but this means we should instead have chosen Y as <strong>current</strong>, contradicting the choice of U.</div>
+</div>
+</div></blockquote>
+<p>A link-state source node S computes the entire path to a destination D (in fact it computes the path to every destination). But as far as the actual path that a packet sent by S will take to D, S has direct control only as far as the first hop N. While the accurate-cost rule we considered in distance-vector routing will still hold, the actual path taken by the packet may differ from the path computed at the source, in the presence of alternative paths of the same length. For example, S may calculate a path S–N–A–D, and yet a packet may take path S–N–B–D, so long as the N–A–D and N–B–D paths have the same length.</p>
+<p>Link-state routing allows calculation of routes on demand (results are then cached), or larger-scale calculation. Link-state also allows routes calculated with quality-of-service taken into account, via straightforward extension of the algorithm above.</p>
+<p>Because the starting node is fixed, the shortest-path-first algorithm can be classified as a <strong>single-source</strong> approach. If the goal is to compute the shortest paths between all pairs of nodes in a network, the <a class="reference external" href="https://en.wikipedia.org/wiki/Floyd%E2%80%93Warshall_algorithm">Floyd-Warshall algorithm</a> is an alternative, with slightly better performance in networks with large numbers of links.</p>
+</div>
+</div>
+<div class="section" id="routing-on-other-attributes">
+<span id="lartc-use"></span><span id="index-32"></span><h2>13.6&nbsp;&nbsp;&nbsp;Routing on Other Attributes<a class="headerlink" href="#routing-on-other-attributes" title="Permalink to this headline">¶</a></h2>
+<p>There is sometimes a desire to route on packet attributes other than the destination, or the destination and QoS bits. For example, we might want to route packets based in part on the packet source, or on the TCP port number. This kind of routing is decidedly nonstandard, though it is often available, and often an important component of traffic engineering.</p>
+<p>This option is often known as <strong>policy-based routing</strong>, because packets are routed according to attributes specified by local administrative policy. (This term should not be confused with BGP <em>routing policy</em> (<a class="reference internal" href="bgp.html#bgp"><span class="std std-ref">15&nbsp;&nbsp;&nbsp;Border Gateway Protocol (BGP)</span></a>), which means something quite different.)</p>
+<p>Policy-based routing is not used frequently, but one routing decision of this type can have far-reaching effects. If an ISP wishes to route customer voice traffic differently from customer data traffic, for example, it need only apply policy-based routing to classify traffic at the point of entry, and send the voice traffic to its own router. After that, ordinary routers on the voice path and on the separate data path can continue the forwarding without using policy-based methods.</p>
+<p>Sometimes policy-based routing is used to <em>mark</em> packets for special processing; this might mean different routing further downstream or it might mean being sent along the same path as the other traffic but with preferential treatment. For two packet-marking strategies, see <a class="reference internal" href="realtime.html#diffserv"><span class="std std-ref">25.7&nbsp;&nbsp;&nbsp;Differentiated Services</span></a> and <a class="reference internal" href="realtime.html#mpls"><span class="std std-ref">25.12&nbsp;&nbsp;&nbsp;Multi-Protocol Label Switching (MPLS)</span></a>.</p>
+<p>On Linux systems policy-based routing is part of the Linux Advanced Routing facility, often grouped with some advanced queuing features known as Traffic Control; the combination is referred to as <a class="reference external" href="http://www.lartc.org/">LARTC</a>.</p>
+<p id="index-33">As a simple example of what can be done, suppose a site has two links L1 and L2 to the Internet, with L1 the default route to the Internet. Perhaps L1 is faster and L2 serves more as a backup; perhaps L2 has been added to increase outbound capacity. A site may wish to route some outbound traffic via L2 for any of the following reasons:</p>
+<ul class="simple">
+<li>the traffic may involve protocols deemed lower in priority (<em>eg</em> email)</li>
+<li>the traffic may be real-time traffic that can benefit from reduced competition on L2</li>
+<li>the traffic may come from lower-priority senders; <em>eg</em> some customers within the site may be relegated to using L2 because they are paying less</li>
+<li>a few large-volume <a class="reference external" href="https://en.wikipedia.org/wiki/Elephant_flow">elephant flows</a> may be offloaded from L1 to L2</li>
+</ul>
+<p>In the first two cases, routing might be based on the destination port numbers; in the third, it might be based on the source IP address. In the fourth case, a site’s classification of its elephant flows may have accumulated over time.</p>
+<p>Note that nothing can be done in the <em>inbound</em> direction unless L1 and L2 lead to the same ISP, and even there any special routing would be at the discretion of that ISP.</p>
+<p id="index-34">The trick with LARTC is to be compatible with existing routing-update protocols; this would be a problem if the kernel forwarding table simply added columns for other packet attributes that neighboring non-LARTC routers knew nothing about. Instead, the forwarding table is split up into multiple ⟨dest, next_hop⟩ (or ⟨dest, QoS, next_hop⟩) tables. One of these tables is the <strong>main</strong> table, and is the table that is updated by routing-update protocols interacting with neighbors. Before a packet is forwarded, administratively supplied rules are consulted to determine which table to apply; these rules <em>are</em> allowed to consult other packet attributes. The collection of tables and rules is known as the <strong>routing policy database</strong>.</p>
+<p>As a simple example, in the situation above the main table would have an entry ⟨default, L1⟩ (more precisely, it would have the IP address of the far end of the L1 link instead of L1 itself). There would also be another table, perhaps named <strong>slow</strong>, with a single entry ⟨default, L2⟩. If a rule is created to have a packet routed using the “slow” table, then that packet will be forwarded via L2. Here is one such Linux rule, which causes all traffic from host 10.0.0.17 to be routed using table “slow”:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ip</span> <span class="n">rule</span> <span class="n">add</span> <span class="kn">from</span> <span class="mf">10.0.0.17</span> <span class="n">table</span> <span class="n">slow</span>
+</pre></div>
+</div>
+<p id="index-35">Now suppose we want to route traffic to port 25 (the SMTP port) via L2. This is harder; Linux provides no support here for routing based on port numbers. However, we can instead use the <a class="reference external" href="https://en.wikipedia.org/wiki/Iptables">iptables</a> mechanism to “mark” all packets destined for port 25, and then create a routing-policy rule to have such marked traffic use the slow table. The mark is known as the forwarding mark, or <code class="docutils literal notranslate"><span class="pre">fwmark</span></code>; its value is 0 by default. The <code class="docutils literal notranslate"><span class="pre">fwmark</span></code> is not actually part of the packet; it is associated with the packet only while the latter remains within the kernel.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">iptables</span> <span class="o">--</span><span class="n">table</span> <span class="n">mangle</span> <span class="o">--</span><span class="n">append</span> <span class="n">PREROUTING</span> \\
+         <span class="o">--</span><span class="n">protocol</span> <span class="n">tcp</span> <span class="o">--</span><span class="n">dport</span> <span class="mi">25</span> <span class="o">--</span><span class="n">jump</span> <span class="n">MARK</span> <span class="o">--</span><span class="nb">set</span><span class="o">-</span><span class="n">mark</span> <span class="mi">1</span>
+
+<span class="n">ip</span> <span class="n">rule</span> <span class="n">add</span> <span class="n">fwmark</span> <span class="mi">1</span> <span class="n">table</span> <span class="n">slow</span>
+</pre></div>
+</div>
+<p>Consult the applicable man pages for further details.</p>
+<p>The iptables mechanism can also be used to set the appropriate QoS bits – the IPv4 DS bits (<a class="reference internal" href="ipv4.html#ipv4-header"><span class="std std-ref">9.1&nbsp;&nbsp;&nbsp;The IPv4 Header</span></a>) or the IPv6 Traffic Class bits (<a class="reference internal" href="ipv6a.html#ipv6-header"><span class="std std-ref">11.1&nbsp;&nbsp;&nbsp;The IPv6 Header</span></a>) – so that a single standard IP forwarding table can be used, though support for the IPv4 QoS bits is limited.</p>
+<p>Linux actually maintains a numbered set of up to 255 tables; the <strong>main</strong> table is number 254. These associations between numbers and table names are stored in <code class="docutils literal notranslate"><span class="pre">/etc/iproute2/rt_tables</span></code>. If we want a table named “slow” then we have to give it a number in this file, perhaps with an entry</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">100</span>  <span class="n">slow</span>
+</pre></div>
+</div>
+<p>(Alternatively, it is possible to replace the name “slow” in the earlier commands with the number.)</p>
+<div class="section" id="reverse-path-filtering">
+<span id="index-36"></span><span id="id13"></span><h3>13.6.1&nbsp;&nbsp;&nbsp;Reverse-Path Filtering<a class="headerlink" href="#reverse-path-filtering" title="Permalink to this headline">¶</a></h3>
+<p>There is one other issue we must deal with to build a working example from the fragments above. When a packet arrives at a router, a feature called <strong>reverse-path filtering</strong> will prevent forwarding the packet if the router does not have a forwarding entry that would forward the <em>source</em> address back out the interface by which the packet just arrived; that is, if the router knows it won’t be able to route reply packets properly, it won’t forward the original packet. This is very commonly implemented, and is meant to prevent spoofing. If an ISP, for example, has IP address block 200.1.0.0/16, then reverse-path filtering will prevent miscreant ISP customers from sending out packets with “spoofed” source addresses not in this block. If every ISP implemented this feature, certain malicious attacks such as SYN flooding (<a class="reference internal" href="tcpA.html#tcp-connection-establishment"><span class="std std-ref">17.3&nbsp;&nbsp;&nbsp;TCP Connection Establishment</span></a>) would be much harder.</p>
+<p>But for the router above with the two paths L1 and L2, reverse-path filtering must be disabled. Suppose this router is R, and let D be the destinaton that the “slow” path is being set up to reach. R will have a “normal” (perhaps default) route to reach D via L1. The point of policy-based routing is so packets to D will be routed using the other, “slow” path, over L2. But with reverse-path filtering in place the router will detect that <em>return</em> packets from D, <em>arriving</em> via L2, have a source address that does not get forwarded <em>back</em> over L2, because the return packets don’t match the routing-policy rule. So, unless reverse-path-filtering is disabled, R will drop these return packets. Packets <em>to</em> D will be delivered, but all D’s replies will be lost.</p>
+<p>On Linux systems, the files in the directory <code class="docutils literal notranslate"><span class="pre">/proc/sys/net/ipv4/conf</span></code> determine the status of reverse-path filtering. This directory contains a subdirectory for each interface, plus <code class="docutils literal notranslate"><span class="pre">default</span></code>. Each subdirectory contains, among other things, a file <code class="docutils literal notranslate"><span class="pre">rp_filter</span></code>; if this file contains a 0, reverse-path filtering is off, while a value of 1 enables it. A value of 2 enables “loose reverse-path filtering”, in that a packet is forwarded if there is <em>some</em> interface – not necessarily the arrival interface – by which the router can reach the source address.</p>
+</div>
+</div>
+<div class="section" id="ecmp">
+<span id="index-37"></span><span id="id14"></span><h2>13.7&nbsp;&nbsp;&nbsp;ECMP<a class="headerlink" href="#ecmp" title="Permalink to this headline">¶</a></h2>
+<p>Equal-Cost MultiPath routing, or ECMP, is a technique for combining two (or more) routes to a destination into a single unit, so that traffic to that destination is distributed (not necessarily equally) among the routes. ECMP is supported by EIGRP (<a class="reference internal" href="#eigrp"><span class="std std-ref">13.4.4&nbsp;&nbsp;&nbsp;EIGRP</span></a>) and the link-state implementations OSPF and IS-IS (<a class="reference internal" href="#link-state"><span class="std std-ref">13.5&nbsp;&nbsp;&nbsp;Link-State Routing-Update Algorithm</span></a>). At the Ethernet level, ECMP is supported in spirit (if not in name) by TRILL and SPB (<a class="reference internal" href="ethernet2.html#trill"><span class="std std-ref">3.3&nbsp;&nbsp;&nbsp;TRILL and SPB</span></a>). It is also supported by BGP (<a class="reference internal" href="bgp.html#bgp"><span class="std std-ref">15&nbsp;&nbsp;&nbsp;Border Gateway Protocol (BGP)</span></a>) for inter-AS routing.</p>
+<p>A simpler alternative to ECMP is <strong>channel bonding</strong>, also known as <strong>link aggregation</strong>, and often based on the <a class="reference external" href="https://en.wikipedia.org/wiki/Link_aggregation">IEEE 802.3ad</a> standard. In channel bonding, two parallel Ethernet links are treated as a single unit. In many cases it is simpler and cheaper to bond two or three 1 Gbps Ethernet links than to upgrade everything to support 10 Gbps. Channel bonding applies, however, in limited circumstances; for example, the two channels must both be Ethernet, and must represent a single link.</p>
+<p>In the absence of channel bonding, equal-cost does not necessarily mean equal-propagation-delay. Even for two short parallel links, queuing delays on one link may mean that packet delivery order is not preserved. As TCP usually interprets out-of-order packet delivery as evidence of packet loss (<a class="reference internal" href="reno.html#fast-retransmit"><span class="std std-ref">19.3&nbsp;&nbsp;&nbsp;TCP Tahoe and Fast Retransmit</span></a>), this can lead to large numbers of spurious retransmissions. For this reason, ECMP is almost always configured to send all the packets of any one TCP connection over just one of the links (as determined by a hash function); some channel-bonding implementations do the same, in fact. A consequence is that ECMP configured this way must see a large number of parallel TCP connections in order to utilize all participating paths reasonably equally. In special cases, however, it may be practical to configure ECMP to alternate between the paths on a per-packet basis, using round-robin transmission; this approach has the potential to achieve much better load-balancing between the paths.</p>
+<p>In terms of routing-update protocols, ECMP can be viewed as allowing two (or more) next_hop values, each with the same cost, to be associated with the same destination.</p>
+<p>See <a class="reference internal" href="mininet.html#multitrunk"><span class="std std-ref">30.9.4&nbsp;&nbsp;&nbsp;multitrunk.py</span></a> for an example of the use of software-defined networking to have multiple TCP connections take different paths to the same destination, in a way similar to the ECMP approach.</p>
+</div>
+<div class="section" id="epilog">
+<h2>13.8&nbsp;&nbsp;&nbsp;Epilog<a class="headerlink" href="#epilog" title="Permalink to this headline">¶</a></h2>
+<p>At this point we have concluded the basics of IP routing, involving routing within large (relatively) <em>homogeneous</em> organizations such as multi-site corporations or Internet Service Providers. Every router involved must agree to run the same protocol, and must agree to a uniform assignment of link costs.</p>
+<p>At the very largest scales, these requirements are impractical. The next chapter is devoted to this issue of very-large-scale IP routing, <em>eg</em> on the global Internet.</p>
+</div>
+<div class="section" id="exercises">
+<span id="routing-exercises"></span><h2>13.9&nbsp;&nbsp;&nbsp;Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<p><em>Exercises may be given fractional (floating point) numbers, to allow for interpolation of new exercises.</em> Exercises marked with a ♢ have solutions or hints at <a class="reference internal" href="solutions.html#routing-solutions"><span class="std std-ref">34.10&nbsp;&nbsp;&nbsp;Solutions for Routing-Update Algorithms</span></a>.</p>
+<p>1.0. Suppose the network is as follows, where distance-vector routing update is used. Each link has cost 1, and each router initially has entries in its forwarding table only for its immediate neighbors (so A’s table contains ⟨B,B,1⟩, ⟨D,D,1⟩ and B’s table contains ⟨A,A,1⟩, ⟨C,C,1⟩).</p>
+<img alt="_images/exercise1.svg" src="_images/exercise1.svg" /><div class="line-block">
+<div class="line">(a). Suppose each router creates a report from its initial configuration and sends that to each of its neighbors. What will each router’s forwarding table be after this set of exchanges? The exchanges, in other words, are all conducted simultaneously; each router first sends out its own report and then processes the reports arriving from its two neighbors.</div>
+<div class="line">(b). What destinations, with corresponding cost values, will be added to each router’s table after the simultaneous-and-parallel exchange process of part (a) is repeated a second time? Ignore the next_hop values.</div>
+<div class="line">Hint: for each router, this step will add one additional destination entry. This new destination entry can be determined without going through the table exchanges in detail.</div>
+</div>
+<p>2.0. Now suppose the configuration of routers has the link weights shown below. Each router again initially has entries in its forwarding table only for its immediate neighbors.</p>
+<img alt="_images/exercise2.svg" src="_images/exercise2.svg" /><div class="line-block">
+<div class="line">(a). As in the previous exercise, give each router’s forwarding table after each router exchanges with its immediate neighbors simultaneously and in parallel.</div>
+<div class="line">(b). How many iterations of such parallel exchanges will it take before C learns to reach F via B; that is, before it creates the entry ⟨F,B,11⟩? Count the answer to part (a) as the first iteration.</div>
+</div>
+<p>3.0.♢ A router R has the following distance-vector table:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="48%" />
+<col width="17%" />
+<col width="34%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">destination</th>
+<th class="head">cost</th>
+<th class="head">next hop</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>A</td>
+<td>2</td>
+<td>R1</td>
+</tr>
+<tr class="row-odd"><td>B</td>
+<td>3</td>
+<td>R2</td>
+</tr>
+<tr class="row-even"><td>C</td>
+<td>4</td>
+<td>R1</td>
+</tr>
+<tr class="row-odd"><td>D</td>
+<td>5</td>
+<td>R3</td>
+</tr>
+</tbody>
+</table>
+<p>R now receives the following report from R1; the cost of the R–R1 link is 1.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="71%" />
+<col width="29%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">destination</th>
+<th class="head">cost</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>A</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td>B</td>
+<td>2</td>
+</tr>
+<tr class="row-even"><td>C</td>
+<td>4</td>
+</tr>
+<tr class="row-odd"><td>D</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p>Give R’s updated table after it processes R1’s report. For each entry that changes, give a brief explanation</p>
+<p>4.0. A router R has the following distance-vector table:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="48%" />
+<col width="17%" />
+<col width="34%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">destination</th>
+<th class="head">cost</th>
+<th class="head">next hop</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>A</td>
+<td>5</td>
+<td>R1</td>
+</tr>
+<tr class="row-odd"><td>B</td>
+<td>6</td>
+<td>R1</td>
+</tr>
+<tr class="row-even"><td>C</td>
+<td>7</td>
+<td>R2</td>
+</tr>
+<tr class="row-odd"><td>D</td>
+<td>8</td>
+<td>R2</td>
+</tr>
+<tr class="row-even"><td>E</td>
+<td>9</td>
+<td>R3</td>
+</tr>
+</tbody>
+</table>
+<p>R now receives the following report from R1; the cost of the R–R1 link is 1.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="71%" />
+<col width="29%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">destination</th>
+<th class="head">cost</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>A</td>
+<td>4</td>
+</tr>
+<tr class="row-odd"><td>B</td>
+<td>7</td>
+</tr>
+<tr class="row-even"><td>C</td>
+<td>7</td>
+</tr>
+<tr class="row-odd"><td>D</td>
+<td>6</td>
+</tr>
+<tr class="row-even"><td>E</td>
+<td>8</td>
+</tr>
+<tr class="row-odd"><td>F</td>
+<td>8</td>
+</tr>
+</tbody>
+</table>
+<p>Give R’s updated table after it processes R1’s report. For each entry that changes, give a brief explanation, in the style of <a class="reference internal" href="#dv-example-4"><span class="std std-ref">13.1.5&nbsp;&nbsp;&nbsp;Example 4</span></a>.</p>
+<p>5.0. At the start of Example 3 (<a class="reference internal" href="#example-3"><span class="std std-ref">13.1.4&nbsp;&nbsp;&nbsp;Example 3</span></a>), we changed C’s routing table so that it reached D via A instead of via E: C’s entry ⟨D,E,2⟩ was changed to ⟨D,A,2⟩. This meant that C had a valid route to D at the start.</p>
+<p>How might the scenario of Example 3 play out if C’s table had not been altered? Give a sequence of reports that leads to correct routing between D and E.</p>
+<p>6.0. In the following exercise, A-D are routers and the attached subnets N1-N6, which are the ultimate destinations, are shown explicitly. In the case of N1 through N4, the links <em>are</em> the subnets. Routers still exchange distance-vector reports with neighboring routers, as usual. In the tables requested below, if a router has a direct connection to a subnet, you may report the next_hop as “direct”, <em>eg</em>, from A’s table, ⟨N1,direct,0⟩</p>
+<img alt="_images/routers_and_nets.svg" src="_images/routers_and_nets.svg" /><div class="line-block">
+<div class="line">(a). Give the initial tables for A through D, before any distance-vector exchanges.</div>
+<div class="line">(b). Give the tables after each router A-D exchanges with its immediate neighbors simultaneously and in parallel.</div>
+<div class="line">(c). At the end of (b), what subnets are <em>not</em> known by what routers?</div>
+</div>
+<p>7.0. Suppose A, B, C, D and E are connected as follows. Each link has cost 1, and so each forwarding table is uniquely determined; B’s table is ⟨A,A,1⟩, ⟨C,C,1⟩, ⟨D,A,2⟩, ⟨E,C,2⟩. Distance-vector routing update is used.</p>
+<img alt="_images/fiveloop_costs.svg" src="_images/fiveloop_costs.svg" /><p>Now suppose the D–E link fails, and so D updates its entry for E to ⟨E,-,∞⟩.</p>
+<div class="line-block">
+<div class="line">(a). Give A’s table after D reports ⟨E,∞⟩ to A</div>
+<div class="line">(b). Give B’s table after A reports to B</div>
+<div class="line">(c). Give A’s table after B reports to A; note that B has an entry ⟨E,C,2⟩</div>
+<div class="line">(d). Give D’s table after A reports to D.</div>
+</div>
+<p>8.0. In the network below, A receives alternating reports about destination D from neighbors B and C. Suppose A uses a modified form of Rule 2 of <a class="reference internal" href="#dv-rules"><span class="std std-ref">13.1.1&nbsp;&nbsp;&nbsp;Distance-Vector Update Rules</span></a>, in which it updates its forwarding table whenever new cost c is less than <em>or equal to</em> c<sub>old</sub>.</p>
+<img alt="_images/dv_ties.svg" src="_images/dv_ties.svg" /><p>Explain why A’s forwarding entry for destination D never stabilizes.</p>
+<p>9.0. Consider the network in <a class="reference internal" href="#split-horizon"><span class="std std-ref">13.2.1.1&nbsp;&nbsp;&nbsp;Split Horizon</span></a>:, using distance-vector routing updates. B and C’s table entries for destination D are shown. All link costs are 1.</p>
+<img alt="_images/split_horizon_loop.svg" src="_images/split_horizon_loop.svg" /><p>Suppose the D–A link breaks and then these update reports occur:</p>
+<ul class="simple">
+<li>A reports ⟨D,∞⟩ to B  (as before)</li>
+<li>C reports ⟨D,2⟩ to B  (as before)</li>
+<li>A now reports ⟨D,∞⟩ to C (instead of B reporting ⟨D,3⟩ to A)</li>
+</ul>
+<div class="line-block">
+<div class="line">(a). Give A, B and C’s forwarding-table records for destination D, including the cost, after these three reports.</div>
+<div class="line">(b). What additional reports (a pair should suffice) will lead to the formation of the routing loop?</div>
+<div class="line">(c). What (single) additional report will eliminate the possibility of the routing loop?</div>
+</div>
+<p>10.0. Suppose the network of <a class="reference internal" href="#dvscp"><span class="std std-ref">13.2&nbsp;&nbsp;&nbsp;Distance-Vector Slow-Convergence Problem</span></a> is changed to the following. Distance-vector update is used; again, the D–A link breaks.</p>
+<img alt="_images/hold_down.svg" src="_images/hold_down.svg" /><div class="line-block">
+<div class="line">(a). Explain why B’s report back to A, after A reports ⟨D,-,∞⟩, is now valid.</div>
+<div class="line">(b). Explain why hold down (<a class="reference internal" href="#hold-down"><span class="std std-ref">13.2.1.3&nbsp;&nbsp;&nbsp;Hold Down</span></a>) will delay the use of the new route A–B–E–D.</div>
+</div>
+<p>11.0. Suppose the routers are A, B, C, D, E and F, and all link costs are 1. The distance-vector forwarding tables for A and F are below. Give the network with the fewest links that is consistent with these tables. Hint: any destination reached at cost 1 is directly connected; if X reaches Y via Z at cost 2, then Z and Y must be directly connected.</p>
+<p>A’s table</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="28%" />
+<col width="28%" />
+<col width="44%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">dest</th>
+<th class="head">cost</th>
+<th class="head">next_hop</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>B</td>
+<td>1</td>
+<td>B</td>
+</tr>
+<tr class="row-odd"><td>C</td>
+<td>1</td>
+<td>C</td>
+</tr>
+<tr class="row-even"><td>D</td>
+<td>2</td>
+<td>C</td>
+</tr>
+<tr class="row-odd"><td>E</td>
+<td>2</td>
+<td>C</td>
+</tr>
+<tr class="row-even"><td>F</td>
+<td>3</td>
+<td>B</td>
+</tr>
+</tbody>
+</table>
+<p>F’s table</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="28%" />
+<col width="28%" />
+<col width="44%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">dest</th>
+<th class="head">cost</th>
+<th class="head">next_hop</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>A</td>
+<td>3</td>
+<td>E</td>
+</tr>
+<tr class="row-odd"><td>B</td>
+<td>2</td>
+<td>D</td>
+</tr>
+<tr class="row-even"><td>C</td>
+<td>2</td>
+<td>D</td>
+</tr>
+<tr class="row-odd"><td>D</td>
+<td>1</td>
+<td>D</td>
+</tr>
+<tr class="row-even"><td>E</td>
+<td>1</td>
+<td>E</td>
+</tr>
+</tbody>
+</table>
+<p>12.0. (a) Suppose routers A and B somehow end up with respective forwarding-table entries ⟨D,B,n⟩ and ⟨D,A,m⟩, thus creating a routing loop. Explain why the loop may be removed more quickly if A and B both use <strong>poison reverse</strong> with split horizon (<a class="reference internal" href="#split-horizon"><span class="std std-ref">13.2.1.1&nbsp;&nbsp;&nbsp;Split Horizon</span></a>), versus if A and B use split horizon only.</p>
+<p>(b). Suppose the network looks like the following. The A–B link is extremely slow.</p>
+<img alt="_images/poison_reverse.svg" src="_images/poison_reverse.svg" /><p>Suppose A and B send reports to each other advertising their routes to D, and immediately afterwards the C–D link breaks and C reports to A and B that D is unreachable. <em>After</em> those unreachability reports from C are processed, A and B’s reports sent to each other before the break finally arrive. Explain why the network is now in the state described in part (a).</p>
+<p>13.0. Suppose the distance-vector algorithm is run on a network and no links break (so by the last paragraph of <a class="reference internal" href="#dv-rules"><span class="std std-ref">13.1.1&nbsp;&nbsp;&nbsp;Distance-Vector Update Rules</span></a> the next_hop-increase rule is never applied).</p>
+<div class="line-block">
+<div class="line">(a). Prove that whenever A is B’s next_hop to destination D, then A’s cost to D is strictly less than B’s. Hint: assume that if this claim is true, then it remains true after any application of the rules in <a class="reference internal" href="#dv-rules"><span class="std std-ref">13.1.1&nbsp;&nbsp;&nbsp;Distance-Vector Update Rules</span></a>. If the lower-cost rule is applied to B after receiving a report from A, resulting in a change to B’s cost to D, then one needs to show A’s cost is less than B’s, and also B’s new cost is less than that of any neighbor C that uses B as its next_hop to D.</div>
+<div class="line">(b). Use (a) to prove that no routing loops ever form.</div>
+</div>
+<p>14.0. It was mentioned in <a class="reference internal" href="#link-state"><span class="std std-ref">13.5&nbsp;&nbsp;&nbsp;Link-State Routing-Update Algorithm</span></a> that link-state routing might give rise to an ephemeral routing loop. Give a concrete scenario illustrating creation (and then dissolution) of such a loop.</p>
+<p>Hint: consider the following network.</p>
+<img alt="_images/exercise11.svg" src="_images/exercise11.svg" /><p>C’s next_hop to A is B, due to the relative link weights (not shown) of the A–B1 and A–C1 links. Then B gets some news. (There are also several other possible scenarios.)</p>
+<p>15.0. Use the Shortest-Path-First algorithm to find the shortest path from A to E in the network below. Show the sets <strong>R</strong> and <strong>T</strong>, and the node <strong>current</strong>, after each step.</p>
+<img alt="_images/zigzag.svg" src="_images/zigzag.svg" /><p>16.0. Suppose you take a laptop, plug it into an Ethernet LAN, <em>and</em> connect to the same LAN via Wi-Fi. From laptop to LAN there are now two routes. Which route will be preferred? How can you tell which way traffic is flowing? How can you configure your OS to prefer one path or another?  (See also <a class="reference internal" href="ipv4companions.html#arp-flux"><span class="std std-ref">10.2.5&nbsp;&nbsp;&nbsp;ARP and multihomed hosts</span></a>, <a class="reference internal" href="ipv4.html#ipv4"><span class="std std-ref">9&nbsp;&nbsp;&nbsp;IP version 4</span></a> exercise 4.0, and <a class="reference internal" href="tcpA.html#tcp"><span class="std std-ref">17&nbsp;&nbsp;&nbsp;TCP Transport Basics</span></a> exercise 5.0.)</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="bigrouting.html" title="14   Large-Scale IP Routing"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ipv6b.html" title="12   IPv6 Additional Features"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, desktop edition 2.0.11</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012-2022, Peter L Dordal.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

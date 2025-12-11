@@ -1,0 +1,539 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>An Introduction to Computer Networks &#8212; An Introduction to Computer Networks, desktop edition 2.0.11</title>
+    <link rel="stylesheet" href="_static/csbnetbook.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script type="text/javascript" src="_static/mobile.js"></script>
+    <script type="text/javascript" src="_static/rightsidebar.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Preface" href="preface.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="preface.html" title="Preface"
+             accesskey="N">next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">An Introduction to Computer Networks, desktop edition 2.0.11</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">An Introduction to Computer Networks</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="preface.html"
+                        title="next chapter">Preface</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="an-introduction-to-computer-networks">
+<h1>An Introduction to Computer Networks<a class="headerlink" href="#an-introduction-to-computer-networks" title="Permalink to this headline">¶</a></h1>
+<div class="line-block">
+<div class="line"><strong>Peter L Dordal</strong></div>
+<div class="line">Department of Computer Science</div>
+<div class="line">Loyola University Chicago</div>
+</div>
+<p>Contents:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="preface.html">Preface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="preface.html#second-edition">Second Edition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preface.html#licensing">Licensing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preface.html#german-edition">German Edition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preface.html#classroom-use">Classroom Use</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preface.html#acknowledgments">Acknowledgments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preface.html#progress-notes">Progress Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preface.html#technical-considerations">Technical considerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preface.html#a-note-on-the-cover">A Note On the Cover</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preface.html#recent-changes">Recent Changes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">1&nbsp;&nbsp;&nbsp;An Overview of Networks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#layers">1.1&nbsp;&nbsp;&nbsp;Layers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#data-rate-throughput-and-bandwidth">1.2&nbsp;&nbsp;&nbsp;Data Rate, Throughput and Bandwidth</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#packets">1.3&nbsp;&nbsp;&nbsp;Packets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#datagram-forwarding">1.4&nbsp;&nbsp;&nbsp;Datagram Forwarding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#topology">1.5&nbsp;&nbsp;&nbsp;Topology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#routing-loops">1.6&nbsp;&nbsp;&nbsp;Routing Loops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#congestion">1.7&nbsp;&nbsp;&nbsp;Congestion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#packets-again">1.8&nbsp;&nbsp;&nbsp;Packets Again</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#lans-and-ethernet">1.9&nbsp;&nbsp;&nbsp;LANs and Ethernet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#ip-internet-protocol">1.10&nbsp;&nbsp;&nbsp;IP - Internet Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#dns">1.11&nbsp;&nbsp;&nbsp;DNS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#transport">1.12&nbsp;&nbsp;&nbsp;Transport</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#firewalls">1.13&nbsp;&nbsp;&nbsp;Firewalls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#some-useful-utilities">1.14&nbsp;&nbsp;&nbsp;Some Useful Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#ietf-and-osi">1.15&nbsp;&nbsp;&nbsp;IETF and OSI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#berkeley-unix">1.16&nbsp;&nbsp;&nbsp;Berkeley Unix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#epilog">1.17&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#exercises">1.18&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ethernet1.html">2&nbsp;&nbsp;&nbsp;Ethernet Basics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ethernet1.html#mbps-classic-ethernet">2.1&nbsp;&nbsp;&nbsp;10-Mbps Classic Ethernet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet1.html#mbps-fast-ethernet">2.2&nbsp;&nbsp;&nbsp;100 Mbps (Fast) Ethernet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet1.html#gigabit-ethernet">2.3&nbsp;&nbsp;&nbsp;Gigabit Ethernet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet1.html#ethernet-switches">2.4&nbsp;&nbsp;&nbsp;Ethernet Switches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet1.html#epilog">2.5&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet1.html#exercises">2.6&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ethernet2.html">3&nbsp;&nbsp;&nbsp;Advanced Ethernet</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ethernet2.html#spanning-tree-algorithm-and-redundancy">3.1&nbsp;&nbsp;&nbsp;Spanning Tree Algorithm and Redundancy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet2.html#virtual-lan-vlan">3.2&nbsp;&nbsp;&nbsp;Virtual LAN (VLAN)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet2.html#trill-and-spb">3.3&nbsp;&nbsp;&nbsp;TRILL and SPB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet2.html#software-defined-networking">3.4&nbsp;&nbsp;&nbsp;Software-Defined Networking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet2.html#epilog">3.5&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet2.html#exercises">3.6&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="wireless.html">4&nbsp;&nbsp;&nbsp;Wireless LANs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wireless.html#adventures-in-radioland">4.1&nbsp;&nbsp;&nbsp;Adventures in Radioland</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wireless.html#wi-fi">4.2&nbsp;&nbsp;&nbsp;Wi-Fi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wireless.html#wimax-and-lte">4.3&nbsp;&nbsp;&nbsp;WiMAX and LTE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wireless.html#fixed-wireless">4.4&nbsp;&nbsp;&nbsp;Fixed Wireless</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wireless.html#epilog">4.5&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wireless.html#exercises">4.6&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="otherLANs.html">5&nbsp;&nbsp;&nbsp;Other LANs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="otherLANs.html#virtual-private-networks">5.1&nbsp;&nbsp;&nbsp;Virtual Private Networks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="otherLANs.html#carrier-ethernet">5.2&nbsp;&nbsp;&nbsp;Carrier Ethernet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="otherLANs.html#token-ring">5.3&nbsp;&nbsp;&nbsp;Token Ring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="otherLANs.html#virtual-circuits">5.4&nbsp;&nbsp;&nbsp;Virtual Circuits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="otherLANs.html#asynchronous-transfer-mode-atm">5.5&nbsp;&nbsp;&nbsp;Asynchronous Transfer Mode: ATM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="otherLANs.html#epilog">5.6&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="otherLANs.html#exercises">5.7&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="links.html">6&nbsp;&nbsp;&nbsp;Links</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="links.html#encoding-and-framing">6.1&nbsp;&nbsp;&nbsp;Encoding and Framing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="links.html#time-division-multiplexing">6.2&nbsp;&nbsp;&nbsp;Time-Division Multiplexing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="links.html#epilog">6.3&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="links.html#exercises">6.4&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="packets.html">7&nbsp;&nbsp;&nbsp;Packets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="packets.html#packet-delay">7.1&nbsp;&nbsp;&nbsp;Packet Delay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="packets.html#packet-delay-variability">7.2&nbsp;&nbsp;&nbsp;Packet Delay Variability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="packets.html#packet-size">7.3&nbsp;&nbsp;&nbsp;Packet Size</a></li>
+<li class="toctree-l2"><a class="reference internal" href="packets.html#error-detection">7.4&nbsp;&nbsp;&nbsp;Error Detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="packets.html#epilog">7.5&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="packets.html#exercises">7.6&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="slidingwindows.html">8&nbsp;&nbsp;&nbsp;Abstract Sliding Windows</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="slidingwindows.html#building-reliable-transport-stop-and-wait">8.1&nbsp;&nbsp;&nbsp;Building Reliable Transport: Stop-and-Wait</a></li>
+<li class="toctree-l2"><a class="reference internal" href="slidingwindows.html#sliding-windows">8.2&nbsp;&nbsp;&nbsp;Sliding Windows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="slidingwindows.html#linear-bottlenecks">8.3&nbsp;&nbsp;&nbsp;Linear Bottlenecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="slidingwindows.html#epilog">8.4&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="slidingwindows.html#exercises">8.5&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ipv4.html">9&nbsp;&nbsp;&nbsp;IP version 4</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ipv4.html#the-ipv4-header">9.1&nbsp;&nbsp;&nbsp;The IPv4 Header</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv4.html#interfaces">9.2&nbsp;&nbsp;&nbsp;Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv4.html#special-addresses">9.3&nbsp;&nbsp;&nbsp;Special Addresses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv4.html#fragmentation">9.4&nbsp;&nbsp;&nbsp;Fragmentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv4.html#the-classless-ip-delivery-algorithm">9.5&nbsp;&nbsp;&nbsp;The Classless IP Delivery Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv4.html#ipv4-subnets">9.6&nbsp;&nbsp;&nbsp;IPv4 Subnets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv4.html#network-address-translation">9.7&nbsp;&nbsp;&nbsp;Network Address Translation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv4.html#unnumbered-interfaces">9.8&nbsp;&nbsp;&nbsp;Unnumbered Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv4.html#mobile-ip">9.9&nbsp;&nbsp;&nbsp;Mobile IP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv4.html#epilog">9.10&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv4.html#exercises">9.11&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ipv4companions.html">10&nbsp;&nbsp;&nbsp;IPv4 Companion Protocols</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ipv4companions.html#dns">10.1&nbsp;&nbsp;&nbsp;DNS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv4companions.html#address-resolution-protocol-arp">10.2&nbsp;&nbsp;&nbsp;Address Resolution Protocol: ARP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv4companions.html#dynamic-host-configuration-protocol-dhcp">10.3&nbsp;&nbsp;&nbsp;Dynamic Host Configuration Protocol (DHCP)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv4companions.html#internet-control-message-protocol">10.4&nbsp;&nbsp;&nbsp;Internet Control Message Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv4companions.html#epilog">10.5&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv4companions.html#exercises">10.6&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ipv6a.html">11&nbsp;&nbsp;&nbsp;IPv6</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ipv6a.html#the-ipv6-header">11.1&nbsp;&nbsp;&nbsp;The IPv6 Header</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv6a.html#ipv6-addresses">11.2&nbsp;&nbsp;&nbsp;IPv6 Addresses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv6a.html#network-prefixes">11.3&nbsp;&nbsp;&nbsp;Network Prefixes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv6a.html#ipv6-multicast">11.4&nbsp;&nbsp;&nbsp;IPv6 Multicast</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv6a.html#ipv6-extension-headers">11.5&nbsp;&nbsp;&nbsp;IPv6 Extension Headers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv6a.html#neighbor-discovery">11.6&nbsp;&nbsp;&nbsp;Neighbor Discovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv6a.html#ipv6-host-address-assignment">11.7&nbsp;&nbsp;&nbsp;IPv6 Host Address Assignment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv6a.html#epilog">11.8&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv6a.html#exercises">11.9&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ipv6b.html">12&nbsp;&nbsp;&nbsp;IPv6 Additional Features</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ipv6b.html#globally-exposed-addresses">12.1&nbsp;&nbsp;&nbsp;Globally Exposed Addresses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv6b.html#icmpv6">12.2&nbsp;&nbsp;&nbsp;ICMPv6</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv6b.html#ipv6-subnets">12.3&nbsp;&nbsp;&nbsp;IPv6 Subnets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv6b.html#using-ipv6-and-ipv4-together">12.4&nbsp;&nbsp;&nbsp;Using IPv6 and IPv4 Together</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv6b.html#ipv6-examples-without-a-router">12.5&nbsp;&nbsp;&nbsp;IPv6 Examples Without a Router</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv6b.html#ipv6-connectivity-via-tunneling">12.6&nbsp;&nbsp;&nbsp;IPv6 Connectivity via Tunneling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv6b.html#ipv6-to-ipv4-connectivity">12.7&nbsp;&nbsp;&nbsp;IPv6-to-IPv4 Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv6b.html#epilog">12.8&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipv6b.html#exercises">12.9&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="routing.html">13&nbsp;&nbsp;&nbsp;Routing-Update Algorithms</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="routing.html#distance-vector-routing-update-algorithm">13.1&nbsp;&nbsp;&nbsp;Distance-Vector Routing-Update Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routing.html#distance-vector-slow-convergence-problem">13.2&nbsp;&nbsp;&nbsp;Distance-Vector Slow-Convergence Problem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routing.html#observations-on-minimizing-route-cost">13.3&nbsp;&nbsp;&nbsp;Observations on Minimizing Route Cost</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routing.html#loop-free-distance-vector-algorithms">13.4&nbsp;&nbsp;&nbsp;Loop-Free Distance Vector Algorithms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routing.html#link-state-routing-update-algorithm">13.5&nbsp;&nbsp;&nbsp;Link-State Routing-Update Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routing.html#routing-on-other-attributes">13.6&nbsp;&nbsp;&nbsp;Routing on Other Attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routing.html#ecmp">13.7&nbsp;&nbsp;&nbsp;ECMP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routing.html#epilog">13.8&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routing.html#exercises">13.9&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bigrouting.html">14&nbsp;&nbsp;&nbsp;Large-Scale IP Routing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bigrouting.html#classless-internet-domain-routing-cidr">14.1&nbsp;&nbsp;&nbsp;Classless Internet Domain Routing: CIDR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bigrouting.html#hierarchical-routing">14.2&nbsp;&nbsp;&nbsp;Hierarchical Routing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bigrouting.html#legacy-routing">14.3&nbsp;&nbsp;&nbsp;Legacy Routing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bigrouting.html#provider-based-routing">14.4&nbsp;&nbsp;&nbsp;Provider-Based Routing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bigrouting.html#geographical-routing">14.5&nbsp;&nbsp;&nbsp;Geographical Routing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bigrouting.html#epilog">14.6&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bigrouting.html#exercises">14.7&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bgp.html">15&nbsp;&nbsp;&nbsp;Border Gateway Protocol (BGP)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bgp.html#as-paths">15.1&nbsp;&nbsp;&nbsp;AS-paths</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bgp.html#as-paths-and-route-aggregation">15.2&nbsp;&nbsp;&nbsp;AS-Paths and Route Aggregation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bgp.html#transit-traffic">15.3&nbsp;&nbsp;&nbsp;Transit Traffic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bgp.html#bgp-filtering-and-routing-policies">15.4&nbsp;&nbsp;&nbsp;BGP Filtering and Routing Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bgp.html#bgp-table-size">15.5&nbsp;&nbsp;&nbsp;BGP Table Size</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bgp.html#bgp-path-attributes">15.6&nbsp;&nbsp;&nbsp;BGP Path attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bgp.html#bgp-and-traffic-engineering">15.7&nbsp;&nbsp;&nbsp;BGP and Traffic Engineering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bgp.html#bgp-and-anycast">15.8&nbsp;&nbsp;&nbsp;BGP and Anycast</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bgp.html#bgp-for-interior-routing">15.9&nbsp;&nbsp;&nbsp;BGP for Interior Routing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bgp.html#bgp-relationships">15.10&nbsp;&nbsp;&nbsp;BGP Relationships</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bgp.html#examples-of-bgp-instability">15.11&nbsp;&nbsp;&nbsp;Examples of BGP Instability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bgp.html#bgp-security-and-route-registries">15.12&nbsp;&nbsp;&nbsp;BGP Security and Route Registries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bgp.html#epilog">15.13&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bgp.html#exercises">15.14&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="udp.html">16&nbsp;&nbsp;&nbsp;UDP Transport</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="udp.html#user-datagram-protocol-udp">16.1&nbsp;&nbsp;&nbsp;User Datagram Protocol – UDP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="udp.html#trivial-file-transport-protocol-tftp">16.2&nbsp;&nbsp;&nbsp;Trivial File Transport Protocol, TFTP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="udp.html#fundamental-transport-issues">16.3&nbsp;&nbsp;&nbsp;Fundamental Transport Issues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="udp.html#other-tftp-notes">16.4&nbsp;&nbsp;&nbsp;Other TFTP notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="udp.html#remote-procedure-call-rpc">16.5&nbsp;&nbsp;&nbsp;Remote Procedure Call (RPC)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="udp.html#epilog">16.6&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="udp.html#exercises">16.7&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tcpA.html">17&nbsp;&nbsp;&nbsp;TCP Transport Basics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tcpA.html#the-end-to-end-principle">17.1&nbsp;&nbsp;&nbsp;The End-to-End Principle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tcpA.html#tcp-header">17.2&nbsp;&nbsp;&nbsp;TCP Header</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tcpA.html#tcp-connection-establishment">17.3&nbsp;&nbsp;&nbsp;TCP Connection Establishment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tcpA.html#tcp-and-wireshark">17.4&nbsp;&nbsp;&nbsp;TCP and WireShark</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tcpA.html#tcp-offloading">17.5&nbsp;&nbsp;&nbsp;TCP Offloading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tcpA.html#tcp-simplex-talk">17.6&nbsp;&nbsp;&nbsp;TCP simplex-talk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tcpA.html#tcp-and-bind">17.7&nbsp;&nbsp;&nbsp;TCP and <code class="docutils literal notranslate"><span class="pre">bind()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tcpA.html#tcp-state-diagram">17.8&nbsp;&nbsp;&nbsp;TCP state diagram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tcpA.html#epilog">17.9&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tcpA.html#exercises">17.10&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tcpB.html">18&nbsp;&nbsp;&nbsp;TCP Issues and Alternatives</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tcpB.html#tcp-old-duplicates">18.1&nbsp;&nbsp;&nbsp;TCP Old Duplicates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tcpB.html#timewait">18.2&nbsp;&nbsp;&nbsp;TIMEWAIT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tcpB.html#the-three-way-handshake-revisited">18.3&nbsp;&nbsp;&nbsp;The Three-Way Handshake Revisited</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tcpB.html#anomalous-tcp-scenarios">18.4&nbsp;&nbsp;&nbsp;Anomalous TCP scenarios</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tcpB.html#tcp-faster-opening">18.5&nbsp;&nbsp;&nbsp;TCP Faster Opening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tcpB.html#path-mtu-discovery">18.6&nbsp;&nbsp;&nbsp;Path MTU Discovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tcpB.html#tcp-sliding-windows">18.7&nbsp;&nbsp;&nbsp;TCP Sliding Windows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tcpB.html#tcp-delayed-acks">18.8&nbsp;&nbsp;&nbsp;TCP Delayed ACKs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tcpB.html#nagle-algorithm">18.9&nbsp;&nbsp;&nbsp;Nagle Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tcpB.html#tcp-flow-control">18.10&nbsp;&nbsp;&nbsp;TCP Flow Control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tcpB.html#silly-window-syndrome">18.11&nbsp;&nbsp;&nbsp;Silly Window Syndrome</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tcpB.html#tcp-timeout-and-retransmission">18.12&nbsp;&nbsp;&nbsp;TCP Timeout and Retransmission</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tcpB.html#keepalive">18.13&nbsp;&nbsp;&nbsp;KeepAlive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tcpB.html#tcp-timers">18.14&nbsp;&nbsp;&nbsp;TCP timers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tcpB.html#variants-and-alternatives">18.15&nbsp;&nbsp;&nbsp;Variants and Alternatives</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tcpB.html#epilog">18.16&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tcpB.html#exercises">18.17&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reno.html">19&nbsp;&nbsp;&nbsp;TCP Reno and Congestion Management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reno.html#basics-of-tcp-congestion-management">19.1&nbsp;&nbsp;&nbsp;Basics of TCP Congestion Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reno.html#slow-start">19.2&nbsp;&nbsp;&nbsp;Slow Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reno.html#tcp-tahoe-and-fast-retransmit">19.3&nbsp;&nbsp;&nbsp;TCP Tahoe and Fast Retransmit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reno.html#tcp-reno-and-fast-recovery">19.4&nbsp;&nbsp;&nbsp;TCP Reno and Fast Recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reno.html#tcp-newreno">19.5&nbsp;&nbsp;&nbsp;TCP NewReno</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reno.html#selective-acknowledgments-sack">19.6&nbsp;&nbsp;&nbsp;Selective Acknowledgments (SACK)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reno.html#tcp-and-bottleneck-link-utilization">19.7&nbsp;&nbsp;&nbsp;TCP and Bottleneck Link Utilization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reno.html#single-packet-losses">19.8&nbsp;&nbsp;&nbsp;Single Packet Losses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reno.html#tcp-assumptions-and-scalability">19.9&nbsp;&nbsp;&nbsp;TCP Assumptions and Scalability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reno.html#tcp-parameters">19.10&nbsp;&nbsp;&nbsp;TCP Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reno.html#epilog">19.11&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reno.html#exercises">19.12&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dynamicsA.html">20&nbsp;&nbsp;&nbsp;Dynamics of TCP</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dynamicsA.html#a-first-look-at-queuing">20.1&nbsp;&nbsp;&nbsp;A First Look At Queuing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicsA.html#bottleneck-links-with-competition">20.2&nbsp;&nbsp;&nbsp;Bottleneck Links with Competition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicsA.html#tcp-reno-fairness-with-synchronized-losses">20.3&nbsp;&nbsp;&nbsp;TCP Reno Fairness with Synchronized Losses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicsA.html#epilog">20.4&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicsA.html#exercises">20.5&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dynamicsB.html">21&nbsp;&nbsp;&nbsp;Further Dynamics of TCP</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dynamicsB.html#notions-of-fairness">21.1&nbsp;&nbsp;&nbsp;Notions of Fairness</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicsB.html#tcp-reno-loss-rate-versus-cwnd">21.2&nbsp;&nbsp;&nbsp;TCP Reno loss rate versus <code class="docutils literal notranslate"><span class="pre">cwnd</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicsB.html#tcp-friendliness">21.3&nbsp;&nbsp;&nbsp;TCP Friendliness</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicsB.html#aimd-revisited">21.4&nbsp;&nbsp;&nbsp;AIMD Revisited</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicsB.html#active-queue-management">21.5&nbsp;&nbsp;&nbsp;Active Queue Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicsB.html#the-high-bandwidth-tcp-problem">21.6&nbsp;&nbsp;&nbsp;The High-Bandwidth TCP Problem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicsB.html#the-lossy-link-tcp-problem">21.7&nbsp;&nbsp;&nbsp;The Lossy-Link TCP Problem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicsB.html#the-satellite-link-tcp-problem">21.8&nbsp;&nbsp;&nbsp;The Satellite-Link TCP Problem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicsB.html#epilog">21.9&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicsB.html#exercises">21.10&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="newtcps.html">22&nbsp;&nbsp;&nbsp;Newer TCP Implementations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="newtcps.html#choosing-a-tcp-on-linux">22.1&nbsp;&nbsp;&nbsp;Choosing a TCP on Linux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="newtcps.html#high-bandwidth-desiderata">22.2&nbsp;&nbsp;&nbsp;High-Bandwidth Desiderata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="newtcps.html#rtts">22.3&nbsp;&nbsp;&nbsp;RTTs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="newtcps.html#a-roadmap">22.4&nbsp;&nbsp;&nbsp;A Roadmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="newtcps.html#highspeed-tcp">22.5&nbsp;&nbsp;&nbsp;Highspeed TCP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="newtcps.html#tcp-vegas">22.6&nbsp;&nbsp;&nbsp;TCP Vegas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="newtcps.html#fast-tcp">22.7&nbsp;&nbsp;&nbsp;FAST TCP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="newtcps.html#tcp-westwood">22.8&nbsp;&nbsp;&nbsp;TCP Westwood</a></li>
+<li class="toctree-l2"><a class="reference internal" href="newtcps.html#tcp-illinois">22.9&nbsp;&nbsp;&nbsp;TCP Illinois</a></li>
+<li class="toctree-l2"><a class="reference internal" href="newtcps.html#compound-tcp">22.10&nbsp;&nbsp;&nbsp;Compound TCP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="newtcps.html#tcp-veno">22.11&nbsp;&nbsp;&nbsp;TCP Veno</a></li>
+<li class="toctree-l2"><a class="reference internal" href="newtcps.html#tcp-hybla">22.12&nbsp;&nbsp;&nbsp;TCP Hybla</a></li>
+<li class="toctree-l2"><a class="reference internal" href="newtcps.html#dctcp">22.13&nbsp;&nbsp;&nbsp;DCTCP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="newtcps.html#h-tcp">22.14&nbsp;&nbsp;&nbsp;H-TCP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="newtcps.html#tcp-cubic">22.15&nbsp;&nbsp;&nbsp;TCP CUBIC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="newtcps.html#tcp-bbr">22.16&nbsp;&nbsp;&nbsp;TCP BBR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="newtcps.html#epilog">22.17&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="newtcps.html#exercises">22.18&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fairqueuing.html">23&nbsp;&nbsp;&nbsp;Queuing and Scheduling</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fairqueuing.html#queuing-and-real-time-traffic">23.1&nbsp;&nbsp;&nbsp;Queuing and Real-Time Traffic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fairqueuing.html#traffic-management">23.2&nbsp;&nbsp;&nbsp;Traffic Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fairqueuing.html#priority-queuing">23.3&nbsp;&nbsp;&nbsp;Priority Queuing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fairqueuing.html#queuing-disciplines">23.4&nbsp;&nbsp;&nbsp;Queuing Disciplines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fairqueuing.html#fair-queuing">23.5&nbsp;&nbsp;&nbsp;Fair Queuing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fairqueuing.html#applications-of-fair-queuing">23.6&nbsp;&nbsp;&nbsp;Applications of Fair Queuing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fairqueuing.html#hierarchical-queuing">23.7&nbsp;&nbsp;&nbsp;Hierarchical Queuing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fairqueuing.html#hierarchical-weighted-fair-queuing">23.8&nbsp;&nbsp;&nbsp;Hierarchical Weighted Fair Queuing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fairqueuing.html#epilog">23.9&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fairqueuing.html#exercises">23.10&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tokenbucket.html">24&nbsp;&nbsp;&nbsp;Token Bucket Rate Limiting</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tokenbucket.html#token-bucket-definition">24.1&nbsp;&nbsp;&nbsp;Token Bucket Definition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tokenbucket.html#token-bucket-examples">24.2&nbsp;&nbsp;&nbsp;Token-Bucket Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tokenbucket.html#multiple-token-buckets">24.3&nbsp;&nbsp;&nbsp;Multiple Token Buckets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tokenbucket.html#gcra">24.4&nbsp;&nbsp;&nbsp;GCRA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tokenbucket.html#guaranteeing-voip-bandwidth">24.5&nbsp;&nbsp;&nbsp;Guaranteeing VoIP Bandwidth</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tokenbucket.html#limiting-delay">24.6&nbsp;&nbsp;&nbsp;Limiting Delay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tokenbucket.html#token-bucket-through-one-router">24.7&nbsp;&nbsp;&nbsp;Token Bucket Through One Router</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tokenbucket.html#token-bucket-through-multiple-routers">24.8&nbsp;&nbsp;&nbsp;Token Bucket Through Multiple Routers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tokenbucket.html#delay-constraints">24.9&nbsp;&nbsp;&nbsp;Delay Constraints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tokenbucket.html#cbq">24.10&nbsp;&nbsp;&nbsp;CBQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tokenbucket.html#linux-htb">24.11&nbsp;&nbsp;&nbsp;Linux HTB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tokenbucket.html#parekh-gallager-theorem">24.12&nbsp;&nbsp;&nbsp;Parekh-Gallager Theorem</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="realtime.html">25&nbsp;&nbsp;&nbsp;Quality of Service</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="realtime.html#net-neutrality">25.1&nbsp;&nbsp;&nbsp;Net Neutrality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="realtime.html#where-the-wild-queues-are">25.2&nbsp;&nbsp;&nbsp;Where the Wild Queues Are</a></li>
+<li class="toctree-l2"><a class="reference internal" href="realtime.html#real-time-traffic">25.3&nbsp;&nbsp;&nbsp;Real-time Traffic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="realtime.html#integrated-services-rsvp">25.4&nbsp;&nbsp;&nbsp;Integrated Services / RSVP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="realtime.html#global-ip-multicast">25.5&nbsp;&nbsp;&nbsp;Global IP Multicast</a></li>
+<li class="toctree-l2"><a class="reference internal" href="realtime.html#rsvp">25.6&nbsp;&nbsp;&nbsp;RSVP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="realtime.html#differentiated-services">25.7&nbsp;&nbsp;&nbsp;Differentiated Services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="realtime.html#red-with-in-and-out">25.8&nbsp;&nbsp;&nbsp;RED with In and Out</a></li>
+<li class="toctree-l2"><a class="reference internal" href="realtime.html#nsis">25.9&nbsp;&nbsp;&nbsp;NSIS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="realtime.html#comcast-congestion-management-system">25.10&nbsp;&nbsp;&nbsp;Comcast Congestion-Management System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="realtime.html#real-time-transport-protocol-rtp">25.11&nbsp;&nbsp;&nbsp;Real-time Transport Protocol (RTP)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="realtime.html#multi-protocol-label-switching-mpls">25.12&nbsp;&nbsp;&nbsp;Multi-Protocol Label Switching (MPLS)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="realtime.html#epilog">25.13&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="realtime.html#exercises">25.14&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="netmgmt1.html">26&nbsp;&nbsp;&nbsp;Network Management and SNMP</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="netmgmt1.html#network-architecture">26.1&nbsp;&nbsp;&nbsp;Network Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="netmgmt1.html#snmp-basics">26.2&nbsp;&nbsp;&nbsp;SNMP Basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="netmgmt1.html#snmp-naming-and-oids">26.3&nbsp;&nbsp;&nbsp;SNMP Naming and OIDs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="netmgmt1.html#mibs">26.4&nbsp;&nbsp;&nbsp;MIBs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="netmgmt1.html#snmpv1-data-types">26.5&nbsp;&nbsp;&nbsp;SNMPv1 Data Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="netmgmt1.html#asn-1-syntax-and-snmp">26.6&nbsp;&nbsp;&nbsp;ASN.1 Syntax and SNMP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="netmgmt1.html#snmp-tables">26.7&nbsp;&nbsp;&nbsp;SNMP Tables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="netmgmt1.html#snmp-operations">26.8&nbsp;&nbsp;&nbsp;SNMP Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="netmgmt1.html#mib-browsing">26.9&nbsp;&nbsp;&nbsp;MIB Browsing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="netmgmt1.html#mib-2">26.10&nbsp;&nbsp;&nbsp;MIB-2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="netmgmt1.html#snmpv1-communities-and-security">26.11&nbsp;&nbsp;&nbsp;SNMPv1 communities and security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="netmgmt1.html#snmp-and-asn-1-encoding">26.12&nbsp;&nbsp;&nbsp;SNMP and ASN.1 Encoding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="netmgmt1.html#network-management-systems">26.13&nbsp;&nbsp;&nbsp;Network Management Systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="netmgmt1.html#gnmi">26.14&nbsp;&nbsp;&nbsp;SNMP Alternatives</a></li>
+<li class="toctree-l2"><a class="reference internal" href="netmgmt1.html#exercises">26.15&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="netmgmt23.html">27&nbsp;&nbsp;&nbsp;SNMP versions 2 and 3</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="netmgmt23.html#snmpv2">27.1&nbsp;&nbsp;&nbsp;SNMPv2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="netmgmt23.html#table-row-creation">27.2&nbsp;&nbsp;&nbsp;Table Row Creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="netmgmt23.html#snmpv3">27.3&nbsp;&nbsp;&nbsp;SNMPv3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="netmgmt23.html#exercises">27.4&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="security.html">28&nbsp;&nbsp;&nbsp;Security</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="security.html#code-execution-intrusion">28.1&nbsp;&nbsp;&nbsp;Code-Execution Intrusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security.html#stack-buffer-overflow">28.2&nbsp;&nbsp;&nbsp;Stack Buffer Overflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security.html#heap-buffer-overflow">28.3&nbsp;&nbsp;&nbsp;Heap Buffer Overflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security.html#network-intrusion-detection">28.4&nbsp;&nbsp;&nbsp;Network Intrusion Detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security.html#cryptographic-goals">28.5&nbsp;&nbsp;&nbsp;Cryptographic Goals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security.html#secure-hashes">28.6&nbsp;&nbsp;&nbsp;Secure Hashes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security.html#shared-key-encryption">28.7&nbsp;&nbsp;&nbsp;Shared-Key Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security.html#diffie-hellman-merkle-exchange">28.8&nbsp;&nbsp;&nbsp;Diffie-Hellman-Merkle Exchange</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security.html#exercises">28.9&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="publickey.html">29&nbsp;&nbsp;&nbsp;Public-Key Encryption</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="publickey.html#rsa">29.1&nbsp;&nbsp;&nbsp;RSA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="publickey.html#forward-secrecy">29.2&nbsp;&nbsp;&nbsp;Forward Secrecy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="publickey.html#trust-and-the-man-in-the-middle">29.3&nbsp;&nbsp;&nbsp;Trust and the Man in the Middle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="publickey.html#end-to-end-encryption">29.4&nbsp;&nbsp;&nbsp;End-to-End Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="publickey.html#ssh-and-tls">29.5&nbsp;&nbsp;&nbsp;SSH and TLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="publickey.html#ipsec">29.6&nbsp;&nbsp;&nbsp;IPsec</a></li>
+<li class="toctree-l2"><a class="reference internal" href="publickey.html#dnssec">29.7&nbsp;&nbsp;&nbsp;DNSSEC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="publickey.html#rsa-key-examples">29.8&nbsp;&nbsp;&nbsp;RSA Key Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="publickey.html#exercises">29.9&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mininet.html">30&nbsp;&nbsp;&nbsp;Mininet</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mininet.html#installing-mininet">30.1&nbsp;&nbsp;&nbsp;Installing Mininet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mininet.html#a-simple-mininet-example">30.2&nbsp;&nbsp;&nbsp;A Simple Mininet Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mininet.html#multiple-switches-in-a-line">30.3&nbsp;&nbsp;&nbsp;Multiple Switches in a Line</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mininet.html#ip-routers-in-a-line">30.4&nbsp;&nbsp;&nbsp;IP Routers in a Line</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mininet.html#ip-routers-with-simple-distance-vector-implementation">30.5&nbsp;&nbsp;&nbsp;IP Routers With Simple Distance-Vector Implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mininet.html#quagga-routing-and-bgp">30.6&nbsp;&nbsp;&nbsp;Quagga Routing and BGP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mininet.html#tcp-competition">30.7&nbsp;&nbsp;&nbsp;TCP Competition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mininet.html#linux-traffic-control-tc">30.8&nbsp;&nbsp;&nbsp;Linux Traffic Control (tc)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mininet.html#openflow-and-the-pox-controller">30.9&nbsp;&nbsp;&nbsp;OpenFlow and the POX Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mininet.html#exercises">30.10&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ns2.html">31&nbsp;&nbsp;&nbsp;Network Simulations: ns-2</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ns2.html#the-ns-2-simulator">31.1&nbsp;&nbsp;&nbsp;The ns-2 simulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ns2.html#a-single-tcp-sender">31.2&nbsp;&nbsp;&nbsp;A Single TCP Sender</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ns2.html#two-tcp-senders-competing">31.3&nbsp;&nbsp;&nbsp;Two TCP Senders Competing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ns2.html#tcp-loss-events-and-synchronized-losses">31.4&nbsp;&nbsp;&nbsp;TCP Loss Events and Synchronized Losses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ns2.html#tcp-reno-versus-tcp-vegas">31.5&nbsp;&nbsp;&nbsp;TCP Reno versus  TCP Vegas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ns2.html#wireless-simulation">31.6&nbsp;&nbsp;&nbsp;Wireless Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ns2.html#epilog">31.7&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ns2.html#exercises">31.8&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ns3.html">32&nbsp;&nbsp;&nbsp;The ns-3 Network Simulator</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ns3.html#installing-and-running-ns-3">32.1&nbsp;&nbsp;&nbsp;Installing and Running ns-3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ns3.html#a-single-tcp-sender">32.2&nbsp;&nbsp;&nbsp;A Single TCP Sender</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ns3.html#wireless">32.3&nbsp;&nbsp;&nbsp;Wireless</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ns3.html#exercises">32.4&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bibliography.html">33&nbsp;&nbsp;&nbsp;Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exercise_numbering.html">Exercise-Numbering Conversion Tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="solutions.html">34&nbsp;&nbsp;&nbsp;Selected Solutions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="solutions.html#solutions-for-an-overview-of-networks">34.1&nbsp;&nbsp;&nbsp;Solutions for <em>An Overview of Networks</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="solutions.html#solutions-for-ethernet">34.2&nbsp;&nbsp;&nbsp;Solutions for <em>Ethernet</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="solutions.html#solutions-for-advanced-ethernet">34.3&nbsp;&nbsp;&nbsp;Solutions for <em>Advanced Ethernet</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="solutions.html#solutions-for-wireless-lans">34.4&nbsp;&nbsp;&nbsp;Solutions for <em>Wireless LANs</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="solutions.html#solutions-for-other-lans">34.5&nbsp;&nbsp;&nbsp;Solutions for <em>Other LANs</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="solutions.html#solutions-for-links">34.6&nbsp;&nbsp;&nbsp;Solutions for <em>Links</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="solutions.html#solutions-for-packets">34.7&nbsp;&nbsp;&nbsp;Solutions for <em>Packets</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="solutions.html#solutions-for-sliding-windows">34.8&nbsp;&nbsp;&nbsp;Solutions for <em>Sliding Windows</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="solutions.html#solutions-for-ipv4">34.9&nbsp;&nbsp;&nbsp;Solutions for <em>IPv4</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="solutions.html#solutions-for-routing-update-algorithms">34.10&nbsp;&nbsp;&nbsp;Solutions for <em>Routing-Update Algorithms</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="solutions.html#solutions-for-large-scale-ip-routing">34.11&nbsp;&nbsp;&nbsp;Solutions for <em>Large-Scale IP Routing</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="solutions.html#solutions-for-border-gateway-protocol">34.12&nbsp;&nbsp;&nbsp;Solutions for <em>Border Gateway Protocol</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="solutions.html#solutions-for-udp">34.13&nbsp;&nbsp;&nbsp;Solutions for <em>UDP</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="solutions.html#solutions-for-tcp-reno-and-congestion-management">34.14&nbsp;&nbsp;&nbsp;Solutions for <em>TCP Reno and Congestion Management</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="solutions.html#solutions-for-dynamics-of-tcp">34.15&nbsp;&nbsp;&nbsp;Solutions for <em>Dynamics of TCP</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="solutions.html#dynamicsb-solutions">34.16&nbsp;&nbsp;&nbsp;Solutions for <em>Dynamics of TCP</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="solutions.html#solutions-for-queuing-and-scheduling">34.17&nbsp;&nbsp;&nbsp;Solutions for <em>Queuing and Scheduling</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="solutions.html#solutions-for-mininet">34.18&nbsp;&nbsp;&nbsp;Solutions for <em>Mininet</em></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="preface.html" title="Preface"
+             >next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">An Introduction to Computer Networks, desktop edition 2.0.11</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012-2022, Peter L Dordal.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,859 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>20   Dynamics of TCP &#8212; An Introduction to Computer Networks, desktop edition 2.0.11</title>
+    <link rel="stylesheet" href="_static/csbnetbook.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script type="text/javascript" src="_static/mobile.js"></script>
+    <script type="text/javascript" src="_static/rightsidebar.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="21   Further Dynamics of TCP" href="dynamicsB.html" />
+    <link rel="prev" title="19   TCP Reno and Congestion Management" href="reno.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="dynamicsB.html" title="21   Further Dynamics of TCP"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="reno.html" title="19   TCP Reno and Congestion Management"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, desktop edition 2.0.11</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">20&nbsp;&nbsp;&nbsp;Dynamics of TCP</a><ul>
+<li><a class="reference internal" href="#a-first-look-at-queuing">20.1&nbsp;&nbsp;&nbsp;A First Look At Queuing</a><ul>
+<li><a class="reference internal" href="#priority-queuing">20.1.1&nbsp;&nbsp;&nbsp;Priority Queuing</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#bottleneck-links-with-competition">20.2&nbsp;&nbsp;&nbsp;Bottleneck Links with Competition</a><ul>
+<li><a class="reference internal" href="#example-1-linear-bottleneck">20.2.1&nbsp;&nbsp;&nbsp;Example 1: linear bottleneck</a></li>
+<li><a class="reference internal" href="#example-2-router-competition">20.2.2&nbsp;&nbsp;&nbsp;Example 2: router competition</a></li>
+<li><a class="reference internal" href="#example-3-competition-and-queue-utilization">20.2.3&nbsp;&nbsp;&nbsp;Example 3: competition and queue utilization</a><ul>
+<li><a class="reference internal" href="#the-equal-delays-case">20.2.3.1&nbsp;&nbsp;&nbsp;The equal-delays case</a></li>
+<li><a class="reference internal" href="#the-equal-windows-case">20.2.3.2&nbsp;&nbsp;&nbsp;The equal-windows case</a></li>
+<li><a class="reference internal" href="#the-fixed-wb-case">20.2.3.3&nbsp;&nbsp;&nbsp;The fixed-w<sub>B</sub> case</a></li>
+<li><a class="reference internal" href="#the-iterative-solution">20.2.3.4&nbsp;&nbsp;&nbsp;The iterative solution</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#example-4-cross-traffic-and-rtt-variation">20.2.4&nbsp;&nbsp;&nbsp;Example 4: cross traffic and RTT variation</a></li>
+<li><a class="reference internal" href="#example-5-dynamic-bottlenecks">20.2.5&nbsp;&nbsp;&nbsp;Example 5: dynamic bottlenecks</a></li>
+<li><a class="reference internal" href="#packet-pairs">20.2.6&nbsp;&nbsp;&nbsp;Packet Pairs</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#tcp-reno-fairness-with-synchronized-losses">20.3&nbsp;&nbsp;&nbsp;TCP Reno Fairness with Synchronized Losses</a><ul>
+<li><a class="reference internal" href="#example-2-faster-additive-increase">20.3.1&nbsp;&nbsp;&nbsp;Example 2: Faster additive increase</a></li>
+<li><a class="reference internal" href="#example-3-longer-rtt">20.3.2&nbsp;&nbsp;&nbsp;Example 3: Longer RTT</a></li>
+<li><a class="reference internal" href="#tcp-reno-rtt-bias">20.3.3&nbsp;&nbsp;&nbsp;TCP Reno RTT bias</a></li>
+<li><a class="reference internal" href="#synchronized-loss-hypothesis">20.3.4&nbsp;&nbsp;&nbsp;Synchronized-Loss Hypothesis</a></li>
+<li><a class="reference internal" href="#loss-synchronization">20.3.5&nbsp;&nbsp;&nbsp;Loss Synchronization</a></li>
+<li><a class="reference internal" href="#extreme-rtt-ratios">20.3.6&nbsp;&nbsp;&nbsp;Extreme RTT Ratios</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#epilog">20.4&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li><a class="reference internal" href="#exercises">20.5&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="reno.html"
+                        title="previous chapter">19&nbsp;&nbsp;&nbsp;TCP Reno and Congestion Management</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="dynamicsB.html"
+                        title="next chapter">21&nbsp;&nbsp;&nbsp;Further Dynamics of TCP</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="dynamics-of-tcp">
+<span id="id1"></span><h1>20&nbsp;&nbsp;&nbsp;Dynamics of TCP<a class="headerlink" href="#dynamics-of-tcp" title="Permalink to this headline">¶</a></h1>
+<p>In this chapter we introduce, first and foremost, the possibility that there are other TCP connections out there competing with us for throughput. In <a class="reference internal" href="slidingwindows.html#bottleneck1"><span class="std std-ref">8.3&nbsp;&nbsp;&nbsp;Linear Bottlenecks</span></a> (and in <a class="reference internal" href="reno.html#bottleneck-link-utilization"><span class="std std-ref">19.7&nbsp;&nbsp;&nbsp;TCP and Bottleneck Link Utilization</span></a>) we looked at the performance of TCP through an <em>uncontested</em> bottleneck; now we allow for competition.</p>
+<p>Although the focus of this chapter is on TCP Reno, many, though not all, of the ideas presented here apply to non-Reno TCPs as well, and even to non-TCP mechanisms such as QUIC. Several non-Reno TCP alternatives are presented later in <a class="reference internal" href="newtcps.html#newtcps"><span class="std std-ref">22&nbsp;&nbsp;&nbsp;Newer TCP Implementations</span></a>.</p>
+<p>The following chapter continues this thread, with some more examples of TCP-Reno large-scale behavior.</p>
+<div class="section" id="a-first-look-at-queuing">
+<span id="queuing1"></span><h2>20.1&nbsp;&nbsp;&nbsp;A First Look At Queuing<a class="headerlink" href="#a-first-look-at-queuing" title="Permalink to this headline">¶</a></h2>
+<p id="index-0">In what order do we transmit the packets in a router’s outbound-interface queue? The conventional answer is in the order of arrival; technically, this is <strong>FIFO</strong> (First-In, First-Out) queuing. What happens to a packet that arrives at a router whose queue for the desired outbound interface is full? The conventional answer is that it is dropped; technically, this is known as <strong>tail-drop</strong>.</p>
+<p>While <strong>FIFO tail-drop</strong> remains very important, there are alternatives. In an admittedly entirely different context (the IPv6 equivalent of ARP), <span class="target" id="index-1"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc4681.html"><strong>RFC 4681</strong></a> states, “When a queue overflows, the new arrival SHOULD replace the oldest entry.” This might be called “head drop”; it is not used for <em>router</em> queues.</p>
+<div class="sidebar" id="index-2">
+<p class="first sidebar-title">Queuing Theory</p>
+<p class="last">While there are lots of queues in this chapter, we avoid the language of traditional <a class="reference external" href="https://en.wikipedia.org/wiki/Queueing_theory">queuing theory</a>. That’s because queues created through sliding windows are highly deterministic in terms of both arrivals and departures (so-called “D/D/1” queues). From a queuing-theory perspective, interesting queues tend to have random (<em>eg</em> Poisson) arrival or service times, or both; <em>eg</em> <a class="reference external" href="https://en.wikipedia.org/wiki/M/M/1_queue">“M/M/1” queues</a>. The advantage, for us, of sliding-windows queues is that they are a good deal more tractable than the general case. When analyzing independent <em>messages</em>, however, M/M/1 queuing is much more important; see for example <a class="reference internal" href="bibliography.html#lk78" id="id2">[LK78]</a>.</p>
+</div>
+<p id="index-3">An alternative drop-policy mechanism that <em>has</em> been considered for router queues is <strong>random drop</strong>. Under this policy, if a packet arrives but the destination queue is full, with N packets waiting, then one of the N+1 packets in all – the N waiting plus the new arrival – is chosen at random for dropping. The most recent arrival has thus a very good chance of gaining an initial place in the queue, but also a reasonable chance of being dropped later on. See <a class="reference internal" href="bibliography.html#am90" id="id3">[AM90]</a>.</p>
+<p>While random drop is seldom if ever put to production use its original form, it does resolve a peculiar synchronization problem related to TCP’s natural periodicity that can lead to starvation for one connection. This situation – known as <strong>phase effects</strong> – will be revisited in <a class="reference internal" href="ns2.html#phase-effects"><span class="std std-ref">31.3.4&nbsp;&nbsp;&nbsp;Phase Effects</span></a>. Mathematically, random-drop queuing is sometimes more tractable than tail-drop because a packet’s loss probability has little dependence on arrival-time race conditions with other packets.</p>
+<div class="section" id="priority-queuing">
+<span id="priority-queuing-1"></span><span id="index-4"></span><h3>20.1.1&nbsp;&nbsp;&nbsp;Priority Queuing<a class="headerlink" href="#priority-queuing" title="Permalink to this headline">¶</a></h3>
+<p>A quite different alternative to FIFO is <strong>priority queuing</strong>. We will consider this in more detail in <a class="reference internal" href="fairqueuing.html#priority-queuing"><span class="std std-ref">23.3&nbsp;&nbsp;&nbsp;Priority Queuing</span></a>, but the basic idea is straightforward: whenever the router is ready to send the next packet, it looks first to see if it has any higher-priority packets to send; lower-priority packets are sent only when there is no waiting higher-priority traffic. This can, of course, lead to complete starvation for the lower-priority traffic, but often there are bandwidth constraints on the higher-priority traffic (<em>eg</em> that it amounts to less than 10% of the total available bandwidth) such that starvation does not occur.</p>
+<p>In an environment of mixed real-time and bulk traffic, it is natural to use priority queuing to give the real-time traffic priority service, by assignment of such traffic to the higher-priority queue. This works quite well as long as, say, the real-time traffic is less than some fixed fraction of the total; we will return to this in <a class="reference internal" href="realtime.html#quality-of-service"><span class="std std-ref">25&nbsp;&nbsp;&nbsp;Quality of Service</span></a>.</p>
+<span class="target" id="index-5"></span></div>
+</div>
+<div class="section" id="bottleneck-links-with-competition">
+<span id="bottleneck-links"></span><span id="index-6"></span><h2>20.2&nbsp;&nbsp;&nbsp;Bottleneck Links with Competition<a class="headerlink" href="#bottleneck-links-with-competition" title="Permalink to this headline">¶</a></h2>
+<p>So far we have been ignoring the fact that there are other TCP connections out there. A single connection in isolation needs not to overrun its bottleneck router and drop packets, at least not too often. However, once there are other connections present, then each individual TCP connection also needs to consider how to maximize its share of the aggregate bandwidth.</p>
+<p>Consider a simple network path, with bandwidths shown in packets/ms. The minimum bandwidth, or <strong>path bandwidth</strong>, is 3 packets/ms.</p>
+<div class="section" id="example-1-linear-bottleneck">
+<h3>20.2.1&nbsp;&nbsp;&nbsp;Example 1: linear bottleneck<a class="headerlink" href="#example-1-linear-bottleneck" title="Permalink to this headline">¶</a></h3>
+<p>Below is the example we considered in <a class="reference internal" href="slidingwindows.html#bottleneck1"><span class="std std-ref">8.3&nbsp;&nbsp;&nbsp;Linear Bottlenecks</span></a>; bandwidths are shown in packets/ms.</p>
+<img alt="_images/linear_bottleneck1.svg" src="_images/linear_bottleneck1.svg" /><p>The bottleneck link for A→B traffic is at R2, and the queue will form at R2’s outbound interface.</p>
+<p>We claimed earlier that if the sender uses sliding windows with a fixed window size, then the network will converge to a steady state in relatively short order. This is also true if multiple senders are involved; however, a mathematical proof of convergence may be more difficult.</p>
+</div>
+<div class="section" id="example-2-router-competition">
+<span id="router-example-2"></span><h3>20.2.2&nbsp;&nbsp;&nbsp;Example 2: router competition<a class="headerlink" href="#example-2-router-competition" title="Permalink to this headline">¶</a></h3>
+<p>The bottleneck-link concept is a useful one for understanding congestion due to a single connection. However, if there are multiple senders in <strong>competition</strong> for a link, the situation is more complicated. Consider the following diagram, in which links are labeled with bandwidths in packets/ms:</p>
+<img alt="_images/two_senders_3.svg" src="_images/two_senders_3.svg" /><p>For a moment, assume R3 uses <em>priority</em> queuing, with the B⟶C path given priority over A⟶C. If B’s flow to C is fixed at 3 packets/ms, then A’s share of the R3–C link will be 1 packet/ms, and A’s bottleneck will be at R3. However, if B’s total flow rate drops to 1 packet/ms, then the R3–C link will have 3 packets/ms available, and the bottleneck for the A–C path will become the 2 packet/ms R1–R3 link.</p>
+<p>Now let us switch to the more-realistic <em>FIFO</em> queuing at R3. If B’s flow is 3 packets/ms and A’s is 1 packet/ms, then the R3–C link will be saturated, but just barely: if each connection sticks to these rates, no queue will develop at R3. However, it is no longer accurate to describe the 1 packet/ms as A’s <em>share</em>: if A wishes to send more, it will begin to compete with B. At first, the queue at R3 will grow; eventually, it is quite possible that B’s total flow rate might drop because <em>B is losing to A in the competition for R3’s queue</em>. This latter effect is very real.</p>
+<p>In general, if two connections share a bottleneck link, they are competing for the bandwidth of that link. That bandwidth share, however, is <em>precisely dictated by the queue share as of a short while before</em>. R3’s fixed rate of 4 packets/ms means one packet every 250 µs. If R3 has a queue of 100 packets, and in that queue there are 37 packets from A and 63 packets from B, then over the next 25 ms (= 100 × 250 µs) R3’s traffic to C will consist of those 37 packets from A and the 63 from B. Thus the competition between A and B for R3–C bandwidth is <em>first fought as a competition for R3’s queue space</em>. This is important enough to state as as rule:</p>
+<span class="target" id="index-7"></span><blockquote>
+<div><strong>Queue-Competition Rule</strong>: in the steady state, if a connection utilizes fraction 𝛼≤1 of a FIFO router’s queue, then that connection has a share of 𝛼 of the router’s total outbound bandwidth.</div></blockquote>
+<p>Below is a picture of R3’s queue and outbound link; the queue contains four packets from A and eight from B. The link, too, contains packets in this same ratio; presumably packets from B are consistently arriving twice as fast as packets from A.</p>
+<img alt="_images/bottleneck_competition.svg" src="_images/bottleneck_competition.svg" /><p>In the steady state here, A and B will use four and eight packets, respectively, of R3’s queue capacity. As acknowledgments return, each sender will replenish the queue accordingly. However, it is not in A’s long-term interest to settle for a queue utilization at R3 of four packets; A may want to take steps that will lead in this setting to a gradual increase of its queue share.</p>
+<p>Although we started the discussion above with fixed packet-sending <strong>rates</strong> for A and B, in general this leads to instability. If A and B’s combined rates add up to more than 4 packets/ms, R3’s queue will grow without bound. It is much better to have A and B use <strong>sliding windows</strong>, and give them each fixed window sizes; in this case, as we shall see, a stable equilibrium is soon reached. Any combination of window sizes is legal regardless of the available bandwidth;  the queue utilization (and, if necessary, the loss rate) will vary as necessary to adapt to the actual bandwidth.</p>
+<p>If there are several competing flows, then a given connection may have multiple bottlenecks, in the sense that there are several routers on the path experiencing queue buildups. In the steady state, however, we can still identify the link (or first link) with minimum bandwidth; we can call this link the bottleneck. Note that the bottleneck link in this sense can change with the sender’s winsize and with competing traffic.</p>
+</div>
+<div class="section" id="example-3-competition-and-queue-utilization">
+<span id="queue-utilization"></span><h3>20.2.3&nbsp;&nbsp;&nbsp;Example 3: competition and queue utilization<a class="headerlink" href="#example-3-competition-and-queue-utilization" title="Permalink to this headline">¶</a></h3>
+<p>In the next diagram, the bottleneck R–C link has a normalized bandwidth of 1 packet per ms (or, more abstractly, one packet per unit time). The bandwidths of the A–R and B–R links do not matter, except they are greater than 1 packet per ms. Each link is labeled with the <strong>propagation delay</strong>, measured in the same time unit as the bandwidth; the delay thus represents the number of packets the link can be transporting at the same time, if sent at the bottleneck rate.</p>
+<img alt="_images/two_senders.svg" src="_images/two_senders.svg" /><p id="index-8">The network layout here, with the shared R–C link as the bottleneck, is sometimes known as the <strong>singlebell</strong> topology. A perhaps-more-common alternative is the <strong>dumbbell</strong> topology of <a class="reference internal" href="#fairness2"><span class="std std-ref">20.3&nbsp;&nbsp;&nbsp;TCP Reno Fairness with Synchronized Losses</span></a>, though the two are equivalent for our purposes.</p>
+<p>Suppose A and B each send to C using sliding windows, each with <strong>fixed</strong> values of winsize w<sub>A</sub> and w<sub>B</sub>. Suppose further that these winsize values are large enough to saturate the R–C link. <em>How big will the queue be at R?</em> And how will the bandwidth divide between the A⟶C and B⟶C flows?</p>
+<p>For the two-competing-connections example above, assume we have reached the steady state. Let <strong>𝛼</strong> denote the fraction of the bandwidth that the A⟶C connection receives, and let <strong>𝛽</strong> = 1-𝛼 denote the fraction that the B⟶C connection gets; because of our normalization choice for the R–C bandwidth, 𝛼 and 𝛽 also represent respective throughputs. From the Queue-Competition Rule above, these bandwidth proportions must agree with the queue proportions; if Q denotes the combined queue utilization of both connections, then that queue will have about 𝛼Q packets from the A⟶C flow and about 𝛽Q packets from the B⟶C flow.</p>
+<p>We worked out the queue usage precisely in <a class="reference internal" href="slidingwindows.html#rtt-calculations"><span class="std std-ref">8.3.2&nbsp;&nbsp;&nbsp;RTT Calculations</span></a> for a <em>single</em> flow; we derived there the following:</p>
+<blockquote>
+<div>queue_usage = winsize − throughput × RTT<sub>noLoad</sub></div></blockquote>
+<p>where we have here used “throughput” instead of “bandwidth” to emphasize that this is the dynamic share rather than the physical transmission capacity.</p>
+<p>This equation remains true for each separate flow in the present case, where the RTT<sub>noLoad</sub> for the A⟶C connection is 2(d<sub>A</sub>+d) (the factor of 2 is to account for the round-trip) and the RTT<sub>noLoad</sub> for the B⟶C connection is 2(d<sub>B</sub>+d). We thus have</p>
+<blockquote>
+<div><p>𝛼Q = w<sub>A</sub> − 2𝛼(d<sub>A</sub>+d)</p>
+<p>𝛽Q = w<sub>B</sub> − 2𝛽(d<sub>B</sub>+d)</p>
+</div></blockquote>
+<p>or, alternatively,</p>
+<blockquote>
+<div><p>𝛼[Q + 2d + 2d<sub>A</sub>] = w<sub>A</sub></p>
+<p>𝛽[Q + 2d + 2d<sub>B</sub>] = w<sub>B</sub></p>
+</div></blockquote>
+<p>If we add the first pair of equations above, we can obtain the combined queue utilization:</p>
+<blockquote>
+<div>Q = w<sub>A</sub> + w<sub>B</sub> − 2d − 2(𝛼d<sub>A</sub>+𝛽d<sub>B</sub>)</div></blockquote>
+<p>The last term here, 2(𝛼d<sub>A</sub>+𝛽d<sub>B</sub>), represents the number of A’s packets in flight on the A–R link plus the number of B’s packets in flight on the B–R link.</p>
+<p>We can solve these equations exactly for 𝛼, 𝛽 and Q in terms of the known quantities, but the algebraic solution is not particularly illuminating. Instead, we examine a few more-tractable special cases.</p>
+<div class="section" id="the-equal-delays-case">
+<span id="da-db-case"></span><h4>20.2.3.1&nbsp;&nbsp;&nbsp;The equal-delays case<a class="headerlink" href="#the-equal-delays-case" title="Permalink to this headline">¶</a></h4>
+<p>We consider first the special case of <strong>equal delays</strong>: d<sub>A</sub> = d<sub>B</sub> = d’. In this case the term (𝛼d<sub>A</sub>+𝛽d<sub>B</sub>) simplifies to d’, and thus we have Q = w<sub>A</sub> + w<sub>B</sub> − 2d − 2d’. Furthermore, if we divide corresponding sides of the second pair of equations above, we get 𝛼/𝛽 = w<sub>A</sub>/w<sub>B</sub>; that is, the bandwidth (and thus the queue utilization) divides in exact accordance to the window-size proportions.</p>
+<p>If, however, d<sub>A</sub> is larger than d<sub>B</sub>, then a greater fraction of the A⟶C packets will be in transit, and so fewer will be in the queue at R, and so 𝛼 will be somewhat smaller and 𝛽 somewhat larger.</p>
+</div>
+<div class="section" id="the-equal-windows-case">
+<span id="wa-wb-case"></span><h4>20.2.3.2&nbsp;&nbsp;&nbsp;The equal-windows case<a class="headerlink" href="#the-equal-windows-case" title="Permalink to this headline">¶</a></h4>
+<p>If we assume equal winsize values instead, w<sub>A</sub> = w<sub>B</sub> = w, then we get</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">𝛼/𝛽 = [Q + 2d + 2d<sub>B</sub>] / [Q + 2d + 2d<sub>A</sub>]</div>
+</div>
+</div></blockquote>
+<p>The bandwidth ratio here is biased against the larger of d<sub>A</sub> or d<sub>B</sub>. That is, if d<sub>A</sub> &gt; d<sub>B</sub>, then more of A’s packets will be in transit, and thus fewer will be in R’s queue, and so A will have a smaller fraction of the the bandwidth.
+This bias is, however, not quite proportional: if we assume d<sub>A</sub> is double d<sub>B</sub> and d<sub>B</sub> = d = Q/2, then 𝛼/𝛽  = 3/4, and A gets 3/7 of the bandwidth to B’s 4/7.</p>
+<p>Still assuming w<sub>A</sub> = w<sub>B</sub> = w, let us decrease w to the point where the link is just saturated, but Q=0. At this point 𝛼/𝛽 = [d+d<sub>B</sub>]/[d +d<sub>A</sub>]; that is, bandwidth divides according to the respective RTT<sub>noLoad</sub> values. As w rises, additional queue capacity is used and 𝛼/𝛽 will move closer to 1.</p>
+</div>
+<div class="section" id="the-fixed-wb-case">
+<span id="fixed-wb-case"></span><h4>20.2.3.3&nbsp;&nbsp;&nbsp;The fixed-w<sub>B</sub> case<a class="headerlink" href="#the-fixed-wb-case" title="Permalink to this headline">¶</a></h4>
+<p>Finally, let us consider what happens if w<sub>B</sub> is <strong>fixed</strong> at a large-enough value to create a queue at R from the B–C traffic alone, while w<sub>A</sub> then increases from zero to a point much larger than w<sub>B</sub>. Denote the number of B’s packets in R’s queue by Q<sub>B</sub>; with w<sub>A</sub> = 0 we have 𝛽=1 and Q = Q<sub>B</sub> = w<sub>B</sub> − 2(d<sub>B</sub>+d) = throughput × (RTT − RTT<sub>noLoad</sub>).</p>
+<p>As w<sub>A</sub> begins to increase from zero, the competition will decrease B’s throughput. We have 𝛼  = w<sub>A</sub>/[Q+2d+2d<sub>A</sub>]; <strong>small</strong> changes in w<sub>A</sub> will not lead to much change in Q, and even less in Q+2d+2d<sub>A</sub>, and so 𝛼 will initially be approximately proportional to w<sub>A</sub>.</p>
+<p>For B’s part, increased competition from A (increased w<sub>A</sub>) will always decrease B’s share of the bottleneck R–C link; this link is saturated and every packet of A’s in transit there must take away one slot on that link for a packet of B’s. This in turn means that B’s bandwidth 𝛽 must decrease as w<sub>A</sub> rises. As B’s bandwidth decreases, Q<sub>B</sub> = 𝛽Q = w<sub>B</sub> − 2𝛽(d<sub>B</sub>+d) must increase; another way to put this is as the transit capacity falls, the queue utilization rises. For Q<sub>B</sub> = 𝛽Q to increase while 𝛽 decreases, Q must be increasing faster than 𝛽 is decreasing.</p>
+<p>Finally, we can conclude that as w<sub>A</sub> gets large and 𝛽→0, the limiting value for B’s queue utilization Q<sub>B</sub> at R will be the entire windowful w<sub>B</sub>, up from its starting value (when w<sub>A</sub>=0) of w<sub>B</sub> − 2(d<sub>B</sub>+d). If d<sub>B</sub>+d had been small relative to w<sub>B</sub>, then Q<sub>B</sub>’s increase will be modest, and it may be appropriate to consider Q<sub>B</sub> relatively constant.</p>
+<p>We remark again that the formulas here are based on the assumption that the bottleneck bandwidth is one packet per unit time; see exercise 1.0 for the necessary adjustments for conventional bandwidth measurements.</p>
+</div>
+<div class="section" id="the-iterative-solution">
+<h4>20.2.3.4&nbsp;&nbsp;&nbsp;The iterative solution<a class="headerlink" href="#the-iterative-solution" title="Permalink to this headline">¶</a></h4>
+<p>Given d, d<sub>A</sub>, d<sub>B</sub>, w<sub>A</sub> and w<sub>B</sub>, one way to solve for 𝛼, 𝛽 and Q is to proceed <strong>iteratively</strong>. Suppose an initial ⟨𝛼,𝛽⟩ is given, as the respective fractions of packets in the queue at R. Over the next period of time, 𝛼 and 𝛽 must (by the Queue Rule) become the bandwidth ratios. If the A–C connection has bandwidth 𝛼 (recall that the R–C connection has bandwidth 1.0, in packets per unit time, so a bandwidth fraction of 𝛼 means an actual bandwidth of 𝛼), then the number of packets in bidirectional transit will be 2𝛼(d<sub>A</sub>+d), and so the number of A–C packets in R’s queue will be Q<sub>A</sub> = w<sub>A</sub> − 2𝛼(d<sub>A</sub>+d); similarly for Q<sub>B</sub>. At that point we will have 𝛼<sub>new</sub> = Q<sub>A</sub>/(Q<sub>A</sub>+Q<sub>B</sub>). Starting with an appropriate guess for 𝛼  and iterating 𝛼 → 𝛼<sub>new</sub> a few times, if the sequence converges then it will converge to the steady-state solution. Convergence is not guaranteed, however, and is dependent on the initial guess for 𝛼. One guess that often leads to convergence is w<sub>A</sub>/(w<sub>A</sub>+w<sub>B</sub>).</p>
+</div>
+</div>
+<div class="section" id="example-4-cross-traffic-and-rtt-variation">
+<span id="cross-traffic"></span><h3>20.2.4&nbsp;&nbsp;&nbsp;Example 4: cross traffic and RTT variation<a class="headerlink" href="#example-4-cross-traffic-and-rtt-variation" title="Permalink to this headline">¶</a></h3>
+<p>In the following diagram, let us consider what happens to the A–B traffic when the C⟶D link ramps up. Bandwidths shown are expressed as packets/ms and all queues are FIFO. (Because the bandwidth is not equal to 1.0, we cannot apply the formulas of the previous section directly.) We will assume that propagation delays are small enough that only an inconsequential number of packets from C to D can be simultaneously in transit at the bottleneck rate of 5 packets/ms. All senders will use sliding windows.</p>
+<img alt="_images/cross_traffic1.svg" src="_images/cross_traffic1.svg" /><p>Let us suppose the A–B link is idle, and the C⟶D connection begins sending with a window size chosen so as to create a queue of 30 of C’s packets at R1 (if propagation delays are such that two packets can be in transit each direction, we would achieve this with winsize=34).</p>
+<p>Now imagine A begins sending. If A sends a single packet, is not shut out even though the R1–R2 link is 100% busy. A’s packet will simply have to wait at R1 behind the 30 packets from C; the waiting time in the queue will be 30 packets ÷ (5 packets/ms) = 6 ms. If we change the winsize of the C⟶D connection, the delay for A’s packets will be directly proportional to the number of C’s packets in R1’s queue.</p>
+<p>To most intents and purposes, the C⟶D flow here has increased the RTT of the A⟶B flow by 6 ms. As long as A’s contribution to R1’s queue is small relative to C’s, the delay at R1 for A’s packets looks more like propagation delay than bandwidth delay, because if A sends two back-to-back packets they will likely be enqueued consecutively at R1 and thus be subject to a single 6 ms queuing delay. By varying the C⟶D window size, we can, within limits, increase or decrease the RTT for the A⟶B flow.</p>
+<p>Let us return to the fixed C⟶D window size – denoted w<sub>C</sub> – chosen to yield a queue of 30 of C’s packets at R1. As A increases its own window size from, say, 1 to 5, the C⟶D throughput will decrease slightly, but C’s contribution to R1’s queue will remain dominant.</p>
+<p>As in the argument at the end of <a class="reference internal" href="#fixed-wb-case"><span class="std std-ref">20.2.3.3&nbsp;&nbsp;&nbsp;The fixed-wB case</span></a>, small propagation delays mean that w<sub>C</sub> will not be much larger than 30. As w<sub>A</sub> climbs from zero to infinity, C’s contribution to R1’s queue rises from 30 to at most w<sub>C</sub>, and so the 6ms delay for A⟶B packets remains relatively constant even as A’s winsize rises to the point that A’s contribution to R1’s queue far outweighed C’s. (As we will argue in the next paragraphs, this can actually happen only if the R2–R3 bandwidth is increased). Each packet from A arriving at R1 will, on average, face 30 or so of C’s packets ahead of it, along with anywhere from many fewer to many more of A’s packets.</p>
+<p>If A’s window size is 1, its one packet at a time will wait 6 ms in the queue at R1. If A’s window size is greater than 1 but remains small, so that A contributes only a small proportion of R1’s queue, then A’s packets will wait only at R1. Initially, as A’s winsize increases, the queue at R1 grows but all other queues remain empty.</p>
+<p>However, if A’s winsize grows large enough that its packets consume 40% of R1’s queue in the steady state, then this situation changes. At the point when A has 40% of R1’s queue, by the Queue Competition Rule it will also have a 40% share of the R1–R2 link’s bandwidth, that is, 40% × 5 = 2 packets/ms. Because the R2–R3 link has a bandwidth of 2 packets/ms, <em>the A–B throughput can never grow beyond this</em>. If the C–D contribution to R1’s queue is held constant at 30 packets, then this point is reached when A’s contribution to R1’s queue is 20 packets.</p>
+<p>Because A’s proportional contribution to R1’s queue cannot increase further, any additional increase to A’s winsize must result in those packets now being enqueued at R2.</p>
+<p>We have now reached a situation where A’s packets are queuing up at both R1 and at R2, contrary to the single-sender principle that packets can queue at only one router. Note, however, that for any fixed value of A’s winsize, a small-enough increase in A’s winsize will result in either that increase going entirely to R1’s queue or entirely to R2’s queue. Specifically, if w<sub>A</sub> represents A’s winsize at the point when A has 40% of R1’s queue (a little above 20 packets if propagation delays are small), then for winsize &lt; w<sub>A</sub> any queue growth will be at R1 while for winsize &gt; w<sub>A</sub> any queue growth will be at R2. In a sense the bottleneck link “switches” from R1–R2 to R2–R3 at the point winsize = w<sub>A</sub>.</p>
+<p>In the graph below, A’s contribution to R1’s queue is plotted in green and A’s contribution to R2’s queue is in blue. It may be instructive to compare this graph with the third graph in <a class="reference internal" href="slidingwindows.html#graphs-at-the-congestion-knee"><span class="std std-ref">8.3.3&nbsp;&nbsp;&nbsp;Graphs at the Congestion Knee</span></a>, which illustrates a single connection with a single bottleneck.</p>
+<img alt="_images/cross_traffic_graph.svg" src="_images/cross_traffic_graph.svg" /><p>In Exercise 8.0 we consider some minor changes needed if propagation delay is <em>not</em> inconsequential.</p>
+</div>
+<div class="section" id="example-5-dynamic-bottlenecks">
+<h3>20.2.5&nbsp;&nbsp;&nbsp;Example 5: dynamic bottlenecks<a class="headerlink" href="#example-5-dynamic-bottlenecks" title="Permalink to this headline">¶</a></h3>
+<p>The next example has two links offering potential competition to the A⟶B flow: C⟶D and E⟶F. Either of these could send traffic so as to throttle (or at least compete with) the A⟶B traffic. Either of these could choose a window size so as to build up a persistent queue at R1 or R3; a persistent queue of 20 packets would mean that A⟶B traffic would wait 4 ms in the queue.</p>
+<img alt="_images/cross_traffic2.svg" src="_images/cross_traffic2.svg" /><p>Despite situations like this, we will usually use the term “bottleneck link” as if it were a precisely defined concept. In Examples 2, 3 and 4 above, a better term might be “competitive link”; for Example 5 we perhaps should say “competitive link<strong>s</strong>.</p>
+</div>
+<div class="section" id="packet-pairs">
+<span id="index-9"></span><span id="id4"></span><h3>20.2.6&nbsp;&nbsp;&nbsp;Packet Pairs<a class="headerlink" href="#packet-pairs" title="Permalink to this headline">¶</a></h3>
+<p>One approach for a sender to attempt to measure the physical bandwidth of the bottleneck link is the <strong>packet-pairs</strong> technique: the sender repeatedly sends a pair of packets P1 and P2 to the receiver, one right after the other. The receiver records the time difference between the arrivals.</p>
+<p>Sooner or later, we would expect that P1 and P2 would arrive consecutively at the bottleneck router R, and be put into the queue next to each other. They would then be sent one right after the other on the bottleneck link; if T is the time difference in arrival at the far end of the link, the physical bandwidth is size(P1)/T. At least some of the time, the packets will remain spaced by time T for the rest of their journey.</p>
+<p>The theory is that the receiver can measure the different arrival-time differences for the different packet pairs, and look for the <em>minimum</em> time difference. Often, this will be the time difference introduced by the bandwidth delay on the bottleneck link, as in the previous paragraph, and so the ultimate receiver will be able to infer that the bottleneck physical bandwidth is size(P1)/T.</p>
+<p>Two things can mar this analysis. First, packets may be reordered; P2 might arrive before P1. Second, P1 and P2 can arrive together at the bottleneck router and be sent consecutively, but then, later in the network, the two packets can arrive at a second router R2 with a (transient) queue large enough that P2 arrives while P1 is in R2’s queue. If P1 and P2 are consecutive in R2’s queue, then the ultimate arrival-time difference is likely to reflect R2’s (higher) outbound bandwidth rather than R’s.</p>
+<p>Additional analysis of the problems with the packet-pair technique can be found in [VP97], along with a proposal for an improved technique known as <em>packet bunch mode</em>.</p>
+</div>
+</div>
+<div class="section" id="tcp-reno-fairness-with-synchronized-losses">
+<span id="fairness2"></span><span id="index-10"></span><h2>20.3&nbsp;&nbsp;&nbsp;TCP Reno Fairness with Synchronized Losses<a class="headerlink" href="#tcp-reno-fairness-with-synchronized-losses" title="Permalink to this headline">¶</a></h2>
+<p>This brings us to the question of just what <em>is</em> a “fair” division of bandwidth. A starting place is to assume that “fair” means “equal”, though, as we shall see below, the question does not end there.</p>
+<p>For the moment, consider again two competing TCP Reno connections: Connection 1 (in blue) from A to C and Connection 2 (in green) from B to D, through the same bottleneck router R, <em>and with the same RTT</em>. The router R will use tail-drop queuing.</p>
+<img alt="_images/dumbbell.svg" src="_images/dumbbell.svg" /><p id="index-11">The layout illustrated here, with the shared link somewhere in the middle of each path, is sometimes known as the <strong>dumbbell</strong> topology.</p>
+<p>For the time being, we will also continue to assume the TCP Reno <strong>synchronized-loss hypothesis</strong>: that in any one RTT either <em>both</em> connections experience a loss or <em>neither</em> does. (This assumption is suspect; we explore it further in <a class="reference internal" href="#tcp-rtt-bias"><span class="std std-ref">20.3.3&nbsp;&nbsp;&nbsp;TCP Reno RTT bias</span></a> and in <a class="reference internal" href="ns2.html#basic2"><span class="std std-ref">31.3&nbsp;&nbsp;&nbsp;Two TCP Senders Competing</span></a>). This was the model reviewed previously in <a class="reference internal" href="reno.html#fairness1"><span class="std std-ref">19.1.1.1&nbsp;&nbsp;&nbsp;A first look at fairness</span></a>; we argued there that in any RTT without a loss, the expression (<code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>1</sub> - <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>2</sub>) remained the same (both <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>s incremented by 1), while in any RTT <em>with</em> a loss the expression (<code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>1</sub> - <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>2</sub>) decreased by a factor of 2 (both <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>s decreased by factors of 2).</p>
+<p>Here is a graphical version of the same argument, as originally introduced in <a class="reference internal" href="bibliography.html#cj89" id="id5">[CJ89]</a>. We plot <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>1</sub> on the x-axis and <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>2</sub> on the y-axis. An additive increase of both (in equal amounts) moves the point (x,y) = (<code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>1</sub>,<code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>2</sub>) along the line parallel to the 45° line y=x; equal multiplicative decreases of both moves the point (x,y) along a line straight back towards the origin. If the maximum network capacity is Max, then a loss occurs whenever x+y exceeds Max, that is, the point (x,y) crosses the line x+y=Max.</p>
+<img alt="_images/cjgraph.svg" src="_images/cjgraph.svg" /><p>Beginning at the initial state, additive increase moves the state at a 45° angle up to the line x+y=Max, in small increments denoted by the small arrowheads. At this point a loss would occur, and the state jumps back halfway <em>towards the origin</em>. The state then moves at 45° incrementally back to the line x+y=Max, and continues to zigzag slowly towards the equal-shares line y=x.</p>
+<p>Any attempt to increase <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> faster than linear will mean that the increase phase is not parallel to the line y=x, but in fact veers away from it. This will slow down the process of convergence to equal shares.</p>
+<p>Finally, here is a <strong>timeline</strong> version of the argument. We will assume that the A–C path capacity, the B–D path capacity and R’s queue size all add up to 24 packets, and that in any RTT in which <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>1</sub> + <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>2</sub> &gt; 24, both connections experience a packet loss. We also assume that, initially, the first connection has <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>=20, and the second has <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>=1.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="10%" />
+<col width="10%" />
+<col width="69%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">T</th>
+<th class="head">A–C</th>
+<th class="head">B–D</th>
+<th class="head">&#160;</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>20</td>
+<td>1</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td>21</td>
+<td>2</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>2</td>
+<td>22</td>
+<td>3</td>
+<td>total <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is 25; packet loss</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td>11</td>
+<td>1</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>4</td>
+<td>12</td>
+<td>2</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>5</td>
+<td>13</td>
+<td>3</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>6</td>
+<td>14</td>
+<td>4</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>7</td>
+<td>15</td>
+<td>5</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>8</td>
+<td>16</td>
+<td>6</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>9</td>
+<td>17</td>
+<td>7</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>10</td>
+<td>18</td>
+<td>8</td>
+<td>second packet loss</td>
+</tr>
+<tr class="row-odd"><td>11</td>
+<td>9</td>
+<td>4</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>12</td>
+<td>10</td>
+<td>5</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>13</td>
+<td>11</td>
+<td>6</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>14</td>
+<td>12</td>
+<td>7</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>15</td>
+<td>13</td>
+<td>8</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>16</td>
+<td>14</td>
+<td>9</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>17</td>
+<td>15</td>
+<td>10</td>
+<td>third packet loss</td>
+</tr>
+<tr class="row-even"><td>18</td>
+<td>7</td>
+<td>5</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>19</td>
+<td>8</td>
+<td>6</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>20</td>
+<td>9</td>
+<td>7</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>21</td>
+<td>10</td>
+<td>8</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>22</td>
+<td>11</td>
+<td>9</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>23</td>
+<td>12</td>
+<td>10</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>24</td>
+<td>13</td>
+<td>11</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>25</td>
+<td>14</td>
+<td>12</td>
+<td>fourth loss</td>
+</tr>
+<tr class="row-even"><td>26</td>
+<td>7</td>
+<td>6</td>
+<td><code class="docutils literal notranslate"><span class="pre">cwnd</span></code>s are quite close</td>
+</tr>
+<tr class="row-odd"><td>…</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>32</td>
+<td>13</td>
+<td>12</td>
+<td>loss</td>
+</tr>
+<tr class="row-odd"><td>33</td>
+<td>6</td>
+<td>6</td>
+<td><code class="docutils literal notranslate"><span class="pre">cwnd</span></code>s are equal</td>
+</tr>
+</tbody>
+</table>
+<p>So far, fairness seems to be winning.</p>
+<div class="section" id="example-2-faster-additive-increase">
+<span id="faster-additive-increase"></span><h3>20.3.1&nbsp;&nbsp;&nbsp;Example 2: Faster additive increase<a class="headerlink" href="#example-2-faster-additive-increase" title="Permalink to this headline">¶</a></h3>
+<p>Here is the same kind of timeline – again with the synchronized-loss hypothesis – but with the additive-increase increment changed from 1 to 2 for the B–D connection (but not for A–C); both connections start with <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>=1. Again, we assume a loss occurs when <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>1</sub> + <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>2</sub> &gt; 24</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="10%" />
+<col width="10%" />
+<col width="69%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">T</th>
+<th class="head">A–C</th>
+<th class="head">B–D</th>
+<th class="head">&#160;</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>1</td>
+<td>1</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td>2</td>
+<td>3</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>2</td>
+<td>3</td>
+<td>5</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td>4</td>
+<td>7</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>4</td>
+<td>5</td>
+<td>9</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>5</td>
+<td>6</td>
+<td>11</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>6</td>
+<td>7</td>
+<td>13</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>7</td>
+<td>8</td>
+<td>15</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>8</td>
+<td>9</td>
+<td>17</td>
+<td>first packet loss</td>
+</tr>
+<tr class="row-odd"><td>9</td>
+<td>4</td>
+<td>8</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>10</td>
+<td>5</td>
+<td>10</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>11</td>
+<td>6</td>
+<td>12</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>12</td>
+<td>7</td>
+<td>14</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>13</td>
+<td>8</td>
+<td>16</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>14</td>
+<td>9</td>
+<td>18</td>
+<td>second loss</td>
+</tr>
+<tr class="row-odd"><td>15</td>
+<td>4</td>
+<td>9</td>
+<td>essentially where we were at T=9</td>
+</tr>
+</tbody>
+</table>
+<p>The effect here is that the second connection’s average <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>, and thus its throughput, is double that of the first connection. Thus, changes to the additive-increase increment lead to very significant changes in fairness. In general, an additive-increase value of 𝛼  increases throughput, relative to TCP Reno, by a factor of 𝛼.</p>
+</div>
+<div class="section" id="example-3-longer-rtt">
+<span id="longer-rtt"></span><h3>20.3.2&nbsp;&nbsp;&nbsp;Example 3: Longer RTT<a class="headerlink" href="#example-3-longer-rtt" title="Permalink to this headline">¶</a></h3>
+<p>For the next example, we will return to standard TCP Reno, with an increase increment of 1. But here we assume that the RTT of the A–C connection is <strong>double</strong> that of the B–D connection, perhaps because of additional delay in the A–R link. The longer RTT means that the first connection sends packet flights only when T is even. Here is the timeline, where we allow the first connection a hefty head-start. As before, we assume a loss occurs when  <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>1</sub> + <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>2</sub> &gt; 24.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="73%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">T</th>
+<th class="head">A–C</th>
+<th class="head">B–D</th>
+<th class="head">&#160;</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>20</td>
+<td>1</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td></td>
+<td>2</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>2</td>
+<td>21</td>
+<td>3</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td></td>
+<td>4</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>4</td>
+<td>22</td>
+<td>5</td>
+<td>first loss</td>
+</tr>
+<tr class="row-odd"><td>5</td>
+<td></td>
+<td>2</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>6</td>
+<td>11</td>
+<td>3</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>7</td>
+<td></td>
+<td>4</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>8</td>
+<td>12</td>
+<td>5</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>9</td>
+<td></td>
+<td>6</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>10</td>
+<td>13</td>
+<td>7</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>11</td>
+<td></td>
+<td>8</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>12</td>
+<td>14</td>
+<td>9</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>13</td>
+<td></td>
+<td>10</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>14</td>
+<td>15</td>
+<td>11</td>
+<td>second loss</td>
+</tr>
+<tr class="row-odd"><td>15</td>
+<td></td>
+<td>5</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>16</td>
+<td>7</td>
+<td>6</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>17</td>
+<td></td>
+<td>7</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>18</td>
+<td>8</td>
+<td>8</td>
+<td>B–D has caught up</td>
+</tr>
+<tr class="row-odd"><td><strong>20</strong></td>
+<td>9</td>
+<td>10</td>
+<td><strong>from here on only even values for T shown</strong></td>
+</tr>
+<tr class="row-even"><td><strong>22</strong></td>
+<td>10</td>
+<td>12</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td><strong>24</strong></td>
+<td>11</td>
+<td>14</td>
+<td>third loss</td>
+</tr>
+<tr class="row-even"><td><strong>26</strong></td>
+<td>5</td>
+<td>8</td>
+<td>B–D is now ahead</td>
+</tr>
+<tr class="row-odd"><td><strong>28</strong></td>
+<td>6</td>
+<td>10</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td><strong>30</strong></td>
+<td>7</td>
+<td>12</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td><strong>32</strong></td>
+<td>8</td>
+<td>14</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td><strong>34</strong></td>
+<td>9</td>
+<td>16</td>
+<td>fourth loss</td>
+</tr>
+<tr class="row-odd"><td><strong>35</strong></td>
+<td></td>
+<td>8</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td><strong>36</strong></td>
+<td>4</td>
+<td>9</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td><strong>38</strong></td>
+<td>5</td>
+<td>11</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td><strong>40</strong></td>
+<td>6</td>
+<td>13</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td><strong>42</strong></td>
+<td>7</td>
+<td>15</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td><strong>44</strong></td>
+<td>8</td>
+<td>17</td>
+<td>fifth loss</td>
+</tr>
+<tr class="row-odd"><td>45</td>
+<td></td>
+<td>8</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td><strong>46</strong></td>
+<td>4</td>
+<td>9</td>
+<td>exactly where we were at T=36</td>
+</tr>
+</tbody>
+</table>
+<p>The interval 36≤T&lt;46 represents the steady state here; the first connection’s average <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is 6 while the second connection’s average is (8+9+…+16+17)/10 = 12.5. Worse, the first connection sends a windowful only half as often. In the interval 36≤T&lt;46 the first connection sends 4+5+6+7+8 = 30 packets; the second connection sends 125. The cost of the first connection’s longer RTT is <em>quadratic</em>; in general, as we argue more formally below, if the first connection has RTT = 𝜆 &gt; 1 relative to the second’s, then its bandwidth will be reduced by a factor of 1/𝜆<sup>2</sup>.</p>
+<p>Is this fair?</p>
+<p id="index-12">Early thinking was that there was something to fix here; see <a class="reference internal" href="bibliography.html#f91" id="id6">[F91]</a> and <a class="reference internal" href="bibliography.html#fj92" id="id7">[FJ92]</a>, §3.3 where the Constant-Rate window-increase algorithm is discussed. A more recent attempt to address this problem is <strong>TCP Hybla</strong>, <a class="reference internal" href="bibliography.html#cf04" id="id8">[CF04]</a>; discussed later in <a class="reference internal" href="newtcps.html#hybla"><span class="std std-ref">22.12&nbsp;&nbsp;&nbsp;TCP Hybla</span></a>.</p>
+<p>Alternatively, we may simply <em>define</em> TCP Reno’s bandwidth allocation as “fair”, at least in some contexts. This approach is particularly common when the issue at hand is making sure other TCP implementations – and non-TCP flows – compete for bandwidth in roughly the same way that TCP Reno does. While TCP Reno’s strategy is now understood to be “greedy” in some respects, “fixing” it in the Internet at large is generally recognized as a very difficult option.</p>
+</div>
+<div class="section" id="tcp-reno-rtt-bias">
+<span id="tcp-rtt-bias"></span><span id="index-13"></span><h3>20.3.3&nbsp;&nbsp;&nbsp;TCP Reno RTT bias<a class="headerlink" href="#tcp-reno-rtt-bias" title="Permalink to this headline">¶</a></h3>
+<p>Let us consider more carefully the way TCP allocates bandwidth between two connections sharing a bottleneck link with relative RTTs of 1 and 𝜆&gt;1. We claimed above that the slower connection’s bandwidth will be reduced by a factor of 1/𝜆<sup>2</sup>; we will now show this under some assumptions. First, uncontroversially, we will assume  FIFO droptail queuing at the bottleneck router, and also that the network ceiling (and hence <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> at the point of loss) is “sufficiently” large. We will also assume, for simplicity, that the network ceiling C is constant.</p>
+<p>We need one more assumption: that most loss events are experienced by both connections. This is the <strong>synchronized losses</strong> hypothesis, and is the most debatable; we will explore it further in the next section. But first, here is the general argument with this assumption.</p>
+<p>Let connection 1 be the faster connection, and assume a steady state has been reached. Both connections experience loss when <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>1</sub>+<code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>2</sub> ≥ C, because of the synchronized-loss hypothesis. Let c<sub>1</sub> and c<sub>2</sub> denote the respective window sizes at the point just before the loss. Both <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> values are then halved. Let N be the number of RTTs <em>for connection 1</em> before the network ceiling is reached again. During this time c<sub>1</sub> increases by N; c<sub>2</sub> increases by approximately N/𝜆  if N is reasonably large. Each of these increases represents half the corresponding <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>; we thus have c<sub>1</sub>/2 = N and c<sub>2</sub>/2 = N/𝜆. Taking ratios of respective sides, we get c<sub>1</sub>/c<sub>2</sub> = N/(N/𝜆) = 𝜆, and from that we can solve to get c<sub>1</sub> = C𝜆/(1+𝜆) and c<sub>2</sub> = C/(1+𝜆).</p>
+<p>To get the relative bandwidths, we have to count packets sent during the interval between losses. Both connections have <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> averaging about 3/4 of the maximum value; that is, the average <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>s are 3/4 c<sub>1</sub> and 3/4 c<sub>2</sub> respectively. Connection 1 has N RTTs and so sends about 3/4 c<sub>1</sub>×N packets. Connection 2, with its slower RTT, has only about N/𝜆 RTTs (again we use the assumption that N is reasonably large), and so sends about 3/4 c<sub>2</sub>×N/𝜆 packets. The ratio of these is c<sub>1</sub>/(c<sub>2</sub>/𝜆) = 𝜆<sup>2</sup>. Connection 1 sends fraction 𝜆<sup>2</sup>/(1+𝜆<sup>2</sup>) of the packets; connection 2 sends fraction 1/(1+𝜆<sup>2</sup>).</p>
+</div>
+<div class="section" id="synchronized-loss-hypothesis">
+<span id="index-14"></span><span id="id9"></span><h3>20.3.4&nbsp;&nbsp;&nbsp;Synchronized-Loss Hypothesis<a class="headerlink" href="#synchronized-loss-hypothesis" title="Permalink to this headline">¶</a></h3>
+<p>The synchronized-loss hypothesis says that if two TCP connections share a bottleneck link, then whenever the queue is full, late-arriving packets from <em>each</em> connection will find it so, and be dropped. Once the queue becomes full, in other words, it stays full for long enough for each connection to experience a packet loss. The hypothesis is most relevent when, as is the case for TCP Reno, packet losses trigger changes to <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>.</p>
+<p>This hypothesis is mostly a convenience for reasoning about TCP, and should not be taken as literal fact, though it is often “largely” true. That said, it is certainly possible to come up with hypothetical situations where losses are not synchronized. Recall that a TCP Reno connection’s <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is incremented by only 1 each RTT; losses generally occur when this single extra packet generated by the increment to <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> arrives to find a full queue. Generally speaking, packets are leaving the queue about as fast as they are arriving; actual overfull-queue instants may be rare. It is certainly conceivable that, at least some of the time, one connection would overflow the queue by one packet, and halve its <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>, in a short enough time interval that the other connection misses the queue-full moment entirely. Alternatively, if queue overflows lead to effectively random selection of lost packets (as would certainly be true for random-drop queuing, and might be true for tail-drop if there were sufficient randomness in packet arrival times), then there is a finite probability that all the lost packets at a given loss event come from the same connection.</p>
+<p>The synchronized-loss hypothesis is still valid if either or both connection experiences <em>more</em> than one packet loss, within a single RTT; the hypothesis fails only when one connection experiences no losses.</p>
+<p>We will return to possible failure of the synchronized-loss hypothesis in <a class="reference internal" href="dynamicsB.html#tcp-rtt-bias-revisited"><span class="std std-ref">21.2.2&nbsp;&nbsp;&nbsp;Unsynchronized TCP Losses</span></a>. In <a class="reference internal" href="ns2.html#basic2"><span class="std std-ref">31.3&nbsp;&nbsp;&nbsp;Two TCP Senders Competing</span></a> we will consider some TCP Reno simulations in which actual measurement does not entirely agree with the synchronized-loss model. Two problems will emerge. The first is that when two connections compete in isolation, a form of synchronization known as <strong>phase effects</strong> (<a class="reference internal" href="ns2.html#phase-effects"><span class="std std-ref">31.3.4&nbsp;&nbsp;&nbsp;Phase Effects</span></a>) can introduce a persistent perhaps-unexpected bias. The second is that the longer-RTT connection often does manage to miss out on the full-queue moment entirely, as discussed above in the second paragraph of this section. This results in a larger <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> than the synchronized-loss hypothesis would predict.</p>
+</div>
+<div class="section" id="loss-synchronization">
+<span id="index-15"></span><span id="id10"></span><h3>20.3.5&nbsp;&nbsp;&nbsp;Loss Synchronization<a class="headerlink" href="#loss-synchronization" title="Permalink to this headline">¶</a></h3>
+<p>The synchronized-loss hypothesis assumes <em>all</em> losses are synchronized. There is another side to this phenomenon that is an issue even if only some reasonable fraction of loss events are synchronized: synchronized losses may represent a collective inefficiency in the use of bandwidth. In the immediate aftermath of a synchronized loss, it is very likely that the bottleneck link will go underutilized, as (at least) two connections using it have just cut their sending rate in half. Better utilization would be achieved if the loss events could be staggered, so that at the point when connection 1 experiences a loss, connection 2 is only halfway to its next loss. For an example, see exercise 18.0 in the following chapter.</p>
+<p>This loss synchronization is a very real effect on the Internet, even if losses are not necessarily <em>all</em> synchronized. A major contributing factor to synchronization is the relatively slow response of all parties involved to packet loss. In the diagram above at <a class="reference internal" href="#fairness2"><span class="std std-ref">20.3&nbsp;&nbsp;&nbsp;TCP Reno Fairness with Synchronized Losses</span></a>, if A increments its <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> leading to an overflow at R, the A–R link is likely still full of packets, and R’s queue remains full, and so there is a reasonable likelihood that sender B will also experience a loss, even if its <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> was not particularly high, simply because its packets arrived at the wrong instant. Congestion, unfortunately, takes time to clear.</p>
+</div>
+<div class="section" id="extreme-rtt-ratios">
+<span id="extreme-cases"></span><span id="index-16"></span><h3>20.3.6&nbsp;&nbsp;&nbsp;Extreme RTT Ratios<a class="headerlink" href="#extreme-rtt-ratios" title="Permalink to this headline">¶</a></h3>
+<p>What happens to TCP Reno fairness if one TCP connection has a 100-fold-larger RTT than another? The short answer is that the shorter connection <em>may</em> get 10,000 times the throughput. The longer answer is that this isn’t quite as easy to set up as one might imagine. For the arguments above, it is necessary for the two connections to have a common bottleneck link:</p>
+<img alt="_images/extreme_rtt.svg" src="_images/extreme_rtt.svg" /><p>In the diagram above, the A–C connection wants its <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> to be about 200 ms × 10 packets/ms = 2,000 packets; it is competing for the R–C link with the B–D connection which is happy with a <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> of 22. If R’s queue capacity is also about 20, then with most of the bandwidth the B–C connection will experience a loss about every 20 RTTs, which is to say every 22 ms. If the A–C link shares even a modest fraction of those losses, it is indeed in trouble.</p>
+<p>However, the A–C <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> cannot fall below 1.0; to test the 10,000-fold hypothesis taking this constraint into account we would have to scale up the numbers on the B–C link so the transit capacity there was at least 10,000. This would mean a 400 Gbps R–C bandwidth, or else an unrealistically large A–R delay.</p>
+<p>As a second issue, realistically the A–C link is much more likely to have its bottleneck somewhere in the middle of its long path. In a typical real scenario along the lines of that diagrammed above, B, C and R are all local to a site, and bandwidth of long-haul paths is almost always less than the local LAN bandwidth within a site. If the A–R path has a 1 packet/ms bottleneck somewhere, then it may be less likely to be as dramatically affected by B–C traffic.</p>
+<p>A few actual simulations using the methods of <a class="reference internal" href="ns2.html#basic2"><span class="std std-ref">31.3&nbsp;&nbsp;&nbsp;Two TCP Senders Competing</span></a> resulted in an average <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> for the A–C connection of between 1 and 2, versus a B–C <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> of 20-25, regardless of whether the two links shared a bottleneck or if the A–C link had its bottleneck somewhere along the A–R path. This <em>may</em> suggest that the A–C connection was indeed saved by the 1.0 <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> minimum.</p>
+</div>
+</div>
+<div class="section" id="epilog">
+<h2>20.4&nbsp;&nbsp;&nbsp;Epilog<a class="headerlink" href="#epilog" title="Permalink to this headline">¶</a></h2>
+<p>TCP Reno’s core congestion algorithm is based on algorithms in Jacobson and Karel’s 1988 paper <a class="reference internal" href="bibliography.html#jk88" id="id11">[JK88]</a>, now twenty-five years old. There are concerns both that TCP Reno uses too much bandwidth (the greediness issue) and that it does not use enough (the high-bandwidth-TCP problem).</p>
+<p>In the next chapter we consider alternative versions of TCP that attempt to solve some of the above problems associated with TCP Reno.</p>
+</div>
+<div class="section" id="exercises">
+<span id="dynamicsa-exercises"></span><h2>20.5&nbsp;&nbsp;&nbsp;Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<p><em>Exercises may be given fractional (floating point) numbers, to allow for interpolation of new exercises.</em> Exercises marked with a ♢ have solutions or hints at <a class="reference internal" href="solutions.html#dynamicsa-solutions"><span class="std std-ref">34.15&nbsp;&nbsp;&nbsp;Solutions for Dynamics of TCP</span></a>.</p>
+<p>1.0. In the section <a class="reference internal" href="#queue-utilization"><span class="std std-ref">20.2.3&nbsp;&nbsp;&nbsp;Example 3: competition and queue utilization</span></a>, we derived the formula</p>
+<div class="line-block">
+<div class="line">Q = w<sub>A</sub> + w<sub>B</sub> − 2d − 2(𝛼d<sub>A</sub>+𝛽d<sub>B</sub>)</div>
+</div>
+<p>under the assumption that the bottleneck bandwidth was 1 packet per unit time. Give the formula when the bottleneck bandwidth is r packets per unit time. Hint: the formula above will apply if we measure time in units of 1/r; only the delays d, d<sub>A</sub> and d<sub>B</sub> need to be re-scaled to refer to “normal” time. A delay d measured in “normal” time corresponds to a delay dʹ = r×d measured in 1/r units.</p>
+<p>2.0. Consider the following network, where the bandwidths marked are all in packets/ms. C is sending to D using sliding windows and A and B are idle.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>          C
+          │
+         100
+          │
+A───100───R1───5───R2───100───B
+                   │
+                  100
+                   │
+                   D
+</pre></div>
+</div>
+<p>Suppose the one-way propagation delay on the 100 packet/ms links is 1 ms, and the one-way propagation delay on the R1–R2 link is 2 ms. The RTT<sub>noLoad</sub> for the C–D path is thus about 8 ms, for a bandwidth×delay product of 40 packets. If C uses winsize = 50, then the queue at R1 will have size 10.</p>
+<p>Now suppose A starts sending to B using sliding windows, also with winsize = 50. What will be the size of the queue at R1?</p>
+<p>Hint: by symmetry, the queue will be equally divided between A’s packets and C’s, and A and C will each see a throughput of 2.5 packets/ms. RTT<sub>noLoad</sub>, however, does not change. The number of packets in transit for each connection will be 2.5 packets/ms × RTT<sub>noLoad</sub>.</p>
+<p>3.0. In the previous exercise, give the average number of <strong>data</strong> packets (not ACKs) in transit on each individual link:</p>
+<div class="line-block">
+<div class="line">(a).♢ for the original case in which C is the only sender, with winsize = 50 (the only active links here are C–R1, R1–R2 and R2–D).</div>
+<div class="line">(b). for the new case in which B is also sending, also with winsize = 50. In this case all links are active.</div>
+</div>
+<p>Each link will also have an equal number of <strong>ACK</strong> packets in transit in the reverse direction. Hint: since winsize ≥ bandwidth×delay, packets are sent at the bottleneck rate.</p>
+<p>4.0.♢ Consider the following network, with links labeled with one-way propagation delays in milliseconds (so, ignoring bandwidth delay, A’s RTT<sub>noLoad</sub> is 40 ms and B’s is 20 ms). The bottleneck link is R–D, with a bandwidth of 6 packets/ms.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>A────── 15 ──────┐
+                 │
+                 R──5──D
+                 │
+           B──5──┘
+</pre></div>
+</div>
+<p>Initially B sends to D using a winsize of 120, the bandwidth×round-trip-delay product for the B–D path. A then begins sending as well, increasing its winsize until its share of the bandwidth is 2 packets/ms.</p>
+<p>What is A’s winsize at this point? How many packets do A and B each have in the queue at R?</p>
+<p>It is perhaps easiest to solve this by repeated use of the observation that the number of packets in transit on a connection is always equal to RTT<sub>noLoad</sub> times the actual bandwidth received by that connection. The algebraic methods of <a class="reference internal" href="#queue-utilization"><span class="std std-ref">20.2.3&nbsp;&nbsp;&nbsp;Example 3: competition and queue utilization</span></a> can also be used, but bandwidth there was normalized to 1; all propagation delays given here would therefore need to be multiplied by 6.</p>
+<p>5.0. Consider the C–D path from the diagram of <a class="reference internal" href="#cross-traffic"><span class="std std-ref">20.2.4&nbsp;&nbsp;&nbsp;Example 4: cross traffic and RTT variation</span></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>C───100───R1───5───R2───100───D
+</pre></div>
+</div>
+<p>Link numbers are bandwidths in packets/ms. Assume C is the only sender.</p>
+<div class="line-block">
+<div class="line">(a).♢ Give propagation delays for the links C–R1 and R2–D so that there will be an average of 5 packets in transit on the C–R1 and R2–D links, in each direction, if C uses a winsize sufficient to saturate the bottleneck R1–R2 link.</div>
+<div class="line">(b). Give propagation delays for all three links so that, when C uses a winsize equal to the round-trip transit capacity, there are 5 packets each way on the C–R1 link, 10 on the R1–R2 link, and 20 on the R2–D link.</div>
+</div>
+<p>6.0. Suppose we have the network layout below of <a class="reference internal" href="#cross-traffic"><span class="std std-ref">20.2.4&nbsp;&nbsp;&nbsp;Example 4: cross traffic and RTT variation</span></a>, except that the R1–R2 bandwidth is 6 packets/ms and the R2–R3 bandwidth is 3 pkts/ms. The delays are as shown, making the C–D RTT<sub>noLoad</sub> 10 ms and the A–B RTT<sub>noLoad</sub> 16 ms. A connects to B and C connects to D.</p>
+<div class="line-block">
+<div class="line">(a).♢ Find window sizes w<sub>A</sub> and w<sub>C</sub> so that the A–B and C–D connections share the bottleneck R1–R2 bandwidth equally, and there is no queue.</div>
+</div>
+<div class="line-block">
+<div class="line">(b). Show that increasing each of w<sub>A</sub> and w<sub>C</sub> by 30 packets leaves each connection with 30 packets in R1’s queue – so the bandwidth is still shared equally – and none in R2’s. Hint: As in (a), the A–B bandwidth cannot exceed 3 packets/ms, and C’s packets can only accumulate at R1. To show A cannot have less than 50% of the bandwidth, observe that, if this happened, then A can have no queue at R2 (because packets now leave faster than they arrive), and so all of A’s extra packets must also queue at R1.</div>
+</div>
+<img alt="_images/exercise4.svg" src="_images/exercise4.svg" /><p>7.0. Suppose we have the network layout of the previous exercise, 6.0. Suppose also that the A–B and C–D connections have settled upon window sizes as in 6.0(b), so that each contributes 30 packets to R1’s queue. Each connection thus has 50% of the R1–R2 bandwidth and there is no queue at R2.</p>
+<p>Now A’s winsize is incremented by 10, initially, at least, leading to A contributing more than 50% of R1’s queue. When the steady state is reached, how will these extra 10 packets be distributed between R1 and R2? Hint: As A’s winsize increases, A’s overall throughput cannot rise due to the bandwidth restriction of the R2–R3 link.</p>
+<p>8.0. Suppose we have the network layout of exercise 6.0, but modified so  that the round-trip C–D RTT<sub>noLoad</sub> is 5 ms. The round-trip A–B RTT<sub>noLoad</sub> may be different.</p>
+<p>The R1–R2 bandwidth is 6 packets/ms, so with A idle the C–D throughput is 6 packets/ms.</p>
+<div class="line-block">
+<div class="line">(a). Suppose that A and C have window sizes such that, with <em>both</em> transmitting, each has 30 packets in the queue at R1. What is C’s winsize? Hint: C’s throughput is now 3 packets/ms.</div>
+<div class="line">(b). Now suppose C’s winsize, with A idle, is 60. In this case the C–D transit capacity would be 5 ms × 6 packets/ms = 30 packets, and so C would have 60−30 = 30 packets in R1’s queue. A then begins sending, with a winsize chosen so that A and C’s contributions to R1’s queue are equal; C’s winsize remains at 60. What will be C’s (and thus A’s) queue usage at R1? Hint: find the transit capacity for a throughput of 3 packets/ms.</div>
+<div class="line">(c). Suppose the A–B RTT<sub>noLoad</sub> is 10 ms. If C’s winsize is 60, find the winsize for A that makes A and C’s contributions to R1’s queue equal.</div>
+</div>
+<p>9.0. One way to address the reduced bandwidth TCP Reno gives to long-RTT connections is for all connections to use an increase increment of RTT<sup>2</sup> instead of 1; that is, everyone uses AIMD(RTT<sup>2</sup>,1/2) instead of AIMD(1,1/2) (or AIMD(k×RTT<sup>2</sup>,1/2), where k is an arbitrary scaling factor that applies to everyone).</p>
+<div class="line-block">
+<div class="line">(a). Construct a table in the style of of <a class="reference internal" href="#longer-rtt"><span class="std std-ref">20.3.2&nbsp;&nbsp;&nbsp;Example 3: Longer RTT</span></a> above, showing the result of two connections using this strategy, where one connection has RTT = 1 and the other has RTT = 2. Start the connections with <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>=RTT<sup>2</sup>, and assume a loss occurs when  <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>1</sub> + <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>2</sub> &gt; 24.</div>
+<div class="line">(b). Explain why this strategy might not be desirable if one connection is over a direct LAN with an RTT of 1 ms, while the second connection has a very long path and an RTT of 1.0 sec. (Hint: the <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>-increment value for the short-RTT connection would have to apply whether or not the long-RTT connection was present.)</div>
+</div>
+<p>10.0. Suppose two 1 kB packets are sent as part of a packet-pair probe, and the minimum time measured between arrivals is 5 ms. What is the estimated bottleneck bandwidth?</p>
+<p>11.0. Consider the following three causes of a 1-second network delay between A and B. In all cases, assume ACKs travel instantly from B back to A.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">(i) An intermediate router with a 1-second-per-packet bandwidth delay; all other bandwidth delays negligible</div>
+<div class="line">(ii) An intermediate link with a 1-second propagation delay; all bandwidth delays negligible</div>
+<div class="line">(iii) An intermediate router with a 100-ms-per-packet bandwidth delay, and a steadily replenished queue of 10 packets, from another source (as in the diagram in <a class="reference internal" href="#cross-traffic"><span class="std std-ref">20.2.4&nbsp;&nbsp;&nbsp;Example 4: cross traffic and RTT variation</span></a>).</div>
+</div>
+</div></blockquote>
+<p>(a). Suppose that, in each of these cases, the packet-pair technique (<a class="reference internal" href="#packet-pairs"><span class="std std-ref">20.2.6&nbsp;&nbsp;&nbsp;Packet Pairs</span></a>) is used to measure the bandwidth. Assuming no packet reordering, what is the minimum time interval we could expect in each case?</p>
+<p>(b). What would be the corresponding values of the measured bandwidths, in packets per second? (For purposes of bandwidth measurement, you may assume that the “negligible” bandwidth delay in case (ii) is 0.01 sec.)</p>
+<p>12.0. Suppose A sends packets to B using TCP Reno. The round-trip propagation delay is 1.0 seconds, and the bandwidth is 100 packets/sec (1 packet every 10 ms).</p>
+<p>(a). Give RTT<sub>actual</sub> when the window size has reached 100 packets.</p>
+<p>(b). Give RTT<sub>actual</sub> when the window size has reached 200 packets.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="dynamicsB.html" title="21   Further Dynamics of TCP"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="reno.html" title="19   TCP Reno and Congestion Management"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, desktop edition 2.0.11</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012-2022, Peter L Dordal.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

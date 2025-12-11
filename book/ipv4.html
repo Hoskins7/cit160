@@ -1,0 +1,712 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>9   IP version 4 &#8212; An Introduction to Computer Networks, desktop edition 2.0.11</title>
+    <link rel="stylesheet" href="_static/csbnetbook.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script type="text/javascript" src="_static/mobile.js"></script>
+    <script type="text/javascript" src="_static/rightsidebar.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="10   IPv4 Companion Protocols" href="ipv4companions.html" />
+    <link rel="prev" title="8   Abstract Sliding Windows" href="slidingwindows.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="ipv4companions.html" title="10   IPv4 Companion Protocols"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="slidingwindows.html" title="8   Abstract Sliding Windows"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, desktop edition 2.0.11</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">9&nbsp;&nbsp;&nbsp;IP version 4</a><ul>
+<li><a class="reference internal" href="#the-ipv4-header">9.1&nbsp;&nbsp;&nbsp;The IPv4 Header</a></li>
+<li><a class="reference internal" href="#interfaces">9.2&nbsp;&nbsp;&nbsp;Interfaces</a><ul>
+<li><a class="reference internal" href="#multihomed-hosts">9.2.1&nbsp;&nbsp;&nbsp;Multihomed hosts</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#special-addresses">9.3&nbsp;&nbsp;&nbsp;Special Addresses</a><ul>
+<li><a class="reference internal" href="#multicast-addresses">9.3.1&nbsp;&nbsp;&nbsp;Multicast addresses</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#fragmentation">9.4&nbsp;&nbsp;&nbsp;Fragmentation</a></li>
+<li><a class="reference internal" href="#the-classless-ip-delivery-algorithm">9.5&nbsp;&nbsp;&nbsp;The Classless IP Delivery Algorithm</a><ul>
+<li><a class="reference internal" href="#efficient-forwarding-table-lookup">9.5.1&nbsp;&nbsp;&nbsp;Efficient Forwarding-Table Lookup</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ipv4-subnets">9.6&nbsp;&nbsp;&nbsp;IPv4 Subnets</a><ul>
+<li><a class="reference internal" href="#subnet-example">9.6.1&nbsp;&nbsp;&nbsp;Subnet Example</a></li>
+<li><a class="reference internal" href="#links-between-subnets">9.6.2&nbsp;&nbsp;&nbsp;Links between subnets</a></li>
+<li><a class="reference internal" href="#subnets-versus-switching">9.6.3&nbsp;&nbsp;&nbsp;Subnets versus Switching</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#network-address-translation">9.7&nbsp;&nbsp;&nbsp;Network Address Translation</a><ul>
+<li><a class="reference internal" href="#nat-problems">9.7.1&nbsp;&nbsp;&nbsp;NAT Problems</a></li>
+<li><a class="reference internal" href="#middleboxes">9.7.2&nbsp;&nbsp;&nbsp;Middleboxes</a></li>
+<li><a class="reference internal" href="#nat-traversal">9.7.3&nbsp;&nbsp;&nbsp;NAT Traversal</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#unnumbered-interfaces">9.8&nbsp;&nbsp;&nbsp;Unnumbered Interfaces</a></li>
+<li><a class="reference internal" href="#mobile-ip">9.9&nbsp;&nbsp;&nbsp;Mobile IP</a><ul>
+<li><a class="reference internal" href="#ip-in-ip-encapsulation">9.9.1&nbsp;&nbsp;&nbsp;IP-in-IP Encapsulation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#epilog">9.10&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li><a class="reference internal" href="#exercises">9.11&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="slidingwindows.html"
+                        title="previous chapter">8&nbsp;&nbsp;&nbsp;Abstract Sliding Windows</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="ipv4companions.html"
+                        title="next chapter">10&nbsp;&nbsp;&nbsp;IPv4 Companion Protocols</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="ip-version-4">
+<span id="ipv4"></span><h1>9&nbsp;&nbsp;&nbsp;IP version 4<a class="headerlink" href="#ip-version-4" title="Permalink to this headline">¶</a></h1>
+<p>There are multiple LAN protocols below the IP layer and multiple transport protocols above, but IP itself stands alone. The Internet is the IP Internet. If you want to run your own LAN protocol somewhere, or if you want to run your own transport protocol, the Internet backbone will still work just fine for you. But if you want to change the IP layer, you will encounter difficulty. (Just talk to the IPv6 people, or the IP-multicasting or IP-reservations groups.)</p>
+<p>In this chapter we discuss the original core IP protocol – known as version 4, or IPv4, and with a 32-bit address size. Most of the Internet today (2020) still uses IPv4, though IPv6 is making inroads. We will see how the IP layer enables efficient, scalable routing. In the following chapter we discuss some companion protocols: ICMP, ARP, DHCP and DNS.</p>
+<p>Despite its ubiquity, IPv4 faces an unsettled future: the Internet has run out of new large blocks of IPv4 addresses (<a class="reference internal" href="intro.html#ip-overview"><span class="std std-ref">1.10&nbsp;&nbsp;&nbsp;IP - Internet Protocol</span></a>). There is therefore increasing pressure to convert to IPv6, with its 128-bit address size. Progress has been slow, however, and delaying tactics such as IPv4-address markets and NAT (<a class="reference internal" href="#nat"><span class="std std-ref">9.7&nbsp;&nbsp;&nbsp;Network Address Translation</span></a>) – by which multiple hosts can share a single public IPv4 address – have allowed IPv4 to continue. Aside from the major change in address structure, there are relatively few differences in the routing models of IPv4 and IPv6. We will study IPv4 in this and the following chapters, and IPv6 in <a class="reference internal" href="ipv6a.html#ipv6"><span class="std std-ref">11&nbsp;&nbsp;&nbsp;IPv6</span></a>; at points where the IPv4/IPv6 difference doesn’t much matter we will simply write “IP”.</p>
+<p id="index-0">IPv4 (and IPv6) is, in effect, a universal <strong>routing and addressing</strong> protocol. Routing and addressing are developed together; every node has an IP address and every router knows how to handle IP addresses. IP was originally seen as a way to <em>inter</em>connect multiple LANs, but it may make more sense now to view IP as a virtual LAN overlaying all the physical LANs.</p>
+<p id="index-1">A crucial aspect of IP is its <strong>scalability</strong>. As of 2019 the Internet had over 10<sup>9</sup> hosts; this estimate is probably low. However, at the same time the size of the largest forwarding tables was still under 10<sup>6</sup> (<a class="reference internal" href="bgp.html#bgp-table-size"><span class="std std-ref">15.5&nbsp;&nbsp;&nbsp;BGP Table Size</span></a>). Ethernet, in comparison, scales poorly, as the forwarding tables need one entry for every active host.</p>
+<div class="sidebar">
+<p class="first sidebar-title">How many IPv4 hosts are there?</p>
+<p class="last">Counting the size of the Internet is not easy. <a class="reference external" href="https://www.isc.org">The Internet Systems Consortium</a> used to run a <a class="reference external" href="https://www.isc.org/survey">survey</a> based on DNS; it reached one billion <strong>hosts</strong> in 2012 and leveled off there. But not all devices get a DNS entry; behind NAT routers, few do. According to <a class="reference external" href="https://www.internetlivestats.com/internet-users/">InternetLiveStats.com</a>, as of 2019 there were four billion Internet <strong>users</strong>, about 50% of the world’s population, counting an “Internet user” as someone who could access the Internet in their own home. <a class="reference external" href="https://newsroom.fb.com/company-info">Facebook</a> reported 2.4 billion monthly active users in June 2019.</p>
+</div>
+<p>Furthermore, IP, unlike Ethernet, offers excellent support for <strong>multiple redundant links</strong>. If the network below were an IP network, each node would communicate with each immediate neighbor via their shared direct link. If, on the other hand, this were an Ethernet network with the spanning-tree algorithm, then one of the four links would simply be disabled completely.</p>
+<img alt="_images/4loop.svg" src="_images/4loop.svg" /><p>The IP network service model is to act like a giant LAN. That is, there are no acknowledgments; delivery is generally described as best-effort. This design choice is perhaps surprising, but it has also been quite fruitful.</p>
+<p>If you want to provide a universal service for delivering any packet anywhere, what else do you need besides routing and addressing? Every network (LAN) needs to be able to carry any packet. The protocols spell out the use of octets (bytes), so the only possible compatibility issue is that a packet is <em>too large</em> for a given network. IPv4 handles this by supporting <strong>fragmentation</strong>: a network may break a too-large packet up into units it can transport successfully. While IPv4 fragmentation is inefficient and clumsy, it does guarantee that any packet can potentially be delivered to any node. (Note, however, that IPv6 has given up on universal fragmentation; <a class="reference internal" href="ipv6a.html#ipv6-fragmentation"><span class="std std-ref">11.5.4&nbsp;&nbsp;&nbsp;IPv6 Fragment Header</span></a>.)</p>
+<div class="section" id="the-ipv4-header">
+<span id="ipv4-header"></span><span id="index-2"></span><h2>9.1&nbsp;&nbsp;&nbsp;The IPv4 Header<a class="headerlink" href="#the-ipv4-header" title="Permalink to this headline">¶</a></h2>
+<p>The IPv4 Header needs to contain the following information:</p>
+<ul class="simple">
+<li>destination and source addresses</li>
+<li>indication of ipv4 versus ipv6</li>
+<li>a Time To Live (TTL) value, to prevent infinite routing loops</li>
+<li>a field indicating what comes next in the packet (<em>eg</em> TCP v UDP)</li>
+<li>fields supporting fragmentation and reassembly.</li>
+</ul>
+<p>The header is organized as a series of 32-bit words as follows:</p>
+<img alt="_images/ip4header.svg" src="_images/ip4header.svg" /><p>The IPv4 header, and basics of IPv4 protocol operation, were originally defined in <span class="target" id="index-3"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc791.html"><strong>RFC 791</strong></a>; some minor changes have since occurred. Most of these changes were documented in <span class="target" id="index-4"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1122.html"><strong>RFC 1122</strong></a>, though the DS field was defined in <span class="target" id="index-5"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2474.html"><strong>RFC 2474</strong></a> and the ECN bits were first proposed in <span class="target" id="index-6"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2481.html"><strong>RFC 2481</strong></a>.</p>
+<p>The <strong>Version</strong> field is, for IPv4, the number 4: 0100. The <strong>IHL</strong> field represents the total IPv4 Header Length, in 32-bit words; an IPv4 header can thus be at most 15 words long. The base header takes up five words, so the IPv4 Options can consist of at most ten words. If one looks at IPv4 packets using a packet-capture tool that displays the packets in hex, the first byte will most often be 0x45.</p>
+<p id="index-7">The <strong>Differentiated Services</strong> (DS) field is used by the Differentiated Services suite to specify preferential handling for designated packets, <em>eg</em> those involved in VoIP or other real-time protocols. The <strong>Explicit Congestion Notification</strong> bits are there to allow routers experiencing congestion to mark packets, thus indicating to the sender that the transmission rate should be reduced. We will address these in <a class="reference internal" href="dynamicsB.html#ecn"><span class="std std-ref">21.5.3&nbsp;&nbsp;&nbsp;Explicit Congestion Notification (ECN)</span></a>.
+These two fields together replace the old 8-bit <strong>Type of Service</strong> field.</p>
+<p>The <strong>Total Length</strong> field is present because an IPv4 packet may be smaller than the minimum LAN packet size (see Exercise 1) or larger than the maximum (if the IPv4 packet has been fragmented over several LAN packets. The IPv4 packet length, in other words, cannot be inferred from the LAN-level packet size. Because the Total Length field is 16 bits, the maximum IPv4 packet size is 2<sup>16</sup> bytes. This is probably much too large, even if fragmentation were not something to be avoided (though see IPv6 “jumbograms” in <a class="reference internal" href="ipv6a.html#hop-by-hop-options-header"><span class="std std-ref">11.5.1&nbsp;&nbsp;&nbsp;Hop-by-Hop Options Header</span></a>).</p>
+<p>The second word of the header is devoted to fragmentation, discussed below at <a class="reference internal" href="#ipv4-fragmentation"><span class="std std-ref">9.4&nbsp;&nbsp;&nbsp;Fragmentation</span></a>.</p>
+<p id="index-8">The <strong>Time-to-Live</strong> (TTL) field is decremented by 1 at each router; if it reaches 0, the packet is discarded. A typical initial value is 64; it must be larger than the total number of hops in the path. In most cases, a value of 32 would work. The TTL field is there to prevent routing loops – always a serious problem should they occur – from consuming resources indefinitely. Later we will look at various IP routing-table update protocols and how they minimize the risk of routing loops; they do not, however, eliminate it. By comparison, Ethernet headers have no TTL field, but Ethernet also disallows cycles in the underlying topology.</p>
+<p>The <strong>Protocol</strong> field contains a value to identify the contents of the packet body. A few of the more common values are</p>
+<ul class="simple">
+<li>1: an ICMP packet, <a class="reference internal" href="ipv4companions.html#icmp"><span class="std std-ref">10.4&nbsp;&nbsp;&nbsp;Internet Control Message Protocol</span></a></li>
+<li>4: an encapsulated IPv4 packet, <a class="reference internal" href="#ip-in-ip-encapsulation"><span class="std std-ref">9.9.1&nbsp;&nbsp;&nbsp;IP-in-IP Encapsulation</span></a></li>
+<li>6: a TCP packet</li>
+<li>17: a UDP packet</li>
+<li>41: an encapsulated IPv6 packet, <a class="reference internal" href="ipv6b.html#in4"><span class="std std-ref">12.6&nbsp;&nbsp;&nbsp;IPv6 Connectivity via Tunneling</span></a></li>
+<li>50: an Encapsulating Security Payload, <a class="reference internal" href="publickey.html#ipsec"><span class="std std-ref">29.6&nbsp;&nbsp;&nbsp;IPsec</span></a></li>
+</ul>
+<p>A list of assigned protocol numbers is maintained by the <a class="reference external" href="http://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml">IANA</a>.</p>
+<p>The <strong>Header Checksum</strong> field is the “Internet checksum” applied to the header only, not the body. Its only purpose is to allow the discarding of packets with corrupted headers. When the TTL value is decremented the router must update the header checksum. This can be done “algebraically” by adding a 1 in the correct place to compensate, but it is not hard simply to re-sum the 8 halfwords of the average header. The header checksum must also be updated when an IPv4 packet header is rewritten by a NAT router.</p>
+<p>The <strong>Source</strong> and <strong>Destination Address</strong> fields contain, of course, the IPv4 addresses. These would normally be updated only by NAT firewalls.</p>
+<p id="index-9">The source-address field is supposed to be the sender’s IPv4 address, but hardly any ISP checks that traffic they send out has a source address matching one of their customers, despite the call to do so in <span class="target" id="index-10"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2827.html"><strong>RFC 2827</strong></a>. As a result, IP <strong>spoofing</strong> – the sending of IP packets with a faked source address – is straightforward. For some examples, see <a class="reference internal" href="tcpB.html#isn-spoofing"><span class="std std-ref">18.3.1&nbsp;&nbsp;&nbsp;ISNs and spoofing</span></a>, and SYN flooding at <a class="reference internal" href="tcpA.html#tcp-connection-establishment"><span class="std std-ref">17.3&nbsp;&nbsp;&nbsp;TCP Connection Establishment</span></a>.</p>
+<p id="index-11">IP-address spoofing also facilitates an all-too-common IP-layer <strong>denial-of-service</strong> attack in which a server is flooded with a huge volume of traffic so as to reduce the bandwidth available to legitimate traffic to a trickle. This flooding traffic typically originates from a large number of compromised machines. Without spoofing, even a lengthy list of sources can be blocked, but, with spoofing, this becomes quite difficult.</p>
+<p id="index-12">One IPv4 option is the <strong>Record Route</strong> option, in which routers are to insert their own IPv4 address into the IPv4 header option area. Unfortunately, with only ten words available, there is not enough space to record most longer routes (but see <a class="reference internal" href="ipv4companions.html#traceroute"><span class="std std-ref">10.4.1&nbsp;&nbsp;&nbsp;Traceroute and Time Exceeded</span></a>, below). The <strong>Timestamp</strong> option is related; intermediate routers are requested to mark packets with their address and a local timestamp (to save space, the option can request only timestamps). There is room for only four ⟨address,timestamp⟩ pairs, but addresses can be <strong>prespecified</strong>; that is, the sender can include up to four IPv4 addresses and only those routers will fill in a timestamp.</p>
+<p>Another option, now deprecated as security risk, is to support <strong>source routing</strong>. The sender would insert into the IPv4 header option area a list of IPv4 addresses; the packet would be routed to pass through each of those IPv4 addresses in turn. With <strong>strict</strong> source routing, the IPv4 addresses had to represent adjacent neighbors; no router could be used if its IPv4 address were not on the list. With <strong>loose</strong> source routing, the listed addresses did not have to represent adjacent neighbors and ordinary IPv4 routing was used to get from one listed IPv4 address to the next. Both forms are essentially never used, again for security reasons: if a packet has been source-routed, it may have been routed outside of the at-least-somewhat trusted zone of the Internet backbone.</p>
+<p id="index-13">Finally, the IPv4 header was carefully laid out with memory alignment in mind. The 4-byte address fields are aligned on 4-byte boundaries, and the 2-byte fields are aligned on 2-byte boundaries. All this was once considered important enough that incoming packets were stored following two bytes of padding at the head of their containing buffer, so the IPv4 header, starting after the 14-byte Ethernet header, would be aligned on a 4-byte boundary. Today, however, the architectures for which this sort of alignment mattered have mostly faded away; alignment is a non-issue for <a class="reference external" href="https://en.wikipedia.org/wiki/ARM_architecture">ARM</a> and Intel <a class="reference external" href="https://en.wikipedia.org/wiki/X86">x86</a> processors.</p>
+</div>
+<div class="section" id="interfaces">
+<span id="index-14"></span><span id="id1"></span><h2>9.2&nbsp;&nbsp;&nbsp;Interfaces<a class="headerlink" href="#interfaces" title="Permalink to this headline">¶</a></h2>
+<p>IP addresses (both IPv4 and IPv6) are, strictly speaking, assigned not to hosts or nodes, but to <strong>interfaces</strong>. In the most common case, where each node has a single LAN interface, this is a distinction without a difference. In a room full of workstations each with a single Ethernet interface <code class="docutils literal notranslate"><span class="pre">eth0</span></code> (or perhaps <code class="docutils literal notranslate"><span class="pre">Ethernet</span> <span class="pre">adapter</span> <span class="pre">Local</span> <span class="pre">Area</span> <span class="pre">Connection</span></code>), we might as well view the IP address assigned to the interface as assigned to the workstation itself.</p>
+<p id="index-15">Each of those workstations, however, likely also has a <strong>loopback</strong> interface (at least conceptually), providing a way to deliver IP packets to other processes on the same machine. On many systems, the name “localhost” resolves to the IPv4 loopback address 127.0.0.1 (the IPv6 address ::1 is also used); see <a class="reference internal" href="#special-addresses"><span class="std std-ref">9.3&nbsp;&nbsp;&nbsp;Special Addresses</span></a>. Delivering packets to the loopback interface is simply a form of interprocess communication; a functionally similar alternative is <a class="reference external" href="https://en.wikipedia.org/wiki/Named_pipe">named pipes</a>.</p>
+<p>Loopback delivery avoids the need to use the LAN at all, or even the need to <em>have</em> a LAN. For simple client/server testing, it is often convenient to have both client and server on the same machine, in which case the loopback interface is a convenient (and fast) standin for a “real” network interface. On unix-based machines the loopback interface represents a genuine logical interface, commonly named <code class="docutils literal notranslate"><span class="pre">lo</span></code>. On Windows systems the “interface” may not represent an actual operating-system entity, but this is of practical concern only to those interested in “sniffing” all loopback traffic; packets sent to the loopback address are still delivered as expected.</p>
+<p id="index-16">Workstations often have special other interfaces as well. Most recent versions of Microsoft Windows have a Teredo Tunneling pseudo-interface and an Automatic Tunneling pseudo-interface; these are both intended (when activated) to support IPv6 connectivity when the local ISP supports only IPv4. The Teredo protocol is documented in <span class="target" id="index-17"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc4380.html"><strong>RFC 4380</strong></a>.</p>
+<p>When VPN connections are created, as in <a class="reference internal" href="otherLANs.html#vpn"><span class="std std-ref">5.1&nbsp;&nbsp;&nbsp;Virtual Private Networks</span></a>, each end of the logical connection typically terminates at a virtual interface (one of these is labeled <code class="docutils literal notranslate"><span class="pre">tun0</span></code> in the diagram of <a class="reference internal" href="otherLANs.html#vpn"><span class="std std-ref">5.1&nbsp;&nbsp;&nbsp;Virtual Private Networks</span></a>). These virtual interfaces appear, to the systems involved, to be attached to a point-to-point link that leads to the other end.</p>
+<p>When a computer hosts a virtual machine, there is almost always a virtual network to connect the host and virtual systems. The host will have a virtual interface to connect to the virtual network. The host may act as a NAT router for the virtual machine, “hiding” that virtual machine behind its own IP address, or it may act as an Ethernet switch, in which case the virtual machine will need an additional public IP address.</p>
+<div class="sidebar">
+<p class="first sidebar-title">What’s My IP Address?</p>
+<p class="last">This simple-seeming question is in fact not very easy to answer, if by “my IP address” one means the IP address assigned to the interface that connects directly to the Internet. One strategy is to find the address of the default router, and then iterate through all interfaces (<em>eg</em> with the Java <code class="docutils literal notranslate"><span class="pre">NetworkInterface</span></code> class) to find an IP address with a matching network prefix; a Python3 example of this approach appears in <a class="reference internal" href="mininet.html#multicast-programming"><span class="std std-ref">30.5.1&nbsp;&nbsp;&nbsp;Multicast Programming</span></a>. Unfortunately, finding the default router (to identify the primary interface) is hard to do in an OS-independent way, and even then this approach can fail if the Wi-Fi and Ethernet interfaces both are assigned IP addresses on the same network, but only one is actually connected.</p>
+</div>
+<p>Routers always have at least two interfaces on two separate IP networks. Generally this means a separate IP address for each interface, though some point-to-point interfaces can be used without being assigned any IP address (<a class="reference internal" href="#unnumbered"><span class="std std-ref">9.8&nbsp;&nbsp;&nbsp;Unnumbered Interfaces</span></a>).</p>
+<div class="section" id="multihomed-hosts">
+<span id="multihomed"></span><span id="index-18"></span><h3>9.2.1&nbsp;&nbsp;&nbsp;Multihomed hosts<a class="headerlink" href="#multihomed-hosts" title="Permalink to this headline">¶</a></h3>
+<p>A non-router host with multiple non-loopback network interfaces is often said to be <strong>multihomed</strong>.  Many laptops, for example, have both an Ethernet interface and a Wi-Fi interface. Both of these can be used simultaneously, with different IP addresses assigned to each. On residential networks the two interfaces will often be on the same IP network (<em>eg</em> the same bridged Wi-Fi/Ethernet LAN); at more security-conscious sites the Ethernet and Wi-Fi interfaces are often on quite different IP networks (though see <a class="reference internal" href="ipv4companions.html#arp-flux"><span class="std std-ref">10.2.5&nbsp;&nbsp;&nbsp;ARP and multihomed hosts</span></a>).</p>
+<p>Multiple physical interfaces are not actually needed here; it is usually possible to assign multiple IP addresses to a <em>single</em> interface. Sometimes this is done to allow two IP networks (two distinct prefixes) to share a single physical LAN; in this case the interface would be assigned one IP address for each IP network. Other times a single interface is assigned multiple IP addresses on the same IP network; this is often done so that one physical machine can act as a server (<em>eg</em> a web server) for multiple distinct IP addresses corresponding to multiple distinct domain names.</p>
+<p>Multihoming raises some issues with packets addressed to one interface, A, with IP address A<sub>IP</sub>, but which arrive via another interface, B, with IP address B<sub>IP</sub>. Strictly speaking, such arriving packets should be discarded unless the host is promoted to functioning as a router. In practice, however, the strict interpretation often causes problems; a typical user understanding is that the IP address A<sub>IP</sub> should work to reach the host even if the physical connection is to interface B. A related issue is whether the host receiving such a packet addressed to A<sub>IP</sub> on interface B is allowed to send its <em>reply</em> with source address A<sub>IP</sub>, even though the reply must be sent via interface B.</p>
+<p><span class="target" id="index-19"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1122.html"><strong>RFC 1122</strong></a>, §3.3.4, defines two alternatives here:</p>
+<ul class="simple">
+<li>The <strong>Strong End-System</strong> model: IP addresses – incoming and outbound – must match the physical interface.</li>
+<li>The <strong>Weak End-System</strong> model: A match is not required: interface B can accept packets addressed to A<sub>IP</sub>, and send packets with source address A<sub>IP</sub>.</li>
+</ul>
+<p>Linux systems generally use the weak model by default. See also <a class="reference internal" href="ipv4companions.html#arp-flux"><span class="std std-ref">10.2.5&nbsp;&nbsp;&nbsp;ARP and multihomed hosts</span></a>.</p>
+<p>While it is important to be at least vaguely aware of the special cases that multihoming presents, we emphasize again that in most ordinary contexts each end-user workstation has one IP address that corresponds to a LAN connection.</p>
+</div>
+</div>
+<div class="section" id="special-addresses">
+<span id="id2"></span><h2>9.3&nbsp;&nbsp;&nbsp;Special Addresses<a class="headerlink" href="#special-addresses" title="Permalink to this headline">¶</a></h2>
+<p>A few IPv4 addresses represent special cases.</p>
+<p id="index-20">While the standard IPv4 loopback address is 127.0.0.1, any IPv4 address beginning with 127 can serve as a loopback address. Logically they all represent the current host. Most hosts are configured to resolve the name “localhost” to 127.0.0.1. However, any loopback address – <em>eg</em> 127.255.37.59 – should work, <em>eg</em> with <code class="docutils literal notranslate"><span class="pre">ping</span></code>. For an example using 127.0.<strong>1</strong>.0, see <a class="reference internal" href="ipv4companions.html#dns"><span class="std std-ref">10.1&nbsp;&nbsp;&nbsp;DNS</span></a>.</p>
+<p id="index-21"><strong>Private addresses</strong> are IPv4 addresses intended only for site internal use, <em>eg</em> either behind a NAT firewall or intended to have no Internet connectivity at all. If a packet shows up at any non-private router (<em>eg</em> at an ISP router), with a private IPv4 address as either source or destination address, the packet should be dropped. Three standard private-address blocks have been defined:</p>
+<ul class="simple">
+<li>10.0.0.0/8</li>
+<li>172.16.0.0/12</li>
+<li>192.168.0.0/16</li>
+</ul>
+<p>The last block is the one from which addresses are most commonly allocated by DHCP servers (<a class="reference internal" href="ipv4companions.html#small-dhcp"><span class="std std-ref">10.3.1&nbsp;&nbsp;&nbsp;NAT, DHCP and the Small Office</span></a>) built into NAT routers.</p>
+<p>There are subtle issues with private addresses. First of all, when organizations merge, wholesale private-address renumbering is usually necessary. Second, suppose Alice uses 10.0.0.0/8 for her home network, where her laptop is 10.0.0.23. Suppose also that Alice connects via a VPN to work, and her server at work is also 10.0.0.23. Connection between laptop and server will then fail. It would also fail if the server were 10.0.0.24, as Alice’s laptop will think that should be on the local subnet, and it is not. There are other potential conflicts as well. Perhaps the main reason these problems are not worse than they are is that most home networks use 192.168.0.0/16, and most corporate networks use one of the other two private-address blocks.</p>
+<p>There is an additional problem with mobile-phone networks. Most phones get a mobile-network IPv4 address from the carrier, and also a Wi-Fi IPv4 address from whatever Wi-Fi network the phone owner is currently connected to. If the carrier uses any of the above private-address blocks, there is a fair chance that, at some Wi-Fi-providing establishment, someone’s carrier-assigned mobile IPv4 address will conflict with their Wi-Fi address. The addresses may even be the same. Because of this, <span class="target" id="index-22"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc6598.html"><strong>RFC 6598</strong></a> has established the following special address block for mobile-device carriers, known as a <strong>shared-address</strong> block:</p>
+<ul class="simple">
+<li>100.64.0.0/10</li>
+</ul>
+<p>It is exactly like a private-address block, except no one is to use it except mobile-device carriers.</p>
+<span class="target" id="index-23"></span><p><strong>Broadcast addresses</strong> are a special form of IPv4 address intended to be used in conjunction with LAN-layer broadcast. The most common forms are “broadcast to this network”, consisting of all 1-bits, and “broadcast to network D”, consisting of D’s network-address bits followed by all 1-bits for the host bits. If you try to send a packet to the broadcast address of a remote network D, the odds are that some router involved will refuse to forward it, and the odds are even higher that, once the packet arrives at a router actually on network D, that router will refuse to broadcast it. Even addressing a broadcast to one’s own network will fail if the underlying LAN does not support LAN-level broadcast (<em>eg</em> ATM).</p>
+<p>The highly influential early Unix implementation Berkeley 4.2 BSD used 0-bits for the broadcast bits, instead of 1’s. As a result, to this day host bits cannot be all 1-bits or all 0-bits in order to avoid confusion with the IPv4 broadcast address. One consequence of this is that a Class C network has 254 usable host addresses, not 256.</p>
+<div class="section" id="multicast-addresses">
+<span id="ip-multicast-1"></span><span id="index-24"></span><h3>9.3.1&nbsp;&nbsp;&nbsp;Multicast addresses<a class="headerlink" href="#multicast-addresses" title="Permalink to this headline">¶</a></h3>
+<p>Finally, <strong>IPv4 multicast addresses</strong> remain as the last remnant of the Class A/B/C strategy: multicast addresses are Class D, with first byte beginning 1110 (meaning that the first byte is, in decimal, 224-239). Multicasting means delivering to a specified <em>set</em> of addresses, preferably by some mechanism more efficient than sending to each address individually. A reasonable goal of multicast would be that no more than one copy of the multicast packet traverses any given link.</p>
+<p>Support for IPv4 multicast requires considerable participation by the backbone routers involved. For example, if hosts A, B and C each connect to different interfaces of router R1, and A wishes to send a multicast packet to B and C, then it is up to R1 to receive the packet, figure out that B and C are the intended recipients, and forward the packet <em>twice</em>, once for B’s interface and once for C’s. R1 must also keep track of what hosts have joined the <strong>multicast group</strong> and what hosts have left. Due to this degree of router participation, backbone router support for multicasting has not been entirely forthcoming. A discussion of IPv4 multicasting appears in <a class="reference internal" href="realtime.html#quality-of-service"><span class="std std-ref">25&nbsp;&nbsp;&nbsp;Quality of Service</span></a>.</p>
+</div>
+</div>
+<div class="section" id="fragmentation">
+<span id="ipv4-fragmentation"></span><span id="index-25"></span><h2>9.4&nbsp;&nbsp;&nbsp;Fragmentation<a class="headerlink" href="#fragmentation" title="Permalink to this headline">¶</a></h2>
+<p>If you are trying to interconnect two LANs (as IP does), what else might be needed besides Routing and Addressing? IPv4 (and IPv6) explicitly assumes all packets are composed on 8-bit bytes (something not universally true in the early days of IP; to this day the RFCs refer to “octets” to emphasize this requirement). IP also defines bit-order within a byte, and it is left to the networking hardware to translate properly. Neither byte size nor bit order, therefore, can interfere with packet forwarding.</p>
+<p id="index-26">There is one more feature IPv4 must provide, however, if the goal is universal connectivity: it must accommodate networks for which the maximum packet size, or <strong>Maximum Transfer Unit</strong>, MTU, is smaller than the packet that needs forwarding. Otherwise, if we were using IPv4 to join Token Ring (MTU = 4kB, at least originally) to Ethernet (MTU = 1500B), the token-ring packets might be too large to deliver to the Ethernet side, or to traverse an Ethernet backbone <em>en route</em> to another Token Ring. (Token Ring, in its day, did commonly offer a configuration option to allow Ethernet interoperability.)</p>
+<p>So, IPv4 must support fragmentation, and thus also reassembly. There are two potential strategies here: <strong>per-link</strong> fragmentation and reassembly, where the reassembly is done at the opposite end of the link (as in ATM), and <strong>path</strong> fragmentation and reassembly, where reassembly is done at the far end of the path. The latter approach is what is taken by IPv4, partly because intermediate routers are too busy to do reassembly (this is as true today as it was in 1981 when <span class="target" id="index-27"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc791.html"><strong>RFC 791</strong></a> was published), partly because there is no absolute guarantee that all fragments will go to the same next-hop router, and partly because IPv4 fragmentation has always been seen as the strategy of last resort.</p>
+<p id="index-28">An IPv4 sender is supposed to use a different value for the <strong>IDENT</strong> field for different packets, at least up until the field wraps around. When an IPv4 datagram is fragmented, the fragments keep the same IDENT field, so this field in effect indicates which fragments belong to the same packet.</p>
+<p id="index-29">After fragmentation, the <strong>Fragment Offset</strong> field marks the start position of the data portion of this fragment within the data portion of the original IPv4 packet. Note that the start position can be a number up to 2<sup>16</sup>, the maximum IPv4 packet length, but the FragOffset field has only 13 bits. This is handled by requiring the data portions of fragments to have sizes a multiple of 8 (three bits), and left-shifting the FragOffset value by 3 bits before using it.</p>
+<p>As an example, consider the following network, where MTUs are excluding the LAN header:</p>
+<img alt="_images/mtu.svg" src="_images/mtu.svg" /><p>Suppose A addresses a packet of 1500 bytes to B, and sends it via the LAN to the first router R1. The packet contains 20 bytes of IPv4 header and 1480 of data.</p>
+<p>R1 fragments the original packet into two packets of sizes 20+976 = 996 and 20+504=524. Having 980 bytes of payload in the first fragment would fit, but violates the rule that the sizes of the data portions be divisible by 8. The first fragment packet has FragOffset = 0; the second has FragOffset = 976.</p>
+<p>R2 <em>re</em>fragments the first fragment into three packets as follows:</p>
+<ul class="simple">
+<li>first: size = 20+376=396, FragOffset = 0</li>
+<li>second: size = 20+376=396, FragOffset = 376</li>
+<li>third: size = 20+224 = 244 (note 376+376+224=976), FragOffset = 752.</li>
+</ul>
+<p>R2 refragments the second fragment into two:</p>
+<ul class="simple">
+<li>first: size = 20+376 = 396, FragOffset = 976+0 = 976</li>
+<li>second: size = 20+128 = 148, FragOffset = 976+376=1352</li>
+</ul>
+<p>R3 then sends the fragments on to B, without reassembly.</p>
+<p>Note that it would have been slightly more efficient to have fragmented into four fragments of sizes 376, 376, 376, and 352 in the beginning. Note also that the packet format is designed to handle fragments of different sizes easily. The algorithm is based on multiple fragmentation with reassembly only at the final destination.</p>
+<p>Each fragment has its IPv4-header Total Length field set to the length of that fragment.</p>
+<p id="index-30">We have not yet discussed the three flag bits. The first bit is reserved, and must be 0. The second bit is the <strong>Don’t Fragment</strong>, or DF, bit. If it is set to 1 by the sender then a router must <em>not</em> fragment the packet and must drop it instead; see <a class="reference internal" href="tcpB.html#path-mtu-discovery"><span class="std std-ref">18.6&nbsp;&nbsp;&nbsp;Path MTU Discovery</span></a> for an application of this. The third bit, the <strong>More Fragments</strong> bit, is set to 1 for all fragments <em>except</em> the final one (this bit is thus set to 0 if no fragmentation has occurred). The third bit tells the receiver where the fragments stop.</p>
+<div class="sidebar">
+<p class="first sidebar-title">That first flag bit</p>
+<p class="last"><span class="target" id="index-31"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3514.html"><strong>RFC 3514</strong></a> proposes the use of the first flag bit here as a security flag: it would be set to 0 for legitimate traffic, while senders of malicious and hacking traffic were supposed to set the bit to 1. This would make detection and firewalling of malicious traffic much easier. The publication date of this RFC is April 1, or April Fool’s Day; there is a long tradition of RFC humor released that day. Another example is <span class="target" id="index-32"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2324.html"><strong>RFC 2324</strong></a>.</p>
+</div>
+<p>The receiver must take the arriving fragments and <strong>reassemble</strong> them into a whole packet. The fragments may not arrive in order – unlike in ATM networks – and may have unrelated packets interspersed. The reassembler must identify when different arriving packets are fragments of the same original, and must figure out how to reassemble the fragments in the correct order; both these problems were essentially trivial for ATM.</p>
+<p>Fragments are considered to belong to the same packet if they have the same IDENT field and also the same source and destination addresses and same protocol.</p>
+<p>As all fragment sizes are a multiple of 8 bytes, the receiver can keep track of whether all fragments have been received with a bitmap in which each bit represents one 8-byte fragment chunk. A 1 kB packet could have up to 128 such chunks; the bitmap would thus be 16 bytes.</p>
+<p>If a fragment arrives that is part of a new (and fragmented) packet, a buffer is allocated. While the receiver cannot know the final size of the buffer, it can usually make a reasonable guess. Because of the FragOffset field, the fragment can then be stored in the buffer in the appropriate position. A new bitmap is also allocated, and a <strong>reassembly timer</strong> is started.</p>
+<p>As subsequent fragments arrive, not necessarily in order, they too can be placed in the proper buffer in the proper position, and the appropriate bits in the bitmap are set to 1.</p>
+<p>If the bitmap shows that all fragments have arrived, the packet is sent on up as a completed IPv4 packet. If, on the other hand, the reassembly timer expires, then all the pieces received so far are discarded.</p>
+<p id="index-33">TCP connections usually engage in <strong>Path MTU Discovery</strong>, and figure out the largest packet size they can send that will <em>not</em> entail fragmentation (<a class="reference internal" href="tcpB.html#path-mtu-discovery"><span class="std std-ref">18.6&nbsp;&nbsp;&nbsp;Path MTU Discovery</span></a>). But it is not unusual, for example, for UDP protocols to use fragmentation, especially over the short haul. In the Network File System (NFS) protocol, for example, UDP is used to carry 8 kB disk blocks. These are often sent as a single 8+ kB IPv4 packet, fragmented over Ethernet to five full packets and a fraction. Fragmentation works reasonably well here because most of the time the packets do not leave the Ethernet they started on. Note that this is an example of fragmentation done by the <em>sender</em>, not by an intermediate router.</p>
+<p>Finally, any given IP link may provide its own link-layer fragmentation and reassembly; we saw in <a class="reference internal" href="otherLANs.html#atm-sar"><span class="std std-ref">5.5.1&nbsp;&nbsp;&nbsp;ATM Segmentation and Reassembly</span></a> that ATM does just this. Such link-layer mechanisms are, however, generally invisible to the IP layer.</p>
+</div>
+<div class="section" id="the-classless-ip-delivery-algorithm">
+<span id="ipdelivery"></span><h2>9.5&nbsp;&nbsp;&nbsp;The Classless IP Delivery Algorithm<a class="headerlink" href="#the-classless-ip-delivery-algorithm" title="Permalink to this headline">¶</a></h2>
+<p>Recall from Chapter 1 that any IPv4 address can be divided into a net portion IP<sub>net</sub> and a host portion IP<sub>host</sub>; the division point was determined by whether the IPv4 address was a Class A, a Class B, or a Class C. We also indicated in Chapter 1 that the division point was not always so clear-cut; we now present the delivery algorithm, for both hosts and routers, that does <em>not</em> assume a globally predeclared division point of the input IPv4 address into net and host portions. We will, for the time being, punt on the question of forwarding-table lookup and assume there is a <code class="docutils literal notranslate"><span class="pre">lookup()</span></code> method available that, when given a destination address, returns the next_hop neighbor.</p>
+<p>Instead of class-based divisions, we will assume that each of the IPv4 addresses assigned to a node’s interfaces is configured with an associated length of the network prefix; following the slash notation of <a class="reference internal" href="intro.html#ip-overview"><span class="std std-ref">1.10&nbsp;&nbsp;&nbsp;IP - Internet Protocol</span></a>, if B is an address and the prefix length is k = k<sub>B</sub> then the prefix itself is B/k. As usual, an ordinary host may have only one IP interface, while a router will always have multiple interfaces.</p>
+<p>Let D be the given IPv4 destination address; we want to decide if D is <strong>local</strong> or <strong>nonlocal</strong>. The host or router involved may have multiple IP interfaces, but for each interface the length of the network portion of the address will be known.  For each network address B/k assigned to one of the host’s interfaces, we compare the first k bits of B and D; that is, we ask if D <strong>matches</strong> B/k.</p>
+<ul class="simple">
+<li>If one of these comparisons yields a match, delivery is <strong>local</strong>; the host delivers the packet to its final destination via the LAN connected to the corresponding interface. This means looking up the LAN address of the destination, if applicable, and sending the packet to that destination via the interface.</li>
+<li>If there is no match, delivery is <strong>nonlocal</strong>, and the host passes D to the <code class="docutils literal notranslate"><span class="pre">lookup()</span></code> routine of the forwarding table and sends to the associated next_hop (which must represent a physically connected neighbor). It is now up to <code class="docutils literal notranslate"><span class="pre">lookup()</span></code> routine to make any necessary determinations as to how D might be split into D<sub>net</sub> and D<sub>host</sub>; the split <em>cannot</em> be made outside of <code class="docutils literal notranslate"><span class="pre">lookup()</span></code>.</li>
+</ul>
+<p>The forwarding table is, abstractly, a set of network addresses – now also with lengths – each of the form B/k, with an associated next_hop destination for each. The <code class="docutils literal notranslate"><span class="pre">lookup()</span></code> routine will, in principle, compare D with each table entry B/k, looking for a match (that is, equality of the first k = k<sub>B</sub> bits). As with the local-delivery interfaces check above, the net/host division point (that is, k) will come from the table entry; it will not be inferred from D or from any other information borne by the packet. There is, in fact, no place in the IPv4 header to store a net/host division point, and furthermore different routers along the path may use different values of k with the same destination address D. Routers receive the prefix length /k for a destination B/k as part of the process by which they receive ⟨destination,next_hop⟩ pairs; see <a class="reference internal" href="routing.html#routing-update"><span class="std std-ref">13&nbsp;&nbsp;&nbsp;Routing-Update Algorithms</span></a>.</p>
+<p>In <a class="reference internal" href="bigrouting.html#large-scale-ip-routing"><span class="std std-ref">14&nbsp;&nbsp;&nbsp;Large-Scale IP Routing</span></a> we will see that in some cases multiple matches in the forwarding table may exist, <em>eg</em> 147.0.0.0/8 and 147.126.0.0/16. The <strong>longest-match</strong> rule will be introduced for such cases to pick the best match.</p>
+<p>Here is a simple example for a router with immediate neighbors A-E:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="59%" />
+<col width="41%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">destination</th>
+<th class="head">next_hop</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>10.3.0.0/16</td>
+<td>A</td>
+</tr>
+<tr class="row-odd"><td>10.4.1.0/24</td>
+<td>B</td>
+</tr>
+<tr class="row-even"><td>10.4.2.0/24</td>
+<td>C</td>
+</tr>
+<tr class="row-odd"><td>10.4.3.0/24</td>
+<td>D</td>
+</tr>
+<tr class="row-even"><td>10.3.37.0/24</td>
+<td>E</td>
+</tr>
+</tbody>
+</table>
+<p>The IPv4 addresses 10.3.67.101 and 10.3.59.131 both route to A. The addresses 10.4.1.101, 10.4.2.157 and 10.4.3.233 route to B, C and D respectively. Finally, 10.3.37.103 matches both A and E, but the E match is longer so the packet is routed that way.</p>
+<p id="index-34">The forwarding table may also contain a <strong>default</strong> entry for the next_hop, which it may return in cases when the destination D does not match any known network. We take the view here that returning such a default entry is a valid result of the routing-table <code class="docutils literal notranslate"><span class="pre">lookup()</span></code> operation, rather than a third option to the algorithm above; one approach is for the default entry to be the next_hop corresponding to the destination 0.0.0.0/0, which does indeed match everything (use of this would definitely require the above longest-match rule, though).</p>
+<p>Default routes are hugely important in keeping leaf forwarding tables small. Even backbone routers sometimes expend considerable effort to keep the network address prefixes in their forwarding tables as short as possible, through consolidation.</p>
+<p>At a site with a single ISP and with no Internet customers (that is, which is not itself an ISP for others), the top-level forwarding table usually has a single external route: its default route to its ISP. If a site has more than one ISP, however, the top-level forwarding table can expand in a hurry. For example, <a class="reference external" href="https://en.wikipedia.org/wiki/Internet2">Internet2</a> is a consortium of research sites with very-high-bandwidth internal interconnections, acting as a sort of “parallel Internet”. Before Internet2, Loyola’s top-level forwarding table had the usual single external default route. After Internet2, we in effect had a second ISP and had to divide traffic between the commercial ISP and the Internet2 ISP. The default route still pointed to the commercial ISP, but Loyola’s top-level forwarding table now had to have an entry for every individual Internet2 site, so that traffic to any of these sites would be forwarded via the Internet2 ISP. See exercise 5.0.</p>
+<p>Routers may also be configured to allow passing quality-of-service information to the <code class="docutils literal notranslate"><span class="pre">lookup()</span></code> method, as mentioned in Chapter 1, to support different routing paths for different kinds of traffic (<em>eg</em> bulk file-transfer versus real-time).</p>
+<p>For a modest exception to the local-delivery rule described here, see below in <a class="reference internal" href="#unnumbered"><span class="std std-ref">9.8&nbsp;&nbsp;&nbsp;Unnumbered Interfaces</span></a>.</p>
+<div class="section" id="efficient-forwarding-table-lookup">
+<span id="index-35"></span><span id="id3"></span><h3>9.5.1&nbsp;&nbsp;&nbsp;Efficient Forwarding-Table Lookup<a class="headerlink" href="#efficient-forwarding-table-lookup" title="Permalink to this headline">¶</a></h3>
+<p>Fast implementation of the <code class="docutils literal notranslate"><span class="pre">lookup()</span></code> operation above is tricky, especially in the presence of destination entries that may not result in unique matches, such as 10.0.0.0/8 and 10.11.0.0/16, which both match 10.11.12.13. Straightforward hashing, in particular, is out, as the prefix-length value k is not available to the call of <code class="docutils literal notranslate"><span class="pre">lookup()</span></code>.</p>
+<p id="index-36">The simplest approach is a <strong>trie</strong>, a form of tree in which the child nodes are labeled with bit strings; the concatenated node labels on a branch represent an address prefix.  Node labels can represent single address bits or larger bit groups. A trie allows straightforward implementation of the longest-match rule by requiring that we descend in the trie until no further matches are possible.</p>
+<p>As an example, we construct a trie for the following forwarding table:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="61%" />
+<col width="39%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">destination</th>
+<th class="head">next_hop</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1.10.0.0/16</td>
+<td>A</td>
+</tr>
+<tr class="row-odd"><td>1.10.104.0/24</td>
+<td>B</td>
+</tr>
+<tr class="row-even"><td>1.10.105.0/24</td>
+<td>C</td>
+</tr>
+<tr class="row-odd"><td>1.11.0.0/16</td>
+<td>D</td>
+</tr>
+<tr class="row-even"><td>1.12.116.0/24</td>
+<td>E</td>
+</tr>
+<tr class="row-odd"><td>1.12.117.0/24</td>
+<td>F</td>
+</tr>
+</tbody>
+</table>
+<p>As all the prefix lengths are multiples of 8 bits, we build the trie using bytes as node labels:</p>
+<img alt="_images/routing_trie.svg" src="_images/routing_trie.svg" /><p>Heavy blue nodes represent matches; light nodes represent non-matches. There is one heavy node for each entry in the table above. To look up 1.10.105.213 in the trie, we view the address as a list ⟨1,10,105,213⟩. From the root, we traverse nodes 1 and 10, arriving at a heavy node representing the destination 1.10.0.0/16. However, the next element of the address list is 105, and so we continue down to child node 105, thus matching 1.10.105.0/24. There are no further child nodes, so this match is as long as possible.</p>
+<p>A straightforward trie implementation for arbitrary prefix lengths requires single-bit node labels. However, the Luleå algorithm, <a class="reference internal" href="bibliography.html#dbcp97" id="id4">[DBCP97]</a>, implements lookup with a trie of only three levels, representing address bits 0-15, 16-23 and 24-31. At the top of the trie, an array of size 2<sup>16</sup> helps determine the first child node; similar supplemental data structures assist with the child-node lookups at subsequent levels.</p>
+<p id="index-37">Finally, high-performance switches often implement the <code class="docutils literal notranslate"><span class="pre">lookup()</span></code> operation using <strong>content-addressable memory</strong>. IP forwarding requires the ternary form of this memory, TCAM, described in the final paragraph of <a class="reference internal" href="ethernet2.html#switch-hardware"><span class="std std-ref">3.2.1&nbsp;&nbsp;&nbsp;Switch Hardware</span></a>. If A/k is an IP address prefix of length k, then A goes in the TCAM memory register, and the corresponding mask register is used to indicate that only the first k bits matter.</p>
+<p>When an IPv4 address is presented to the TCAM for lookup, there may now be multiple matches of differing lengths. To implement the longest-match rule, we first need to make sure that, in the TCAM sequence of registers, shorter prefixes come before longer ones. The TCAM encoder circuit then converts the matching register’s position in the sequence to an address corresponding to the register, with which the rest of the routing information can be retrieved. This encoder must be designed so that it always prefers longer prefixes (higher TCAM sequence positions). A longest-match lookup can then be performed in a single memory-lookup cycle.</p>
+<p>When backbone IPv4 routers experience acute difficulties due to growth of the forwarding table, it is often because the existing table has outgrown the space available in the TCAM hardware.</p>
+</div>
+</div>
+<div class="section" id="ipv4-subnets">
+<span id="ip-subnets"></span><span id="index-38"></span><h2>9.6&nbsp;&nbsp;&nbsp;IPv4 Subnets<a class="headerlink" href="#ipv4-subnets" title="Permalink to this headline">¶</a></h2>
+<p>Subnets were the first step away from Class A/B/C routing: a large network (<em>eg</em> a class A or B) could be divided into smaller IPv4 networks called subnets. Consider, for example, a typical Class B network such as Loyola University’s (originally 147.126.0.0/16); the underlying assumption is that any packet can be delivered via the underlying LAN to any internal host. This would require a rather large LAN, and would require that a single physical LAN be used throughout the site. What if our site has more than one physical LAN? Or is really too big for one physical LAN? It did not take long for the IP world to run into this problem.</p>
+<p>Subnets were first proposed in <span class="target" id="index-39"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc917.html"><strong>RFC 917</strong></a>, and became official with <span class="target" id="index-40"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc950.html"><strong>RFC 950</strong></a>.</p>
+<p>Getting a separate IPv4 network prefix for each subnet is bad for routers: the backbone forwarding tables now must have an entry for every subnet instead of just for every site. What is needed is a way for a site to appear to the outside world as a single IP network, but for further IP-layer routing to be supported <em>inside</em> the site. This is what subnets accomplish.</p>
+<p id="index-41">Subnets introduce <strong>hierarchical routing</strong>: first we route to the primary network, then inside that site we route to the subnet, and finally the last hop delivers to the host.</p>
+<p>Routing with subnets involves in effect moving the IP<sub>net</sub> division line rightward. (Later, when we consider CIDR, we will see the complementary case of moving the division line to the left.) For now, observe that moving the line rightward within a site does not affect the outside world at all; outside routers are not even aware of site-internal subnetting.</p>
+<p>In the following diagram, the outside world directs traffic addressed to 147.126.0.0/16 to the router R. Internally, however, the site is divided into subnets. The idea is that traffic from 147.126.1.0/24 to 147.126.2.0/24 is routed, not switched; the two LANs involved may not even be compatible (for example, the ovals might represent Token Ring while the lines represent Ethernet). Most of the subnets shown are of size /24, meaning that the third byte of the IPv4 address has become part of the network portion of the subnet’s address; one /20 subnet is also shown. <span class="target" id="index-42"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc950.html"><strong>RFC 950</strong></a> would have disallowed the subnet with third byte 0, but having 0 for the subnet bits generally does work.</p>
+<img alt="_images/subnet.svg" src="_images/subnet.svg" /><p>What we want is for the internal routing to be based on the extended network prefixes shown, while externally continuing to use only the single routing entry for 147.126.0.0/16.</p>
+<p>To implement subnets, we divide the site’s IPv4 network into some combination of physical LANs – the subnets –, and assign each a <strong>subnet address</strong>: an IPv4 network address which has the <em>site’s</em>  IPv4 network address as prefix. To put this more concretely, suppose the site’s IPv4 network address is A, and consists of n network bits (so the site address may be written with the slash notation as A/n); in the diagram above, A/n = 147.126.0.0/16. A subnet address is an IPv4 network address B/k such that:</p>
+<blockquote>
+<div><ul class="simple">
+<li>The address B/k is within the site: the first n bits of B are the same as A/n’s</li>
+<li>B/k extends A/n: k≥n</li>
+</ul>
+</div></blockquote>
+<p>An example B/k in the diagram above is 147.126.1.0/24. (There is a slight simplification here in that subnet addresses do not absolutely <em>have</em> to be prefixes; see below.)</p>
+<p>We now have to figure out how packets will be routed to the correct subnet. For incoming packets we could set up some proprietary protocol at the entry router to handle this. However, the more complicated situation is all those existing internal hosts that, under the class A/B/C strategy, would still believe they can deliver via the LAN to any site host, when in fact they can now only do that for hosts on their own subnet. We need a more general solution.</p>
+<p id="index-43">We proceed as follows. For each subnet address B/k, we create a <strong>subnet mask</strong> for B consisting of k 1-bits followed by enough 0-bits to make a total of 32. We then make sure that every host and router in the site knows the subnet mask for every one of its <em>interfaces</em>. Hosts usually find their subnet mask the same way they find their IP address (by static configuration if necessary, but more likely via DHCP, below).</p>
+<p>Hosts and routers now apply the IP delivery algorithm of the previous section, with the proviso that, if a subnet mask for an interface is present, then the subnet mask is used to determine the number of address bits rather than the Class A/B/C mechanism. That is, we determine whether a packet addressed to destination D is deliverable locally via an interface with subnet address B/k and corresponding mask M by comparing D&amp;M with B&amp;M, where <strong>&amp;</strong> represents bitwise AND; if the two match, the packet is local. This will generally involve a match of <em>more</em> bits than if we used the Class A/B/C strategy to determine the network portion of addresses D and B.</p>
+<p>As stated previously, given an address D with no other context, we will <em>not</em> be able to determine the network/host division point in general (<em>eg</em> for outbound packets). However, that division point is not in fact what we need. All that <em>is</em> needed is a way to tell if a given destination host address D belongs to the current subnet, say B; that is, we need to compare the first k bits of D and B where k is the (known) length of B.</p>
+<p>In the diagram above, the subnet mask for the /24 subnets would be 255.255.255.0; bitwise ANDing any IPv4 address with the mask is the same as extracting the first 24 bits of the IPv4 address, that is, the subnet portion. The mask for the /20 subnet would be 255.255.240.0 (240 in binary is 1111 0000).</p>
+<p>In the diagram above none of the subnets overlaps or conflicts: the subnets 147.126.0.0/24 and 147.126.1.0/24 are disjoint. It takes a little more effort to realize that 147.126.16.0/20 does not overlap with the others, but note that an IPv4 address matches this network prefix only if the first four bits of the third byte are 0001, so the third byte itself ranges from decimal 32 to decimal 63 = binary 0001 1111.</p>
+<p>Note also that if host A = 147.126.0.1 wishes to send to destination D = 147.126.1.1, and A is <em>not</em> subnet-aware, then delivery will fail: A will infer that the interface is a Class B, and therefore compare the first two bytes of A and D, and, finding a match, will attempt direct LAN delivery. But direct delivery is now likely impossible, as the subnets are not joined by a switch. Only with the subnet mask will A realize that its network is 147.126.0.0/<strong>24</strong> while D’s is 147.126.1.0/24 and that these are not the same. A <em>would</em> still be able to send packets to its own subnet. In fact A would still be able to send packets to the outside world: it would realize that the destination in that case does not match 147.126.0.0/16 and will thus forward to its router. Hosts on other subnets would be the only unreachable ones.</p>
+<p>Properly, the subnet address is the entire prefix, <em>eg</em> 147.126.65.0/24. However, it is often convenient to identify the subnet address with just those bits that represent the extension of the site IPv4-network address; we might thus say casually that the subnet address here is 65.</p>
+<p>The class-based IP-address strategy allowed any host anywhere on the Internet to properly separate any address into its net and host portions. With subnets, this division point is now allowed to vary; for example, the address 147.126.65.48 divides into 147.126 | 65.48 outside of Loyola, but into 147.126.65 | 48 inside. This means that the net-host division is no longer an absolute property of addresses, but rather something that depends on where the packet is on its journey.</p>
+<p>Technically, we also need the requirement that given any two subnet addresses of different, disjoint subnets, neither is a proper prefix of the other. This guarantees that if A is an IP address and B is a subnet address with mask M (so B = B&amp;M), then  A&amp;M = B implies A does not match any other subnet. Regardless of the net/host division rules, we cannot possibly allow subnet 147.126.16.0/20 to represent one LAN while 147.126.16.0/24 represents another; the second subnet address block is a subset of the first. (We <em>can</em>, and sometimes do, allow the first LAN to correspond to everything in 147.126.16.0/20 that is not also in 147.126.16.0/24; this is the longest-match rule.)</p>
+<p>The strategy above is actually a slight simplification of what the subnet mechanism actually allows: subnet address bits do not in fact have to be contiguous, and masks do not have to be a series of 1-bits followed by 0-bits. The mask can be <em>any</em> bit-mask; the subnet address bits are by definition those where there is a 1 in the mask bits. For example, we could at a Class-B site use the <em>fourth</em> byte as the subnet address, and the <em>third</em> byte as the host address. The subnet mask would then be 255.255.0.255. While this generality was once sometimes useful in dealing with “legacy” IPv4 addresses that could not easily be changed, life is simpler when the subnet bits precede the host bits.</p>
+<div class="section" id="subnet-example">
+<span id="id5"></span><h3>9.6.1&nbsp;&nbsp;&nbsp;Subnet Example<a class="headerlink" href="#subnet-example" title="Permalink to this headline">¶</a></h3>
+<p>As an example of having different subnet masks on different interfaces, let us consider the division of a class-C network into subnets of size 70, 40, 25, and 20. The subnet addresses will of necessity have different lengths, as there is not room for four subnets each able to hold 70 hosts.</p>
+<ul class="simple">
+<li>A: size 70</li>
+<li>B: size 40</li>
+<li>C: size 25</li>
+<li>D: size 20</li>
+</ul>
+<p>Because of the different subnet-address lengths, division of a local IPv4 address LA into net versus host on subnets cannot be done in isolation, without looking at the host bits. However, that division is not in fact what we need. All that is needed is a way to tell if the local address LA belongs to a given subnet, say B; that is, we need to compare the first n bits of LA and B, where n is the length of B’s subnet mask. We do this by comparing LA&amp;M to B&amp;M, where M is the mask corresponding to n. LA&amp;M is not necessarily the same as LA<sub>net</sub>, if LA actually belongs to one of the other subnets. However, if LA&amp;M = B&amp;M, then LA must belong subnet B, in which case LA&amp;M is in fact LA<sub>net</sub>.</p>
+<p>We will assume that the site’s IPv4 network address is 200.0.0.0/24. The first three bytes of each subnet address must match 200.0.0. Only some of the bits of the fourth byte will be part of the subnet address, so we will switch to binary for the last byte, and use both the /n notation (for total number of subnet bits) and also add a vertical bar | to mark the separation between subnet and host.</p>
+<p>Example: 200.0.0.10 | 00 0000 / 26</p>
+<p>Note that this means that the 0-bit following the 1-bit in the fourth byte is “significant” in that for a subnet to match, it must match this 0-bit exactly. The remaining six 0-bits are part of the host portion.</p>
+<p>To allocate our four subnet addresses above, we start by figuring out just how many host bits we need in each subnet. Subnet sizes are always powers of 2, so we round
+up the subnets to the appropriate size. For subnet A, this means we need 7 host bits to accommodate 2<sup>7</sup> = 128 hosts, and so we have a single bit in the fourth byte to devote to the subnet address. Similarly, for B we will need 6 host bits and will have 2 subnet bits, and for C and D we will need 5 host bits each and will have 8-5=3 subnet bits.</p>
+<p>We now start choosing non-overlapping subnet addresses. We have one bit in the fourth byte to choose for A’s subnet; rather arbitrarily, let us choose this bit to be 1. This means that <em>every other subnet address</em> must have a 0 in the first bit position of the fourth byte, or we would have ambiguity.</p>
+<p>Now for B’s subnet address. We have two bits to work with, and the first bit must be 0. Let us choose the second bit to be 0 as well. If the fourth byte begins 00, the packet is part of subnet B, and the subnet addresses for C and D must therefore <em>not</em> begin 00.</p>
+<p>Finally, we choose subnet addresses for C and D to be 010 and 011, respectively. We thus have</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="5%" />
+<col width="33%" />
+<col width="37%" />
+<col width="18%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">subnet</th>
+<th class="head">size</th>
+<th class="head">address bits in fourth byte</th>
+<th class="head">host bits in 4th byte</th>
+<th class="head">decimal range</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>A</td>
+<td>128</td>
+<td>1</td>
+<td>7</td>
+<td>128-255</td>
+</tr>
+<tr class="row-odd"><td>B</td>
+<td>64</td>
+<td>00</td>
+<td>6</td>
+<td>0-63</td>
+</tr>
+<tr class="row-even"><td>C</td>
+<td>32</td>
+<td>010</td>
+<td>5</td>
+<td>64-95</td>
+</tr>
+<tr class="row-odd"><td>D</td>
+<td>32</td>
+<td>011</td>
+<td>5</td>
+<td>96-127</td>
+</tr>
+</tbody>
+</table>
+<p>As desired, none of the subnet addresses in the third column is a prefix of any other subnet address.</p>
+<p>The end result of all of this is that routing is now <strong>hierarchical</strong>: we route on the site IP address to get to a site, and then route on the subnet address within the site.</p>
+</div>
+<div class="section" id="links-between-subnets">
+<h3>9.6.2&nbsp;&nbsp;&nbsp;Links between subnets<a class="headerlink" href="#links-between-subnets" title="Permalink to this headline">¶</a></h3>
+<p>Suppose the Loyola CS department subnet (147.126.65.0/24) and a department at some other site, we will say 147.100.100.0/24, install a private link.
+How does this affect routing?</p>
+<p>Each department router would add an entry for the other subnet,
+routing along the private link. Traffic addressed to the other subnet
+would take the private link. All other traffic would go to the default
+router. Traffic from the remote department to 147.126.6<strong>4</strong>.0/24 would
+take the long route, and Loyola traffic to 147.100.10<strong>1</strong>.0/24 would take
+the long route.</p>
+<div class="sidebar">
+<p class="first sidebar-title">Subnet anecdote</p>
+<p>A long time ago I was responsible for two hosts, abel and borel. One day I was informed that machines in computer lab 1 at the other end of campus could not reach borel, though they could reach abel. Machines in lab 2, <em>adjacent</em> to lab 1, however, could reach both borel and abel just fine. What was the difference?</p>
+<p>It turned out that borel had a bad (/16 instead of /24) subnet mask, and so it was attempting local delivery to the labs. This <em>should</em> have meant it could reach neither of the labs, as both labs were on a different subnet from my machines; I was still perplexed. After considerably more investigation, it turned out that between abel/borel and the lab building was a <strong>bridge-router</strong>: a hybrid device that properly routed subnet traffic at the IP layer, but which also forwarded Ethernet packets directly, the latter feature apparently for the purpose of backwards compatibility. Lab 2 was connected directly to the bridge-router and thus appeared to be on the same LAN as borel, despite the apparently different subnet; lab 1 was connected to its own router R1 which in turn connected to the bridge-router. Lab 1 was thus, at the LAN level, isolated from abel and borel.</p>
+<p>Moral 1: Switching and routing are both great ideas, alone. But switching at one layer mixed with routing at another is not.</p>
+<p class="last">Moral 2: Test thoroughly! The reason the problem wasn’t noticed earlier was that previously borel communicated only with other hosts on its own subnet and with hosts outside the university entirely. Both of these worked with the bad subnet mask; it was different-subnet local hosts that were the problem.</p>
+</div>
+<p>How would nearby subnets at either endpoint decide whether to use the private link? Classical link-state or distance-vector theory (<a class="reference internal" href="routing.html#routing-update"><span class="std std-ref">13&nbsp;&nbsp;&nbsp;Routing-Update Algorithms</span></a>) requires that they be able to compare the private-link route with the going-around-the-long-way route. But this requires a global picture of relative routing costs, which, as we shall see, almost certainly does not exist. The two departments are in different routing domains; if neighboring subnets at either end want to use the private link, then manual configuration is likely the only option.</p>
+</div>
+<div class="section" id="subnets-versus-switching">
+<span id="index-44"></span><span id="id6"></span><h3>9.6.3&nbsp;&nbsp;&nbsp;Subnets versus Switching<a class="headerlink" href="#subnets-versus-switching" title="Permalink to this headline">¶</a></h3>
+<p>A frequent network design question is whether to have many small subnets or to instead have just a few (or even only one) larger subnet. With multiple small subnets, IP <strong>routing</strong> would be used to interconnect them; the use of larger subnets would replace much of that routing with LAN-layer communication, likely Ethernet <strong>switching</strong>. Debates on this route-versus-switch question have gone back and forth in the networking community, with one aphorism summarizing a common view:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">Switch when you can, route when you must</div>
+</div>
+</div></blockquote>
+<p>This aphorism reflects the idea that switching is faster, cheaper and easier to configure, and that subnet boundaries should be drawn only where “necessary”.</p>
+<p>Ethernet switching equipment is indeed generally cheaper than routing equipment, for the same overall level of features and reliability. And traditional switching requires relatively little configuration, while to implement subnets not only must the subnets be created by hand but one must also set up and configure the routing-update protocols. However, the price difference between switching and routing is not always significant in the big picture, and the configuration involved is often straightforward.</p>
+<p>Somewhere along the way, however, switching has acquired a reputation – often deserved – for being <em>faster</em> than routing. It is true that routers have  more to do than switches: they must decrement TTL, update the header checksum, and attach a new LAN header. But these things are relatively minor: a larger reason many routers are slower than switches may simply be that they are inevitably <em>asked to serve as firewalls</em>. This means “deep inspection” of every packet, <em>eg</em> comparing every packet to each of a large number of firewall rules. The firewall may also be asked to keep track of connection state. All this drives down the forwarding rate, as measured in packets-per-second.</p>
+<p>Traditional switching scales remarkably well, but it does have limitations. First, broadcast packets must be forwarded throughout a switched network; they do not, however, pass to different subnets. Second, LAN networks do not like redundant links (that is, loops); while one can rely on the spanning-tree algorithm to eliminate these, that algorithm too becomes less efficient at larger scales.</p>
+<p id="index-45">The rise of software-defined networking (<a class="reference internal" href="ethernet2.html#sdn"><span class="std std-ref">3.4&nbsp;&nbsp;&nbsp;Software-Defined Networking</span></a>) has blurred the distinction between routing and switching. The term “Layer 3 switch” is sometimes used to describe routers that in effect do not support all the usual firewall bells and whistles. These are often SDN Ethernet switches (<a class="reference internal" href="ethernet2.html#sdn"><span class="std std-ref">3.4&nbsp;&nbsp;&nbsp;Software-Defined Networking</span></a>) that are making forwarding decisions based on the contents of the IP header. Such streamlined switch/routers may also be able to do most of the hard work in specialized hardware, another source of speedup.</p>
+<p>But SDN can do much more than IP-layer forwarding, by taking advantage of site-specific layout information. One application, of a switch hierarchy for traffic entering a datacenter, appears in <a class="reference internal" href="ethernet2.html#openflow"><span class="std std-ref">3.4.1&nbsp;&nbsp;&nbsp;OpenFlow Switches</span></a>. Other SDN applications include enabling Ethernet topologies with loops, offloading large-volume flows to alternative paths, and implementing policy-based routing as in <a class="reference internal" href="routing.html#lartc-use"><span class="std std-ref">13.6&nbsp;&nbsp;&nbsp;Routing on Other Attributes</span></a>. Some SDN solutions involve site-specific programming, but others work more-or-less out of the box. Locations with switch-versus-route issues are likely to turn increasingly to SDN in the future.</p>
+</div>
+</div>
+<div class="section" id="network-address-translation">
+<span id="nat"></span><span id="index-46"></span><h2>9.7&nbsp;&nbsp;&nbsp;Network Address Translation<a class="headerlink" href="#network-address-translation" title="Permalink to this headline">¶</a></h2>
+<p>What do you do if your ISP assigns to you a single IPv4 address and you have two computers? The solution is Network Address Translation, or <strong>NAT</strong>. NAT’s ability to “multiplex” an arbitrarily large number of individual hosts behind a single IPv4 address (or small number of addresses) makes it an important tool in the conservation of IPv4 addresses. It also, however, enables an important form of firewall-based security. It is documented in <span class="target" id="index-47"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3022.html"><strong>RFC 3022</strong></a>, where this is called NAPT, or Network Address <strong>Port</strong> Translation. Another term in common use is <strong>IP masquerading</strong>.</p>
+<p>The basic idea is that, instead of assigning each host at a site a publicly visible IPv4 address, just one such address is assigned to a special device known as a NAT router. A NAT router sold for residential or small-office use is commonly simply called a “router”, or (somewhat more precisely) a “residential gateway”. One side of the NAT router connects to the Internet; the other connects to the site’s internal network. Hosts on the internal network are assigned private IP addresses (<a class="reference internal" href="#special-addresses"><span class="std std-ref">9.3&nbsp;&nbsp;&nbsp;Special Addresses</span></a>), typically of the form or 192.168.x.y or 10.x.y.z. Connections to internal hosts that originate in the outside world are banned. When an internal machine wants to connect to the outside, the NAT router intercepts the connection, and forwards the connection’s packets after rewriting the source address to make it appear they came from the NAT router’s own IP address, shown below as 200.1.2.37.</p>
+<img alt="_images/nat.svg" src="_images/nat.svg" /><p>The remote machine responds, sending its responses to the NAT router’s public IPv4 address. The NAT router remembers the connection, having stored the connection information in a special forwarding table, and forwards the data to the correct internal host, rewriting the destination-address field of the incoming packets.</p>
+<p>The NAT forwarding table also includes port numbers. That way, if two internal hosts attempt to connect to the same external host, the NAT router can tell which packets belong to which. For example, suppose internal hosts A and B each connect from port 3000 to port 80 on external hosts S and T, respectively. Here is what the NAT forwarding table might look like. No columns for the NAT router’s own IPv4 addresses are needed; we shall let NR denote the router’s external address.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="18%" />
+<col width="29%" />
+<col width="17%" />
+<col width="17%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">remote host</th>
+<th class="head">remote port</th>
+<th class="head">outside source port</th>
+<th class="head">inside host</th>
+<th class="head">inside port</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>S</td>
+<td>80</td>
+<td>3000</td>
+<td>A</td>
+<td>3000</td>
+</tr>
+<tr class="row-odd"><td>T</td>
+<td>80</td>
+<td>3000</td>
+<td>B</td>
+<td>3000</td>
+</tr>
+</tbody>
+</table>
+<p>A packet to S from ⟨A,3000⟩ would be rewritten so that the source was ⟨NR,3000⟩. A packet from ⟨S,80⟩ addressed to ⟨NR,3000⟩ would be rewritten and forwarded to ⟨A,3000⟩. Similarly, a packet from ⟨T,80⟩ addressed to ⟨NR,3000⟩ would be rewritten and forwarded to ⟨B,3000⟩; the NAT table takes into account the source host and port as well as the destination.</p>
+<p>Sometimes it is necessary for the NAT router to rewrite the internal-side port number as well; this happens if two internal hosts want to connect, each from the <em>same</em> port, to the same external host and port. For example, suppose B now opens a connection to ⟨S,80⟩, also from inside port 3000. This time the NAT router must remap the port number, because that is the only way to distinguish between packets from ⟨S,80⟩ back to A and to B. With B’s second connection’s internal port remapped from 3000 to 3001, the new table is</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="18%" />
+<col width="29%" />
+<col width="17%" />
+<col width="17%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">remote host</th>
+<th class="head">remote port</th>
+<th class="head">outside source port</th>
+<th class="head">inside host</th>
+<th class="head">inside port</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>S</td>
+<td>80</td>
+<td>3000</td>
+<td>A</td>
+<td>3000</td>
+</tr>
+<tr class="row-odd"><td>T</td>
+<td>80</td>
+<td>3000</td>
+<td>B</td>
+<td>3000</td>
+</tr>
+<tr class="row-even"><td>S</td>
+<td>80</td>
+<td>3001</td>
+<td>B</td>
+<td>3000</td>
+</tr>
+</tbody>
+</table>
+<p>The NAT router does not create TCP connections between itself and the external hosts; it simply forwards packets (with rewriting). The connection endpoints are still the external hosts S and T and the internal hosts A and B. However, NR might very well <em>monitor</em> the TCP connections to know when they have closed (by looking for FIN packets, <a class="reference internal" href="tcpA.html#closing"><span class="std std-ref">17.8.1&nbsp;&nbsp;&nbsp;Closing a connection</span></a>), and so can be removed from the table. For UDP connections, NAT routers typically remove the forwarding entry after some period of inactivity; see <a class="reference internal" href="udp.html#udp"><span class="std std-ref">16&nbsp;&nbsp;&nbsp;UDP Transport</span></a>, exercise 16.0.</p>
+<p>NAT still works for <em>some</em> traffic without port numbers, such as network pings, though the above table is then not quite the whole story. See <a class="reference internal" href="ipv4companions.html#icmp"><span class="std std-ref">10.4&nbsp;&nbsp;&nbsp;Internet Control Message Protocol</span></a>.</p>
+<p>Done properly, NAT improves the security of a site, by making it impossible for an external host to probe or to initiate a connection to any of the internal hosts. While this firewall feature is of great importance, essentially the same effect can be achieved without address translation, and <em>with</em> public IPv4 addresses for all internal hosts, by having the router refuse to forward incoming packets that are not part of existing connections. The router still needs to maintain a table like the NAT table above, in order to recognize such packets. The address translation itself, in other words, is not the source of the firewall security. That said, it is hard for a NAT router to “fail open”; <em>ie</em> to fail in a way that lets outside connections in. It is much easier for a non-NAT firewall to fail open.</p>
+<p>For the common residential form of NAT router, see <a class="reference internal" href="ipv4companions.html#small-dhcp"><span class="std std-ref">10.3.1&nbsp;&nbsp;&nbsp;NAT, DHCP and the Small Office</span></a>.</p>
+<div class="section" id="nat-problems">
+<span id="index-48"></span><span id="id7"></span><h3>9.7.1&nbsp;&nbsp;&nbsp;NAT Problems<a class="headerlink" href="#nat-problems" title="Permalink to this headline">¶</a></h3>
+<p>NAT router’s refusal to allow inbound connections is a source of occasional frustration. We illustrate some of these frustrations here, using Voice-over-IP (VoIP) and the call-setup protocol SIP (<span class="target" id="index-49"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3261.html"><strong>RFC 3261</strong></a>). The basic strategy is that each phone is associated with a remote <strong>phone server</strong>. These phone servers, because they have to be able to accept incoming connections from anywhere, must not be behind NAT routers. The phones themselves, however, usually will be:</p>
+<img alt="_images/phones.svg" src="_images/phones.svg" /><p>For phone1 to call phone2, phone1 first contacts Server1, which then contacts Server2. So far, all is well. The final step is for Server2 to contact phone2, which, however, cannot be done normally as NAT2 allows no inbound connections.</p>
+<p>One common solution is for phone2 to maintain a persistent connection to Server2 (and ditto for phone1 and Server1). By having these persistent phone-to-server connections, we can arrange for the phone to ring on incoming calls.</p>
+<p>As a second issue, somewhat particular to the SIP protocol, is that it is common for server and phone to prefer to use UDP port 5060 at <em>both</em> ends. For a single internal phone, it is likely that port 5060 will pass through without remapping, so the phone will appear to be connecting from the desired port 5060. However, if there are two phones inside (not shown above), one of them will appear to be connecting to the server <em>from</em> an alternative port. The solution here is to have the server tolerate such port remapping.</p>
+<p>VoIP systems run into a much more serious problem with NAT, however. Once the call between phone1 and phone2 is set up, the servers would prefer to step out of the loop, and have the phones exchange voice packets directly. The SIP protocol was designed to handle this by having each phone report to its respective server the UDP socket (⟨IP address,port⟩ pair) it intends to use for the voice exchange; the servers then report these phone sockets to each other, and from there to the opposite phones. This socket information is rendered incorrect by NAT, however, certainly the IP address and quite likely the port as well. If only one of the phones is behind a NAT firewall, it can initiate the voice connection to the other phone, but the other phone will see the voice packets arriving from a different socket than promised and will likely not recognize them as part of the call. If both phones are behind NAT firewalls, they may not be able to connect directly to one another at all. The common solution is for the VoIP server of a phone behind a NAT firewall to remain in the communications path, forwarding packets to its hidden partner. This works, but represents an unwanted server workload.</p>
+<p id="index-50">If a site wants to make it possible to allow external connections to hosts behind a NAT router or other firewall, one option is <strong>tunneling</strong>. This is the creation of a “virtual LAN link” that runs on top of a TCP connection between the end user and one of the site’s servers; the end user can thus appear to be on one of the organization’s internal LANs; see <a class="reference internal" href="otherLANs.html#vpn"><span class="std std-ref">5.1&nbsp;&nbsp;&nbsp;Virtual Private Networks</span></a>. Another option is to “open up” a specific port: in essence, a static NAT-table entry is made connecting a specific port on the NAT router to a specific internal host and port (usually the same port). For example, all UDP packets to port 5060 on the NAT router might be forwarded to port 5060 on internal host A, even in the absence of any prior packet exchange. Gamers creating peer-to-peer game connections must also usually engage in some port-opening configuration. The Port Control Protocol (<span class="target" id="index-51"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc6887.html"><strong>RFC 6887</strong></a>) is sometimes used for this. See also <a class="reference internal" href="#pwnat"><span class="std std-ref">9.7.3&nbsp;&nbsp;&nbsp;NAT Traversal</span></a>, below.</p>
+<p>NAT routers work very well when the communications model is of client-side TCP connections, originating from the inside and with public outside servers as destination. The NAT model works less well for peer-to-peer networking, as with the gamers above, where two computers, each behind a different NAT router, wish to establish a connection. Most NAT routers provide at least limited support for “opening” access to a given internal ⟨host,port⟩ socket, by creating a semi-permanent forwarding-table entry. See also <a class="reference internal" href="tcpA.html#tcp-exercises"><span class="std std-ref">17.10&nbsp;&nbsp;&nbsp;Exercises</span></a>, exercise 3.0.</p>
+<p>NAT routers also often have trouble with UDP protocols, due to the tendency for such protocols to have the public server reply from a <em>different</em> port than the one originally contacted. For example, if host A behind a NAT router attempts to use TFTP (<a class="reference internal" href="udp.html#tftp"><span class="std std-ref">16.2&nbsp;&nbsp;&nbsp;Trivial File Transport Protocol, TFTP</span></a>), and sends a packet to port 69 of public server C, then C is likely to reply from some <em>new</em> port, say 3000, and this reply is likely to be dropped by the NAT router as there will be no entry there yet for traffic from ⟨C,3000⟩.</p>
+</div>
+<div class="section" id="middleboxes">
+<span id="index-52"></span><span id="id8"></span><h3>9.7.2&nbsp;&nbsp;&nbsp;Middleboxes<a class="headerlink" href="#middleboxes" title="Permalink to this headline">¶</a></h3>
+<p>Firewalls and NAT routers are sometimes classed as <strong>middleboxes</strong>: network devices that block, throttle or modify traffic beyond what is necessary for basic forwarding. Middleboxes play a very important role in network security, but they sometimes (as here with VoIP) break things. The word “middlebox” (versus “router” or “firewall”) usually has a perjorative connotation; middleboxes have, in some circles, acquired a rather negative reputation.</p>
+<p>NAT routers’ interference with VoIP, above, is a direct consequence of their function: NAT handles connections from inside to outside quite well, but the NAT mechanism offers no support for connections from one inside to another inside. Sometimes, however, middleboxes block traffic when there is no technical reason to do so, simply because correct behavior has not been widely implemented. As an example, the SCTP protocol, <a class="reference internal" href="tcpB.html#sctp"><span class="std std-ref">18.15.2&nbsp;&nbsp;&nbsp;SCTP</span></a>, has seen very limited use despite some putative advantages over TCP, largely due to lack of NAT-router support. SCTP cannot be used by residential users because the middleboxes have not kept up.</p>
+<p>A third category of middlebox-related problems is overzealous blocking in the name of security. SCTP runs into this problem as well, though not quite as universally: a few routers simply drop all SCTP packets because they represent an “unknown” – and therefore suspect – type of traffic. There is a place for this block-by-default approach. If a datacenter firewall blocks all inbound TCP traffic except to port 80 (the HTTP port), and if SCTP is not being used within the datacenter intentionally, it is hard to argue against blocking all inbound SCTP traffic. But if the frontline router for home or office users blocks all <em>outbound</em> SCTP traffic, then the users cannot use SCTP.</p>
+<p>A consequence of overzealous blocking is that it becomes much harder to introduce new protocols. If a new protocol is blocked for even a small fraction of potential users, it is just not worth the effort. See also the discussion at <a class="reference internal" href="tcpB.html#quic2"><span class="std std-ref">18.15.4&nbsp;&nbsp;&nbsp;QUIC Revisited</span></a>; the design of QUIC includes several elements to mitigate middlebox problems.</p>
+<p>For another example of overzealous blocking by middleboxes, with the added element of spoofed TCP RST packets, see the sidebar at <a class="reference internal" href="dynamicsB.html#ecn"><span class="std std-ref">21.5.3&nbsp;&nbsp;&nbsp;Explicit Congestion Notification (ECN)</span></a>.</p>
+</div>
+<div class="section" id="nat-traversal">
+<span id="pwnat"></span><span id="index-53"></span><h3>9.7.3&nbsp;&nbsp;&nbsp;NAT Traversal<a class="headerlink" href="#nat-traversal" title="Permalink to this headline">¶</a></h3>
+<p>If a server must be located behind a NAT router, the traditional way to make it visible to the outside internet is to “open up” one or more selected ports, using the Port Control Protocol, above. Surprisingly, it is often possible to arrange for a UDP connection between a client A and a server B, both behind different NAT firewalls, without any special NAT-router cooperation. TCP connections can, if desired, then be tunneled over the UDP connection. See <a class="reference internal" href="bibliography.html#megk10" id="id9">[MEGK10]</a> and the <a class="reference external" href="https://github.com/samyk/pwnat">pwnat</a> package.</p>
+<p>We will first assume that the server B knows the public IP address A<sub>public</sub> of A’s NAT router, and knows that A wishes to communicate. B then begins sending a series of UDP packets to an agreed-upon port at A<sub>public</sub>, using an agreed-upon source port; these packets might be sent at 10-second intervals. The pwnat package uses port 2222 for both endpoints; we will assume that here. These packets, of course, are dropped by A’s NAT router.</p>
+<p>A now sends a single UDP packet to B’s public IP address, from port 2222 and to port 2222. When A’s NAT router sees these packets, it will create a NAT-table entry as follows:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="18%" />
+<col width="29%" />
+<col width="17%" />
+<col width="17%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">remote host</th>
+<th class="head">remote port</th>
+<th class="head">outside source port</th>
+<th class="head">inside host</th>
+<th class="head">inside port</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>B<sub>public</sub></td>
+<td>2222</td>
+<td>2222[?]</td>
+<td>A</td>
+<td>2222</td>
+</tr>
+</tbody>
+</table>
+<p>Assuming that A’s NAT router does not remap port 2222 as the outside source port, the existence of this NAT-table entry will allow B’s packets to be delivered to A. A can then respond, and the bidirectional connection is established. Remapping of port 2222 by A’s NAT router would be a serious problem, but is quite unlikely if no other host at A’s end is using port 2222.</p>
+<p>So far, we have assumed that server B knew about A’s interest in advance. A similar trick, using ICMP (below at <a class="reference internal" href="ipv4companions.html#icmp"><span class="std std-ref">10.4&nbsp;&nbsp;&nbsp;Internet Control Message Protocol</span></a>) allows A to notify B of its interest and existence, so that B can begin sending its series of UDP packets. The idea here is for B to send periodic ICMP Echo Request (ping-request) packets to a fixed IP address IP<sub>blackhole</sub> chosen because it is not in use. All these packets disappear somewhere, but they do create an ICMP opening in B’s NAT router. The client A is assumed to know B’s public IP address B<sub>public</sub>, and begins to send ICMP Time Exceeded packets to B<sub>public</sub> that are crafted to look like legitimate responses to B’s Echo Request packets. ICMP Time Exceeded messages are acceptable regardless of their source IP address; their intended use is by intermediate routers reporting a problem. B’s NAT router will now (hopefully) forward A’s arriving Time Exceeded packets to B. The ICMP Time Exceeded packet has error-message space for A’s public IP address A<sub>public</sub>; when received, this triggers B’s sending of UDP packets to ⟨A<sub>public</sub>,2222⟩ as above. A and B do have to standardize on a specific ping query identifier.</p>
+<p>How NAT routers handle ICMP replies does vary from implementation to implementation, and some higher-end NAT devices do notice problems with B’s forged ICMP Time Exceeded packets, either at A’s end or at B’s. However, for most consumer-grade NAT devices, this strategy works quite well.</p>
+</div>
+</div>
+<div class="section" id="unnumbered-interfaces">
+<span id="unnumbered"></span><span id="index-54"></span><h2>9.8&nbsp;&nbsp;&nbsp;Unnumbered Interfaces<a class="headerlink" href="#unnumbered-interfaces" title="Permalink to this headline">¶</a></h2>
+<p>We mentioned in <a class="reference internal" href="intro.html#ip-overview"><span class="std std-ref">1.10&nbsp;&nbsp;&nbsp;IP - Internet Protocol</span></a> and <a class="reference internal" href="#interfaces"><span class="std std-ref">9.2&nbsp;&nbsp;&nbsp;Interfaces</span></a> that some devices allow the use of point-to-point IP links without assigning IP addresses to the interfaces at the ends of the link. Such IP interfaces are referred to as <strong>unnumbered</strong>; they generally make sense only on routers. It is a firm requirement that the node (<em>ie</em> router) at each endpoint of such a link has at least one other interface that <em>does</em> have an IP address; otherwise, the node in question would be anonymous, and could not participate in the router-to-router protocols of <a class="reference internal" href="routing.html#routing-update"><span class="std std-ref">13&nbsp;&nbsp;&nbsp;Routing-Update Algorithms</span></a>.</p>
+<p>The diagram below shows a link L joining routers R1 and R2, which are connected to subnets 200.0.0.0/24 and 201.1.1.0/24 respectively. The endpoint interfaces of L, both labeled <code class="docutils literal notranslate"><span class="pre">link0</span></code>, are unnumbered.</p>
+<img alt="_images/unnumbered.svg" src="_images/unnumbered.svg" /><p>The endpoints of L could always be assigned private IPv4 addresses (<a class="reference internal" href="#special-addresses"><span class="std std-ref">9.3&nbsp;&nbsp;&nbsp;Special Addresses</span></a>), such as 10.0.0.1 and 10.0.0.2. To do this we would need to create a subnet; because the host bits cannot be all 0’s or all 1’s, the minimum subnet size is four (<em>eg</em> 10.0.0.0/30). Furthermore, the routing protocols to be introduced in <a class="reference internal" href="routing.html#routing-update"><span class="std std-ref">13&nbsp;&nbsp;&nbsp;Routing-Update Algorithms</span></a> will distribute information about the subnet throughout the organization or “routing domain”, meaning care must be taken to ensure that each link’s subnet is unique. Use of unnumbered links avoids this.</p>
+<p>If R1 were to <em>originate</em> a packet to be sent to (or forwarded via) R2, the standard strategy is for it to treat its <code class="docutils literal notranslate"><span class="pre">link0</span></code> interface as if it shared the IP address of its Ethernet interface <code class="docutils literal notranslate"><span class="pre">eth0</span></code>, that is, 200.0.0.1; R2 would do likewise. This still leaves R1 and R2 violating the IP local-delivery rule of <a class="reference internal" href="#ipdelivery"><span class="std std-ref">9.5&nbsp;&nbsp;&nbsp;The Classless IP Delivery Algorithm</span></a>; R1 is expected to deliver packets via local delivery to 201.1.1.1 but has no interface that is assigned an IP address on the destination subnet 201.1.1.0/24. The necessary dispensation, however, is granted by <span class="target" id="index-55"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1812.html"><strong>RFC 1812</strong></a>. All that is necessary by way of configuration is that R1 be told R2 is a directly connected neighbor reachable via its <code class="docutils literal notranslate"><span class="pre">link0</span></code> interface. On Linux systems this might be done with the <code class="docutils literal notranslate"><span class="pre">ip</span> <span class="pre">route</span></code> command on R1 as follows:</p>
+<div class="sidebar" id="index-56">
+<p class="first sidebar-title"><code class="docutils literal notranslate"><span class="pre">ip</span> <span class="pre">route</span></code></p>
+<p class="last">The Linux <code class="docutils literal notranslate"><span class="pre">ip</span> <span class="pre">route</span></code> command illustrated here was tested on a virtual point-to-point link created with <code class="docutils literal notranslate"><span class="pre">ssh</span></code> and <code class="docutils literal notranslate"><span class="pre">pppd</span></code>; the link interface name was in fact <code class="docutils literal notranslate"><span class="pre">ppp0</span></code>. While the command appeared to work as advertised, it was only possible to create the link if endpoint IP addresses were assigned at the time of creation; these were then removed with <code class="docutils literal notranslate"><span class="pre">ip</span> <span class="pre">route</span> <span class="pre">del</span></code> and then re-assigned with the command shown here.</p>
+</div>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">ip</span> <span class="pre">route</span> <span class="pre">add</span> <span class="pre">201.1.1.1</span> <span class="pre">dev</span> <span class="pre">link0</span></code></div>
+</div>
+</div></blockquote>
+<p>Because L is a point-to-point link, there is no destination LAN address and thus no ARP query.</p>
+</div>
+<div class="section" id="mobile-ip">
+<span id="index-57"></span><span id="id10"></span><h2>9.9&nbsp;&nbsp;&nbsp;Mobile IP<a class="headerlink" href="#mobile-ip" title="Permalink to this headline">¶</a></h2>
+<p>In the original IPv4 model, there was a strong if implicit assumption that each IP host would stay put. One role of an IPv4 address is simply as a unique endpoint identifier, but another role is as a <strong>locator</strong>: some prefix of the address (<em>eg</em> the network part, in the class-A/B/C strategy, or the provider prefix) represents something about where the host is physically located. Thus, if a host moves far enough, it may need a new address.</p>
+<p>When laptops are moved from site to site, it is common for them to receive a new IP address at each location, <em>eg</em> via DHCP as the laptop connects to the local Wi-Fi. But what if we wish to support devices like smartphones that may remain active and communicating while moving for thousands of miles? Changing IP addresses requires changing TCP connections; life (and application development) might be simpler if a device had a single, unchanging IP address.</p>
+<p>One option, commonly used with smartphones connected to some so-called “3G” networks, is to treat the phone’s data network as a giant wireless LAN. The phone’s IP address need not change as it moves within this LAN, and it is up to the phone provider to figure out how to manage LAN-level routing, much as is done in <a class="reference internal" href="wireless.html#wi-fi-roaming"><span class="std std-ref">4.2.4.3&nbsp;&nbsp;&nbsp;Roaming</span></a>.</p>
+<p id="index-58">But <strong>Mobile IP</strong> is another option, documented in <span class="target" id="index-59"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc5944.html"><strong>RFC 5944</strong></a>. In this scheme, a mobile host has a permanent <strong>home address</strong> and, while roaming about, will also have a temporary <strong>care-of address</strong>, which changes from place to place. The care-of address might be, for example, an IP address assigned by a local Wi-Fi network, and which in the absence of Mobile IP would be <em>the</em> IP address for the mobile host. (This kind of care-of address is known as “co-located”; the care-of address can also be associated with some other device – known as a <strong>foreign agent</strong> – in the vicinity of the mobile host.) The goal of Mobile IP is to make sure that the mobile host is always reachable via its home address.</p>
+<p id="index-60">To maintain connectivity to the home address, a Mobile IP host needs to have a <strong>home agent</strong> back on the home network; the job of the home agent is to maintain an IP tunnel that always connects to the device’s current care-of address. Packets arriving at the home network addressed to the home address will be forwarded to the mobile device over this tunnel by the home agent. Similarly, if the mobile device wishes to send packets <em>from</em> its home address – that is, with the home address as IP source address – it can use the tunnel to forward the packet to the home agent.</p>
+<p>The home agent may use proxy ARP (<a class="reference internal" href="ipv4companions.html#arp-finer-points"><span class="std std-ref">10.2.1&nbsp;&nbsp;&nbsp;ARP Finer Points</span></a>) to declare itself to be the appropriate destination on the home LAN for packets addressed to the home (IP) address; it is then straightforward for the home agent to forward the packets.</p>
+<p>An <strong>agent discovery</strong> process is used for the mobile host to decide whether it is mobile or not; if it is, it then needs to notify its home agent of its current care-of address.</p>
+<div class="section" id="ip-in-ip-encapsulation">
+<span id="index-61"></span><span id="id11"></span><h3>9.9.1&nbsp;&nbsp;&nbsp;IP-in-IP Encapsulation<a class="headerlink" href="#ip-in-ip-encapsulation" title="Permalink to this headline">¶</a></h3>
+<p>There are several forms of packet encapsulation that can be used for Mobile IP tunneling, but the default one is IP-in-IP encapsulation, defined in <span class="target" id="index-62"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2003.html"><strong>RFC 2003</strong></a>. In this process, the entire original IP packet (with header addressed to the home address) is used as data for a new IP packet, with a new IP header (the “outer” header) addressed to the care-of address.</p>
+<img alt="_images/encapsulation.svg" src="_images/encapsulation.svg" /><p>A value of 4 in the outer-IP-header <code class="docutils literal notranslate"><span class="pre">Protocol</span></code> field indicates that IPv4-in-IPv4 tunneling is being used, so the receiver knows to forward the packet on using the information in the inner header. The MTU of the tunnel will be the original MTU of the path to the care-of address, minus the size of the outer header. A very similar mechanism is used for IPv6-in-IPv4 encapsulation (that is, with IPv6 in the inner packet), except that the outer IPv4 <code class="docutils literal notranslate"><span class="pre">Protocol</span></code> field value is now 41. See <a class="reference internal" href="ipv6b.html#in4"><span class="std std-ref">12.6&nbsp;&nbsp;&nbsp;IPv6 Connectivity via Tunneling</span></a>.</p>
+<p id="index-63">IP-in-IP encapsulation presents some difficulties for NAT routers. If two hosts A and B behind a NAT router send out encapsulated packets, the packets may differ only in the source IP address. The NAT router, upon receiving responses, doesn’t know whether to forward them to A or to B. One partial solution is for the NAT router to support only one inside host sending encapsulated packets. If the NAT router knew that encapsulation was being used for Mobile IP, it might look at the home address in the inner header to determine the correct home agent to which to deliver the packet, but this is a big assumption. A fuller solution is outlined in <span class="target" id="index-64"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3519.html"><strong>RFC 3519</strong></a>.</p>
+</div>
+</div>
+<div class="section" id="epilog">
+<h2>9.10&nbsp;&nbsp;&nbsp;Epilog<a class="headerlink" href="#epilog" title="Permalink to this headline">¶</a></h2>
+<p>At this point we have concluded the basic mechanics of IPv4. Still to come is a discussion of how IP routers build their forwarding tables. This turns out to be a complex topic, divided into routing within single organizations and ISPs – <a class="reference internal" href="routing.html#routing-update"><span class="std std-ref">13&nbsp;&nbsp;&nbsp;Routing-Update Algorithms</span></a> – and routing between organizations – <a class="reference internal" href="bigrouting.html#large-scale-ip-routing"><span class="std std-ref">14&nbsp;&nbsp;&nbsp;Large-Scale IP Routing</span></a>.</p>
+<p>But before that, in the next chapter, we compare IPv4 with IPv6, now twenty years old but still seeing limited adoption. The biggest issue fixed by IPv6 is IPv4’s lack of address space, but there are also several other less dramatic improvements.</p>
+</div>
+<div class="section" id="exercises">
+<span id="ipv4-exercises"></span><h2>9.11&nbsp;&nbsp;&nbsp;Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<p><em>Exercises may be given fractional (floating point) numbers, to allow for interpolation of new exercises.</em> Exercises marked with a ♢ have solutions or hints at <a class="reference internal" href="solutions.html#ipv4-solutions"><span class="std std-ref">34.9&nbsp;&nbsp;&nbsp;Solutions for IPv4</span></a>.</p>
+<p>1.0. Suppose an Ethernet packet represents a TCP acknowledgment; that is, the packet contains the Ethernet header, the IPv4 header, a 20-byte TCP header, and a 4-byte CRC checksum. Is such a packet smaller than the 10-Mbit Ethernet minimum-packet size, and, if so, by how much?</p>
+<p>2.0. How can a receiving host tell if an arriving IPv4 packet is unfragmented? Hint: such a packet will be both the “first fragment” and the “last fragment”; how are these two states marked in the IPv4 header?</p>
+<p>3.0. How long will it take the IDENT field of the IPv4 header to wrap around, if the sender host A sends a stream of packets to host B as fast as possible? Assume the packet size is 1500 bytes and the bandwidth is 600 Mbps.</p>
+<p>4.0. The following diagram has routers A, B, C, D and E; E is the “border router” connecting the site to the Internet. All router-to-router connections are via Ethernet-LAN  /24 subnets with addresses of the form 200.0.x. Give forwarding tables for each of A♢, B, C and D. Each table should include each of the listed subnets and also a <strong>default</strong> entry that routes traffic toward router E. Directly connected subnets may be listed with a next_hop of “direct”.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>200.0.5────A────200.0.6────B────200.0.7────D────200.0.8────E────Internet
+                           │
+                       200.0.9
+                           │
+                           C
+                           │
+                       200.0.10
+</pre></div>
+</div>
+<p>5.0. (This exercise is an attempt at modeling Internet-2 routing.) Suppose sites S<sub>1</sub> … S<sub>n</sub> each have a single connection to the standard Internet, and each site S<sub>i</sub> has a single IPv4 address block A<sub>i</sub>. Each site’s connection to the Internet is through a single router R<sub>i</sub>; each R<sub>i</sub>’s default route points towards the standard Internet. The sites also maintain a separate, higher-speed network among themselves; each site has a single link to this separate network, also through R<sub>i</sub>. Describe what the forwarding tables on each R<sub>i</sub> will have to look like so that traffic from one S<sub>i</sub> to another will always use the separate higher-speed network.</p>
+<p>6.0. For each IPv4 network prefix given (with length), identify which of the subsequent IPv4 addresses are part of the same subnet.</p>
+<div class="line-block">
+<div class="line">(a). <strong>10.0.130.0/23</strong>:  10.0.130.23, 10.0.129.1, 10.0.131.12, 10.0.132.7</div>
+<div class="line">(b). <strong>10.0.132.0/22</strong>:  10.0.130.23, 10.0.135.1, 10.0.134.12, 10.0.136.7</div>
+<div class="line">(c). <strong>10.0.64.0/18</strong>:   10.0.65.13, 10.0.32.4, 10.0.127.3, 10.0.128.4</div>
+<div class="line">(d).♢ <strong>10.0.168.0/21</strong>: 10.0.166.1, 10.0.170.3, 10.0.174.5, 10.0.177.7</div>
+<div class="line">(e). <strong>10.0.0.64/26</strong>: 10.0.0.125, 10.0.0.66, 10.0.0.130, 10.0.0.62</div>
+</div>
+<p>7.0. Convert the following subnet masks to /k notation, and vice-versa:</p>
+<div class="line-block">
+<div class="line">(a).♢ 255.255.240.0</div>
+<div class="line">(b). 255.255.248.0</div>
+<div class="line">(c). 255.255.255.192</div>
+<div class="line">(d).♢ /20</div>
+<div class="line">(e). /22</div>
+<div class="line">(f). /27</div>
+</div>
+<p>8.0. Suppose that the subnet bits below for the following five subnets A-E all come from the beginning of the fourth byte of the IPv4 address; that is, these are subnets of a /24 block.</p>
+<ul class="simple">
+<li>A: 00</li>
+<li>B: 01</li>
+<li>C: 110</li>
+<li>D: 111</li>
+<li>E: 1010</li>
+</ul>
+<div class="line-block">
+<div class="line">(a). What are the sizes of each subnet, and the corresponding decimal ranges? Count the addresses with host bits all 0’s or with host bits all 1’s as part of the subnet.</div>
+<div class="line">(b). How many IPv4 addresses in the class-C block do not belong to any of the subnets A, B, C, D and E?</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="ipv4companions.html" title="10   IPv4 Companion Protocols"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="slidingwindows.html" title="8   Abstract Sliding Windows"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, desktop edition 2.0.11</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012-2022, Peter L Dordal.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

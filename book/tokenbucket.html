@@ -1,0 +1,578 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>24   Token Bucket Rate Limiting &#8212; An Introduction to Computer Networks, desktop edition 2.0.11</title>
+    <link rel="stylesheet" href="_static/csbnetbook.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script type="text/javascript" src="_static/mobile.js"></script>
+    <script type="text/javascript" src="_static/rightsidebar.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="25   Quality of Service" href="realtime.html" />
+    <link rel="prev" title="23   Queuing and Scheduling" href="fairqueuing.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="realtime.html" title="25   Quality of Service"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fairqueuing.html" title="23   Queuing and Scheduling"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, desktop edition 2.0.11</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">24&nbsp;&nbsp;&nbsp;Token Bucket Rate Limiting</a><ul>
+<li><a class="reference internal" href="#token-bucket-definition">24.1&nbsp;&nbsp;&nbsp;Token Bucket Definition</a></li>
+<li><a class="reference internal" href="#token-bucket-examples">24.2&nbsp;&nbsp;&nbsp;Token-Bucket Examples</a></li>
+<li><a class="reference internal" href="#multiple-token-buckets">24.3&nbsp;&nbsp;&nbsp;Multiple Token Buckets</a></li>
+<li><a class="reference internal" href="#gcra">24.4&nbsp;&nbsp;&nbsp;GCRA</a><ul>
+<li><a class="reference internal" href="#applications-of-token-bucket">24.4.1&nbsp;&nbsp;&nbsp;Applications of Token Bucket</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#guaranteeing-voip-bandwidth">24.5&nbsp;&nbsp;&nbsp;Guaranteeing VoIP Bandwidth</a></li>
+<li><a class="reference internal" href="#limiting-delay">24.6&nbsp;&nbsp;&nbsp;Limiting Delay</a><ul>
+<li><a class="reference internal" href="#token-bucket-queue-utilization">24.6.1&nbsp;&nbsp;&nbsp;Token Bucket Queue Utilization</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#token-bucket-through-one-router">24.7&nbsp;&nbsp;&nbsp;Token Bucket Through One Router</a></li>
+<li><a class="reference internal" href="#token-bucket-through-multiple-routers">24.8&nbsp;&nbsp;&nbsp;Token Bucket Through Multiple Routers</a></li>
+<li><a class="reference internal" href="#delay-constraints">24.9&nbsp;&nbsp;&nbsp;Delay Constraints</a><ul>
+<li><a class="reference internal" href="#hierarchical-token-bucket">24.9.1&nbsp;&nbsp;&nbsp;Hierarchical Token Bucket</a></li>
+<li><a class="reference internal" href="#fair-queuing-token-bucket-combinations">24.9.2&nbsp;&nbsp;&nbsp;Fair Queuing / Token Bucket combinations</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cbq">24.10&nbsp;&nbsp;&nbsp;CBQ</a></li>
+<li><a class="reference internal" href="#linux-htb">24.11&nbsp;&nbsp;&nbsp;Linux HTB</a></li>
+<li><a class="reference internal" href="#parekh-gallager-theorem">24.12&nbsp;&nbsp;&nbsp;Parekh-Gallager Theorem</a><ul>
+<li><a class="reference internal" href="#epilog">24.12.1&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li><a class="reference internal" href="#exercises">24.12.2&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="fairqueuing.html"
+                        title="previous chapter">23&nbsp;&nbsp;&nbsp;Queuing and Scheduling</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="realtime.html"
+                        title="next chapter">25&nbsp;&nbsp;&nbsp;Quality of Service</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="token-bucket-rate-limiting">
+<span id="token-bucket"></span><span id="index-0"></span><h1>24&nbsp;&nbsp;&nbsp;Token Bucket Rate Limiting<a class="headerlink" href="#token-bucket-rate-limiting" title="Permalink to this headline">¶</a></h1>
+<p>The token-bucket algorithm provides an alternative to fair queuing (<a class="reference internal" href="fairqueuing.html#fair-queuing"><span class="std std-ref">23.5&nbsp;&nbsp;&nbsp;Fair Queuing</span></a>) for providing a traffic allocation to each of several groups. The main practical difference between fair queuing and token bucket is that if one sender is idle, fair queuing distributes that sender’s bandwidth among the other senders. Token bucket does not: the bandwidth a sender is allocated is a <strong>bandwidth cap</strong>.</p>
+<p>Suppose the outbound bandwidth is 4 packets/ms and we want to allocate to one particular sender, A, a bandwidth of 1 packet/ms. We could use fair queuing and give sender A a bandwidth fraction of 25%, but suppose we do not want A ever to get more bandwidth than 1 packet/ms. We might do this, for example, because A is paying a reduced rate, and any excess available bandwidth is to be divided among the <em>other</em> senders.</p>
+<p>The catch is that we want the flexibility to allow A’s packets to arrive at irregular intervals. We could simply wait 1 ms after each of A’s packets begins transmission, before the next can begin, but this may be too strict. Suppose A has been dutifully submitting packets at 1ms intervals and then the packet that was supposed to arrive at T=6ms instead arrives at T=6.5. If the following packet then arrives on time at T=7, does this mean it should now be held until T=7.5, <em>etc</em>? Or do we allow A to send one late packet at T=6.5 and the next at T=7, on the theory that the <em>average</em> rate is still 1 packet/ms?</p>
+<p>The latter option is generally what we want, and the solution is to define A’s quota in terms of a <strong>token-bucket specification</strong>, which allows for specification of both an average rate and also a burst capacity. The implemented token-bucket specification is often called a token-bucket <strong>filter</strong>.</p>
+<p id="index-1">If a packet does not meet the token-bucket specification, it is <strong>non-compliant</strong>; we can do any of the following things:</p>
+<ul class="simple">
+<li><strong>delay</strong> the packet until the bucket is ready</li>
+<li><strong>drop</strong> the packet</li>
+<li><strong>mark</strong> the packet as non-compliant</li>
+</ul>
+<p>The first option here is often called <strong>shaping</strong>; the second, more authoritarian option is sometimes known as <strong>policing</strong>. When packet marking is used, the marked packets are sometimes sent at lower priority, and sometimes are dropped preferentially by some downstream router.</p>
+<p>Note that, of the three approaches here, dropping and marking are the most straightforward to implement. Delaying packets requires creating a place to store them, and an algorithm for resending them at the appropriate time.</p>
+<p>Policing is generally appropriate only at the point when the traffic enters the network (<em>eg</em> at the user/ISP interface), where the traffic generator still has more-or-less full control over the packet spacing. Further downstream, congestion delays may lead to packet bunching, which may lead to violations of the token-bucket specification that are unfair to blame on the traffic generator.</p>
+<p>Another use for token-bucket specifications is as a theoretical traffic description, rather than a rule to be enforced; in this context compliance is a non-issue.</p>
+<p>A token-bucket filter can be thought of as a queuing discipline, with an underlying FIFO queue. If non-compliant packets are delayed, it is non-work-conserving. Dropping non-compliant packets can be viewed as an alternative to tail-drop. The queuing-discipline definition in <a class="reference internal" href="fairqueuing.html#queuing-disciplines"><span class="std std-ref">23.4&nbsp;&nbsp;&nbsp;Queuing Disciplines</span></a> does not provide for marking packets, but this is a straightforward extension.</p>
+<div class="section" id="token-bucket-definition">
+<span id="id1"></span><h2>24.1&nbsp;&nbsp;&nbsp;Token Bucket Definition<a class="headerlink" href="#token-bucket-definition" title="Permalink to this headline">¶</a></h2>
+<p>The idea behind a token bucket is that there is a notional bucket somewhere, being filled at a steady rate with tokens (or, if more divisibility is needed, with fluid); any overflow from the bucket is discarded. To send a packet, we need to be able to take one token from the bucket; if the bucket is empty then the packet is non-compliant and must suffer special treatment as above. If the bucket is full, however, then the sender may send a <strong>burst</strong> of packets corresponding to the bucket capacity (at which point the bucket will be empty).</p>
+<p>A common variation is requiring one token per byte rather than per packet, with the fill rate correspondingly scaled; this allows packet size to be taken into account.</p>
+<p>More precisely, a token-bucket specification TB(r,B<sub>max</sub>) includes a <strong>token fill rate</strong> of r tokens/sec, representing the rate at which the bucket fills with tokens, and also a <strong>bucket capacity</strong> (or depth) B<sub>max</sub>&gt;0. The bucket fills at the rate specified, subject to a maximum of B<sub>max</sub>; we will denote the current capacity by B, or by B(t) if we need to specify the time.
+In order for a packet of size S (possibly S=1 for counting size in units of whole packets) to be within the specification, the bucket must have at least S tokens; that is, B≥S. Otherwise the packet is non-compliant. When the packet is sent, S tokens are removed from the bucket, that is, B=B−S. It is possible for the packets of a given flow all to be compliant with a given token-bucket specification at one point (<em>eg</em> one router) in the network but not at another point; this can happen, for example, if more than B<sub>max</sub> packets pile up at a downstream router due to momentary congestion.</p>
+<p>The following graph is a visual representation of a token-bucket constraint. The black and purple curves plotted are of cumulative bits sent as a function of time, that is, bits(t). When bits(t) is horizontal, the sender is idle.</p>
+<img alt="_images/tokenbucketgraph.svg" src="_images/tokenbucketgraph.svg" /><p>The blue line represents a sender sending linearly at the rate r, with no burstiness. At vertical distance B<sub>max</sub> above the blue line is the red line. Graphs for compliant senders cannot cross this, because that would entail a burst of more than B<sub>max</sub> above the blue line; we give a more formal argument below. As a sender’s graph approaches the red line, the sender’s current bucket contents decreases; the instantaneous bucket contents for the black sender is shown at one point as B(t).</p>
+<p>The purple sender has fallen below the blue line at one point; as a result, it can never catch up. In fact, after passing through the vertex at point A the purple graph can never cross the dashed red line. A proof is in <a class="reference internal" href="#token-bucket-queue-utilization"><span class="std std-ref">24.6.1&nbsp;&nbsp;&nbsp;Token Bucket Queue Utilization</span></a>, following some numeric token-bucket examples that illustrate how a token-bucket filter works.</p>
+<div class="sidebar">
+<p class="first sidebar-title">Satellite Token Bucket</p>
+<p class="last">When I first got satellite Internet, my service was limited by a token-bucket filter with rate 56 kbps and bucket 300 megabytes. When the bucket emptied, it took 12 hours to refill. The idea was that someone could use the Internet intensely but relatively briefly; satellite access is expensive. Within a year, the provider switched to a flat 300 MB cap per day; the token-bucket rule was apparently not well understood by customers.</p>
+</div>
+<p>If a packet arrives when there are not enough tokens in the bucket to send it, then as indicated above there are three options. The sender can engage in shaping, making the packet wait until sufficient tokens accumulate. The sender can engage in policing, dropping the packet. Or the sender can send the packet immediately but mark it as noncompliant.</p>
+<p>One common strategy is to send noncompliant packets – as marked in the third option above – with lower priority. Alternatively, marked packets may face a greater chance of being dropped by some downstream router. In ATM networks (<a class="reference internal" href="otherLANs.html#atm"><span class="std std-ref">5.5&nbsp;&nbsp;&nbsp;Asynchronous Transfer Mode: ATM</span></a>) the cell-loss priority bit is often used to mark noncompliant packets.</p>
+<p>Token-bucket specifications supply a framework for making decisions about <strong>admission control</strong>: a router can decide whether to accept a new connection (or whether to accept the connection’s quality-of-service request) based on the requested rate and bucket (queue) requirements.</p>
+<p>Token-bucket specifications are the mirror-image equivalent to <strong>leaky-bucket specifications</strong>, in which the fluid leaks out of the leaky bucket at rate r and to send a packet we must add S units without overflowing. The two forms are completely equivalent.</p>
+<p id="index-2">So far we have been using token-bucket specifications to describe traffic; <em>eg</em> traffic <em>arriving</em> at a router. It is also possible to use token buckets to describe the router itself; in this setting, the leaky-bucket formulation may be clearer. The router’s queue represents the bucket, and the router’s packet transmissions represent tokens leaking out of the bucket. Arriving packets are added to the bucket; a bucket overflow represents lost packets. We will not pursue this interpretation further.</p>
+</div>
+<div class="section" id="token-bucket-examples">
+<h2>24.2&nbsp;&nbsp;&nbsp;Token-Bucket Examples<a class="headerlink" href="#token-bucket-examples" title="Permalink to this headline">¶</a></h2>
+<p>Suppose the token-bucket specification is <strong>TB(1/3 packet/ms, 4 packets)</strong>, and packets arrive at the following times, with the bucket initially full:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">0, 0, 0, 2, 3, 6, 9, 12</div>
+</div>
+</div></blockquote>
+<p>After all the T=0 packets are processed, the bucket holds 1 token. By the time the fourth packet arrives at T=2, the bucket volume has risen to 1 2/3; it immediately drops to 2/3 when packet 4 is sent. By T=3, the bucket volume has reached 1 and the fifth packet can be sent. The bucket is now empty, but fortunately the remaining packets arrive at 3-ms intervals and can all be sent.</p>
+<p>In the next set of packet arrival times, again with TB(1/3,4), we have three bursts of four packets each.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">0, 0, 0, 0, 12, 12, 12, 12, 24, 24, 24, 24</div>
+</div>
+</div></blockquote>
+<p>Each burst empties the bucket, which then takes 12 ms to refill. All packets are compliant.</p>
+<p>In the following set of packet arrival times, still with TB(1/3,4), the burst of four packets at T=0 drains the bucket. At T=3 the bucket size has increased back to 1, allowing the packet that arrives then to be sent but also draining the bucket again.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">0, 0, 0, 0, 3, 6, 12, 12</div>
+</div>
+</div></blockquote>
+<p>At T=6 the same thing happens. From T=6 to T=12 the bucket contents rise from 0 to 2, allowing the two packets arriving at T=12 to be sent.</p>
+<p>Finally, suppose packets arrive at the following times at our TB(1/3,4) filter.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">0, 1, 2, 3, 4, 5</div>
+</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line">Just after T=0 the bucket size is 3; just before T=1 it is 3 1/3.</div>
+<div class="line">Just after T=1 the bucket size is 2 1/3; just before T=2 it is 2 2/3</div>
+<div class="line">Just after T=2 the bucket size is 1 2/3; just before T=3 it is 2</div>
+<div class="line">Just after T=3 the bucket size is 1; just before T=4 it is 1 1/3</div>
+<div class="line">Just after T=4 the bucket size is 1/3; just before T=5 it is 2/3</div>
+<div class="line">At T=5 the bucket size is 2/3 and the arriving packet is <strong>noncompliant</strong>.</div>
+</div>
+<p>We can also represent this in tabular form as follows; note that for the noncompliant packet the bucket is not decremented.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="35%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">packet arrival</th>
+<th class="head">0</th>
+<th class="head">1</th>
+<th class="head">2</th>
+<th class="head">3</th>
+<th class="head">4</th>
+<th class="head">5</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>bucket just before</td>
+<td>4</td>
+<td>3&nbsp;1/3</td>
+<td>2&nbsp;2/3</td>
+<td>2</td>
+<td>1&nbsp;1/3</td>
+<td>2/3</td>
+</tr>
+<tr class="row-odd"><td>bucket just after</td>
+<td>3</td>
+<td>2&nbsp;1/3</td>
+<td>1&nbsp;2/3</td>
+<td>1</td>
+<td>1/3</td>
+<td>2/3</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="multiple-token-buckets">
+<span id="multiple-token-bucket"></span><span id="index-3"></span><h2>24.3&nbsp;&nbsp;&nbsp;Multiple Token Buckets<a class="headerlink" href="#multiple-token-buckets" title="Permalink to this headline">¶</a></h2>
+<p>It often makes sense to require that a sender comply with two (or more) separate token-bucket specifications. We can think of these being applied to the traffic sequentially. Often one filter will specify a peak rate, with a small bucket size, and the other will specify an average rate, with a larger bucket size. Consider, for example, the following pair:</p>
+<ol class="arabic simple">
+<li>TB(1 packet/ms, &nbsp; 1.5 packets)</li>
+<li>TB(1/5 packet/ms, 6 packets)</li>
+</ol>
+<p>The first specification, meant to apply to the peak rate, mandates 1 ms on average between packets, but packets can be only 0.5 ms early without being noncompliant. The second specification, meant to apply over the longer term, states that <em>on average</em> there will be 5 ms between packets, subject to a burst of 6. The following is compliant, assuming both buckets are initially full.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">0, 1, 2.5, 3, 4, 5, 6, 10, 15, 20</div>
+</div>
+</div></blockquote>
+<p>The first seven packets arrive at 1 ms intervals (the rate of the first filter) except for the packet that arrived at T=2.5 instead of T=2. The sender was allowed to send again at T=3 instead of waiting until T=3.5 because the bucket size in the first filter was 1.5 instead of 1.0. Here are the packet arrivals with the current size of each bucket <strong>at the time of packet arrival</strong>, just before the bucket is decremented. At T=2.0, the filter2 bucket would be 4.4.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="16%" />
+<col width="7%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">arrival:</th>
+<th class="head">T=0</th>
+<th class="head">T=1</th>
+<th class="head">T=2.5</th>
+<th class="head">T=3</th>
+<th class="head">T=4</th>
+<th class="head">T=5</th>
+<th class="head">T=6</th>
+<th class="head">T=10</th>
+<th class="head">T=15</th>
+<th class="head">T=20</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Filter 1:</td>
+<td>1.5</td>
+<td>1.5</td>
+<td>1.5</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>1.5</td>
+<td>1.5</td>
+<td>1.5</td>
+</tr>
+<tr class="row-odd"><td>Filter 2:</td>
+<td>6</td>
+<td>5.2</td>
+<td>4.5</td>
+<td>3.6</td>
+<td>2.8</td>
+<td>2</td>
+<td>1.2</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>1.0</td>
+</tr>
+</tbody>
+</table>
+<p id="index-4">If we move up each packet in time to the first point when both buckets have reached 1.0, we get the <strong>fastest compliant sequence</strong> for this pair of filters. This is the sequence generated by a token-bucket <em>shaper</em> when there is a steady backlog of packets and each is sent as soon as the bucket capacity (or capacities, when applicable) is full enough to allow sending. After T=0, the filter1 bucket returns to capacity 1.0 at T=0.5. Continuing, the filter1 bucket allows for additional transmissions at T=1.5, T=2.5, T=3.5, T=4.5 and T=5.5. At this point filter2 becomes the limiting factor; its bucket is at 0.1 after the T=5.5 packet is sent and does not return to 1.0 until T=10.0. We get the following:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="16%" />
+<col width="7%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">arrival:</th>
+<th class="head">T=0</th>
+<th class="head">T=0.5</th>
+<th class="head">T=1.5</th>
+<th class="head">T=2.5</th>
+<th class="head">T=3.5</th>
+<th class="head">T=4.5</th>
+<th class="head">T=5.5</th>
+<th class="head">T=10</th>
+<th class="head">T=15</th>
+<th class="head">T=20</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Filter 1:</td>
+<td>1.5</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>1.5</td>
+<td>1.5</td>
+<td>1.5</td>
+</tr>
+<tr class="row-odd"><td>Filter 2:</td>
+<td>6</td>
+<td>5.1</td>
+<td>4.3</td>
+<td>3.5</td>
+<td>2.7</td>
+<td>1.9</td>
+<td>1.1</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>1.0</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="gcra">
+<h2>24.4&nbsp;&nbsp;&nbsp;GCRA<a class="headerlink" href="#gcra" title="Permalink to this headline">¶</a></h2>
+<p>Another formulation of the token-bucket specifications is the <strong>Generic Cell Rate Algorithm</strong>, or GCRA; this formulation is frequently used in classification of ATM traffic. A GCRA specification takes two parameters, a mean packet spacing time T, and an early-arrival allowance 𝜏. For each packet we compute a <em>theoretical arrival time</em>, tat, initially zero. A packet may arrive earlier by amount at most 𝜏. Specifically, if t is the time of actual arrival, we have two cases:</p>
+<ol class="arabic simple">
+<li>t ≥ tat−𝜏: the packet is compliant, and we update tat to max(t,tat) + T</li>
+<li>t &lt; tat−𝜏: the packet is too early and is noncompliant; tat is unchanged.</li>
+</ol>
+<p>A flow satisfying GCRA(T,𝜏) is equivalent to a token-bucket specification with rate 1/T packets/unit time, and bucket size (𝜏+1)/T; tat represents the time the bucket would next be full. The time to fill an empty bucket is 𝜏+1; if the bucket becomes full at time tat then, working backwards, it would contain enough to send one packet at time tat−𝜏.</p>
+<p>For traffic flows with a more-or-less constant rate, 𝜏 represents the time by which one packet can be late without permanently falling behind its regular 1/T rate. The GCRA formulation is sometimes more convenient than the token-bucket formulation, particularly when 𝜏&lt;T.</p>
+<div class="section" id="applications-of-token-bucket">
+<span id="index-5"></span><span id="id2"></span><h3>24.4.1&nbsp;&nbsp;&nbsp;Applications of Token Bucket<a class="headerlink" href="#applications-of-token-bucket" title="Permalink to this headline">¶</a></h3>
+<p>Unlike fair queuing, token-bucket filtering can be implemented at the downstream end of a link, though possibly with results not quite in agreement with expectations. Let us return to the final scenario of <a class="reference internal" href="fairqueuing.html#fair-queuing-applications"><span class="std std-ref">23.6&nbsp;&nbsp;&nbsp;Applications of Fair Queuing</span></a>:</p>
+<img alt="_images/3receivers.svg" src="_images/3receivers.svg" /><p>While fair queuing cannot be applied at R to enforce equal shares to A, B and C, we <em>can</em> implement a token-bucket filter at R that limits each of A, B and C to 2 Mbps.</p>
+<p>There are two drawbacks. First, the filter is not work-conserving: if A is idle, B and C will still only receive 2 Mbps. Second, in the absence of feedback there is no guarantee that limiting the traffic at R will eventually result in reduced utilization of the ISP⟶R link. While this is true for TCP traffic, due to the self-clocking property, it is conceivable that a sender D somewhere is trying to send 8 Mbps of real-time UDP traffic to A, via ISP and R. Three-quarters of the traffic would then fail to be compliant, and might be dropped by R, but unless D gets feedback from A that not much of the traffic is getting through, and that it should reduce its sending rate, the token-bucket filter at R will not achieve what we want. Most protocols <em>do</em> provide this kind of feedback, but not all.</p>
+</div>
+</div>
+<div class="section" id="guaranteeing-voip-bandwidth">
+<span id="voip-bandwidth"></span><span id="index-6"></span><h2>24.5&nbsp;&nbsp;&nbsp;Guaranteeing VoIP Bandwidth<a class="headerlink" href="#guaranteeing-voip-bandwidth" title="Permalink to this headline">¶</a></h2>
+<p>As a particular instance of the previous situation, suppose we have an Internet connection from our ISP and want to begin using VoIP for telephony. We would like to reserve something like 64 kbps of bandwidth for one VoIP line (plus room for headers), so that large downloads do not degrade voice quality. We can easily do this for the upstream direction, either with fair or priority queuing;  priority queuing will not lead to starvation of other traffic as the total VoIP traffic is limited by the number of lines.</p>
+<p>However, the downstream direction may be more of a problem, if we are unable to enlist the ISP to apply fair or priority queuing at their end. As we argued in <a class="reference internal" href="fairqueuing.html#fair-queuing-applications"><span class="std std-ref">23.6&nbsp;&nbsp;&nbsp;Applications of Fair Queuing</span></a>, fair queuing at the downstream end of a congested link has no effect. A queue buildup at the ISP’s end of the link will mean that incoming VoIP traffic has to wait in line with traffic from other downloads, and may never receive the bandwidth it requires. And it is more than likely that the router at the ISP’s end has a rather large queue, meaning relatively extensive waiting times. We need to limit the total downstream traffic, but are limited to traffic manipulations at the downstream end.</p>
+<p><strong>Token-bucket</strong> can provide an answer here. The idea is to limit the aggregate bandwidth of the non-VoIP traffic entering the site, leaving some room for the VoIP traffic. We create at the downstream site entrance (node TBF in the diagram below) a token-bucket filter that applies only to non-VoIP traffic (this feature is represented by the dashed “VoIP bypass” path). The filter’s rate limit will be the total download bandwidth minus a reservation for VoIP; for example, if we knew that the total bandwidth was 500 bits/ms we might reserve 100 bits/ms, say, for VoIP traffic by having the token-bucket filter limit delivery of non-VoIP download traffic to 400 bits/ms. In the diagram below, the token-bucket filter is represented conceptually by the large red dot; the short red segment represents the virtual (not physical) “bottleneck link” for the non-VoIP traffic.</p>
+<img alt="_images/voip_bandwidth.svg" src="_images/voip_bandwidth.svg" /><p>Unfortunately, we encounter three problems. The first is that if no VoIP traffic is flowing then we probably do not want the 400 bits/ms cap on other traffic; we might arrange this by applying the cap only when the phone is in use, or by setting aside a small enough bandwidth fraction that it does not have a material affect on overall bulk bandwidth. The second problem is the (remote) possibility discussed in the previous example that the sender might keep sending anyway, at 500 bits/ms; our downstream token-bucket filter can throw away as many bits as it wants but the ISP-to-site link will still be saturated. Third, it is often quite difficult to determine exactly what the bandwidth of a particular Internet connection <em>is</em>. Especially if, as is often the case, it is shared, or configured to change with time, or subject to a large-bucket token-bucket cap by the ISP.</p>
+<p>Fortunately, typical VoIP bandwidth needs are low enough that one can often muddle through without providing any quality-of-service guarantees at all. This remains, however, a good example of the difficulties often faced by real-time traffic.</p>
+</div>
+<div class="section" id="limiting-delay">
+<span id="voip-delay"></span><span id="index-7"></span><h2>24.6&nbsp;&nbsp;&nbsp;Limiting Delay<a class="headerlink" href="#limiting-delay" title="Permalink to this headline">¶</a></h2>
+<p>Now let’s repeat the previous example, but instead of trying to guarantee VoIP bandwidth, we will instead attempt to limit the total queuing delay. This may mean that, in the presence of large downloads, VoIP traffic will get only 50 bits/ms, but there should be little if any queuing at the ISP’s router.</p>
+<p>Again, we create a token-bucket filter at the site entrance, and set it to limit the <em>total</em> rate of incoming traffic to just below the download link bandwidth. If packets can arrive at 1,000 kbps, we might set the token-bucket rate to 900 kbps, or perhaps even a little higher. This means that the bottleneck link in the downstream direction will now be the “virtual” link from the downstream token-bucket filter to the rest of the site, shown in red in the diagram of the previous section. A queue will then build up at this token-bucket filter, at the red dot in the diagram above. However, at least in the steady state for TCP traffic, the queue will <em>not build at the ISP’s end</em>.</p>
+<p>The next step is to enable CoDel, <a class="reference internal" href="dynamicsB.html#codel"><span class="std std-ref">21.5.6&nbsp;&nbsp;&nbsp;CoDel</span></a>, to manage this queue in front of the token-bucket filter. CoDel achieves this by dropping traffic until the queue has an appropriate size. The end result will be that downstream traffic encounters no queue at the ISP’s end (again assuming a TCP steady state), and at most a modestly sized CoDel-regulated queue at the site’s end. Not only have we limited the waiting time for VoIP traffic, we have limited queuing delays for <em>all</em> traffic.</p>
+<p>In exchange, we are giving up 100% utilization of the downstream link, though if delay is causing significant problems this may be a reasonable tradeoff. It also means CoDel will be throwing away traffic that has already made it to our site, but, in the long run, that may be well worth it.</p>
+<p>If the ISP limits download bandwidth via a token-bucket filter with a significant bucket, as many do in order to accommodate burstiness, we can copy their upstream bucket size at our downstream end.</p>
+<div class="section" id="token-bucket-queue-utilization">
+<span id="index-8"></span><span id="id3"></span><h3>24.6.1&nbsp;&nbsp;&nbsp;Token Bucket Queue Utilization<a class="headerlink" href="#token-bucket-queue-utilization" title="Permalink to this headline">¶</a></h3>
+<p>Suppose traffic meeting token-bucket specification TB(r,B<sub>max</sub>) arrives at a router R, with no competition from other traffic. The bucket fill rate r corresponds to the minimum outbound link bandwidth needed by R to guarantee that the traffic does not build up; we do not want traffic on average arriving faster than it can depart.</p>
+<p>Intuitively, the bucket size B<sub>max</sub> corresponds to the amount of <strong>queue space</strong> at R that the flow can consume. To make this more precise, we will argue that, if the output rate from R is at least r, then the number of untransmitted bits stored at R is never more than B<sub>max</sub>.</p>
+<p>To show this more formally, we start by proving the “red line lemma” implicit in the discussion of the graph in <a class="reference internal" href="#token-bucket-definition"><span class="std std-ref">24.1&nbsp;&nbsp;&nbsp;Token Bucket Definition</span></a> above, that the sender can never cross the red line. Specifically, assume the flow satisfies TB(r,B<sub>max</sub>) and has a full bucket at time t=0. Let bits(t) be the cumulative number of bits sent (packetized or not) by time t. The blue line is the graph bits = rt and the red line is the graph bits = rt + B<sub>max</sub>; we show the following:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">bits(t) &lt;= rt + B<sub>max</sub></div>
+</div>
+</div></blockquote>
+<p>We first prove this so long as the graph is above the blue line; that is, bits(t) &gt;= rt.
+We claim that the right-hand side minus the left-hand side above, rt + B<sub>max</sub> - bits(t), represents the volume B(t) of fluid (or tokens) in the bucket. Equating and rearranging slightly, we need to show B(t) + bits(t) - rt is always equal to B<sub>max</sub>. This is true at t=0 when bits(t) = rt = 0 and the bucket is full. We next establish that its rate of change is also 0, and so it is constant.</p>
+<p>While the bucket is not full, B(t) is always being filled at rate r. Correspondingly, rt is increasing at rate r, so B(t) - rt is not affected by the fill rate. Similarly, B(t) is being reduced at exactly the rate bits(t) is increasing. If we use the packet formulation, then when a packet arrives B(t) is reduced by the packet size and bits(t) increases by exactly the same amount.</p>
+<div class="sidebar">
+<p class="first sidebar-title">The Calculus Version</p>
+<p class="last">For readers familiar with calculus it may help to note dB(t)/dt = r - bits’(t), at least if we assume, say, a fluid bit-arrival model where bits(t) is differentiable. That is, the bucket volume B(t) increases at rate r and also decreases at a rate equal to that of arriving data. Therefore, the rate of change of B(t) + bits(t) - rt is just r - bits’(t) + bits’(t) - r = 0.</p>
+</div>
+<p>This does not quite apply when bits(t) falls below the blue line. However, we have nothing to prove then. If bits(t) has a later interval above the blue line, starting at time t<sub>1</sub>, we can reapply the argument above re-starting the clock and the bits counter at t=t<sub>1</sub>.</p>
+<p>In fact, we can argue that whenever the bits(t) graph passes through a point below the blue line, such as point A in the diagram above, then bits(t) cannot in the future climb above the new red line (the dashed red line in the diagram) B<sub>max</sub> units above point A.</p>
+</div>
+</div>
+<div class="section" id="token-bucket-through-one-router">
+<span id="id4"></span><h2>24.7&nbsp;&nbsp;&nbsp;Token Bucket Through One Router<a class="headerlink" href="#token-bucket-through-one-router" title="Permalink to this headline">¶</a></h2>
+<p>We now return to the claim about accumulation at a router R with outbound flow at least r; as before, let bits(t) represent the cumulative amount of data received. As long as bits(t) is above the blue line, the router can continuously transmit at rate r and the net number of bits held within the router is bits(r) - rt. By the argument above, this is bounded by B<sub>max</sub>. If bits(t) falls below the blue line, the router’s queue is empty and the router can transmit incoming data at least as fast as it is arriving.</p>
+<p>While R can never be holding more than B<sub>max</sub> bytes, at the instant just before a packet finishes transmission it can have B<sub>max</sub> bytes in the queue, plus the currently transmitting packet still taking up an entire buffer. As a practical matter, then, we may need space equal to B<sub>max</sub> plus one packet.</p>
+<p>While a token-bucket specification does not include a delay bound specifically, we can compute an upper bound to the queuing delay at a router R as B<sub>max</sub>/r; this is the time it takes for one full bucket’s worth of packets to be transmitted.</p>
+<p>If we have N flows each individually satisfying TB(r,B), then the collective traffic will satisfy TB(Nr, NB) (see exercise 1.0). However, a bucket size of NB will be needed only when all N individual flows have their bursts “gang up” at a particular instant. Often it is possible to take advantage of theoretical or empirical statistical information and conclude that the collective traffic “most of the time” meets a token-bucket specification TB(Nr, B<sub>N</sub>) for B<sub>N</sub> significantly less than NB.</p>
+</div>
+<div class="section" id="token-bucket-through-multiple-routers">
+<span id="id5"></span><h2>24.8&nbsp;&nbsp;&nbsp;Token Bucket Through Multiple Routers<a class="headerlink" href="#token-bucket-through-multiple-routers" title="Permalink to this headline">¶</a></h2>
+<p>If we have a single TB(r,B<sub>max</sub>) flow through N routers, however, the queuing delay is <em>not</em> larger than for a single router, again assuming no competition. More specifically, assume that the traffic flow arrives at router R<sub>1</sub> satisfying TB(r,B), and passes in turn through R<sub>1</sub> to R<sub>N</sub>. Each router R<sub>i</sub> has an outbound bandwidth at least as large as r. Then the total queuing delay through all N routers remains B<sub>max</sub>/r. If the packets pile up to the maximum size B<sub>max</sub>, they only do so once.</p>
+<p>To prove this we compare the TB sequence of packets with the same sequence of packets sent at a steady rate r through the same series of routers. If the last bit of packet k is the Nth bit since we began, then for the steady stream we send packet k at time N/r. We assume the link rates are all reduced to r.</p>
+<p>Let t=0 represent the time we start counting bits. For every n, we established above that the nth bit of the TB packet flow can be transmitted at most B<sub>max</sub>/r seconds ahead of the nth steady-stream bit, which is sent at time n/r. The steady-stream packets do not encounter queuing delays at all, as each router has always finished the previous one. The TB packets can each arrive no later than the steady-stream packets, as they were sent earlier and they cannot cross. Therefore, the maximum delay faced by any TB packet is B<sub>max</sub>/r, exactly as for traffic through a single router.</p>
+</div>
+<div class="section" id="delay-constraints">
+<span id="index-9"></span><span id="id6"></span><h2>24.9&nbsp;&nbsp;&nbsp;Delay Constraints<a class="headerlink" href="#delay-constraints" title="Permalink to this headline">¶</a></h2>
+<p>If a traffic flow arriving at a router R is compliant for token-bucket specification TB(r,B), then as we showed above the amount of R’s queue space used by the flow will be bounded by B so long as R can devote at least rate r to the flow’s traffic.</p>
+<p>Now let us add a <strong>real-time delay constraint</strong>: suppose that R is not to be allowed to delay any of the flow’s packets by more than time D. For the time being, assume that there is no other traffic at R. We now need to make sure that R has sufficient bandwidth to forward a bucketful of size B within the time interval D.  To send a burst of size B in time D, bandwidth B/D is needed. Therefore, to satisfy the real-time constraint, R needs outbound bandwidth</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">s = max(r, B/D)</div>
+</div>
+</div></blockquote>
+<p><strong>Example 1</strong>: suppose the traffic specification is TB(1/3, 10), where the rate is in (equal-sized) packets/µsec, and D is 40 µsec. Then B/D is 1/4 packets/µsec, and the necessary outbound bandwidth s is simply r=1/3.</p>
+<p><strong>Example 2</strong>: now suppose in the previous example that the delay limit D is 20 µsec. In this case, we need s = B/D = 1/2 packets/µsec.</p>
+<p>If there <em>is</em> other traffic, the delay constraint still holds, provided s represents the bandwidth allocated by R to the flow, and the flow’s packets receive priority service at R, and we first subtract the largest-packet delay as in <a class="reference internal" href="packets.html#realtime-packet-size"><span class="std std-ref">7.3.2&nbsp;&nbsp;&nbsp;Packet Size and Real-Time Traffic</span></a>.</p>
+<p>Calculations of this sort often play a role in a router’s decision on whether to accept a <strong>reservation</strong> for an additional TB(r,B) flow with associated delay constraint.</p>
+<div class="section" id="hierarchical-token-bucket">
+<span id="index-10"></span><span id="id7"></span><h3>24.9.1&nbsp;&nbsp;&nbsp;Hierarchical Token Bucket<a class="headerlink" href="#hierarchical-token-bucket" title="Permalink to this headline">¶</a></h3>
+<p>Token-bucket filters can also be used to form a hierarchy, as in <a class="reference internal" href="fairqueuing.html#generic-hierarchical-queuing"><span class="std std-ref">23.7.1&nbsp;&nbsp;&nbsp;Generic Hierarchical Queuing</span></a>. In this section we will assume that token bucket is used only for shaping; that is, delaying packets until the bucket has sufficiently filled. As usual, packets will remain in the leaf FIFO queues until they are ready to be transmitted.</p>
+<p>Central to the hierarchy is the conceptual time each internal token-bucket node <strong>releases</strong> its next packet; that is, becomes able to inform its parent node (when asked) that it has a packet ready to send, even if the packet physically remains waiting in one of the leaf queues. If a node N is informed by a child node that a packet has been released and N’s bucket has sufficient capacity, then N releases the packet in turn to its parent immediately; otherwise N waits until its bucket fills sufficiently to make the packet compliant. When a packet arrives at a leaf node, it will be progressively released by each node along the path to the root; when it is released by the root node it can be sent.</p>
+<p>To make token-bucket filters classful, we will assume that each node may have multiple input subqueues, but treats these as if they were consolidated into a single FIFO subqueue. That is, the node releases packets to its parent in the order they were released to the node by its children.</p>
+<p>Leaf nodes can mark each packet with its release time at the moment of arrival. Interior nodes may only be able to determine their release times for packets that have been released by their child nodes.</p>
+<p>It is now straightforward to define the <code class="docutils literal notranslate"><span class="pre">peek()</span></code> operation of <a class="reference internal" href="fairqueuing.html#generic-hierarchical-queuing"><span class="std std-ref">23.7.1&nbsp;&nbsp;&nbsp;Generic Hierarchical Queuing</span></a>: a node looks at the set of packets it has released and returns the one with the earliest release time.</p>
+<p>In a token-bucket hierarchy it makes a sense to say that two child flows have bucket sizes of 200 and 300, respectively, while the combined flow is to be limited to a bucket size of 400.</p>
+<p>The following diagram illustrates an example of a token-bucket hierarchy. The three token-bucket filters TB1, TB2 and TB3 have rates in packets/ms and bucket sizes in packets.</p>
+<img alt="_images/hierarchical_tokenbucket.svg" src="_images/hierarchical_tokenbucket.svg" /><p>If TB1’s rate is, as here, less than the sum of its child rates, then as long as its children always have packets ready to send, the children will receive bandwidth in proportion to their token bucket rates. In the example above, TB1’s rate is 4 packets/ms and yet the sum of the rates of its children is 5 packets/ms. Each child will therefore receive 4/5 its promised rate: TB2 will send at a rate of 2×(4/5) packets/ms while TB3 will send at rate of 3×(4/5) packets/ms.</p>
+<p>To see this, assume FIFO2 and FIFO3 remain nonempty for a period long enough for their buckets to empty. TB2 and TB3 will then each release packets to TB1 at their respective rates of 2 packets/ms and 3 packets/ms. In the following sequence of release times to TB1, we assume TB3 starts at T=0 and TB2 at T=0.01, to avoid ties. Packets from A released by TB2 are shown in italic:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">0, <em>0.01</em>, .33, <em>0.51</em>, .67, 1.0, <em>1.01</em>, 1.33, <em>1.51</em>, 1.67, 2.0, <em>2.01</em></div>
+</div>
+</div></blockquote>
+<p>They will be dequeued by TB1 at 4 packets/ms, once TB1’s bucket is empty. In the long run, TB3 has released three packets into this sequence for every two of TB2’s, so sender B will receive 3/5 of the dequeuings, and thus 3/5 of the 4 packet/ms root bandwidth.</p>
+<p>We can also have each token-bucket node physically forward released packets to FIFO queues attached to each parent node; we called this an internal-storage hierarchy in <a class="reference internal" href="fairqueuing.html#hierarchical-queuing"><span class="std std-ref">23.7&nbsp;&nbsp;&nbsp;Hierarchical Queuing</span></a>. In this particular case, the leaf-storage and internal-storage mechanisms function identically, provided the internal links are infinitely fast and the internal queues infinitely large. See exercise 6.0.</p>
+<p>There is no point in having a node with a bucket larger than the sum of its child buckets and also a rate larger than the sum of its child rates. In the example above, in which the sum of the child rates exceeds the parent rates, A would be able to send at a sustained rate of 2 packets/ms provided B sends at only 2 packets/ms as well; reducing the child rates to 2×(4/5) and 3×(4/5) packets/ms respectively is not equivalent. If a node’s rate is larger than the sum of the child rates, then it will be able to handle the child traffic without delay once the child buckets have emptied. Before that, though, the parent bucket may be the limiting factor.</p>
+</div>
+<div class="section" id="fair-queuing-token-bucket-combinations">
+<h3>24.9.2&nbsp;&nbsp;&nbsp;Fair Queuing / Token Bucket combinations<a class="headerlink" href="#fair-queuing-token-bucket-combinations" title="Permalink to this headline">¶</a></h3>
+<p>At first glance, combining fair queuing with token bucket might seem improbable: the goal of fair queuing is to be <em>work-conserving</em>, allowing the bandwidth assigned to an idle input class to be divided among the active input classes, and the goal of token bucket is generally to limit a class to its token-bucket-defined maximum transmission rate. The usual approach to a hierarchy-based synthesis is to allow the administrator to decide, at each node of the hierarchy, whether or not the node can “borrow” (without repayment) bandwidth from inactive siblings. If it can, the set of siblings with mutual borrowing privileges resembles a fair-queuing scheduler; if not, the node is more like a token-bucket scheduler.</p>
+</div>
+</div>
+<div class="section" id="cbq">
+<h2>24.10&nbsp;&nbsp;&nbsp;CBQ<a class="headerlink" href="#cbq" title="Permalink to this headline">¶</a></h2>
+<p>CBQ was introduced in <a class="reference internal" href="bibliography.html#cj91" id="id8">[CJ91]</a> and analyzed in <a class="reference internal" href="bibliography.html#fj95" id="id9">[FJ95]</a>. It did not actually use the token-bucket mechanism, but instead implemented shaping by keeping track of the average idle time (more precisely, non-transmitting time) for a given input class. Input classes that tried to send too much were restricted, unless the node was permitted to “borrow” bandwidth from a sibling. When an input class sent less than it was allowed, its average utilization would fall; if a burst arrived then it would take some time for the average to “catch up” and thus the node could briefly send faster than its assigned rate. However, the size of the implicit “bucket” could be controlled only indirectly.</p>
+</div>
+<div class="section" id="linux-htb">
+<span id="index-11"></span><span id="id10"></span><h2>24.11&nbsp;&nbsp;&nbsp;Linux HTB<a class="headerlink" href="#linux-htb" title="Permalink to this headline">¶</a></h2>
+<p>The Linux <strong>HTB</strong> queuing discipline, part of the Traffic Control (tc) system, allows the same general functionality of CBQ, but replaces the average-idle calculations with token-bucket filters. This permits more direct control of burst sizes, and also avoids some technical timing issues that CBQ users had to watch out for. For the sake of efficiency, HTB uses the deficit round-robin algorithm for fair queuing; as noted in <a class="reference internal" href="fairqueuing.html#quantum-algorithm"><span class="std std-ref">23.5.5&nbsp;&nbsp;&nbsp;Deficit Round Robin</span></a>, this means less precise control over packet delay.</p>
+<p>Although the HTB name comes from “hierarchical token bucket”, it is best viewed as primarily an implementation of hierarchical weighted fair queuing (<a class="reference internal" href="fairqueuing.html#hwfq"><span class="std std-ref">23.8&nbsp;&nbsp;&nbsp;Hierarchical Weighted Fair Queuing</span></a>). In fact, HTB doesn’t actually implement “hierarchical token bucket”; token buckets are for shaping, and HTB does shaping <em>only</em> at the leaf nodes of the hierarchy. The higher-level, or interior, nodes are present only to create the hierarchy for fair queuing.</p>
+<p>Each node in the tree has the following attributes:</p>
+<ul class="simple">
+<li>its guaranteed rate, r, corresponding to the token-bucket rate</li>
+<li>its burst allowance B, corresponding to the bucket size</li>
+<li>its ceiling rate r<sub>ceil</sub>; leaf nodes never send faster than this</li>
+</ul>
+<p>In many cases r<sub>ceil</sub> may simply be the output rate of the root node. For interior nodes, if the configured ceiling rate is less than the sum of the child rates, the child nodes can still send at their full rates; interior nodes cannot do rate-limiting. A low ceiling rate will, however, affect borrowing, below.</p>
+<p>The most important attribute of each node is its guaranteed rate. The requested rate at each node should be at least as large as the sum of the child rates. In the following diagram, all rates are in kbps; burst allowances are not shown. We will assume the root guaranteed rate, 600 kbps, is also its ceiling rate.</p>
+<img alt="_images/linux_htb.svg" src="_images/linux_htb.svg" /><p>Packets are marked <strong>green</strong>, <strong>yellow</strong> or <strong>red</strong> depending on their situation. Red packets are those that must wait; eventually they will turn yellow and then green.</p>
+<p>Packets are considered <strong>green</strong> if they are now compliant (perhaps after waiting earlier) for one of the leaf token-bucket nodes; green packets are sent as soon as possible.</p>
+<p>After L1, L2 and L3 have each emptied their buckets, they will not exhaust node N’s rate. Similarly, after N and M have emptied their buckets they will use only half of R’s rate. Nodes are allowed to “borrow” bandwidth – without payback – from their parent’s rates; packets benefiting from such borrowed bandwidth are marked <strong>yellow</strong>, and may also be sent immediately if no green packets are waiting. Borrowing is always in proportion to a node’s guaranteed rate, in the manner of fair queuing. That is, the guaranteed rates of the child nodes are treated as unnormalized fair-queuing weights; normalized weight fractions are obtained by dividing by their total. N above would have normalized weight fraction 200/(200+100) = 2/3.</p>
+<p>If L1, L2 and L3 engage in borrowing from N, and each has traffic to send, then each gets a total bandwidth of 50, 50 and 100 kbps, respectively. If L3 is idle, then L1 and L2 each would get 100 kbps. If N and M borrow in turn from R, they each can send at 400 and 200 kbps respectively, in which case L1, L2 and L3 (again assuming all are active) get 100, 100 and 200 kbps. If M elects not do do any borrowing, because it has nothing to send, then N will get 600 kbps and L1, L2 and L3 will get 150, 150 and 300.</p>
+<p>If fair-queuing behavior is not desired, we can set r<sub>ceil</sub> = r so that a node can never send faster than its guaranteed rate. This allows HTB to model the token-bucket-only hierarchy of <a class="reference internal" href="#hierarchical-token-bucket"><span class="std std-ref">24.9.1&nbsp;&nbsp;&nbsp;Hierarchical Token Bucket</span></a>.</p>
+<p>A working example of HTB, with one parent and two child nodes, is constructed in <a class="reference internal" href="mininet.html#tc"><span class="std std-ref">30.8&nbsp;&nbsp;&nbsp;Linux Traffic Control (tc)</span></a>.</p>
+</div>
+<div class="section" id="parekh-gallager-theorem">
+<span id="index-12"></span><span id="id11"></span><h2>24.12&nbsp;&nbsp;&nbsp;Parekh-Gallager Theorem<a class="headerlink" href="#parekh-gallager-theorem" title="Permalink to this headline">¶</a></h2>
+<p>As a final example relating token-bucket specifications and fair queuing, we present the Parekh-Gallager Theorem, which provides a precise queuing-delay bound on traffic that enters a network meeting a token-bucket specification TB(r,B) and which has a guaranteed weighted-fair-queuing fraction through each router along the path.</p>
+<p>Specifically, let us assume that the traffic travels from sender A to destination B through N routers R<sub>1</sub> … R<sub>N</sub>. The output rate of the ith router R<sub>i</sub> is r<sub>i</sub>, of which our flow is guaranteed rate f<sub>i</sub>≤r<sub>i</sub>. Let f = min {f<sub>i</sub>|i&lt;N}. Suppose the maximum packet size for packets in our flow is S, and the maximum packet size including competing traffic is S<sub>max</sub>. Then the total delay encountered by the flow’s packets is bounded by the sum of the following:</p>
+<ol class="arabic simple">
+<li>propagation delay (total single-bit delay along all N+1 links)</li>
+<li>B/f</li>
+<li>The sum from 1 to N of S/f<sub>i</sub></li>
+<li>The sum from 1 to N of S<sub>max</sub>/r<sub>i</sub></li>
+</ol>
+<p>The second term B/f represents the queuing delay introduced by a single burst of size B; we showed in <a class="reference internal" href="#token-bucket-through-multiple-routers"><span class="std std-ref">24.8&nbsp;&nbsp;&nbsp;Token Bucket Through Multiple Routers</span></a> that this delay bound applied regardless of the number of routers.</p>
+<p>The third term represents the total store-and-forward delay at each router for packets belonging to our flow under GPS; the delay at R<sub>i</sub> is S/f<sub>i</sub>.</p>
+<p>The final term represents the degree to which fair-queuing may delay a packet beyond the theoretical GPS time expressed in the third term. If the routers were to use GPS, then the first three terms above would bound the packet delay; we established in <a class="reference internal" href="fairqueuing.html#finishing-order-bound"><span class="std std-ref">23.5.4.7&nbsp;&nbsp;&nbsp;Finishing-Order Bound</span></a> that router R<sub>i</sub> may introduce an additional delay above and beyond the GPS delay of at most S<sub>max</sub>/r<sub>i</sub>.</p>
+<div class="section" id="epilog">
+<h3>24.12.1&nbsp;&nbsp;&nbsp;Epilog<a class="headerlink" href="#epilog" title="Permalink to this headline">¶</a></h3>
+<p>In the previous chapter we saw that if we want to use all the outbound bandwidth, but divide it among several senders, fair queuing was the way to go. But if we want to impose an absolute rather than a relative cap on traffic, token bucket is appropriate. Sometimes caps have business justifications: customers who want more bandwidth should pay more. But sometimes, as in <a class="reference internal" href="#voip-bandwidth"><span class="std std-ref">24.5&nbsp;&nbsp;&nbsp;Guaranteeing VoIP Bandwidth</span></a>, token buckets are beneficial even if we’re really not interested in caps; they work well on the downstream router where fair queuing does not.</p>
+<p>It is for real-time traffic, however, that queuing disciplines such as fair queuing, token bucket and even priority queuing come into their own as fundamental building blocks. These tools allow us to guarantee a bandwidth fraction to VoIP traffic, or to allow such traffic to be sent with minimal delay. In the next chapter <a class="reference internal" href="realtime.html#quality-of-service"><span class="std std-ref">25&nbsp;&nbsp;&nbsp;Quality of Service</span></a> we will encounter fair queuing and token-bucket specifications repeatedly.</p>
+</div>
+<div class="section" id="exercises">
+<h3>24.12.2&nbsp;&nbsp;&nbsp;Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h3>
+<p><em>Exercises may be given fractional (floating point) numbers, to allow for interpolation of new exercises.</em> Exercises marked with a ♢ have solutions or hints at <a class="reference internal" href="solutions.html#queuing-solutions"><span class="std std-ref">34.17&nbsp;&nbsp;&nbsp;Solutions for Queuing and Scheduling</span></a>.</p>
+<p>1.0. If two traffic streams meet token-bucket specifications of TB(r1,b1) and TB(r2,b2) respectively, show their commingled traffic must meet TB(r1+r2,b1+b2). Hint: imagine a common bucket of size b1+b2, filled at rate r1 with red tokens and at rate r2 with blue tokens.</p>
+<p>2.0. For each sequence of arrival times, indicate which packets are compliant for the given token-bucket specification. If a packet is noncompliant, go on to the next arrival without decrementing the bucket.</p>
+<div class="line-block">
+<div class="line">(a). TB(1/4,5):  0, 0, 0, 2, 3, 4, 5, 7, 9, 11, 15, 18</div>
+<div class="line">(b). TB(1/3,6):  0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9</div>
+<div class="line">(c). TB(1/3,6):  0, 2, 4, 6, 8, 10, 12, 14, 16, 18</div>
+</div>
+<p>3.0. Find the fastest sequence (see the end of <a class="reference internal" href="#multiple-token-bucket"><span class="std std-ref">24.3&nbsp;&nbsp;&nbsp;Multiple Token Buckets</span></a>) for the following flows. Both start at T=0, and all buckets are initially full.</p>
+<div class="line-block">
+<div class="line">(a). TB(1/4, 4); packets can depart at a minimum of 1 time unit apart. Continue the sequence to at least T=10</div>
+<div class="line">(b). TB(1/2, 4) and TB(1/8, 8); multiple packets can depart at the same instant. Continue to at least T=25.</div>
+</div>
+<p>4.0. Give the fastest sequence of packets compliant for all three of the following token-bucket specifications. Continue the sequence at least until T=60.</p>
+<ul class="simple">
+<li>TB(1/2, 1)</li>
+<li>TB(1/6, 4)</li>
+<li>TB(1/12, 8)</li>
+</ul>
+<p>Hint: the first specification means arrival times must always be separated by at least 2. The middle specification should kick in by T=12.</p>
+<p>5.0. Show that if a GPS traffic flow (<a class="reference internal" href="fairqueuing.html#gps"><span class="std std-ref">23.5.4&nbsp;&nbsp;&nbsp;The GPS Model</span></a>) satisfies a token-bucket specification TB(r,B), then in any interval of time t<sub>1</sub>≤t≤t<sub>2</sub> the amount of traffic is at most B + r×(t<sub>2</sub>−t<sub>1</sub>). Hint: during the interval t<sub>1</sub>≤t≤t<sub>2</sub> the amount of fluid added to the bucket is exactly r×(t<sub>2</sub>−t<sub>1</sub>).</p>
+<p>6.0. Show that the token-bucket leaf-storage hierarchy of <a class="reference internal" href="#hierarchical-token-bucket"><span class="std std-ref">24.9.1&nbsp;&nbsp;&nbsp;Hierarchical Token Bucket</span></a> produces the same result as an “internal-storage” hierarchy in which each intermediate token-bucket node contained a real, infinite-capacity FIFO queue, and each node instantaneously transmitted each packet to the parent’s FIFO queue as soon as it was released. Show that packets are transmitted by each hierarchy at the same times. Hint: show that each node in the leaf-storage hierarchy “releases” a packet at the same time the corresponding internal-storage hierarchy forwards the packet upwards.</p>
+<p>7.0. The following Linux htb hierarchies are labeled with their guaranteed rates. Is there any difference in terms of the bandwidth allocations that would be received by senders A and B?</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>   <span class="p">(</span><span class="n">a</span><span class="p">)</span>                                 <span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="n">R</span>                                   <span class="n">R</span>
+   <span class="mi">100</span>                                 <span class="mi">100</span>
+  <span class="o">/</span>   \                               <span class="o">/</span>   \
+ <span class="o">/</span>     \                             <span class="o">/</span>     \
+<span class="n">L1</span>     <span class="n">L2</span>                           <span class="n">L1</span>     <span class="n">L2</span>
+<span class="mi">60</span>     <span class="mi">40</span>                           <span class="mi">30</span>     <span class="mi">20</span>
+<span class="o">|</span>       <span class="o">|</span>                           <span class="o">|</span>       <span class="o">|</span>
+<span class="n">A</span>       <span class="n">B</span>                           <span class="n">A</span>       <span class="n">B</span>
+</pre></div>
+</div>
+<p>8.0. Suppose we know that the real-time traffic through a given router R uses at most 1 Mbps of the total 10 Mbps bandwidth. Consider the following two ways of giving the real-time traffic special treatment:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">i. Using priority queuing, and giving the real-time traffic higher priority.</div>
+<div class="line">ii. Using weighted fair queuing, and giving the real-time traffic a 10% share</div>
+</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line">(a). Show that, if the real-time traffic meets a token-bucket specification with rate 1 Mbps and negligible bucket size, then the two mechanisms are equivalent, in the sense that if the real-time and non-real-time traffic flows are sending at fractions 𝛼 and 𝛽, respectively, of the 10 Mbps outbound rate, with 𝛼+𝛽=1 (and with 𝛼≤10%), then the two methods above will actually send at the same rates.</div>
+<div class="line">(b). What differences can be expected if the bucket size is <em>not</em> negligible? Which approach will favor the real-time fraction?</div>
+</div>
+<p>9.0. In the previous exercise, now suppose we have <em>two</em> separate real-time flows, each guaranteed by a token-bucket specification not to exceed 1 Mbps. Is there a material difference between any pair of the following?</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">i. Sending the two real-time flows at priority 1, and the remaining traffic at priority 2.</div>
+<div class="line">ii. Sending the first real-time flow at priority 1, the second at priority 2, and the remaining traffic at priority 3.</div>
+<div class="line">iii. Giving each real-time flow a WFQ share of 10%, and the rest a WFQ share of 80%</div>
+</div>
+</div></blockquote>
+<p>10.0. Suppose a router uses priority queuing. There is one low-priority and one high-priority input. The outbound bandwidth is r.</p>
+<div class="line-block">
+<div class="line">(a). If the high-priority queue is currently empty, what is the maximum time that an arriving high-priority packet must wait?</div>
+</div>
+<div class="line-block">
+<div class="line">(b). If the high-priority traffic follows a token-bucket description TB(rp,B), with rp &lt; r, what is the maximum time an arriving high-priority packet must wait? Hint: use <a class="reference internal" href="#token-bucket-queue-utilization"><span class="std std-ref">24.6.1&nbsp;&nbsp;&nbsp;Token Bucket Queue Utilization</span></a>.</div>
+</div>
+<p>Your answer may include symbolic representations of any necessary additional parameters.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="realtime.html" title="25   Quality of Service"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fairqueuing.html" title="23   Queuing and Scheduling"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, desktop edition 2.0.11</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012-2022, Peter L Dordal.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

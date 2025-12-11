@@ -1,0 +1,949 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>8   Abstract Sliding Windows &#8212; An Introduction to Computer Networks, desktop edition 2.0.11</title>
+    <link rel="stylesheet" href="_static/csbnetbook.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script type="text/javascript" src="_static/mobile.js"></script>
+    <script type="text/javascript" src="_static/rightsidebar.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="9   IP version 4" href="ipv4.html" />
+    <link rel="prev" title="7   Packets" href="packets.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="ipv4.html" title="9   IP version 4"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="packets.html" title="7   Packets"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, desktop edition 2.0.11</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">8&nbsp;&nbsp;&nbsp;Abstract Sliding Windows</a><ul>
+<li><a class="reference internal" href="#building-reliable-transport-stop-and-wait">8.1&nbsp;&nbsp;&nbsp;Building Reliable Transport: Stop-and-Wait</a><ul>
+<li><a class="reference internal" href="#packet-loss">8.1.1&nbsp;&nbsp;&nbsp;Packet Loss</a></li>
+<li><a class="reference internal" href="#sorcerer-s-apprentice-bug">8.1.2&nbsp;&nbsp;&nbsp;Sorcerer’s Apprentice Bug</a></li>
+<li><a class="reference internal" href="#flow-control">8.1.3&nbsp;&nbsp;&nbsp;Flow Control</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sliding-windows">8.2&nbsp;&nbsp;&nbsp;Sliding Windows</a><ul>
+<li><a class="reference internal" href="#bandwidth-delay">8.2.1&nbsp;&nbsp;&nbsp;Bandwidth × Delay</a></li>
+<li><a class="reference internal" href="#the-receiver-side">8.2.2&nbsp;&nbsp;&nbsp;The Receiver Side</a></li>
+<li><a class="reference internal" href="#loss-recovery-under-sliding-windows">8.2.3&nbsp;&nbsp;&nbsp;Loss Recovery Under Sliding Windows</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#linear-bottlenecks">8.3&nbsp;&nbsp;&nbsp;Linear Bottlenecks</a><ul>
+<li><a class="reference internal" href="#simple-fixed-window-size-analysis">8.3.1&nbsp;&nbsp;&nbsp;Simple fixed-window-size analysis</a><ul>
+<li><a class="reference internal" href="#case-1-winsize-2">8.3.1.1&nbsp;&nbsp;&nbsp;Case 1: winsize = 2</a></li>
+<li><a class="reference internal" href="#case-2-winsize-4">8.3.1.2&nbsp;&nbsp;&nbsp;Case 2: winsize = 4</a></li>
+<li><a class="reference internal" href="#case-3-winsize-6">8.3.1.3&nbsp;&nbsp;&nbsp;Case 3: winsize = 6</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#rtt-calculations">8.3.2&nbsp;&nbsp;&nbsp;RTT Calculations</a></li>
+<li><a class="reference internal" href="#graphs-at-the-congestion-knee">8.3.3&nbsp;&nbsp;&nbsp;Graphs at the Congestion Knee</a></li>
+<li><a class="reference internal" href="#simple-packet-based-sliding-windows-implementation">8.3.4&nbsp;&nbsp;&nbsp;Simple Packet-Based Sliding-Windows Implementation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#epilog">8.4&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li><a class="reference internal" href="#exercises">8.5&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="packets.html"
+                        title="previous chapter">7&nbsp;&nbsp;&nbsp;Packets</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="ipv4.html"
+                        title="next chapter">9&nbsp;&nbsp;&nbsp;IP version 4</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="abstract-sliding-windows">
+<span id="id1"></span><h1>8&nbsp;&nbsp;&nbsp;Abstract Sliding Windows<a class="headerlink" href="#abstract-sliding-windows" title="Permalink to this headline">¶</a></h1>
+<p id="index-0">In this chapter we take a general look at how to build reliable data-transport layers on top of unreliable lower layers. This is achieved through a <strong>retransmit-on-timeout</strong> policy;  that is, if a packet is transmitted and there is no acknowledgment received during the timeout interval then the packet is resent. As a class, protocols where one side implements retransmit-on-timeout are known as <strong>ARQ</strong> protocols, for Automatic Repeat reQuest.</p>
+<p>In addition to reliability, we also want to keep as many packets in transit as the network can support. The strategy used to achieve this is known as <strong>sliding windows</strong>. It turns out that the sliding-windows algorithm is also the key to managing congestion; we return to this in <a class="reference internal" href="reno.html#congestion-avoidance"><span class="std std-ref">19&nbsp;&nbsp;&nbsp;TCP Reno and Congestion Management</span></a>.</p>
+<p>The <em>End-to-End</em> principle, <a class="reference internal" href="tcpA.html#end2end"><span class="std std-ref">17.1&nbsp;&nbsp;&nbsp;The End-to-End Principle</span></a>, suggests that trying to achieve a reliable transport layer by building reliability into a lower layer is a misguided approach; that is, implementing reliability at the endpoints of a connection – as is described here – is in fact the correct mechanism.</p>
+<div class="section" id="building-reliable-transport-stop-and-wait">
+<span id="stop-and-wait"></span><span id="index-1"></span><h2>8.1&nbsp;&nbsp;&nbsp;Building Reliable Transport: Stop-and-Wait<a class="headerlink" href="#building-reliable-transport-stop-and-wait" title="Permalink to this headline">¶</a></h2>
+<p id="index-2">Retransmit-on-timeout generally requires sequence numbering for the packets, though if a network path is guaranteed not to reorder packets then it is safe to allow the sequence numbers to wrap around surprisingly quickly (for stop-and-wait, a single-bit sequence number will work; see exercise 8.5). However, as the no-reordering hypothesis does not apply to the Internet at large, we will assume conventional numbering. Data[N] will be the Nth data packet, acknowledged by ACK[N].</p>
+<p>In the <strong>stop-and-wait</strong> version of retransmit-on-timeout, the sender sends only one outstanding packet at a time. If there is no response, the packet may be retransmitted, but the sender does not send Data[N+1] until it has received ACK[N]. Of course, the receiving side will not send ACK[N] until it has received Data[N]; <em>each</em> side has only one packet in play at a time. In the absence of packet loss, this leads to the following:</p>
+<img alt="_images/stopandwait.svg" src="_images/stopandwait.svg" /><div class="section" id="packet-loss">
+<span id="id2"></span><h3>8.1.1&nbsp;&nbsp;&nbsp;Packet Loss<a class="headerlink" href="#packet-loss" title="Permalink to this headline">¶</a></h3>
+<p>Lost packets, however, are a reality. The left half of the diagram below illustrates a lost Data packet, where the sender is the host sending Data and the Receiver is the host sending ACKs.
+The receiver is not aware of the loss; it sees Data[N] as simply slow to arrive.</p>
+<img alt="_images/data_ack_loss.svg" src="_images/data_ack_loss.svg" /><p id="index-3">The right half of the diagram, by comparison, illustrates the case of a lost ACK. The receiver has received a <em>duplicate</em> Data[N]. We have assumed here that the receiver has implemented a <strong>retransmit-on-duplicate</strong> strategy, and so its response upon receipt of the duplicate Data[N] is to retransmit ACK[N].</p>
+<p>As a final example, note that it is possible for ACK[N] to have been delayed (or, similarly, for the first Data[N] to have been delayed) longer than the timeout interval. Not every packet that times out is actually lost!</p>
+<img alt="_images/late_ack.svg" src="_images/late_ack.svg" /><p>In this case we see that, after sending Data[N], receiving a delayed ACK[N] (rather than the expected ACK[N+1]) <em>must be considered a normal event</em>.</p>
+<p>In principle, either side can implement retransmit-on-timeout if nothing is received. Either side can also implement retransmit-on-duplicate; this was done by the receiver in the second example above but <em>not</em> by the sender in the third example (the sender received a second ACK[N] but did not retransmit Data[N+1]).</p>
+<p>At least one side <em>must</em> implement retransmit-on-timeout; otherwise a lost packet leads to deadlock as the sender and the receiver both wait forever. The other side <em>must</em> implement at least one of retransmit-on-duplicate or retransmit-on-timeout; usually the former alone. If both sides implement retransmit-on-timeout with different timeout values, generally the protocol will still work.</p>
+</div>
+<div class="section" id="sorcerer-s-apprentice-bug">
+<span id="sorcerer-s-apprentice"></span><span id="index-4"></span><h3>8.1.2&nbsp;&nbsp;&nbsp;Sorcerer’s Apprentice Bug<a class="headerlink" href="#sorcerer-s-apprentice-bug" title="Permalink to this headline">¶</a></h3>
+<div class="sidebar">
+<p class="first sidebar-title">Sorcerer’s Apprentice</p>
+<p class="last">The Sorcerer’s Apprentice bug is named for the legend in which the apprentice casts a spell on a broom to carry water, one bucket at a time. When the basin is full, the apprentice chops the broom in half to stop it, only to find both halves still carrying water. An animated version of this appears in Disney’s _Fantasia_, set to the music of <a class="reference external" href="https://en.wikipedia.org/wiki/The_Sorcerer%27s_Apprentice_(Dukas)">Paul Dukas</a>. I used to post a YouTube link here to the video, but Disney has blocked it. It may still be findable online, though. Mickey Mouse chops the broom about five and a half minutes in from the start of the music.</p>
+</div>
+<p>A strange thing happens if one side implements retransmit-on-timeout but <em>both</em> sides implement retransmit-on-duplicate, as can happen if the implementer takes the naive view that retransmitting on duplicates is “safer”; the moral here is that too much redundancy can be the Wrong Thing. Let us imagine that an implementation uses this strategy (with the sender retransmitting on timeouts), and that the initial ACK[3] is delayed until after Data[3] is retransmitted on timeout. In the following diagram, the only packet retransmitted due to timeout is the second Data[3]; all the other duplications are due to the bilateral retransmit-on-duplicate strategy.</p>
+<img alt="_images/sorcerer.svg" src="_images/sorcerer.svg" /><p>All packets are sent <em>twice</em> from Data[3] on. The transfer completes normally, but takes double the normal bandwidth. The usual fix is to have one side (usually the sender) retransmit on timeout only. TCP does this; see <a class="reference internal" href="tcpB.html#tcp-rto"><span class="std std-ref">18.12&nbsp;&nbsp;&nbsp;TCP Timeout and Retransmission</span></a>. See also exercise 2.0.</p>
+</div>
+<div class="section" id="flow-control">
+<span id="sw-flow-control"></span><span id="index-5"></span><h3>8.1.3&nbsp;&nbsp;&nbsp;Flow Control<a class="headerlink" href="#flow-control" title="Permalink to this headline">¶</a></h3>
+<p>Stop-and-wait also provides a simple form of <strong>flow control</strong> to prevent data from arriving at the receiver faster than it can be handled. Assuming the time needed to process a received packet is less than one RTT, the stop-and-wait mechanism will prevent data from arriving too fast. If the processing time is slightly larger than RTT, all the receiver has to do is to wait to send ACK[N] until Data[N] has not only arrived but also been processed, and the receiver is <em>ready</em> for Data[N+1].</p>
+<p>For modest per-packet processing delays this works quite well, but if the processing delays are long it introduces a new problem: Data[N] may time out and be retransmitted even though it has successfully been received; the receiver cannot send an ACK until it has finished processing. One approach is to have <em>two</em> kinds of ACKs: ACK<sub>WAIT</sub>[N] meaning that Data[N] has arrived but the receiver is not yet ready for Data[N+1], and ACK<sub>GO</sub>[N] meaning that the sender may now send Data[N+1]. The receiver will send ACK<sub>WAIT</sub>[N] when Data[N] arrives, and ACK<sub>GO</sub>[N] when it is done processing it.</p>
+<p>Presumably we want the sender not to time out and retransmit Data[N] after ACK<sub>WAIT</sub>[N] is received, as a retransmission would be unnecessary. This introduces a new problem: if the subsequent ACK<sub>GO</sub>[N] is lost and neither side times out, the connection is deadlocked. The sender is waiting for ACK<sub>GO</sub>[N], which is lost, and the receiver is waiting for Data[N+1], which the sender will not send until the lost ACK<sub>GO</sub>[N] arrives. One solution is for the receiver to switch to a timeout model, perhaps until Data[N+1] is received.</p>
+<p>TCP has a fix to the flow-control problem involving sender-side polling; see <a class="reference internal" href="tcpB.html#tcp-flow-control"><span class="std std-ref">18.10&nbsp;&nbsp;&nbsp;TCP Flow Control</span></a>.</p>
+</div>
+</div>
+<div class="section" id="sliding-windows">
+<span id="index-6"></span><span id="id3"></span><h2>8.2&nbsp;&nbsp;&nbsp;Sliding Windows<a class="headerlink" href="#sliding-windows" title="Permalink to this headline">¶</a></h2>
+<p>Stop-and-wait is reliable but it is not very efficient (unless the path involves neither intermediate switches nor significant propagation delay; that is, the path involves a single LAN link). Most links along a multi-hop stop-and-wait path will be idle most of the time. During a file transfer, ideally we would like zero idleness (at least along the slowest link; see <a class="reference internal" href="#bottleneck1"><span class="std std-ref">8.3&nbsp;&nbsp;&nbsp;Linear Bottlenecks</span></a>).</p>
+<p>We can improve overall throughput by allowing the sender to continue to transmit, sending Data[N+1] (and beyond) <em>without</em> waiting for ACK[N]. We cannot, however, allow the sender get <em>too</em> far ahead of the returning ACKs. Packets sent too fast, as we shall see, simply end up waiting in queues, or, worse, dropped from queues. If the links of the network have sufficient bandwidth, packets may also be dropped at the receiving end.</p>
+<p id="index-7">Now that, say, Data[3] and Data[4] may be simultaneously in transit, we have to revisit what ACK[4] means: does it mean that the receiver has received only Data[4], or does it mean both Data[3] and Data[4] have arrived? We will assume the latter, that is, ACKs are <strong>cumulative</strong>: ACK[N] cannot be sent until Data[K] has arrived for all K≤N. With this understanding, if ACK[3] is lost then a later-arriving ACK[4] makes up for it; without it, if ACK[3] is lost the only recovery is to retransmit Data[3].</p>
+<p id="index-8">The sender picks a <strong>window size</strong>, winsize. The basic idea of sliding windows is that the sender is allowed to send this many packets before waiting for an ACK. More specifically, the sender keeps a state variable <strong>last_ACKed</strong>, representing the last packet for which it has received an ACK from the other end; if data packets are numbered starting from 1 then initially last_ACKed = 0.</p>
+<div class="sidebar">
+<p class="first sidebar-title">Window Size</p>
+<p class="last">In this chapter we will assume winsize does not change. TCP, however, varies winsize up and down with the goal of making it as large as possible without introducing congestion; we will return to this in <a class="reference internal" href="reno.html#congestion-avoidance"><span class="std std-ref">19&nbsp;&nbsp;&nbsp;TCP Reno and Congestion Management</span></a>.</p>
+</div>
+<p id="index-9">At any instant, the sender may send packets numbered last_ACKed + 1 through last_ACKed + winsize; this packet range is known as the <strong>window</strong>. Generally, if the first link in the path is not the slowest one, the sender will most of the time have sent all these.</p>
+<p>If ACK[N] arrives with N &gt; last_ACKed (typically N = last_ACKed+1), then the window <em>slides forward</em>; we set last_ACKed = N. This also increments the upper edge of the window, and frees the sender to send more packets. For example, with winsize = 4 and last_ACKed = 10, the window is [11,12,13,14]. If ACK[11] arrives, the window slides forward to [12,13,14,15], freeing the sender to send Data[15]. If instead ACK[13] arrives, then the window slides forward to [14,15,16,17] (recall that ACKs are cumulative), and three more packets become eligible to be sent. If there is no packet reordering and no packet losses (and every packet is ACKed individually) then the window will slide forward in units of one packet at a time; the next arriving ACK will always be ACK[last_ACKed+1].</p>
+<p id="index-10">Note that the rate at which ACKs are returned will always be exactly equal to the rate at which the slowest link is delivering packets. That is, if the slowest link (the “bottleneck” link) is delivering a packet every 50 ms, then the receiver will receive those packets every 50 ms and the ACKs will return at a rate of one every 50 ms. Thus, new packets will be sent at an average rate exactly matching the delivery rate; this is the sliding-windows <strong>self-clocking</strong> property. Self-clocking has the effect of reducing congestion by automatically reducing the sender’s <em>rate</em> whenever the available fraction of the bottleneck bandwidth is reduced.</p>
+<p>Below is a video of sliding windows in action, with winsize = 5. (<a class="reference external" href="https://vimeo.com/150452468">A link is here</a>, if the embedded video does not display properly, which will certainly be the case with non-html formats.) The nodes are labeled 0, 1 and 2. The second link, 1–2, has a capacity of five packets in transit either way, so one “flight” (windowful) of five packets can exactly fill this link. The 0–1 link has a capacity of one packet in transit either way. The video was prepared using the network animator, “nam”, described further in <a class="reference internal" href="ns2.html#simulations"><span class="std std-ref">31&nbsp;&nbsp;&nbsp;Network Simulations: ns-2</span></a>.</p>
+<iframe src="https://player.vimeo.com/video/150452468" width="500" height="256" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe> <p><a href="https://vimeo.com/150452468">sliding windows, with fixed window size of 5</a>.</p><p>The first flight of five data packets leaves node 0 just after T=0, and leaves node 1 at around T=1 (in video time). Subsequent flights are spaced about seven seconds apart. The tiny packets moving leftwards from node 2 to node 0 represent ACKs; at the very beginning of the video one can see five returning ACKs from the previous windowful. At any moment (except those instants where packets have just been received) there are in principle five packets in transit, either being transmitted on a link as data, or being transmitted as an ACK, or sitting in a queue (this last does not happen in this video). Due to occasional video artifacts, in some frames not all the ACK packets are visible.</p>
+<div class="section" id="bandwidth-delay">
+<span id="bandwidthxdelay2"></span><span id="index-11"></span><h3>8.2.1&nbsp;&nbsp;&nbsp;Bandwidth × Delay<a class="headerlink" href="#bandwidth-delay" title="Permalink to this headline">¶</a></h3>
+<p>As indicated previously (<a class="reference internal" href="packets.html#packet-delay"><span class="std std-ref">7.1&nbsp;&nbsp;&nbsp;Packet Delay</span></a>), the bandwidth × RTT product represents the amount of data that can be sent before the first response is received. It plays a large role in the analysis of transport protocols. In the literature the bandwidth×delay product is often abbreviated BDP.</p>
+<p>The bandwidth × RTT product is generally the optimum value for the window size. There is, however, one catch: if a sender chooses winsize larger than this, then the RTT simply grows – due to queuing delays – to the point that bandwidth × RTT matches the chosen winsize. That is, a connection’s own traffic can inflate RTT<sub>actual</sub> to well above RTT<sub>noLoad</sub>; see <a class="reference internal" href="#case-3-winsize-6"><span class="std std-ref">8.3.1.3&nbsp;&nbsp;&nbsp;Case 3: winsize = 6</span></a> below for an example. For this reason, a sender is often more interested in bandwidth × RTT<sub>noLoad</sub>, or, at the very least, the RTT before the sender’s own packets had begun contributing to congestion.</p>
+<p id="index-12">We will sometimes refer to the bandwidth × RTT<sub>noLoad</sub> product as the <strong>transit capacity</strong> of the route. As will become clearer below, a winsize smaller than this means underutilization of the network, while a larger winsize means each packet spends time waiting in a queue somewhere.</p>
+<p>Below are simplified diagrams for sliding windows with window sizes of 1, 4 and 6, each with a path bandwidth of 6 packets/RTT (so bandwidth × RTT = 6 packets). The diagram shows the initial packets sent as a burst; these then would be spread out as they pass through the bottleneck link so that, after the first burst, packet spacing is uniform. (Real sliding-windows protocols such as TCP generally attempt to avoid such initial bursts.)</p>
+<img alt="_images/sliding_windows.svg" src="_images/sliding_windows.svg" /><p>With winsize=1 we send 1 packet per RTT; with winsize=4 we always <em>average</em> 4 packets per RTT. To put this another way, the three window sizes lead to bottle-neck link utilizations of 1/6, 4/6 and 6/6 = 100%, respectively.</p>
+<p>While it is tempting to envision setting winsize to bandwidth × RTT, in practice this can be complicated; neither bandwidth nor RTT is constant. Available bandwidth can fluctuate in the presence of competing traffic. As for RTT, if a sender sets winsize too large then the RTT is simply inflated to the point that bandwidth × RTT matches winsize; that is, a connection’s own traffic can inflate RTT<sub>actual</sub> to well above RTT<sub>noLoad</sub>. This happens even in the absence of competing traffic.</p>
+</div>
+<div class="section" id="the-receiver-side">
+<h3>8.2.2&nbsp;&nbsp;&nbsp;The Receiver Side<a class="headerlink" href="#the-receiver-side" title="Permalink to this headline">¶</a></h3>
+<p>Perhaps surprisingly, sliding windows can work pretty well with the receiver assuming that winsize=1, even if the sender is in fact using a much larger value. Each of the receivers in the diagrams above receives Data[N] and responds with ACK[N]; the only difference with the larger <em>sender</em> winsize is that the Data[N] arrive faster.</p>
+<p>If we are using the sliding-windows algorithm over single links, we may assume packets are never reordered, and a receiver winsize of 1 works quite well. Once switches are introduced, however, life becomes more complicated (though some links may do <em>link-level</em> sliding-windows for per-link throughput optimization).</p>
+<p>If packet reordering is a possibility, it is common for the receiver to use the same winsize as the sender. This means that the receiver must be prepared to buffer a full window full of packets. If the window is [11,12,13,14,15,16], for example, and Data[11] is delayed, then the receiver may have to buffer Data[12] through Data[16].</p>
+<p>Like the sender, the receiver will also maintain the state variable last_ACKed, though it will not be completely synchronized with the sender’s version. At any instant, the receiver is willing to accept Data[last_ACKed+1] through Data[last_ACKed+winsize]. For any but the first of these, the receiver must buffer the arriving packet. If Data[last_ACKed+1] arrives, then the receiver should consult its buffers and send back the largest cumulative ACK it can for the data received; for example, if the window is [11-16] and Data[12], Data[13] and Data[15] are in the buffers, then on arrival of Data[11] the correct response is ACK[13]. Data[11] fills the “gap”, and the receiver has now received everything up through Data[13]. The new receive window is [14-19], and as soon as the ACK[13] reaches the sender that will be the new send window as well.</p>
+</div>
+<div class="section" id="loss-recovery-under-sliding-windows">
+<span id="index-13"></span><h3>8.2.3&nbsp;&nbsp;&nbsp;Loss Recovery Under Sliding Windows<a class="headerlink" href="#loss-recovery-under-sliding-windows" title="Permalink to this headline">¶</a></h3>
+<p>Suppose winsize = 4 and packet 5 is lost. It is quite possible that packets 6, 7, and 8 may have been received. However, the only (cumulative) acknowledgment that can be sent back is ACK[4]; the sender does not know how much of the windowful made it through. Because of the possibility that <em>only</em> Data[5] (or more generally Data[last_ACKed+1]) is lost, and because losses are usually associated with congestion, when we most especially do <em>not</em> wish to overburden the network, the sender will usually retransmit only the first lost packet, <em>eg</em> packet 5. If packets 6, 7, and 8 were also lost, then after retransmission of Data[5] the sender will receive ACK[5], and can assume that Data[6] now needs to be sent. However, if packets 6-8 did make it through, then after retransmission the sender will receive back ACK[8], and so will know 6-8 do not need retransmission and that the next packet to send is Data[9].</p>
+<p>Normally Data[6] through Data[8] would time out shortly after Data[5] times out. After the first timeout, however, sliding windows protocols generally suppress further timeout/retransmission responses until recovery is more-or-less complete.</p>
+<p id="index-14">Once a full timeout has occurred, usually the sliding-windows process itself has ground to a halt, in that there are usually no packets remaining in flight. This is sometimes described as <strong>pipeline drain</strong>. After recovery, the sliding-windows process will have to start up again. Most implementations of TCP, as we shall see later, implement a mechanism (“fast recovery”) for early detection of packet loss, before the pipeline has fully drained.</p>
+</div>
+</div>
+<div class="section" id="linear-bottlenecks">
+<span id="bottleneck1"></span><span id="index-15"></span><h2>8.3&nbsp;&nbsp;&nbsp;Linear Bottlenecks<a class="headerlink" href="#linear-bottlenecks" title="Permalink to this headline">¶</a></h2>
+<p id="index-16">Consider the simple network path shown below, with bandwidths shown in packets/ms. The minimum bandwidth, or <strong>path bandwidth</strong>, is 3 packets/ms.</p>
+<img alt="_images/linear_bottleneck1.svg" src="_images/linear_bottleneck1.svg" /><p>The slow links are R2–R3 and R3–R4. We will refer to the slowest link as the <strong>bottleneck</strong> link; if there are (as here) ties for the slowest link, then the first such link is the bottleneck. The bottleneck link is where the queue will form. If traffic is sent at a rate of 4 packets/ms from A to B, it will pile up in an ever-increasing queue at R2. Traffic will <em>not</em> pile up at R3; it arrives at R3 at the same rate by which it departs.</p>
+<p>Furthermore, if sliding windows is used (rather than a fixed-<em>rate</em> sender), traffic will eventually not queue up at any router other than R2: data cannot reach B faster than the 3 packets/ms rate, and so B will not return ACKs faster than this rate, and so A will eventually not <em>send</em> data faster than this rate. At this 3 packets/ms rate, traffic will not pile up at R1 (or R3 or R4).</p>
+<p>There is a significant advantage in speaking in terms of winsize rather than transmission <em>rate</em>. If A sends to B at any rate greater than 3 packets/ms, then the situation is unstable as the bottleneck queue grows without bound and there is no convergence to a steady state. There is no analogous instability, however, if A uses sliding windows, even if the winsize chosen is quite large (although a large-enough winsize will overflow the bottleneck queue).
+If a sender specifies a sending window size rather than a rate, then the network will converge to a steady state in relatively short order; if a queue develops it will be steadily replenished at the same rate that packets depart, and so will be of fixed size.</p>
+<div class="section" id="simple-fixed-window-size-analysis">
+<span id="fixed-window-size"></span><h3>8.3.1&nbsp;&nbsp;&nbsp;Simple fixed-window-size analysis<a class="headerlink" href="#simple-fixed-window-size-analysis" title="Permalink to this headline">¶</a></h3>
+<p>We will analyze the effect of window size on overall throughput and on RTT. Consider the following network path, with bandwidths now labeled in packets/<strong>second</strong>.</p>
+<img alt="_images/linear_bottleneck2.svg" src="_images/linear_bottleneck2.svg" /><p>We will assume that in the backward B⟶A direction, all connections are infinitely fast, meaning zero delay; this is often a good approximation because ACK packets are what travel in that direction and they are negligibly small. In the A⟶B direction, we will assume that the A⟶R1 link is infinitely fast, but the other four each have a bandwidth of 1 packet/second (and no propagation-delay component). This makes the R1⟶R2 link the <strong>bottleneck link</strong>; any queue will now form at R1. The “path bandwidth” is 1 packet/second, and the RTT is 4 seconds.</p>
+<p>As a roughly equivalent alternative example, we might use the following:</p>
+<img alt="_images/linear_bottleneck3.svg" src="_images/linear_bottleneck3.svg" /><p>with the following assumptions: the C–S1 link is infinitely fast (zero delay), S1⟶S2 and S2⟶D each take 1.0 sec bandwidth delay (so two packets take 2.0 sec, per link, etc), and ACKs also have a 1.0 sec bandwidth delay in the reverse direction.</p>
+<p>In both scenarios, if we send one packet, it takes 4.0 seconds for the ACK to return, on an idle network. This means that the no-load delay, RTT<sub>noLoad</sub>, is 4.0 seconds.</p>
+<p>(These models will change significantly if we replace the 1 packet/sec bandwidth delay with a 1-second <em>propagation</em> delay; in the former case, 2 packets take 2 seconds, while in the latter, 2 packets take 1 second. See exercise 6.0.)</p>
+<p>We assume a single connection is made; <em>ie</em> there is no competition.
+Bandwidth × delay here is 4 packets (1 packet/sec × 4 sec RTT)</p>
+<div class="section" id="case-1-winsize-2">
+<h4>8.3.1.1&nbsp;&nbsp;&nbsp;Case 1: winsize = 2<a class="headerlink" href="#case-1-winsize-2" title="Permalink to this headline">¶</a></h4>
+<p>In this case winsize &lt; bandwidth×delay (where delay = RTT).
+The table below shows what is sent by A and each of R1-R4 for each second.
+Every packet is acknowledged 4 seconds after it is sent; that is, RTT<sub>actual</sub> = 4 sec, equal to RTT<sub>noLoad</sub>; this will remain true as the winsize changes by small amounts (<em>eg</em> to 1 or 3).
+Throughput is proportional to winsize:
+when winsize = 2, throughput is 2 packets in 4 seconds, or 2/4 = 1/2 packet/sec.
+During each second, two of the routers R1-R4 are idle.
+The overall path will have less than 100% utilization.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="12%" />
+<col width="16%" />
+<col width="14%" />
+<col width="14%" />
+<col width="14%" />
+<col width="14%" />
+<col width="10%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Time</th>
+<th class="head">A</th>
+<th class="head">R1</th>
+<th class="head">R1</th>
+<th class="head">R2</th>
+<th class="head">R3</th>
+<th class="head">R4</th>
+<th class="head">B</th>
+</tr>
+<tr class="row-even"><th class="head">T</th>
+<th class="head">sends</th>
+<th class="head">queues</th>
+<th class="head">sends</th>
+<th class="head">sends</th>
+<th class="head">sends</th>
+<th class="head">sends</th>
+<th class="head">ACKs</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-odd"><td>0</td>
+<td>1,2</td>
+<td>2</td>
+<td>1</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td>1</td>
+<td></td>
+<td></td>
+<td>2</td>
+<td>1</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td></td>
+<td></td>
+<td></td>
+<td>2</td>
+<td>1</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>3</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>2</td>
+<td>1</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>4</td>
+<td>3</td>
+<td></td>
+<td>3</td>
+<td></td>
+<td></td>
+<td>2</td>
+<td>1</td>
+</tr>
+<tr class="row-even"><td>5</td>
+<td>4</td>
+<td></td>
+<td>4</td>
+<td>3</td>
+<td></td>
+<td></td>
+<td>2</td>
+</tr>
+<tr class="row-odd"><td>6</td>
+<td></td>
+<td></td>
+<td></td>
+<td>4</td>
+<td>3</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>7</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>4</td>
+<td>3</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>8</td>
+<td>5</td>
+<td></td>
+<td>5</td>
+<td></td>
+<td></td>
+<td>4</td>
+<td>3</td>
+</tr>
+<tr class="row-even"><td>9</td>
+<td>6</td>
+<td></td>
+<td>6</td>
+<td>5</td>
+<td></td>
+<td></td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<p>Note the brief pile-up at R1 (the bottleneck link!) on startup.
+However, in the steady state, there is no queuing. Real sliding-windows protocols generally have some way of
+minimizing this “initial pileup”.</p>
+</div>
+<div class="section" id="case-2-winsize-4">
+<h4>8.3.1.2&nbsp;&nbsp;&nbsp;Case 2: winsize = 4<a class="headerlink" href="#case-2-winsize-4" title="Permalink to this headline">¶</a></h4>
+<p>When winsize=4, at each second all four slow links are busy.
+There is again an initial burst leading to a brief surge in the queue; RTT<sub>actual</sub> for Data[4] is 7 seconds. However,  RTT<sub>actual</sub> for every subsequent packet is 4 seconds, and there are no queuing delays (and nothing in the queue) after T=2.
+The steady-state connection throughput is 4 packets in 4 seconds, <em>ie</em> 1 packet/second.
+Note that overall path throughput now equals the bottleneck-link bandwidth, so this is the best
+possible throughput.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="12%" />
+<col width="16%" />
+<col width="14%" />
+<col width="14%" />
+<col width="14%" />
+<col width="14%" />
+<col width="10%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">T</th>
+<th class="head">A sends</th>
+<th class="head">R1 queues</th>
+<th class="head">R1 sends</th>
+<th class="head">R2 sends</th>
+<th class="head">R3 sends</th>
+<th class="head">R4 sends</th>
+<th class="head">B ACKs</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>1,2,3,4</td>
+<td>2,3,4</td>
+<td>1</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td></td>
+<td>3,4</td>
+<td>2</td>
+<td>1</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>2</td>
+<td></td>
+<td>4</td>
+<td>3</td>
+<td>2</td>
+<td>1</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td></td>
+<td></td>
+<td>4</td>
+<td>3</td>
+<td>2</td>
+<td>1</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>4</td>
+<td>5</td>
+<td></td>
+<td>5</td>
+<td>4</td>
+<td>3</td>
+<td>2</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td>5</td>
+<td>6</td>
+<td></td>
+<td>6</td>
+<td>5</td>
+<td>4</td>
+<td>3</td>
+<td>2</td>
+</tr>
+<tr class="row-even"><td>6</td>
+<td>7</td>
+<td></td>
+<td>7</td>
+<td>6</td>
+<td>5</td>
+<td>4</td>
+<td>3</td>
+</tr>
+<tr class="row-odd"><td>7</td>
+<td>8</td>
+<td></td>
+<td>8</td>
+<td>7</td>
+<td>6</td>
+<td>5</td>
+<td>4</td>
+</tr>
+<tr class="row-even"><td>8</td>
+<td>9</td>
+<td></td>
+<td>9</td>
+<td>8</td>
+<td>7</td>
+<td>6</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+<p>At T=4, R1 has just finished sending Data[4] as Data[5] arrives from A; R1 can begin sending
+packet 5 immediately. No queue will develop.</p>
+<p>Case 2 is the “congestion knee” of Chiu and Jain <a class="reference internal" href="bibliography.html#cj89" id="id4">[CJ89]</a>, defined here in <a class="reference internal" href="intro.html#congestion"><span class="std std-ref">1.7&nbsp;&nbsp;&nbsp;Congestion</span></a>.</p>
+</div>
+<div class="section" id="case-3-winsize-6">
+<span id="id5"></span><h4>8.3.1.3&nbsp;&nbsp;&nbsp;Case 3: winsize = 6<a class="headerlink" href="#case-3-winsize-6" title="Permalink to this headline">¶</a></h4>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="18%" />
+<col width="15%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+<col width="10%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">T</th>
+<th class="head">A sends</th>
+<th class="head">R1 queues</th>
+<th class="head">R1 sends</th>
+<th class="head">R2 sends</th>
+<th class="head">R3 sends</th>
+<th class="head">R4 sends</th>
+<th class="head">B ACKs</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>1,2,3,4,5,6</td>
+<td>2,3,4,5,6</td>
+<td>1</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td></td>
+<td>3,4,5,6</td>
+<td>2</td>
+<td>1</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>2</td>
+<td></td>
+<td>4,5,6</td>
+<td>3</td>
+<td>2</td>
+<td>1</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td></td>
+<td>5,6</td>
+<td>4</td>
+<td>3</td>
+<td>2</td>
+<td>1</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>4</td>
+<td>7</td>
+<td>6,7</td>
+<td>5</td>
+<td>4</td>
+<td>3</td>
+<td>2</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td>5</td>
+<td>8</td>
+<td>7,8</td>
+<td>6</td>
+<td>5</td>
+<td>4</td>
+<td>3</td>
+<td>2</td>
+</tr>
+<tr class="row-even"><td>6</td>
+<td>9</td>
+<td>8,9</td>
+<td>7</td>
+<td>6</td>
+<td>5</td>
+<td>4</td>
+<td>3</td>
+</tr>
+<tr class="row-odd"><td>7</td>
+<td>10</td>
+<td>9,10</td>
+<td>8</td>
+<td>7</td>
+<td>6</td>
+<td>5</td>
+<td>4</td>
+</tr>
+<tr class="row-even"><td>8</td>
+<td>11</td>
+<td>10,11</td>
+<td>9</td>
+<td>8</td>
+<td>7</td>
+<td>6</td>
+<td>5</td>
+</tr>
+<tr class="row-odd"><td>9</td>
+<td>12</td>
+<td>11,12</td>
+<td>10</td>
+<td>9</td>
+<td>8</td>
+<td>7</td>
+<td>6</td>
+</tr>
+<tr class="row-even"><td>10</td>
+<td>13</td>
+<td>12,13</td>
+<td>11</td>
+<td>10</td>
+<td>9</td>
+<td>8</td>
+<td>7</td>
+</tr>
+</tbody>
+</table>
+<p>Note that packet 7 is sent at T=4 and the acknowledgment is received
+at T=10, for an RTT of 6.0 seconds. All later packets have the same RTT<sub>actual</sub>.
+That is, the RTT has risen from RTT<sub>noLoad</sub> = 4 seconds to 6 seconds.
+<em>Note that we continue to send one windowful each RTT</em>; that is, the throughput is still winsize/RTT, but RTT is now 6 seconds.</p>
+<p id="index-17">One might initially conjecture that if winsize is greater than the bandwidth×RTT<sub>noLoad</sub> product, then the entire window cannot be in transit at one time. In fact this is not the case; the sender <em>does</em> usually have the entire window sent and in transit, but <strong>RTT has been inflated</strong> so it appears to the sender that winsize <em>equals</em> the bandwidth×RTT product.</p>
+<p>In general, whenever winsize &gt; bandwidth×RTT<sub>noLoad</sub>,
+what happens is that the extra packets pile up at a router somewhere along the path (specifically, at the router in front of the bottleneck link).
+RTT<sub>actual</sub> is inflated by queuing delay to winsize/bandwidth, where bandwidth is that of the bottleneck link; this means winsize = bandwidth×RTT<sub>actual</sub>. Total throughput is equal to that bandwidth. Of the 6 seconds of RTT<sub>actual</sub> in the example here, a packet spends 4 of those seconds being transmitted on one link or another because RTT<sub>noLoad</sub>=4. The other two seconds, therefore, must be spent in a queue; there is no other place for packets wait. Looking at the table, we see that each second there are indeed two packets in the queue at R1.</p>
+<p>If the bottleneck link is the very first link, packets may begin returning before the sender has sent the entire windowful. In this case we may argue that the full windowful has at least been queued by the sender, and thus has in this sense been “sent”. Suppose the network, for example, is</p>
+<img alt="_images/linear_bottleneck4.svg" src="_images/linear_bottleneck4.svg" /><p>where, as before, each link transports 1 packet/sec from A to B and is infinitely fast in the reverse direction. Then, if A sets winsize = 6, a queue of 2 packets will form at A.</p>
+</div>
+</div>
+<div class="section" id="rtt-calculations">
+<span id="id6"></span><h3>8.3.2&nbsp;&nbsp;&nbsp;RTT Calculations<a class="headerlink" href="#rtt-calculations" title="Permalink to this headline">¶</a></h3>
+<p>We can make some quantitative observations of sliding windows behavior, and about queue utilization. First, we note that RTT<sub>noLoad</sub> is the physical “travel” time (subject to the limitations addressed in <a class="reference internal" href="packets.html#delay-variability"><span class="std std-ref">7.2&nbsp;&nbsp;&nbsp;Packet Delay Variability</span></a>); any time in excess of RTT<sub>noLoad</sub> is spent waiting in a queue somewhere. Therefore, the following holds regardless of competing traffic, and even for individual packets:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>queue_time = RTT<sub>actual</sub> − RTT<sub>noLoad</sub></li>
+</ol>
+</div></blockquote>
+<p>When the bottleneck link is saturated, that is, is always busy, the number of packets actually in transit (not queued) somewhere along the path will always be bandwidth × RTT<sub>noLoad</sub>.</p>
+<p>Second, we always send exactly one windowful per actual RTT, assuming no losses and each packet is individually acknowledged. This is perhaps best understood by examining the diagrams above, but here is a simple non-visual argument: if we send Data[N] at time T<sub>D</sub>, and ACK[N] arrives at time T<sub>A</sub>, then RTT = T<sub>A</sub> − T<sub>D</sub>, by definition. At time T<sub>A</sub> the sender is allowed to send Data[N+winsize], so during the RTT interval T<sub>D</sub> ≤ T &lt; T<sub>A</sub> the sender must have sent Data[N] through Data[N+winsize-1]; that is, winsize many packets in time RTT. Therefore (whether or not there is competing traffic) we always have</p>
+<blockquote>
+<div><ol class="arabic simple" start="2">
+<li>throughput = winsize/RTT<sub>actual</sub></li>
+</ol>
+</div></blockquote>
+<p>where “throughput” is the rate at which the connection is sending packets.</p>
+<p>This relationship holds even if winsize or the bottleneck bandwidth changes suddenly, though in that case RTT<sub>actual</sub> might change from one packet to the next, and the throughput here must be seen as a measurement averaged over the RTT of one specific packet. If the sender doubles its winsize, those extra packets will immediately end up in a queue somewhere (perhaps a queue at the sender itself, though this is why in examples it is often clearer if the first link has infinite bandwidth so as to prevent this). If the bottleneck bandwidth is cut in half without changing winsize, eventually the RTT must rise due to queuing. See exercise 17.0.</p>
+<p>In the sliding windows <em>steady state</em>, where throughput and RTT<sub>actual</sub> are reasonably constant, the average number of packets in the queue is just throughput×queue_time (where throughput is measured in packets/sec):</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">3. queue_usage = throughput × (RTT<sub>actual</sub> − RTT<sub>noLoad</sub>)</div>
+<div class="line">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; = winsize × (1 − RTT<sub>noLoad</sub>/RTT<sub>actual</sub>)</div>
+</div>
+</div></blockquote>
+<p>To give a little more detail making the averaging perhaps clearer, each packet spends time (RTT<sub>actual</sub> − RTT<sub>noLoad</sub>) in the queue, from equation 1 above. The total time spent by a windowful of packets is winsize × (RTT<sub>actual</sub> − RTT<sub>noLoad</sub>), and dividing this by RTT<sub>actual</sub> thus gives the average number of packets in the queue over the RTT interval in question.</p>
+<p>In the presence of competing traffic, the throughput referred to above is simply the connection’s current share of the total bandwidth. It is the value we get if we measure the rate of returning ACKs.
+If there is <em>no</em> competing traffic and winsize is below the congestion knee – winsize &lt; bandwidth × RTT<sub>noLoad</sub> – then winsize is the limiting factor in throughput. Finally, if there is no competition and winsize ≥ bandwidth × RTT<sub>noLoad</sub> then the connection is using 100% of the capacity of the bottleneck link and throughput is equal to the bottleneck-link physical bandwidth. To put this another way,</p>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li>RTT<sub>actual</sub> = winsize/bottleneck_bandwidth</li>
+</ol>
+<blockquote>
+<div>queue_usage = winsize − bandwidth × RTT<sub>noLoad</sub></div></blockquote>
+</div></blockquote>
+<p>Dividing the first equation by RTT<sub>noLoad</sub>, and noting that bandwidth × RTT<sub>noLoad</sub> = winsize - queue_usage = transit_capacity, we get</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">5. RTT<sub>actual</sub>/RTT<sub>noLoad</sub> = winsize/transit_capacity</div>
+<div class="line-block">
+<div class="line">= (transit_capacity + queue_usage) / transit_capacity</div>
+</div>
+</div>
+</div></blockquote>
+<p>Regardless of the value of winsize, in the steady state the sender never sends faster than the bottleneck bandwidth. This is because the bottleneck bandwidth determines the rate of packets arriving at the far end, which in turn determines the rate of ACKs arriving back at the sender, which in turn determines the continued sending rate. This illustrates the self-clocking nature of sliding windows.</p>
+<p>We will return in <a class="reference internal" href="dynamicsA.html#dynamics-of-tcp"><span class="std std-ref">20&nbsp;&nbsp;&nbsp;Dynamics of TCP</span></a> to the issue of bandwidth in the presence of competing traffic.
+For now, suppose a sliding-windows sender has winsize &gt; bandwidth × RTT<sub>noLoad</sub>, leading as above to a fixed amount of queue usage, and no competition. Then another connection starts up and competes for the bottleneck link. The first connection’s <em>effective</em> bandwidth will thus decrease. This means that bandwidth × RTT<sub>noLoad</sub> will decrease, and hence the connection’s queue usage will increase.</p>
+</div>
+<div class="section" id="graphs-at-the-congestion-knee">
+<span id="id7"></span><h3>8.3.3&nbsp;&nbsp;&nbsp;Graphs at the Congestion Knee<a class="headerlink" href="#graphs-at-the-congestion-knee" title="Permalink to this headline">¶</a></h3>
+<p>Consider the following graphs of winsize versus</p>
+<ol class="arabic simple">
+<li>throughput</li>
+<li>delay</li>
+<li>queue utilization</li>
+</ol>
+<img alt="_images/winsize_knee.svg" src="_images/winsize_knee.svg" /><p>The critical winsize value is equal to bandwidth × RTT<sub>noLoad</sub>; this is known as the congestion <strong>knee</strong>. For winsize below this, we have:</p>
+<ul class="simple">
+<li>throughput is proportional to winsize</li>
+<li>delay is constant</li>
+<li>queue utilization in the steady state is zero</li>
+</ul>
+<p>For winsize larger than the knee, we have</p>
+<ul class="simple">
+<li>throughput is constant (equal to the bottleneck bandwidth)</li>
+<li>delay increases linearly with winsize</li>
+<li>queue utilization increases linearly with winsize</li>
+</ul>
+<p>Ideally, winsize will be at the critical knee. However, the exact value varies with time: available bandwidth changes due to the starting and stopping of competing traffic, and RTT changes due to queuing. Standard TCP makes an effort to stay well <em>above</em> the knee much of the time, presumably on the theory that maximizing throughput is more important than minimizing queue use.</p>
+<p>The <strong>power</strong> of a connection is defined to be throughput/RTT. For sliding windows below the knee, RTT is constant and power is proportional to the window size. For sliding windows above the knee, throughput is constant and delay is proportional to winsize; power is thus proportional to 1/winsize. Here is a graph, akin to those above, of winsize versus power:</p>
+<img alt="_images/winsize_power.svg" src="_images/winsize_power.svg" /></div>
+<div class="section" id="simple-packet-based-sliding-windows-implementation">
+<span id="sliding-windows-implementation"></span><h3>8.3.4&nbsp;&nbsp;&nbsp;Simple Packet-Based Sliding-Windows Implementation<a class="headerlink" href="#simple-packet-based-sliding-windows-implementation" title="Permalink to this headline">¶</a></h3>
+<p>Here is a pseudocode outline of the receiver side of a sliding-windows implementation, ignoring lost packets and timeouts. We abbreviate as follows:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">W:   winsize</div>
+<div class="line">LA:  last_ACKed</div>
+</div>
+</div></blockquote>
+<p>Thus, the next packet expected is LA+1 and the window is [LA+1, …, LA+W]. We have a data structure EarlyArrivals in which we can place packets that cannot yet be delivered to the receiving application.</p>
+<p>Upon arrival of Data[M]:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">if M≤LA or M&gt;LA+W, ignore the packet</div>
+<div class="line">if M&gt;LA+1, put the packet into EarlyArrivals.</div>
+<div class="line">if M==LA+1:</div>
+<div class="line-block">
+<div class="line">deliver the packet (that is, Data[LA+1]) to the application</div>
+<div class="line">LA = LA+1 (slide window forward by 1)</div>
+<div class="line">while (Data[LA+1] is in EarlyArrivals) {</div>
+<div class="line-block">
+<div class="line">output Data[LA+1]</div>
+<div class="line">LA = LA+1</div>
+</div>
+<div class="line">}</div>
+<div class="line">send ACK[LA]</div>
+</div>
+</div>
+</div></blockquote>
+<p>A possible implementation of EarlyArrivals is as an array of packet objects, of size W.
+We always put packet Data[M] into position M % W.</p>
+<p>At any point between packet arrivals, Data[LA+1] is not in EarlyArrivals, but some later packets may be present.</p>
+<p>For the sender side, we begin by sending a full windowful of packets Data[1] through Data[W], and setting LA=0.
+When ACK[M] arrives, LA&lt;M≤LA+W, the window slides forward from [LA+1…LA+W] to [M+1…M+W], and we are now allowed to send Data[LA+W+1] through Data[M+W]. The simplest case is M=LA+1.</p>
+<p>Upon arrival of ACK[M]:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">if M≤LA or M&gt;LA+W, ignore the packet</div>
+<div class="line">otherwise:</div>
+<div class="line-block">
+<div class="line">set K = LA+W+1, the first packet just above the old window</div>
+<div class="line">set LA = M, just below the bottom of the new window</div>
+<div class="line">for (i=K; i≤LA+W; i++) send Data[i]</div>
+</div>
+</div>
+</div></blockquote>
+<p>Note that new ACKs may arrive while we are in the loop at the last line. We assume here that the sender stolidly sends what it may send and only after that does it start to process additional arriving ACKs. Some implementations may take a more asynchronous approach, perhaps with one thread processing arriving ACKs and incrementing LA and another thread sending everything it is allowed to send.</p>
+<p>To add support for timeout and retransmission, each transmitted packet would need to be stored, together with the time it was sent. Periodically this collection of stored packets must then be scanned, looking for packets for which <code class="docutils literal notranslate"><span class="pre">send_time</span></code> + <code class="docutils literal notranslate"><span class="pre">timeout_interval</span></code> ≤ <code class="docutils literal notranslate"><span class="pre">current_time</span></code>; those packets get retransmitted. When a packet Data[N] is acknowledged (perhaps by an ACK[M] for M&gt;N), it can be deleted.</p>
+</div>
+</div>
+<div class="section" id="epilog">
+<h2>8.4&nbsp;&nbsp;&nbsp;Epilog<a class="headerlink" href="#epilog" title="Permalink to this headline">¶</a></h2>
+<p>This completes our discussion of the sliding-windows algorithm in the abstract setting. We will return to concrete implementations of this in <a class="reference internal" href="udp.html#tftp-stop-and-wait"><span class="std std-ref">16.4.1&nbsp;&nbsp;&nbsp;TFTP and the Sorcerer</span></a> (stop-and-wait) and in <a class="reference internal" href="tcpB.html#tcp-sliding-windows"><span class="std std-ref">18.7&nbsp;&nbsp;&nbsp;TCP Sliding Windows</span></a>; the latter is one of the most important mechanisms on the Internet.</p>
+</div>
+<div class="section" id="exercises">
+<span id="sliding-windows-exercises"></span><h2>8.5&nbsp;&nbsp;&nbsp;Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<p><em>Exercises may be given fractional (floating point) numbers, to allow for interpolation of new exercises.</em>  Exercises marked with a ♢ have solutions or hints at <a class="reference internal" href="solutions.html#sliding-solutions"><span class="std std-ref">34.8&nbsp;&nbsp;&nbsp;Solutions for Sliding Windows</span></a>.</p>
+<p>1.0. Sketch a ladder diagram for stop-and-wait if Data[3] is lost the first time it is sent, assuming <strong>no sender timeout</strong> (but the sender retransmits on duplicate), and a <em>receiver</em> timeout of 2 seconds. Continue the diagram to the point where Data[4] is successfully transmitted. Assume an RTT of 1 second.</p>
+<p>2.0. Re-draw the Sorcerer’s Apprentice diagram of <a class="reference internal" href="#sorcerer-s-apprentice"><span class="std std-ref">8.1.2&nbsp;&nbsp;&nbsp;Sorcerer’s Apprentice Bug</span></a>, assuming the sender now does <em>not</em> retransmit on duplicates, though the receiver still does. ACK[3] is, as before, delayed until the sender retransmits Data[3].</p>
+<p>3.0. Suppose a stop-and-wait receiver has an implementation flaw. When Data[1] arrives, ACK[1] and ACK[2] are sent, separated by a brief interval; after that, the receiver transmits ACK[N+1] when Data[N] arrives, rather than the correct ACK[N].</p>
+<div class="line-block">
+<div class="line">(a). Draw a diagram, including at least three RTTs. Assume no packets are lost.</div>
+<div class="line">(b). What is the average throughput, in data packets per RTT? (For normal stop-and-wait, the average throughput is 1.)</div>
+<div class="line">(c). Is there anything the sender can do to detect this receiver behavior before the final packet, assuming no packets are lost and that the sender must respond to each ACK as soon as it arrives?</div>
+</div>
+<p>(Note that if a Data packet <em>is</em> lost, the receiver may already have acknowledged it, which creates a problem.)</p>
+<p>4.0.♢ Consider the alternative model of <a class="reference internal" href="#fixed-window-size"><span class="std std-ref">8.3.1&nbsp;&nbsp;&nbsp;Simple fixed-window-size analysis</span></a>:</p>
+<img alt="_images/linear_bottleneck3.svg" src="_images/linear_bottleneck3.svg" /><div class="line-block">
+<div class="line">(a). Using the formulas of <a class="reference internal" href="#rtt-calculations"><span class="std std-ref">8.3.2&nbsp;&nbsp;&nbsp;RTT Calculations</span></a>, calculate the steady-state queue usage for a window size of 6.</div>
+</div>
+<div class="line-block">
+<div class="line">(b). Again for a window size of 6, create a table like those in <a class="reference internal" href="#fixed-window-size"><span class="std std-ref">8.3.1&nbsp;&nbsp;&nbsp;Simple fixed-window-size analysis</span></a> up through T=8 seconds.</div>
+</div>
+<p>5.0. Create a table as in <a class="reference internal" href="#fixed-window-size"><span class="std std-ref">8.3.1&nbsp;&nbsp;&nbsp;Simple fixed-window-size analysis</span></a> for the original A───R1───R2───R3───R4───B network with winsize = 8. As in the text examples, assume 1 packet/sec bandwidth delay for the R1⟶R2, R2⟶R3, R3⟶R4 and R4⟶B links. The A–R1 link and all reverse links (from B to A) are infinitely fast. Carry out the table for 10 seconds.</p>
+<p>6.0. Create a table as in <a class="reference internal" href="#fixed-window-size"><span class="std std-ref">8.3.1&nbsp;&nbsp;&nbsp;Simple fixed-window-size analysis</span></a> for a network A───R1───R2───B. The A–R1 ink is infinitely fast; the R1–R2 and R2–B each have a 1-second <strong>propagation</strong> delay, in each direction, and zero <em>bandwidth</em> delay (that is, one packet takes 1.0 sec to travel from R1 to R2; two packets also take 1.0 sec to travel from R1 to R2). Assume winsize=6. Carry out the table for 8 seconds. Note that with zero bandwidth delay, multiple packets sent together will remain together until the destination; propagation delay behaves very differently from bandwidth delay!</p>
+<p>7.0. Suppose RTT<sub>noLoad</sub> = 4 seconds and the bottleneck bandwidth is 1 packet every 2 seconds.</p>
+<div class="line-block">
+<div class="line">(a). What window size is needed to remain just at the knee of congestion?</div>
+<div class="line">(b). Suppose winsize=6. What is the eventual value of RTT<sub>actual</sub>?</div>
+<div class="line">(c). Again with winsize=6, how many packets are in the queue at the steady state?</div>
+</div>
+<p>8.0. Create a table as in <a class="reference internal" href="#fixed-window-size"><span class="std std-ref">8.3.1&nbsp;&nbsp;&nbsp;Simple fixed-window-size analysis</span></a> for a network A───R1───R2───R3───B. The A–R1 link is infinitely fast. The R1–R2 and R3–B links have a bandwidth delay of 1 packet/second with no additional propagation delay. The R2–R3 link has a bandwidth delay of 1 packet / 2 seconds, and no propagation delay. The reverse B⟶A direction (for ACKs) is infinitely fast. Assume winsize = 6.</p>
+<div class="line-block">
+<div class="line">(a). Carry out the table for 10 seconds. Note that you will need to show the queue for both R1 and R2.</div>
+<div class="line">(b). Continue the table at least partially until T=18, in sufficient detail that you can verify that RTT<sub>actual</sub> for packet 8 is as calculated in the previous exercise. To do this you will need more than 10 packets, but fewer than 16; the use of hex labels A, B, C for packets 10, 11, 12 is a convenient notation.</div>
+</div>
+<p>Hint: The column for “R2 sends” (or, more accurately, “R2 is in the process of sending”) should look like this:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="67%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">T</th>
+<th class="head">R2 sends</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td>1</td>
+</tr>
+<tr class="row-even"><td>2</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td>2</td>
+</tr>
+<tr class="row-even"><td>4</td>
+<td>2</td>
+</tr>
+<tr class="row-odd"><td>5</td>
+<td>3</td>
+</tr>
+<tr class="row-even"><td>6</td>
+<td>3</td>
+</tr>
+<tr class="row-odd"><td>…</td>
+<td>…</td>
+</tr>
+</tbody>
+</table>
+<p>9.0. Create a table as in <a class="reference internal" href="#fixed-window-size"><span class="std std-ref">8.3.1&nbsp;&nbsp;&nbsp;Simple fixed-window-size analysis</span></a> for a network A───R1───R2───B. The A–R1 link is infinitely fast. The R1–R2 link has a bandwidth delay of 1 packet / 2 seconds and the R2–B link has a bandwidth delay of 1 packet/second, each with no additional propagation delay. The reverse B⟶A direction (for ACKs) is infinitely fast. Assume winsize = 4. Recommended columns are Time, “A sends”, “R1 queues”, “R1 sends”, “R2 sends” and “B Acks”. Hint: the “R1 sends” column will look like the “R2 sends” column for the hint in the previous problem, except it will start at T=0 rather than T=1.</p>
+<p>Note that bandwidth × RTT<sub>noLoad</sub> = 1/2 × 3 = 1.5, and so, by <a class="reference internal" href="#rtt-calculations"><span class="std std-ref">8.3.2&nbsp;&nbsp;&nbsp;RTT Calculations</span></a> equation 4, the queue utilization will be 4 − 1.5 = 2.5.</p>
+<div class="line-block">
+<div class="line">(a). Carry out the table for 8 seconds.</div>
+<div class="line">(b). In the steady state, does R1 have 2.5 packets in the queue? If so, what is meant by half a packet?</div>
+</div>
+<p>10.0 Argue that, if A sends to B using sliding windows, and in the path from A to B the slowest link is <em>not</em> the first link out of A, then eventually A will have the entire window outstanding (except at the instant just after each new ACK comes in).</p>
+<p>11.0.♢ Suppose RTT<sub>noLoad</sub> is 100 ms and the available bandwidth is 1,000 packets/sec. Sliding windows is used.</p>
+<div class="line-block">
+<div class="line">(a). What is the transit capacity for the connection?</div>
+<div class="line">(b). If RTT<sub>actual</sub> rises to 130 ms (due to use of a larger winsize), how many packets are in a queue at any one time?</div>
+<div class="line">(c). If winsize increases by 50, what is RTT<sub>actual</sub>?</div>
+</div>
+<p>12.0. Suppose RTT<sub>noLoad</sub> is 50 ms and the available bandwidth is 2,000 packets/sec (2 packets/ms). Sliding windows is used for transmission.</p>
+<div class="line-block">
+<div class="line">(a). What window size is needed to remain just at the knee of congestion?</div>
+<div class="line">(b). If RTT<sub>actual</sub> rises to 60 ms (due to use of a larger winsize), how many packets are in a queue at any one time?</div>
+<div class="line">(c). What value of winsize would lead to RTT<sub>actual</sub> = 60 ms?</div>
+<div class="line">(d). What value of winsize would make RTT<sub>actual</sub> rise to 100 ms?</div>
+</div>
+<p>13.0. Suppose stop-and-wait is used (winsize=1), and assume that while packets may be lost, <em>they are never reordered</em> (that is, if two packets P1 and P2 are sent in that order, and both arrive, then they arrive in that order). Show that at the point the receiver is waiting for Data[N], the only two packet arrivals possible are Data[N] and Data[N-1]. (A consequence is that, in the absence of reordering, stop-and-wait can make do with 1-bit packet sequence numbers.) Hint: if the receiver is waiting for Data[N], it must have just received Data[N-1] and sent ACK[N-1]. Also, once the sender has sent Data[N], it will never transmit a Data[K] with K&lt;N.</p>
+<p>✰14.0.♢ Suppose winsize=4 in a sliding-windows connection, and assume that while packets may be lost, <em>they are never reordered</em> (that is, if two packets P1 and P2 are sent in that order, and both arrive, then they arrive in that order). Show that if Data[8] is in the receiver’s window (meaning that everything up through Data[4] has been received and acknowledged), then it is no longer possible for even a late Data[0] to arrive at the receiver. (A consequence of the general principle here is that – <em>in the absence of reordering</em> – we can replace the packet sequence number with (sequence_number) mod (2×winsize+1) without ambiguity.)</p>
+<p>15.0. Suppose winsize=4 in a sliding-windows connection, and assume as in the previous exercise that while packets may be lost, they are never reordered. Give an example in which Data[8] is in the receiver’s window (so the receiver has presumably sent ACK[4]), and yet Data[1] legitimately arrives. (Thus, the late-packet bound in the previous exercise is the best possible.)</p>
+<p>16.0. Suppose the network is A───R1───R2───B, where the A–R1 ink is infinitely fast and the R1–R2 link has a bandwidth of 1 packet/second each way, for an RTT<sub>noLoad</sub> of 2 seconds. Suppose also that A begins sending with winsize = 6. By the analysis in <a class="reference internal" href="#case-3-winsize-6"><span class="std std-ref">8.3.1.3&nbsp;&nbsp;&nbsp;Case 3: winsize = 6</span></a>, RTT should rise to winsize/bandwidth = 6 seconds. Give the RTTs of the first eight packets. How long does it take for RTT to rise to 6 seconds?</p>
+<p>17.0. In this exercise we look at the relationship between bottleneck bandwidth and winsize/RTT<sub>actual</sub> when the former changes suddenly. Suppose the network is as follows</p>
+<blockquote>
+<div>A───R1───R2───R3───B</div></blockquote>
+<p>The A──R1 link is infinitely fast. The R1→R2 link has a 1 packet/sec bandwidth delay in the R1→R2 direction. The remaining links R2→R3 and R3→B have a 1 sec bandwidth delay in the direction indicated. ACK packets, being small, travel instantaneously from B back to A.</p>
+<p>A sends to B using a winsize of three. Three packets P0, P1 and P2 are sent at times T=0, T=1 and T=2 respectively.</p>
+<p>At T=3, P0 arrives at B. At this instant the R1→R2 bandwidth is suddenly halved to 1 packet / 2 sec; P3 is transmitted at T=3 and arrives at R2 at T=5. It will arrive at B at T=7.</p>
+<div class="line-block">
+<div class="line">(a). Complete the following table of packet arrival times</div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="12%" />
+<col width="18%" />
+<col width="14%" />
+<col width="14%" />
+<col width="14%" />
+<col width="21%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">T</th>
+<th class="head">A sends</th>
+<th class="head">R1’s queue</th>
+<th class="head">R1 sends</th>
+<th class="head">R2 sends</th>
+<th class="head">R3 sends</th>
+<th class="head">B recvs/ACKs</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>2</td>
+<td>P2</td>
+<td></td>
+<td>P2</td>
+<td>P1</td>
+<td>P0</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td>P3</td>
+<td></td>
+<td>P3</td>
+<td>P2</td>
+<td>P1</td>
+<td>P0</td>
+</tr>
+<tr class="row-even"><td>4</td>
+<td>P4</td>
+<td>P4</td>
+<td>P3 cont</td>
+<td></td>
+<td>P2</td>
+<td>P1</td>
+</tr>
+<tr class="row-odd"><td>5</td>
+<td>P5</td>
+<td>P5</td>
+<td>P4</td>
+<td>P3</td>
+<td></td>
+<td>P2</td>
+</tr>
+<tr class="row-even"><td>6</td>
+<td></td>
+<td>P5</td>
+<td>P4 cont</td>
+<td></td>
+<td>P3</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td>7</td>
+<td>P6</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>P3</td>
+</tr>
+<tr class="row-even"><td>8</td>
+<td></td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>9</td>
+<td>P7</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>10</td>
+<td></td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>11</td>
+<td>P8</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">
+<div class="line">(b). For each of P2, P3, P4 and P5, calculate the througput given by winsize/RTT over the course of that packet’s round trip. Obtain each packet’s RTT from the completed table above.</div>
+</div>
+<div class="line-block">
+<div class="line">(c). Once the steady state is reached in which RTT<sub>actual</sub> = 6, how much time does each packet spend in transit? How much time does each packet spend in R1’s queue?</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="ipv4.html" title="9   IP version 4"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="packets.html" title="7   Packets"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, desktop edition 2.0.11</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012-2022, Peter L Dordal.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

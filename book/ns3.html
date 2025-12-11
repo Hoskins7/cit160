@@ -1,0 +1,674 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>32   The ns-3 Network Simulator &#8212; An Introduction to Computer Networks, desktop edition 2.0.11</title>
+    <link rel="stylesheet" href="_static/csbnetbook.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script type="text/javascript" src="_static/mobile.js"></script>
+    <script type="text/javascript" src="_static/rightsidebar.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="33   Bibliography" href="bibliography.html" />
+    <link rel="prev" title="31   Network Simulations: ns-2" href="ns2.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="bibliography.html" title="33   Bibliography"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ns2.html" title="31   Network Simulations: ns-2"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, desktop edition 2.0.11</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">32&nbsp;&nbsp;&nbsp;The ns-3 Network Simulator</a><ul>
+<li><a class="reference internal" href="#installing-and-running-ns-3">32.1&nbsp;&nbsp;&nbsp;Installing and Running ns-3</a><ul>
+<li><a class="reference internal" href="#running-a-script">32.1.1&nbsp;&nbsp;&nbsp;Running a Script</a></li>
+<li><a class="reference internal" href="#compilation-errors">32.1.2&nbsp;&nbsp;&nbsp;Compilation Errors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#a-single-tcp-sender">32.2&nbsp;&nbsp;&nbsp;A Single TCP Sender</a><ul>
+<li><a class="reference internal" href="#running-the-script">32.2.1&nbsp;&nbsp;&nbsp;Running the Script</a></li>
+<li><a class="reference internal" href="#the-ascii-tracefile">32.2.2&nbsp;&nbsp;&nbsp;The Ascii Tracefile</a></li>
+<li><a class="reference internal" href="#unexpected-timeouts-and-other-phenomena">32.2.3&nbsp;&nbsp;&nbsp;Unexpected Timeouts and Other Phenomena</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#wireless">32.3&nbsp;&nbsp;&nbsp;Wireless</a><ul>
+<li><a class="reference internal" href="#tracefile-analysis">32.3.1&nbsp;&nbsp;&nbsp;Tracefile Analysis</a></li>
+<li><a class="reference internal" href="#aodv-performance">32.3.2&nbsp;&nbsp;&nbsp;AODV Performance</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#exercises">32.4&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="ns2.html"
+                        title="previous chapter">31&nbsp;&nbsp;&nbsp;Network Simulations: ns-2</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="bibliography.html"
+                        title="next chapter">33&nbsp;&nbsp;&nbsp;Bibliography</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="the-ns-3-network-simulator">
+<span id="ns3"></span><h1>32&nbsp;&nbsp;&nbsp;The ns-3 Network Simulator<a class="headerlink" href="#the-ns-3-network-simulator" title="Permalink to this headline">¶</a></h1>
+<p>In this chapter we take a somewhat cursory look at the ns-3 simulator, intended as a replacement for ns-2. The project is managed by the NS-3 Consortium, and all materials are available at <a class="reference external" href="https://www.nsnam.org">www.nsnam.org</a>.</p>
+<p>Ns-3 represents a rather sharp break from ns-2. Gone is the Tcl programming interface; instead, ns-3 simulation programs are written in the C++ language, with extensive calls to the ns-3 library, although they are often still referred to as simulation “scripts”. As the simulator core itself is also written in C++, this in some cases allows improved interaction between configuration and execution. However, configuration and execution are still in most cases quite separate: at the end of the simulation script comes a call <code class="docutils literal notranslate"><span class="pre">Simulator::Run()</span></code> – akin to ns-2’s <code class="docutils literal notranslate"><span class="pre">$ns</span> <span class="pre">run</span></code> – at which point the user-written C++ has done its job and the library takes over.</p>
+<p>To configure a simple simulation, an ns-2 Tcl script had to create nodes and links, create network-connection “agents” attached to nodes, and create traffic-generating applications attached to agents. Much the same applies to ns-3, but in addition each node must be configured with its network interfaces, and each network interface must be assigned an IP address.</p>
+<div class="section" id="installing-and-running-ns-3">
+<h2>32.1&nbsp;&nbsp;&nbsp;Installing and Running ns-3<a class="headerlink" href="#installing-and-running-ns-3" title="Permalink to this headline">¶</a></h2>
+<p>We here outline the steps for installing ns-3 under Linux from the “allinone” <code class="docutils literal notranslate"><span class="pre">tar</span></code> file, assuming that all prerequisite packages (such as gcc) are already in place. Much more general installation instructions can be found at <a class="reference external" href="https://www.nsnam.org">www.nsnam.org</a>. In particular, serious users are likely to want to download the current Mercurial repository directly. Information is also available for Windows and Macintosh installation, although perhaps the simplest option for Windows users is to run ns-3 in a Linux virtual machine.</p>
+<p>The first step is to unzip the <code class="docutils literal notranslate"><span class="pre">tar</span></code> file; this should leave a directory named ns-allinone-3.nn, where nn reflects the version number (20 in the author’s installation as of this 2014 writing). This directory is the root of the ns-3 system; it contains a <code class="docutils literal notranslate"><span class="pre">build.py</span></code> (python) script and the primary ns-3 directory ns-3.nn. All that is necessary is to run the build.py script:</p>
+<blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">./build.py</span></code></div></blockquote>
+<p>Considerable configuration and then compiler output should ensue, hopefully terminating with a list of “Modules built” and “Modules not built”.</p>
+<p>From this point on, most ns-3 work will take place in the subdirectory ns-3.nn, that is, in ns-allinone-3.nn/ns-3.nn. This <em>development</em> directory contains the source directory <code class="docutils literal notranslate"><span class="pre">src</span></code>, the script directory <code class="docutils literal notranslate"><span class="pre">scratch</span></code>, and the execution script <a class="reference external" href="https://code.google.com/p/waf/">waf</a>.</p>
+<p>The development directory also contains a directory <code class="docutils literal notranslate"><span class="pre">examples</span></code> containing a rich set of example scripts. The scripts in <code class="docutils literal notranslate"><span class="pre">examples/tutorial</span></code> are described in depth in the ns-3 tutorial in <code class="docutils literal notranslate"><span class="pre">doc/tutorial</span></code>.</p>
+<div class="section" id="running-a-script">
+<h3>32.1.1&nbsp;&nbsp;&nbsp;Running a Script<a class="headerlink" href="#running-a-script" title="Permalink to this headline">¶</a></h3>
+<p>Let us now run a script, for example, the file first.cc included in the <code class="docutils literal notranslate"><span class="pre">examples/tutorial</span></code> directory. We first copy this file into the directory “scratch”, and then, in the parent development directory, enter the command</p>
+<blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">./waf</span> <span class="pre">--run</span> <span class="pre">first</span></code></div></blockquote>
+<p>The program is compiled and, if compilation is successful, is run.</p>
+<p>In fact, <em>every</em> uncompiled program in the scratch directory is compiled, meaning that projects in progress that are not yet compilable must be kept elsewhere. One convenient strategy is to maintain multiple project directories, and link them symbolically to <code class="docutils literal notranslate"><span class="pre">scratch</span></code> as needed.</p>
+<p>The ns-3 system includes support for command-line options; the following example illustrates the passing by command line of the value 3 for the variable <code class="docutils literal notranslate"><span class="pre">nCsma</span></code>:</p>
+<blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">./waf</span> <span class="pre">--run</span> <span class="pre">&quot;second</span> <span class="pre">--nCsma=3&quot;</span></code></div></blockquote>
+</div>
+<div class="section" id="compilation-errors">
+<h3>32.1.2&nbsp;&nbsp;&nbsp;Compilation Errors<a class="headerlink" href="#compilation-errors" title="Permalink to this headline">¶</a></h3>
+<p>By default, ns-3 enables the <code class="docutils literal notranslate"><span class="pre">-Werror</span></code> option to the compiler, meaning that all warnings are treated as errors. This is good practice for contributed or published scripts, but can be rather exasperating for beginners. To disable this, edit the file waf-tools/cflags.py (relative to the development directory). Change the line</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">warnings_flags</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;-Wall&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;-Werror&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;-Wextra&#39;</span><span class="p">]]</span>
+</pre></div>
+</div>
+<p>to</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">warnings_flags</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;-Wall&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;-Wextra&#39;</span><span class="p">]]</span>
+</pre></div>
+</div>
+<p>Then, in the development directory, run</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">waf</span> <span class="n">configure</span>
+<span class="o">./</span><span class="n">waf</span> <span class="n">build</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="a-single-tcp-sender">
+<span id="ns3-basic1"></span><span id="ns3basic1"></span><h2>32.2&nbsp;&nbsp;&nbsp;A Single TCP Sender<a class="headerlink" href="#a-single-tcp-sender" title="Permalink to this headline">¶</a></h2>
+<p>We begin by translating the single-TCP-sender script of <a class="reference internal" href="ns2.html#basic1"><span class="std std-ref">31.2&nbsp;&nbsp;&nbsp;A Single TCP Sender</span></a>. The full program is in <a class="reference external" href="auxiliary_files/ns3/basic1.cc">basic1.cc</a>; we now review most of it line-by-line; some standard things such as <code class="docutils literal notranslate"><span class="pre">#include</span></code> directives are omitted.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/*</span>
+  <span class="n">Network</span> <span class="n">topology</span><span class="p">:</span>
+
+  <span class="n">A</span><span class="o">----</span><span class="n">R</span><span class="o">----</span><span class="n">B</span>
+
+  <span class="n">A</span><span class="o">--</span><span class="n">R</span><span class="p">:</span> <span class="mi">10</span> <span class="n">Mbps</span> <span class="o">/</span> <span class="mi">10</span> <span class="n">ms</span> <span class="n">delay</span>
+  <span class="n">R</span><span class="o">--</span><span class="n">B</span><span class="p">:</span> <span class="mi">800</span> <span class="n">kbps</span> <span class="o">/</span> <span class="mi">50</span> <span class="n">ms</span> <span class="n">delay</span>
+  <span class="n">queue</span> <span class="n">at</span> <span class="n">R</span><span class="p">:</span> <span class="n">size</span> <span class="mi">7</span>
+<span class="o">*/</span>
+
+<span class="n">using</span> <span class="n">namespace</span> <span class="n">ns3</span><span class="p">;</span>
+
+<span class="n">std</span><span class="p">::</span><span class="n">string</span> <span class="n">fileNameRoot</span> <span class="o">=</span> <span class="s2">&quot;basic1&quot;</span><span class="p">;</span>    <span class="o">//</span> <span class="n">base</span> <span class="n">name</span> <span class="k">for</span> <span class="n">trace</span> <span class="n">files</span><span class="p">,</span> <span class="n">etc</span>
+
+<span class="n">void</span> <span class="n">CwndChange</span> <span class="p">(</span><span class="n">Ptr</span><span class="o">&lt;</span><span class="n">OutputStreamWrapper</span><span class="o">&gt;</span> <span class="n">stream</span><span class="p">,</span> <span class="n">uint32_t</span> <span class="n">oldCwnd</span><span class="p">,</span> <span class="n">uint32_t</span> <span class="n">newCwnd</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="o">*</span><span class="n">stream</span><span class="o">-&gt;</span><span class="n">GetStream</span> <span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">Simulator</span><span class="p">::</span><span class="n">Now</span> <span class="p">()</span><span class="o">.</span><span class="n">GetSeconds</span> <span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot; &quot;</span> <span class="o">&lt;&lt;</span>  <span class="n">newCwnd</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">static</span> <span class="n">void</span>
+<span class="n">TraceCwnd</span> <span class="p">()</span>    <span class="o">//</span> <span class="n">Trace</span> <span class="n">changes</span> <span class="n">to</span> <span class="n">the</span> <span class="n">congestion</span> <span class="n">window</span>
+<span class="p">{</span>
+  <span class="n">AsciiTraceHelper</span> <span class="n">ascii</span><span class="p">;</span>
+  <span class="n">Ptr</span><span class="o">&lt;</span><span class="n">OutputStreamWrapper</span><span class="o">&gt;</span> <span class="n">stream</span> <span class="o">=</span> <span class="n">ascii</span><span class="o">.</span><span class="n">CreateFileStream</span> <span class="p">(</span><span class="n">fileNameRoot</span> <span class="o">+</span> <span class="s2">&quot;.cwnd&quot;</span><span class="p">);</span>
+  <span class="n">Config</span><span class="p">::</span><span class="n">ConnectWithoutContext</span> <span class="p">(</span><span class="s2">&quot;/NodeList/0/$ns3::TcpL4Protocol/SocketList/0/CongestionWindow&quot;</span><span class="p">,</span> <span class="n">MakeBoundCallback</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">CwndChange</span><span class="p">,</span><span class="n">stream</span><span class="p">));</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The function <code class="docutils literal notranslate"><span class="pre">TraceCwnd()</span></code> arranges for tracing of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>; the function <code class="docutils literal notranslate"><span class="pre">CwndChange</span></code> is a <em>callback</em>, invoked by the ns-3 system whenever <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> changes. Such callbacks are common in ns-3.</p>
+<p>The parameter string beginning <code class="docutils literal notranslate"><span class="pre">/NodeList/0/...</span></code> is an example of the <em>configuration namespace</em>. Each ns-3 attribute can be accessed this way. See <a class="reference internal" href="#the-ascii-tracefile"><span class="std std-ref">32.2.2&nbsp;&nbsp;&nbsp;The Ascii Tracefile</span></a> below.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">main</span> <span class="p">(</span><span class="nb">int</span> <span class="n">argc</span><span class="p">,</span> <span class="n">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+  <span class="nb">int</span> <span class="n">tcpSegmentSize</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
+  <span class="n">Config</span><span class="p">::</span><span class="n">SetDefault</span> <span class="p">(</span><span class="s2">&quot;ns3::TcpSocket::SegmentSize&quot;</span><span class="p">,</span> <span class="n">UintegerValue</span> <span class="p">(</span><span class="n">tcpSegmentSize</span><span class="p">));</span>
+  <span class="n">Config</span><span class="p">::</span><span class="n">SetDefault</span> <span class="p">(</span><span class="s2">&quot;ns3::TcpSocket::DelAckCount&quot;</span><span class="p">,</span> <span class="n">UintegerValue</span> <span class="p">(</span><span class="mi">0</span><span class="p">));</span>
+  <span class="n">Config</span><span class="p">::</span><span class="n">SetDefault</span> <span class="p">(</span><span class="s2">&quot;ns3::TcpL4Protocol::SocketType&quot;</span><span class="p">,</span> <span class="n">StringValue</span> <span class="p">(</span><span class="s2">&quot;ns3::TcpReno&quot;</span><span class="p">));</span>
+  <span class="n">Config</span><span class="p">::</span><span class="n">SetDefault</span> <span class="p">(</span><span class="s2">&quot;ns3::RttEstimator::MinRTO&quot;</span><span class="p">,</span> <span class="n">TimeValue</span> <span class="p">(</span><span class="n">MilliSeconds</span> <span class="p">(</span><span class="mi">500</span><span class="p">)));</span>
+</pre></div>
+</div>
+<p>The use of <code class="docutils literal notranslate"><span class="pre">Config::SetDefault()</span></code> allows us to configure objects that will not exist until some later point, perhaps not until the ns-3 simulator is running. The first parameter is an <strong>attribute string</strong>, of the form <code class="docutils literal notranslate"><span class="pre">ns3::</span></code><em>class</em><code class="docutils literal notranslate"><span class="pre">::</span></code><em>attribute</em>. A partial list of attributes is at <a class="reference external" href="https://www.nsnam.org/docs/release/3.19/doxygen/group___attribute_list.html">https://www.nsnam.org/docs/release/3.19/doxygen/group___attribute_list.html</a>. Attributes of a class can also be determined by a command such as the following:</p>
+<blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">./waf</span> <span class="pre">--run</span> <span class="pre">&quot;basic1</span> <span class="pre">--PrintAttributes=ns3::TcpSocket</span></code></div></blockquote>
+<p>The advantage of the <code class="docutils literal notranslate"><span class="pre">Config::SetDefault</span></code> mechanism is that often objects are created indirectly, perhaps by “helper” classes, and so direct setting of class properties can be problematic.</p>
+<p>It is perfectly acceptable to issue some <code class="docutils literal notranslate"><span class="pre">Config::SetDefault</span></code> calls, then create some objects (perhaps implicitly), and then change the defaults (again with <code class="docutils literal notranslate"><span class="pre">Config::SetDefault</span></code>) for creation of additional objects.</p>
+<p>We pick the TCP congesion-control algorithm by setting <code class="docutils literal notranslate"><span class="pre">ns3::TcpL4Protocol::SocketType</span></code>. Options are <code class="docutils literal notranslate"><span class="pre">TcpRfc793</span></code> (no congestion control), <code class="docutils literal notranslate"><span class="pre">TcpTahoe</span></code>, <code class="docutils literal notranslate"><span class="pre">TcpReno</span></code>, <code class="docutils literal notranslate"><span class="pre">TcpNewReno</span></code> and <code class="docutils literal notranslate"><span class="pre">TcpWestwood</span></code>. TCP Cubic and SACK TCP are not supported natively (though they are available if the <a class="reference external" href="http://research.wand.net.nz/software/nsc.php">Network Simulation Cradle</a> is installed).</p>
+<p>Setting the <code class="docutils literal notranslate"><span class="pre">DelAckCount</span></code> attribute to 0 disables delayed ACKs. Setting the <code class="docutils literal notranslate"><span class="pre">MinRTO</span></code> value to 500 ms avoids some unexpected hard timeouts. We will return to both of these below in <a class="reference internal" href="#unexpected-timeouts"><span class="std std-ref">32.2.3&nbsp;&nbsp;&nbsp;Unexpected Timeouts and Other Phenomena</span></a>.</p>
+<p>Next comes our local variables and command-line-option processing. In ns-3 the latter is handled via the <code class="docutils literal notranslate"><span class="pre">CommandLine</span></code> object, which also recognized the <code class="docutils literal notranslate"><span class="pre">--PrintAttributes</span></code> option above. Using the <code class="docutils literal notranslate"><span class="pre">--PrintHelp</span></code> option gives a list of variables that can be set via command-line arguments.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unsigned</span> <span class="nb">int</span> <span class="n">runtime</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>   <span class="o">//</span> <span class="n">seconds</span>
+<span class="nb">int</span> <span class="n">delayAR</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>            <span class="o">//</span> <span class="n">ms</span>
+<span class="nb">int</span> <span class="n">delayRB</span> <span class="o">=</span> <span class="mi">50</span><span class="p">;</span>            <span class="o">//</span> <span class="n">ms</span>
+<span class="n">double</span> <span class="n">bottleneckBW</span><span class="o">=</span> <span class="mf">0.8</span><span class="p">;</span>    <span class="o">//</span> <span class="n">Mbps</span>
+<span class="n">double</span> <span class="n">fastBW</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>          <span class="o">//</span> <span class="n">Mbps</span>
+<span class="n">uint32_t</span> <span class="n">queuesize</span> <span class="o">=</span> <span class="mi">7</span><span class="p">;</span>
+<span class="n">uint32_t</span> <span class="n">maxBytes</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>       <span class="o">//</span> <span class="mi">0</span> <span class="n">means</span> <span class="s2">&quot;unlimited&quot;</span>
+
+<span class="n">CommandLine</span> <span class="n">cmd</span><span class="p">;</span>
+<span class="o">//</span> <span class="n">Here</span><span class="p">,</span> <span class="n">we</span> <span class="n">define</span> <span class="n">command</span> <span class="n">line</span> <span class="n">options</span> <span class="n">overriding</span> <span class="n">some</span> <span class="n">of</span> <span class="n">the</span> <span class="n">above</span><span class="o">.</span>
+<span class="n">cmd</span><span class="o">.</span><span class="n">AddValue</span> <span class="p">(</span><span class="s2">&quot;runtime&quot;</span><span class="p">,</span> <span class="s2">&quot;How long the applications should send data&quot;</span><span class="p">,</span> <span class="n">runtime</span><span class="p">);</span>
+<span class="n">cmd</span><span class="o">.</span><span class="n">AddValue</span> <span class="p">(</span><span class="s2">&quot;delayRB&quot;</span><span class="p">,</span> <span class="s2">&quot;Delay on the R--B link, in ms&quot;</span><span class="p">,</span> <span class="n">delayRB</span><span class="p">);</span>
+<span class="n">cmd</span><span class="o">.</span><span class="n">AddValue</span> <span class="p">(</span><span class="s2">&quot;queuesize&quot;</span><span class="p">,</span> <span class="s2">&quot;queue size at R&quot;</span><span class="p">,</span> <span class="n">queuesize</span><span class="p">);</span>
+<span class="n">cmd</span><span class="o">.</span><span class="n">AddValue</span> <span class="p">(</span><span class="s2">&quot;tcpSegmentSize&quot;</span><span class="p">,</span> <span class="s2">&quot;TCP segment size&quot;</span><span class="p">,</span> <span class="n">tcpSegmentSize</span><span class="p">);</span>
+
+<span class="n">cmd</span><span class="o">.</span><span class="n">Parse</span> <span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">);</span>
+
+<span class="n">std</span><span class="p">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;queuesize=&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">queuesize</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;, delayRB=&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">delayRB</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Next we create three nodes, illustrating the use of smart pointers and <code class="docutils literal notranslate"><span class="pre">CreateObject()</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Ptr</span><span class="o">&lt;</span><span class="n">Node</span><span class="o">&gt;</span> <span class="n">A</span> <span class="o">=</span> <span class="n">CreateObject</span><span class="o">&lt;</span><span class="n">Node</span><span class="o">&gt;</span> <span class="p">();</span>
+<span class="n">Ptr</span><span class="o">&lt;</span><span class="n">Node</span><span class="o">&gt;</span> <span class="n">R</span> <span class="o">=</span> <span class="n">CreateObject</span><span class="o">&lt;</span><span class="n">Node</span><span class="o">&gt;</span> <span class="p">();</span>
+<span class="n">Ptr</span><span class="o">&lt;</span><span class="n">Node</span><span class="o">&gt;</span> <span class="n">B</span> <span class="o">=</span> <span class="n">CreateObject</span><span class="o">&lt;</span><span class="n">Node</span><span class="o">&gt;</span> <span class="p">();</span>
+</pre></div>
+</div>
+<p>Class <code class="docutils literal notranslate"><span class="pre">Ptr</span></code> is a “smart pointer” that manages memory through reference counting. The template function <code class="docutils literal notranslate"><span class="pre">CreateObject</span></code> acts as the ns-3 preferred alternative to <code class="docutils literal notranslate"><span class="pre">operator</span> <span class="pre">new</span></code>. Parameters for objects created this way can be supplied via <code class="docutils literal notranslate"><span class="pre">Config::SetDefault</span></code>, or by some later method call applied to the <code class="docutils literal notranslate"><span class="pre">Ptr</span></code> object. For <code class="docutils literal notranslate"><span class="pre">Node</span></code> objects, for example, we might call <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">-&gt;</span> <span class="pre">AddDevice(...)</span></code>.</p>
+<p>A convenient alternative to creating nodes individually is to create a <em>container</em> of nodes all at once:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">NodeContainer</span> <span class="n">allNodes</span><span class="p">;</span>
+<span class="n">allNodes</span><span class="o">.</span><span class="n">Create</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+<span class="n">Ptr</span><span class="o">&lt;</span><span class="n">Node</span><span class="o">&gt;</span> <span class="n">A</span> <span class="o">=</span> <span class="n">allNodes</span><span class="o">.</span><span class="n">Get</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<p>After the nodes are in place we create our point-to-point links, using the <code class="docutils literal notranslate"><span class="pre">PointToPointHelper</span></code> class. We also create <code class="docutils literal notranslate"><span class="pre">NetDeviceContainer</span></code> objects; we don’t use these here (we could simply call <code class="docutils literal notranslate"><span class="pre">AR.Install(A,R)</span></code>), but will need them below when assigning IPv4 addresses.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">use</span> <span class="n">PointToPointChannel</span> <span class="ow">and</span> <span class="n">PointToPointNetDevice</span>
+<span class="n">NetDeviceContainer</span> <span class="n">devAR</span><span class="p">,</span> <span class="n">devRB</span><span class="p">;</span>
+<span class="n">PointToPointHelper</span> <span class="n">AR</span><span class="p">,</span> <span class="n">RB</span><span class="p">;</span>
+
+<span class="o">//</span> <span class="n">create</span> <span class="n">point</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">point</span> <span class="n">link</span> <span class="kn">from</span> <span class="nn">A</span> <span class="n">to</span> <span class="n">R</span>
+<span class="n">AR</span><span class="o">.</span><span class="n">SetDeviceAttribute</span> <span class="p">(</span><span class="s2">&quot;DataRate&quot;</span><span class="p">,</span> <span class="n">DataRateValue</span> <span class="p">(</span><span class="n">DataRate</span> <span class="p">(</span><span class="n">fastBW</span> <span class="o">*</span> <span class="mi">1000</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)));</span>
+<span class="n">AR</span><span class="o">.</span><span class="n">SetChannelAttribute</span> <span class="p">(</span><span class="s2">&quot;Delay&quot;</span><span class="p">,</span> <span class="n">TimeValue</span> <span class="p">(</span><span class="n">MilliSeconds</span> <span class="p">(</span><span class="n">delayAR</span><span class="p">)));</span>
+<span class="n">devAR</span> <span class="o">=</span> <span class="n">AR</span><span class="o">.</span><span class="n">Install</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">R</span><span class="p">);</span>
+
+<span class="o">//</span> <span class="n">create</span> <span class="n">point</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">point</span> <span class="n">link</span> <span class="kn">from</span> <span class="nn">R</span> <span class="n">to</span> <span class="n">B</span>
+<span class="n">RB</span><span class="o">.</span><span class="n">SetDeviceAttribute</span> <span class="p">(</span><span class="s2">&quot;DataRate&quot;</span><span class="p">,</span> <span class="n">DataRateValue</span> <span class="p">(</span><span class="n">DataRate</span> <span class="p">(</span><span class="n">bottleneckBW</span> <span class="o">*</span> <span class="mi">1000</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)));</span>
+<span class="n">RB</span><span class="o">.</span><span class="n">SetChannelAttribute</span> <span class="p">(</span><span class="s2">&quot;Delay&quot;</span><span class="p">,</span> <span class="n">TimeValue</span> <span class="p">(</span><span class="n">MilliSeconds</span> <span class="p">(</span><span class="n">delayRB</span><span class="p">)));</span>
+<span class="n">RB</span><span class="o">.</span><span class="n">SetQueue</span><span class="p">(</span><span class="s2">&quot;ns3::DropTailQueue&quot;</span><span class="p">,</span> <span class="s2">&quot;MaxPackets&quot;</span><span class="p">,</span> <span class="n">UintegerValue</span><span class="p">(</span><span class="n">queuesize</span><span class="p">));</span>
+<span class="n">devRB</span> <span class="o">=</span> <span class="n">RB</span><span class="o">.</span><span class="n">Install</span><span class="p">(</span><span class="n">R</span><span class="p">,</span><span class="n">B</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Next we hand out IPv4 addresses. The <code class="docutils literal notranslate"><span class="pre">Ipv4AddressHelper</span></code> class can help us with individual LANs (<em>eg</em> A–R and R–B), but it is up to us to make sure our two LANs are on different subnets. If we attempt to put A and B on the same subnet, routing will simply fail, just as it would if we were to do this with real network nodes.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">InternetStackHelper</span> <span class="n">internet</span><span class="p">;</span>
+<span class="n">internet</span><span class="o">.</span><span class="n">Install</span> <span class="p">(</span><span class="n">A</span><span class="p">);</span>
+<span class="n">internet</span><span class="o">.</span><span class="n">Install</span> <span class="p">(</span><span class="n">R</span><span class="p">);</span>
+<span class="n">internet</span><span class="o">.</span><span class="n">Install</span> <span class="p">(</span><span class="n">B</span><span class="p">);</span>
+
+<span class="o">//</span> <span class="n">Assign</span> <span class="n">IP</span> <span class="n">addresses</span>
+
+<span class="n">Ipv4AddressHelper</span> <span class="n">ipv4</span><span class="p">;</span>
+<span class="n">ipv4</span><span class="o">.</span><span class="n">SetBase</span> <span class="p">(</span><span class="s2">&quot;10.0.0.0&quot;</span><span class="p">,</span> <span class="s2">&quot;255.255.255.0&quot;</span><span class="p">);</span>
+<span class="n">Ipv4InterfaceContainer</span> <span class="n">ipv4Interfaces</span><span class="p">;</span>
+<span class="n">ipv4Interfaces</span><span class="o">.</span><span class="n">Add</span> <span class="p">(</span><span class="n">ipv4</span><span class="o">.</span><span class="n">Assign</span> <span class="p">(</span><span class="n">devAR</span><span class="p">));</span>
+<span class="n">ipv4</span><span class="o">.</span><span class="n">SetBase</span> <span class="p">(</span><span class="s2">&quot;10.0.1.0&quot;</span><span class="p">,</span> <span class="s2">&quot;255.255.255.0&quot;</span><span class="p">);</span>
+<span class="n">ipv4Interfaces</span><span class="o">.</span><span class="n">Add</span> <span class="p">(</span><span class="n">ipv4</span><span class="o">.</span><span class="n">Assign</span><span class="p">(</span><span class="n">devRB</span><span class="p">));</span>
+
+<span class="n">Ipv4GlobalRoutingHelper</span><span class="p">::</span><span class="n">PopulateRoutingTables</span> <span class="p">();</span>
+</pre></div>
+</div>
+<p>Next we print out the addresses assigned. This gives us a peek at the <code class="docutils literal notranslate"><span class="pre">GetObject</span></code> template and the ns-3 object-aggregation model. The original <code class="docutils literal notranslate"><span class="pre">Node</span></code> objects we created earlier were quite generic; they gained their <code class="docutils literal notranslate"><span class="pre">Ipv4</span></code> component in the code above. Now we retrieve that component with the <code class="docutils literal notranslate"><span class="pre">GetObject&lt;Ipv4&gt;()</span></code> calls below.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Ptr</span><span class="o">&lt;</span><span class="n">Ipv4</span><span class="o">&gt;</span> <span class="n">A4</span> <span class="o">=</span> <span class="n">A</span><span class="o">-&gt;</span><span class="n">GetObject</span><span class="o">&lt;</span><span class="n">Ipv4</span><span class="o">&gt;</span><span class="p">();</span>  <span class="o">//</span> <span class="n">gets</span> <span class="n">node</span> <span class="n">A</span><span class="s1">&#39;s IPv4 subsystem</span>
+<span class="n">Ptr</span><span class="o">&lt;</span><span class="n">Ipv4</span><span class="o">&gt;</span> <span class="n">B4</span> <span class="o">=</span> <span class="n">B</span><span class="o">-&gt;</span><span class="n">GetObject</span><span class="o">&lt;</span><span class="n">Ipv4</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="n">Ptr</span><span class="o">&lt;</span><span class="n">Ipv4</span><span class="o">&gt;</span> <span class="n">R4</span> <span class="o">=</span> <span class="n">R</span><span class="o">-&gt;</span><span class="n">GetObject</span><span class="o">&lt;</span><span class="n">Ipv4</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="n">Ipv4Address</span> <span class="n">Aaddr</span> <span class="o">=</span> <span class="n">A4</span><span class="o">-&gt;</span><span class="n">GetAddress</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">GetLocal</span><span class="p">();</span>
+<span class="n">Ipv4Address</span> <span class="n">Baddr</span> <span class="o">=</span> <span class="n">B4</span><span class="o">-&gt;</span><span class="n">GetAddress</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">GetLocal</span><span class="p">();</span>
+<span class="n">Ipv4Address</span> <span class="n">Raddr</span> <span class="o">=</span> <span class="n">R4</span><span class="o">-&gt;</span><span class="n">GetAddress</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">GetLocal</span><span class="p">();</span>
+
+<span class="n">std</span><span class="p">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;A&#39;s address: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">Aaddr</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="n">std</span><span class="p">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;B&#39;s address: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">Baddr</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="n">std</span><span class="p">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;R&#39;s #1 address: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">Raddr</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="n">std</span><span class="p">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;R&#39;s #2 address: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">R4</span><span class="o">-&gt;</span><span class="n">GetAddress</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">GetLocal</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>In general, <code class="docutils literal notranslate"><span class="pre">A-&gt;GetObject&lt;T&gt;</span></code> returns the component of type <code class="docutils literal notranslate"><span class="pre">T</span></code> that has been “aggregated” to <code class="docutils literal notranslate"><span class="pre">Ptr&lt;Object&gt;</span> <span class="pre">A</span></code>; often this aggregation is invisible to the script programmer but an understanding of how it works is sometimes useful. The aggregation is handled by the ns-3 <code class="docutils literal notranslate"><span class="pre">Object</span></code> class, which contains an internal list <code class="docutils literal notranslate"><span class="pre">m_aggregates</span></code> of aggregated companion objects. At most one object of a given type can be aggregated to another, making <code class="docutils literal notranslate"><span class="pre">GetObject&lt;T&gt;</span></code> unambiguous. Given a <code class="docutils literal notranslate"><span class="pre">Ptr&lt;Object&gt;</span> <span class="pre">A</span></code>, we can obtain an iterator over the aggregated companions via <code class="docutils literal notranslate"><span class="pre">A-&gt;GetAggregateIterator()</span></code>, of type <code class="docutils literal notranslate"><span class="pre">Object::AggregateIterator</span></code>. From each <code class="docutils literal notranslate"><span class="pre">Ptr&lt;const</span> <span class="pre">Object&gt;</span> <span class="pre">B</span></code> returned by this iterator, we can call <code class="docutils literal notranslate"><span class="pre">B-&gt;GetInstanceTypeId().GetName()</span></code> to get the class name of B.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">GetAddress()</span></code> calls take two parameters; the first specfies the interface (a value of 0 gives the loopback interface) and the second distinguishes between multiple addresses assigned to the same interface (which is not happening here). The call <code class="docutils literal notranslate"><span class="pre">A4-&gt;GetAddress(1,0)</span></code> returns an <code class="docutils literal notranslate"><span class="pre">Ipv4InterfaceAddress</span></code> object containing, among other things, an IP address, a broadcast address and a netmask; <code class="docutils literal notranslate"><span class="pre">GetLocal()</span></code> returns the first of these.</p>
+<p>Next we create the receiver on B, using a <code class="docutils literal notranslate"><span class="pre">PacketSinkHelper</span></code>. A receiver is, in essense, a read-only form of an application server.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">create</span> <span class="n">a</span> <span class="n">sink</span> <span class="n">on</span> <span class="n">B</span>
+<span class="n">uint16_t</span> <span class="n">Bport</span> <span class="o">=</span> <span class="mi">80</span><span class="p">;</span>
+<span class="n">Address</span> <span class="n">sinkAaddr</span><span class="p">(</span><span class="n">InetSocketAddress</span> <span class="p">(</span><span class="n">Ipv4Address</span><span class="p">::</span><span class="n">GetAny</span> <span class="p">(),</span> <span class="n">Bport</span><span class="p">));</span>
+<span class="n">PacketSinkHelper</span> <span class="n">sinkA</span> <span class="p">(</span><span class="s2">&quot;ns3::TcpSocketFactory&quot;</span><span class="p">,</span> <span class="n">sinkAaddr</span><span class="p">);</span>
+<span class="n">ApplicationContainer</span> <span class="n">sinkAppA</span> <span class="o">=</span> <span class="n">sinkA</span><span class="o">.</span><span class="n">Install</span> <span class="p">(</span><span class="n">B</span><span class="p">);</span>
+<span class="n">sinkAppA</span><span class="o">.</span><span class="n">Start</span> <span class="p">(</span><span class="n">Seconds</span> <span class="p">(</span><span class="mf">0.01</span><span class="p">));</span>
+<span class="o">//</span> <span class="n">the</span> <span class="n">following</span> <span class="n">means</span> <span class="n">the</span> <span class="n">receiver</span> <span class="n">will</span> <span class="n">run</span> <span class="mi">1</span> <span class="nb">min</span> <span class="n">longer</span> <span class="n">than</span> <span class="n">the</span> <span class="n">sender</span> <span class="n">app</span><span class="o">.</span>
+<span class="n">sinkAppA</span><span class="o">.</span><span class="n">Stop</span> <span class="p">(</span><span class="n">Seconds</span> <span class="p">(</span><span class="n">runtime</span> <span class="o">+</span> <span class="mf">60.0</span><span class="p">));</span>
+
+<span class="n">Address</span> <span class="n">sinkAddr</span><span class="p">(</span><span class="n">InetSocketAddress</span><span class="p">(</span><span class="n">Baddr</span><span class="p">,</span> <span class="n">Bport</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>Now comes the sending application, on A. We must configure and create a <code class="docutils literal notranslate"><span class="pre">BulkSendApplication</span></code>, attach it to A, and arrange for a connection to be created to B. The <code class="docutils literal notranslate"><span class="pre">BulkSendHelper</span></code> class simplifies this.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BulkSendHelper</span> <span class="n">sourceAhelper</span> <span class="p">(</span><span class="s2">&quot;ns3::TcpSocketFactory&quot;</span><span class="p">,</span>  <span class="n">sinkAddr</span><span class="p">);</span>
+<span class="n">sourceAhelper</span><span class="o">.</span><span class="n">SetAttribute</span> <span class="p">(</span><span class="s2">&quot;MaxBytes&quot;</span><span class="p">,</span> <span class="n">UintegerValue</span> <span class="p">(</span><span class="n">maxBytes</span><span class="p">));</span>
+<span class="n">sourceAhelper</span><span class="o">.</span><span class="n">SetAttribute</span> <span class="p">(</span><span class="s2">&quot;SendSize&quot;</span><span class="p">,</span> <span class="n">UintegerValue</span> <span class="p">(</span><span class="n">tcpSegmentSize</span><span class="p">));</span>
+<span class="n">ApplicationContainer</span> <span class="n">sourceAppsA</span> <span class="o">=</span> <span class="n">sourceAhelper</span><span class="o">.</span><span class="n">Install</span> <span class="p">(</span><span class="n">A</span><span class="p">);</span>
+<span class="n">sourceAppsA</span><span class="o">.</span><span class="n">Start</span> <span class="p">(</span><span class="n">Seconds</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">));</span>
+<span class="n">sourceAppsA</span><span class="o">.</span><span class="n">Stop</span> <span class="p">(</span><span class="n">Seconds</span> <span class="p">(</span><span class="n">runtime</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>If we did not want to use the helper class here, the easiest way to create the <code class="docutils literal notranslate"><span class="pre">BulkSendApplication</span></code> is with an <code class="docutils literal notranslate"><span class="pre">ObjectFactory</span></code>. We configure the factory with the type we want to create and the relevant configuration parameters, and then call <code class="docutils literal notranslate"><span class="pre">factory.Create()</span></code>. (We could have used the <code class="docutils literal notranslate"><span class="pre">Config::SetDefault()</span></code> mechanism and <code class="docutils literal notranslate"><span class="pre">CreateObject()</span></code> as well.)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ObjectFactory</span> <span class="n">factory</span><span class="p">;</span>
+<span class="n">factory</span><span class="o">.</span><span class="n">SetTypeId</span> <span class="p">(</span><span class="s2">&quot;ns3::BulkSendApplication&quot;</span><span class="p">);</span>
+<span class="n">factory</span><span class="o">.</span><span class="n">Set</span> <span class="p">(</span><span class="s2">&quot;Protocol&quot;</span><span class="p">,</span> <span class="n">StringValue</span> <span class="p">(</span><span class="s2">&quot;ns3::TcpSocketFactory&quot;</span><span class="p">));</span>
+<span class="n">factory</span><span class="o">.</span><span class="n">Set</span> <span class="p">(</span><span class="s2">&quot;MaxBytes&quot;</span><span class="p">,</span> <span class="n">UintegerValue</span> <span class="p">(</span><span class="n">maxBytes</span><span class="p">));</span>
+<span class="n">factory</span><span class="o">.</span><span class="n">Set</span> <span class="p">(</span><span class="s2">&quot;SendSize&quot;</span><span class="p">,</span> <span class="n">UintegerValue</span> <span class="p">(</span><span class="n">tcpSegmentSize</span><span class="p">));</span>
+<span class="n">factory</span><span class="o">.</span><span class="n">Set</span> <span class="p">(</span><span class="s2">&quot;Remote&quot;</span><span class="p">,</span> <span class="n">AddressValue</span> <span class="p">(</span><span class="n">sinkAddr</span><span class="p">));</span>
+<span class="n">Ptr</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">&gt;</span> <span class="n">bulkSendAppObj</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">Create</span><span class="p">();</span>
+<span class="n">Ptr</span><span class="o">&lt;</span><span class="n">Application</span><span class="o">&gt;</span> <span class="n">bulkSendApp</span> <span class="o">=</span> <span class="n">bulkSendAppObj</span> <span class="o">-&gt;</span> <span class="n">GetObject</span><span class="o">&lt;</span><span class="n">Application</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="n">bulkSendApp</span><span class="o">-&gt;</span><span class="n">SetStartTime</span><span class="p">(</span><span class="n">Seconds</span><span class="p">(</span><span class="mf">0.0</span><span class="p">));</span>
+<span class="n">bulkSendApp</span><span class="o">-&gt;</span><span class="n">SetStopTime</span><span class="p">(</span><span class="n">Seconds</span><span class="p">(</span><span class="n">runtime</span><span class="p">));</span>
+<span class="n">A</span><span class="o">-&gt;</span><span class="n">AddApplication</span><span class="p">(</span><span class="n">bulkSendApp</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The above gives us no direct access to the actual TCP connection. Yet another alternative is to start by creating the TCP socket and connecting it:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Ptr</span><span class="o">&lt;</span><span class="n">Socket</span><span class="o">&gt;</span> <span class="n">tcpsock</span> <span class="o">=</span> <span class="n">Socket</span><span class="p">::</span><span class="n">CreateSocket</span> <span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">TcpSocketFactory</span><span class="p">::</span><span class="n">GetTypeId</span> <span class="p">());</span>
+<span class="n">tcpsock</span><span class="o">-&gt;</span><span class="n">Bind</span><span class="p">();</span>
+<span class="n">tcpsock</span><span class="o">-&gt;</span><span class="n">Connect</span><span class="p">(</span><span class="n">sinkAddr</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>However, there is then no mechanism for creating a <code class="docutils literal notranslate"><span class="pre">BulkSendApplication</span></code> that uses a pre-existing socket. (For a workaround, see the tutorial example <code class="docutils literal notranslate"><span class="pre">fifth.cc</span></code>.)</p>
+<p>Before beginning execution, we set up tracing; we will look at the tracefile format later. We use the <code class="docutils literal notranslate"><span class="pre">AR</span></code> <code class="docutils literal notranslate"><span class="pre">PointToPointHelper</span></code> class here, but both ascii and pcap tracing apply to the entire A–R–B network.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">Set</span> <span class="n">up</span> <span class="n">tracing</span>
+<span class="n">AsciiTraceHelper</span> <span class="n">ascii</span><span class="p">;</span>
+<span class="n">std</span><span class="p">::</span><span class="n">string</span> <span class="n">tfname</span> <span class="o">=</span> <span class="n">fileNameRoot</span> <span class="o">+</span> <span class="s2">&quot;.tr&quot;</span><span class="p">;</span>
+<span class="n">AR</span><span class="o">.</span><span class="n">EnableAsciiAll</span> <span class="p">(</span><span class="n">ascii</span><span class="o">.</span><span class="n">CreateFileStream</span> <span class="p">(</span><span class="n">tfname</span><span class="p">));</span>
+<span class="o">//</span> <span class="n">Setup</span> <span class="n">tracing</span> <span class="k">for</span> <span class="n">cwnd</span>
+<span class="n">Simulator</span><span class="p">::</span><span class="n">Schedule</span><span class="p">(</span><span class="n">Seconds</span><span class="p">(</span><span class="mf">0.01</span><span class="p">),</span><span class="o">&amp;</span><span class="n">TraceCwnd</span><span class="p">);</span>       <span class="o">//</span> <span class="n">this</span> <span class="n">Time</span> <span class="n">cannot</span> <span class="n">be</span> <span class="mf">0.0</span>
+
+<span class="o">//</span> <span class="n">This</span> <span class="n">tells</span> <span class="n">ns</span><span class="o">-</span><span class="mi">3</span> <span class="n">to</span> <span class="n">generate</span> <span class="n">pcap</span> <span class="n">traces</span><span class="p">,</span> <span class="n">including</span> <span class="s2">&quot;-node#-dev#-&quot;</span> <span class="ow">in</span> <span class="n">filename</span>
+<span class="n">AR</span><span class="o">.</span><span class="n">EnablePcapAll</span> <span class="p">(</span><span class="n">fileNameRoot</span><span class="p">);</span>    <span class="o">//</span> <span class="s2">&quot;.pcap&quot;</span> <span class="n">suffix</span> <span class="ow">is</span> <span class="n">added</span> <span class="n">automatically</span>
+</pre></div>
+</div>
+<p>This last creates four <code class="docutils literal notranslate"><span class="pre">.pcap</span></code> files, <em>eg</em></p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">basic1-0-0.pcap</div>
+<div class="line">basic1-1-0.pcap</div>
+<div class="line">basic1-1-1.pcap</div>
+<div class="line">basic1-2-0.pcap</div>
+</div>
+</div></blockquote>
+<p id="index-0">The first number refers to the node (A=0, R=1, B=2) and the second to the interface. A packet arriving at R but dropped there will appear in the second .pcap file but not the third. These files can be viewed with <a class="reference external" href="http://www.wireshark.org">WireShark</a>.</p>
+<p>Finally we are ready to start the simulator! The <code class="docutils literal notranslate"><span class="pre">BulkSendApplication</span></code> will stop at time <code class="docutils literal notranslate"><span class="pre">runtime</span></code>, but traffic may be in progress. We allow it an additional 60 seconds to clear. We also, after the simulation has run, print out the number of bytes received by B.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="n">Simulator</span><span class="p">::</span><span class="n">Stop</span> <span class="p">(</span><span class="n">Seconds</span> <span class="p">(</span><span class="n">runtime</span><span class="o">+</span><span class="mi">60</span><span class="p">));</span>
+  <span class="n">Simulator</span><span class="p">::</span><span class="n">Run</span> <span class="p">();</span>
+
+  <span class="n">Ptr</span><span class="o">&lt;</span><span class="n">PacketSink</span><span class="o">&gt;</span> <span class="n">sink1</span> <span class="o">=</span> <span class="n">DynamicCast</span><span class="o">&lt;</span><span class="n">PacketSink</span><span class="o">&gt;</span> <span class="p">(</span><span class="n">sinkAppA</span><span class="o">.</span><span class="n">Get</span> <span class="p">(</span><span class="mi">0</span><span class="p">));</span>
+  <span class="n">std</span><span class="p">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;Total Bytes Received from A: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">sink1</span><span class="o">-&gt;</span><span class="n">GetTotalRx</span> <span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="section" id="running-the-script">
+<span id="running-basic1-in-ns3"></span><h3>32.2.1&nbsp;&nbsp;&nbsp;Running the Script<a class="headerlink" href="#running-the-script" title="Permalink to this headline">¶</a></h3>
+<p>When we run the script and plot the <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> trace data (here for about 12 seconds), we get the following:</p>
+<img alt="_images/basic1_ns3_screenshot.png" src="_images/basic1_ns3_screenshot.png" />
+<p>Compare this graph to that in <a class="reference internal" href="ns2.html#ns-cwnd-v-time-1"><span class="std std-ref">31.2.1&nbsp;&nbsp;&nbsp;Graph of cwnd v time</span></a> produced by ns-2. The slow-start phase earlier ended at around 2.0 and now ends closer to 3.0. There are several modest differences, including the halving of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> just before T=1 and the peak around T=2.6; these were not apparent in the ns-2 graph.</p>
+<p>After slow-start is over, the graphs are quite similar; <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> ranges from 10 to 21. The period before was 1.946 seconds; here it is 2.0548; the difference is likely due to a more accurate implementation of the recovery algorithm.</p>
+<p>One striking difference is the presence of the near-vertical line of dots just after each peak. What is happening here is that ns-3 implements the <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> inflation/deflation algorithm outlined at the tail end of <a class="reference internal" href="reno.html#fast-recovery"><span class="std std-ref">19.4&nbsp;&nbsp;&nbsp;TCP Reno and Fast Recovery</span></a>. When three dupACKs are received, <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is set to <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>/2 + 3, and is then allowed to increase to 1.5×<code class="docutils literal notranslate"><span class="pre">cwnd</span></code>. See the end of <a class="reference internal" href="reno.html#fast-recovery"><span class="std std-ref">19.4&nbsp;&nbsp;&nbsp;TCP Reno and Fast Recovery</span></a>.</p>
+</div>
+<div class="section" id="the-ascii-tracefile">
+<span id="id2"></span><h3>32.2.2&nbsp;&nbsp;&nbsp;The Ascii Tracefile<a class="headerlink" href="#the-ascii-tracefile" title="Permalink to this headline">¶</a></h3>
+<p>Below are four lines from the tracefile, starting with the record showing packet 271 (Seq=271001) being dropped by R.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>d 4.9823  /NodeList/1/DeviceList/1/$ns3::PointToPointNetDevice/TxQueue/Drop ns3::PppHeader (Point-to-Point Protocol: IP (0x0021)) ns3::Ipv4Header (tos 0x0 DSCP Default ECN Not-ECT ttl 63 id 296 protocol 6 offset (bytes) 0 flags [none] length: 1040 10.0.0.1 &gt; 10.0.1.2) ns3::TcpHeader (49153 &gt; 80 [ ACK ] Seq=271001 Ack=1 Win=65535) Payload (size=1000)
+r 4.98312 /NodeList/2/DeviceList/0/$ns3::PointToPointNetDevice/MacRx ns3::Ipv4Header (tos 0x0 DSCP Default ECN Not-ECT ttl 63 id 283 protocol 6 offset (bytes) 0 flags [none] length: 1040 10.0.0.1 &gt; 10.0.1.2) ns3::TcpHeader (49153 &gt; 80 [ ACK ] Seq=258001 Ack=1 Win=65535) Payload (size=1000)
++ 4.98312 /NodeList/2/DeviceList/0/$ns3::PointToPointNetDevice/TxQueue/Enqueue ns3::PppHeader (Point-to-Point Protocol: IP (0x0021)) ns3::Ipv4Header (tos 0x0 DSCP Default ECN Not-ECT ttl 64 id 271 protocol 6 offset (bytes) 0 flags [none] length: 40 10.0.1.2 &gt; 10.0.0.1) ns3::TcpHeader (80 &gt; 49153 [ ACK ] Seq=1 Ack=259001 Win=65535)
+- 4.98312 /NodeList/2/DeviceList/0/$ns3::PointToPointNetDevice/TxQueue/Dequeue ns3::PppHeader (Point-to-Point Protocol: IP (0x0021)) ns3::Ipv4Header (tos 0x0 DSCP Default ECN Not-ECT ttl 64 id 271 protocol 6 offset (bytes) 0 flags [none] length: 40 10.0.1.2 &gt; 10.0.0.1) ns3::TcpHeader (80 &gt; 49153 [ ACK ] Seq=1 Ack=259001 Win=65535)
+</pre></div>
+</div>
+<p>As with ns-2, the first letter indicates the action: <strong>r</strong> for received, <strong>d</strong> for dropped, <strong>+</strong> for enqueued, <strong>-</strong> for dequeued. For Wi-Fi tracefiles, <strong>t</strong> is for transmitted. The second field represents the time.</p>
+<p>The third field represents the name of the event in the <em>configuration namespace</em>, sometimes called the <em>configuration path</em> name. The <code class="docutils literal notranslate"><span class="pre">NodeList</span></code> value represents the node (A=0, <em>etc</em>), the <code class="docutils literal notranslate"><span class="pre">DeviceList</span></code> represents the interface, and the final part of the name repeats the action: <code class="docutils literal notranslate"><span class="pre">Drop</span></code>, <code class="docutils literal notranslate"><span class="pre">MacRx</span></code>, <code class="docutils literal notranslate"><span class="pre">Enqueue</span></code>, <code class="docutils literal notranslate"><span class="pre">Dequeue</span></code>.</p>
+<p>After that come a series of class names (<em>eg</em> <code class="docutils literal notranslate"><span class="pre">ns3::Ipv4Header</span></code>, <code class="docutils literal notranslate"><span class="pre">ns3::TcpHeader</span></code>), from the ns-3 attribute system, followed in each case by a parenthesized list of class-specific trace information.</p>
+<p>In the output above, the final three records all refer to node B (<code class="docutils literal notranslate"><span class="pre">/NodeList/2/</span></code>). Packet 258 has just arrived (Seq=258001), and ACK 259001 is then enqueued and sent.</p>
+</div>
+<div class="section" id="unexpected-timeouts-and-other-phenomena">
+<span id="unexpected-timeouts"></span><h3>32.2.3&nbsp;&nbsp;&nbsp;Unexpected Timeouts and Other Phenomena<a class="headerlink" href="#unexpected-timeouts-and-other-phenomena" title="Permalink to this headline">¶</a></h3>
+<p>In the discussion of the script above at <a class="reference internal" href="#ns3basic1"><span class="std std-ref">32.2&nbsp;&nbsp;&nbsp;A Single TCP Sender</span></a> we mentioned that we set <code class="docutils literal notranslate"><span class="pre">ns3::TcpSocket::DelAckCount</span></code> to 0, to disable delayed ACKs, and <code class="docutils literal notranslate"><span class="pre">ns3::RttEstimator::MinRTO</span></code> to 500 ms, to avoid unexpected timeouts.</p>
+<p>If we comment out the line disabling delayed ACKs, little changes in our graph, except that the spacing between consecutive TCP teeth now almost doubles to 3.776. This is because with delayed ACKs the receiver sends only half as many ACKs, and the sender does not take this into account when incrementing <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> (that is, the sender does not implement the suggestion of <span class="target" id="index-1"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3465.html"><strong>RFC 3465</strong></a> mentioned in <a class="reference internal" href="reno.html#per-ack-responses"><span class="std std-ref">19.2.1&nbsp;&nbsp;&nbsp;TCP Reno Per-ACK Responses</span></a>).</p>
+<p>If we leave out the <code class="docutils literal notranslate"><span class="pre">MinRTO</span></code> adjustment, <em>and</em> set <code class="docutils literal notranslate"><span class="pre">tcpSegmentSize</span></code> to 960, we get a more serious problem: the graph now looks something like this:</p>
+<img alt="_images/basic1_noRttFix_small.png" src="_images/basic1_noRttFix_small.png" />
+<p>We can enable ns-3’s internal logging in the <code class="docutils literal notranslate"><span class="pre">TcpReno</span></code> class by entering the commands below, before running the script. (In some cases, as with <code class="docutils literal notranslate"><span class="pre">WifiHelper::EnableLogComponents()</span></code>, logging output can be enabled from within the script.) Once enabled, logging output is written to <code class="docutils literal notranslate"><span class="pre">stderr</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">NS_LOG</span><span class="o">=</span><span class="n">TcpReno</span><span class="o">=</span><span class="n">level_info</span>
+<span class="n">export</span> <span class="n">NS_LOG</span>
+</pre></div>
+</div>
+<p>The log output shows the initial dupACK at 8.54:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">8.54069</span> <span class="p">[</span><span class="n">node</span> <span class="mi">0</span><span class="p">]</span> <span class="n">Triple</span> <span class="n">dupack</span><span class="o">.</span> <span class="n">Reset</span> <span class="n">cwnd</span> <span class="n">to</span> <span class="mi">12960</span><span class="p">,</span> <span class="n">ssthresh</span> <span class="n">to</span> <span class="mi">10080</span>
+</pre></div>
+</div>
+<p>But then, despite Fast Recovery proceding normally, we get a hard timeout:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">8.71463</span> <span class="p">[</span><span class="n">node</span> <span class="mi">0</span><span class="p">]</span> <span class="n">RTO</span><span class="o">.</span> <span class="n">Reset</span> <span class="n">cwnd</span> <span class="n">to</span> <span class="mi">960</span><span class="p">,</span> <span class="n">ssthresh</span> <span class="n">to</span> <span class="mi">14400</span><span class="p">,</span> <span class="n">restart</span> <span class="kn">from</span> <span class="nn">seqnum</span> <span class="mi">510721</span>
+</pre></div>
+</div>
+<p>What is happening here is that the RTO interval was just a little too short, probably due to the use of the “awkward” segment size of 960.</p>
+<p>After the timeout, there is another triple-dupACK!</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">8.90344</span> <span class="p">[</span><span class="n">node</span> <span class="mi">0</span><span class="p">]</span> <span class="n">Triple</span> <span class="n">dupack</span><span class="o">.</span> <span class="n">Reset</span> <span class="n">cwnd</span> <span class="n">to</span> <span class="mi">6240</span><span class="p">,</span> <span class="n">ssthresh</span> <span class="n">to</span> <span class="mi">3360</span>
+</pre></div>
+</div>
+<p>Shortly thereafter, at T=8.98, <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is reset to 3360, in accordance with the Fast Recovery rules.</p>
+<p>The overall effect is that <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is reset, not to 10, but to about 3.4 (in packets). This significantly slows down throughput.</p>
+<p>In recovering from the hard timeout, the sequence number is reset to Seq=510721 (packet 532), as this was the last packet acknowledged. Unfortunately, several later packets had in fact made it through to B. By looking at the tracefile, we can see that at T=8.7818, B received Seq=538561, or packet 561. Thus, when A begins retransmitting packets 533, 534, <em>etc</em> after the timeout, B’s response is to send the ACK the highest packet it has received, packet 561 (Ack=539521).</p>
+<p>This scenario is not what the designers of Fast Recovery had in mind; it is likely triggered by a too-conservative timeout estimate. Still, exactly how to fix it is an interesting question; one approach might be to ignore, in Fast Recovery, triple dupACKs of packets now beyond what the sender is currently sending.</p>
+</div>
+</div>
+<div class="section" id="wireless">
+<span id="ns3-wireless"></span><h2>32.3&nbsp;&nbsp;&nbsp;Wireless<a class="headerlink" href="#wireless" title="Permalink to this headline">¶</a></h2>
+<p>We next present the wireless simulation of <a class="reference internal" href="ns2.html#ns2-wireless"><span class="std std-ref">31.6&nbsp;&nbsp;&nbsp;Wireless Simulation</span></a>. The full script is at <a class="reference external" href="auxiliary_files/ns3/wireless.cc">wireless.cc</a>; the animation output for the <code class="docutils literal notranslate"><span class="pre">netanim</span></code> player is at <a class="reference external" href="auxiliary_files/ns3/wireless.xml">wireless.xml</a>. As before, we have one <code class="docutils literal notranslate"><span class="pre">mover</span></code> node moving horizontally 150 meters above a row of five fixed nodes spaced 200 meters apart. The limit of transmission is set to be 250 meters, meaning that a fixed node goes out of range of the <code class="docutils literal notranslate"><span class="pre">mover</span></code> node just as the latter passes over directly above the <em>next</em> fixed node. As before, we use Ad hoc On-demand Distance Vector (AODV) as the routing protocol. When the <code class="docutils literal notranslate"><span class="pre">mover</span></code> passes over fixed node N, it goes out of range of fixed node N-1, at which point AODV finds a new route to <code class="docutils literal notranslate"><span class="pre">mover</span></code> through fixed node N.</p>
+<img alt="_images/ns3wireless.png" src="_images/ns3wireless.png" />
+<p>As in ns-2, wireless simulations tend to require considerably more configuration than point-to-point simulations. We now review the source code line-by-line. We start with two callback functions and the global variables they will need to access.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">using</span> <span class="n">namespace</span> <span class="n">ns3</span><span class="p">;</span>
+
+<span class="n">Ptr</span><span class="o">&lt;</span><span class="n">ConstantVelocityMobilityModel</span><span class="o">&gt;</span> <span class="n">cvmm</span><span class="p">;</span>
+<span class="n">double</span> <span class="n">position_interval</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">;</span>
+<span class="n">std</span><span class="p">::</span><span class="n">string</span> <span class="n">tracebase</span> <span class="o">=</span> <span class="s2">&quot;scratch/wireless&quot;</span><span class="p">;</span>
+
+<span class="o">//</span> <span class="n">two</span> <span class="n">callbacks</span>
+<span class="n">void</span> <span class="n">printPosition</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="n">Vector</span> <span class="n">thePos</span> <span class="o">=</span> <span class="n">cvmm</span><span class="o">-&gt;</span><span class="n">GetPosition</span><span class="p">();</span>
+  <span class="n">Simulator</span><span class="p">::</span><span class="n">Schedule</span><span class="p">(</span><span class="n">Seconds</span><span class="p">(</span><span class="n">position_interval</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">printPosition</span><span class="p">);</span>
+  <span class="n">std</span><span class="p">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;position: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">thePos</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">void</span> <span class="n">stopMover</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="n">cvmm</span> <span class="o">-&gt;</span> <span class="n">SetVelocity</span><span class="p">(</span><span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">));</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Next comes the data rate:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">main</span> <span class="p">(</span><span class="nb">int</span> <span class="n">argc</span><span class="p">,</span> <span class="n">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+  <span class="n">std</span><span class="p">::</span><span class="n">string</span> <span class="n">phyMode</span> <span class="o">=</span> <span class="s2">&quot;DsssRate1Mbps&quot;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">phyMode</span></code> string represents the Wi-Fi data rate (and modulation technique). DSSS rates are <code class="docutils literal notranslate"><span class="pre">DsssRate1Mbps</span></code>, <code class="docutils literal notranslate"><span class="pre">DsssRate2Mbps</span></code>, <code class="docutils literal notranslate"><span class="pre">DsssRate5_5Mbps</span></code> and <code class="docutils literal notranslate"><span class="pre">DsssRate11Mbps</span></code>. Also available are <code class="docutils literal notranslate"><span class="pre">ErpOfdmRate</span></code> constants to 54 Mbps and <code class="docutils literal notranslate"><span class="pre">OfdmRate</span></code> constants to 150 Mbps with a 40 MHz band-width (<code class="docutils literal notranslate"><span class="pre">GetOfdmRate150MbpsBW40MHz</span></code>). All these are defined in src/wifi/model/wifi-phy.cc.</p>
+<p>Next are the variables that determine the layout and network behavior. The <code class="docutils literal notranslate"><span class="pre">factor</span></code> variable allows slowing down the speed of the <code class="docutils literal notranslate"><span class="pre">mover</span></code> node but correspondingly extending the runtime (though the new-route-discovery time is <em>not</em> scaled):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">bottomrow</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>            <span class="o">//</span> <span class="n">number</span> <span class="n">of</span> <span class="n">bottom</span><span class="o">-</span><span class="n">row</span> <span class="n">nodes</span>
+<span class="nb">int</span> <span class="n">spacing</span> <span class="o">=</span> <span class="mi">200</span><span class="p">;</span>            <span class="o">//</span> <span class="n">between</span> <span class="n">bottom</span><span class="o">-</span><span class="n">row</span> <span class="n">nodes</span>
+<span class="nb">int</span> <span class="n">mheight</span> <span class="o">=</span> <span class="mi">150</span><span class="p">;</span>            <span class="o">//</span> <span class="n">height</span> <span class="n">of</span> <span class="n">mover</span> <span class="n">above</span> <span class="n">bottom</span> <span class="n">row</span>
+<span class="nb">int</span> <span class="n">brheight</span> <span class="o">=</span> <span class="mi">50</span><span class="p">;</span>            <span class="o">//</span> <span class="n">height</span> <span class="n">of</span> <span class="n">bottom</span> <span class="n">row</span>
+
+<span class="nb">int</span> <span class="n">X</span> <span class="o">=</span> <span class="p">(</span><span class="n">bottomrow</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">spacing</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>              <span class="o">//</span> <span class="n">X</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">horizontal</span> <span class="n">dimension</span> <span class="n">of</span> <span class="n">the</span> <span class="n">field</span>
+<span class="nb">int</span> <span class="n">packetsize</span> <span class="o">=</span> <span class="mi">500</span><span class="p">;</span>
+<span class="n">double</span> <span class="n">factor</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">;</span>  <span class="o">//</span> <span class="n">allows</span> <span class="n">slowing</span> <span class="n">down</span> <span class="n">rate</span> <span class="ow">and</span> <span class="n">extending</span> <span class="n">runtime</span><span class="p">;</span> <span class="n">same</span> <span class="n">total</span> <span class="c1"># of packets</span>
+<span class="nb">int</span> <span class="n">endtime</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="mi">100</span><span class="o">*</span><span class="n">factor</span><span class="p">;</span>
+<span class="n">double</span> <span class="n">speed</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span><span class="o">-</span><span class="mf">1.0</span><span class="p">)</span><span class="o">/</span><span class="n">endtime</span><span class="p">;</span>
+<span class="n">double</span> <span class="n">bitrate</span> <span class="o">=</span> <span class="mi">80</span><span class="o">*</span><span class="mf">1000.0</span><span class="o">/</span><span class="n">factor</span><span class="p">;</span>  <span class="o">//</span> <span class="o">*</span><span class="n">average</span><span class="o">*</span> <span class="n">transmission</span> <span class="n">rate</span><span class="p">,</span> <span class="ow">in</span> <span class="n">bits</span><span class="o">/</span><span class="n">sec</span>
+<span class="n">uint32_t</span> <span class="n">interval</span> <span class="o">=</span> <span class="mi">1000</span><span class="o">*</span><span class="n">packetsize</span><span class="o">*</span><span class="mi">8</span><span class="o">/</span><span class="n">bitrate</span><span class="o">*</span><span class="mi">1000</span><span class="p">;</span>    <span class="o">//</span> <span class="ow">in</span> <span class="n">microsec</span>
+<span class="n">uint32_t</span> <span class="n">packetcount</span> <span class="o">=</span> <span class="mi">1000000</span><span class="o">*</span><span class="n">endtime</span><span class="o">/</span> <span class="n">interval</span><span class="p">;</span>
+<span class="n">std</span><span class="p">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;interval = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">interval</span> <span class="o">&lt;&lt;</span><span class="s2">&quot;, rate=&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">bitrate</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;, packetcount=&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">packetcount</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>There are some niceties in calculating the packet transmission interval above; if we do it instead as 1000000*packetsize*8/bitrate then we sometimes run into 32-bit overflow problems or integer-division-roundoff problems.</p>
+<p>Now we configure some Wi-Fi settings.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">disable</span> <span class="n">fragmentation</span> <span class="k">for</span> <span class="n">frames</span> <span class="n">below</span> <span class="mi">2200</span> <span class="nb">bytes</span>
+<span class="n">Config</span><span class="p">::</span><span class="n">SetDefault</span> <span class="p">(</span><span class="s2">&quot;ns3::WifiRemoteStationManager::FragmentationThreshold&quot;</span><span class="p">,</span> <span class="n">StringValue</span> <span class="p">(</span><span class="s2">&quot;2200&quot;</span><span class="p">));</span>
+<span class="o">//</span> <span class="n">turn</span> <span class="n">off</span> <span class="n">RTS</span><span class="o">/</span><span class="n">CTS</span> <span class="k">for</span> <span class="n">frames</span> <span class="n">below</span> <span class="mi">2200</span> <span class="nb">bytes</span>
+<span class="n">Config</span><span class="p">::</span><span class="n">SetDefault</span> <span class="p">(</span><span class="s2">&quot;ns3::WifiRemoteStationManager::RtsCtsThreshold&quot;</span><span class="p">,</span> <span class="n">StringValue</span> <span class="p">(</span><span class="s2">&quot;2200&quot;</span><span class="p">));</span>
+<span class="o">//</span> <span class="n">Set</span> <span class="n">non</span><span class="o">-</span><span class="n">unicast</span> <span class="n">data</span> <span class="n">rate</span> <span class="n">to</span> <span class="n">be</span> <span class="n">the</span> <span class="n">same</span> <span class="k">as</span> <span class="n">that</span> <span class="n">of</span> <span class="n">unicast</span>
+<span class="n">Config</span><span class="p">::</span><span class="n">SetDefault</span> <span class="p">(</span><span class="s2">&quot;ns3::WifiRemoteStationManager::NonUnicastMode&quot;</span><span class="p">,</span> <span class="n">StringValue</span> <span class="p">(</span><span class="n">phyMode</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>Here we create the <code class="docutils literal notranslate"><span class="pre">mover</span></code> node with <code class="docutils literal notranslate"><span class="pre">CreateObject&lt;Node&gt;()</span></code>, but the fixed nodes are created via a <code class="docutils literal notranslate"><span class="pre">NodeContainer</span></code>, as is more typical with larger simulations</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">Create</span> <span class="n">nodes</span>
+<span class="n">NodeContainer</span> <span class="n">fixedpos</span><span class="p">;</span>
+<span class="n">fixedpos</span><span class="o">.</span><span class="n">Create</span><span class="p">(</span><span class="n">bottomrow</span><span class="p">);</span>
+<span class="n">Ptr</span><span class="o">&lt;</span><span class="n">Node</span><span class="o">&gt;</span> <span class="n">lowerleft</span> <span class="o">=</span> <span class="n">fixedpos</span><span class="o">.</span><span class="n">Get</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="n">Ptr</span><span class="o">&lt;</span><span class="n">Node</span><span class="o">&gt;</span> <span class="n">mover</span> <span class="o">=</span> <span class="n">CreateObject</span><span class="o">&lt;</span><span class="n">Node</span><span class="o">&gt;</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>Now we put together a set of “helper” objects for more Wi-Fi configuration. We must configure both the PHY (physical) and MAC layers.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">The</span> <span class="n">below</span> <span class="nb">set</span> <span class="n">of</span> <span class="n">helpers</span> <span class="n">will</span> <span class="n">help</span> <span class="n">us</span> <span class="n">to</span> <span class="n">put</span> <span class="n">together</span> <span class="n">the</span> <span class="n">desired</span> <span class="n">Wi</span><span class="o">-</span><span class="n">Fi</span> <span class="n">behavior</span>
+<span class="n">WifiHelper</span> <span class="n">wifi</span><span class="p">;</span>
+<span class="n">wifi</span><span class="o">.</span><span class="n">SetStandard</span> <span class="p">(</span><span class="n">WIFI_PHY_STANDARD_80211b</span><span class="p">);</span>
+<span class="n">wifi</span><span class="o">.</span><span class="n">SetRemoteStationManager</span> <span class="p">(</span><span class="s2">&quot;ns3::AarfWifiManager&quot;</span><span class="p">);</span> <span class="o">//</span> <span class="n">Use</span> <span class="n">AARF</span> <span class="n">rate</span> <span class="n">control</span>
+</pre></div>
+</div>
+<p>The AARF rate changes can be viewed by enabling the appropriate logging with, at the shell level before <code class="docutils literal notranslate"><span class="pre">./waf</span></code>, <code class="docutils literal notranslate"><span class="pre">NS_LOG=AarfWifiManager=level_debug</span></code>. We are not otherwise interested in rate scaling (<a class="reference internal" href="wireless.html#rate-scaling"><span class="std std-ref">4.2.2&nbsp;&nbsp;&nbsp;Dynamic Rate Scaling</span></a>) here, though.</p>
+<p>The PHY layer helper is <code class="docutils literal notranslate"><span class="pre">YansWifiPhyHelper</span></code>. The YANS project (Yet Another Network Simulator) was an influential precursor to ns-3; see <a class="reference internal" href="bibliography.html#lh06" id="id3">[LH06]</a>. Note the <code class="docutils literal notranslate"><span class="pre">AddPropagationLoss</span></code> configuration, where we set the Wi-Fi range to 250 meters. The MAC layer helper is <code class="docutils literal notranslate"><span class="pre">NqosWifiMacHelper</span></code>; the “nqos” means “no quality-of-service”, <em>ie</em> no use of Wi-Fi PCF (<a class="reference internal" href="wireless.html#pcf"><span class="std std-ref">4.2.7&nbsp;&nbsp;&nbsp;Wi-Fi Polling Mode</span></a>).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>// The PHY layer here is &quot;yans&quot;
+YansWifiPhyHelper wifiPhyHelper =  YansWifiPhyHelper::Default ();
+// for .pcap tracing
+// wifiPhyHelper.SetPcapDataLinkType (YansWifiPhyHelper::DLT_IEEE802_11_RADIO);
+
+YansWifiChannelHelper wifiChannelHelper;              // *not* ::Default() !
+wifiChannelHelper.SetPropagationDelay (&quot;ns3::ConstantSpeedPropagationDelayModel&quot;); // pld: default?
+// the following has an absolute cutoff at distance &gt; 250
+wifiChannelHelper.AddPropagationLoss (&quot;ns3::RangePropagationLossModel&quot;, &quot;MaxRange&quot;, DoubleValue(250));
+Ptr&lt;YansWifiChannel&gt; pchan = wifiChannelHelper.Create ();
+wifiPhyHelper.SetChannel (pchan);
+
+// Add a non-QoS upper-MAC layer &quot;AdhocWifiMac&quot;, and set rate control
+NqosWifiMacHelper wifiMacHelper = NqosWifiMacHelper::Default ();
+wifiMacHelper.SetType (&quot;ns3::AdhocWifiMac&quot;);
+NetDeviceContainer devices = wifi.Install (wifiPhyHelper, wifiMacHelper, fixedpos);
+devices.Add (wifi.Install (wifiPhyHelper, wifiMacHelper, mover));
+</pre></div>
+</div>
+<p>At this point the basic Wi-Fi configuration is done! The next step is to work on the positions and motion. First we establish the positions of the fixed nodes.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MobilityHelper</span> <span class="n">sessile</span><span class="p">;</span>               <span class="o">//</span> <span class="k">for</span> <span class="n">fixed</span> <span class="n">nodes</span>
+<span class="n">Ptr</span><span class="o">&lt;</span><span class="n">ListPositionAllocator</span><span class="o">&gt;</span> <span class="n">positionAlloc</span> <span class="o">=</span> <span class="n">CreateObject</span><span class="o">&lt;</span><span class="n">ListPositionAllocator</span><span class="o">&gt;</span> <span class="p">();</span>
+<span class="nb">int</span> <span class="n">Xpos</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="k">for</span> <span class="p">(</span><span class="nb">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">bottomrow</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">positionAlloc</span><span class="o">-&gt;</span><span class="n">Add</span><span class="p">(</span><span class="n">Vector</span><span class="p">(</span><span class="n">Xpos</span><span class="p">,</span> <span class="n">brheight</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">));</span>
+      <span class="n">Xpos</span> <span class="o">+=</span> <span class="n">spacing</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">sessile</span><span class="o">.</span><span class="n">SetPositionAllocator</span> <span class="p">(</span><span class="n">positionAlloc</span><span class="p">);</span>
+<span class="n">sessile</span><span class="o">.</span><span class="n">SetMobilityModel</span> <span class="p">(</span><span class="s2">&quot;ns3::ConstantPositionMobilityModel&quot;</span><span class="p">);</span>
+<span class="n">sessile</span><span class="o">.</span><span class="n">Install</span> <span class="p">(</span><span class="n">fixedpos</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Next we set up the <code class="docutils literal notranslate"><span class="pre">mover</span></code> node. <code class="docutils literal notranslate"><span class="pre">ConstantVelocityMobilityModel</span></code> is a subclass of <code class="docutils literal notranslate"><span class="pre">MobilityModel</span></code>. At the end we print out a couple things just for confirmation.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Vector</span> <span class="n">pos</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">mheight</span><span class="o">+</span><span class="n">brheight</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="n">Vector</span> <span class="n">vel</span> <span class="p">(</span><span class="n">speed</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="n">MobilityHelper</span> <span class="n">mobile</span><span class="p">;</span>
+<span class="n">mobile</span><span class="o">.</span><span class="n">SetMobilityModel</span><span class="p">(</span><span class="s2">&quot;ns3::ConstantVelocityMobilityModel&quot;</span><span class="p">);</span>        <span class="o">//</span> <span class="n">no</span> <span class="n">Attributes</span>
+<span class="n">mobile</span><span class="o">.</span><span class="n">Install</span><span class="p">(</span><span class="n">mover</span><span class="p">);</span>
+<span class="n">cvmm</span> <span class="o">=</span> <span class="n">mover</span><span class="o">-&gt;</span><span class="n">GetObject</span><span class="o">&lt;</span><span class="n">ConstantVelocityMobilityModel</span><span class="o">&gt;</span> <span class="p">();</span>
+<span class="n">cvmm</span><span class="o">-&gt;</span><span class="n">SetPosition</span><span class="p">(</span><span class="n">pos</span><span class="p">);</span>
+<span class="n">cvmm</span><span class="o">-&gt;</span><span class="n">SetVelocity</span><span class="p">(</span><span class="n">vel</span><span class="p">);</span>
+<span class="n">std</span><span class="p">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;position: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">cvmm</span><span class="o">-&gt;</span><span class="n">GetPosition</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot; velocity: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">cvmm</span><span class="o">-&gt;</span><span class="n">GetVelocity</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="n">std</span><span class="p">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;mover mobility model: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">mobile</span><span class="o">.</span><span class="n">GetMobilityModelType</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Now we configure Ad hoc On-demand Distance Vector routing.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">AodvHelper</span> <span class="n">aodv</span><span class="p">;</span>
+<span class="n">OlsrHelper</span> <span class="n">olsr</span><span class="p">;</span>
+<span class="n">Ipv4ListRoutingHelper</span> <span class="n">listrouting</span><span class="p">;</span>
+<span class="o">//</span><span class="n">listrouting</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="n">olsr</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>                          <span class="o">//</span> <span class="n">generates</span> <span class="n">less</span> <span class="n">traffic</span>
+<span class="n">listrouting</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="n">aodv</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>                            <span class="o">//</span> <span class="n">fastest</span> <span class="n">to</span> <span class="n">find</span> <span class="n">new</span> <span class="n">routes</span>
+</pre></div>
+</div>
+<p>Uncommenting the <code class="docutils literal notranslate"><span class="pre">olsr</span></code> line (and commenting out the last line) is all that is necessary to change to OLSR routing. OLSR is slower to find new routes, but sends less traffic.</p>
+<p>Now we set up the IP addresses. This is straightforward as all the nodes are on a single subnet.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">InternetStackHelper</span> <span class="n">internet</span><span class="p">;</span>
+<span class="n">internet</span><span class="o">.</span><span class="n">SetRoutingHelper</span><span class="p">(</span><span class="n">listrouting</span><span class="p">);</span>
+<span class="n">internet</span><span class="o">.</span><span class="n">Install</span> <span class="p">(</span><span class="n">fixedpos</span><span class="p">);</span>
+<span class="n">internet</span><span class="o">.</span><span class="n">Install</span> <span class="p">(</span><span class="n">mover</span><span class="p">);</span>
+
+<span class="n">Ipv4AddressHelper</span> <span class="n">ipv4</span><span class="p">;</span>
+<span class="n">NS_LOG_INFO</span> <span class="p">(</span><span class="s2">&quot;Assign IP Addresses.&quot;</span><span class="p">);</span>
+<span class="n">ipv4</span><span class="o">.</span><span class="n">SetBase</span> <span class="p">(</span><span class="s2">&quot;10.1.1.0&quot;</span><span class="p">,</span> <span class="s2">&quot;255.255.255.0&quot;</span><span class="p">);</span>           <span class="o">//</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">only</span> <span class="n">one</span> <span class="n">subnet</span>
+<span class="n">Ipv4InterfaceContainer</span> <span class="n">i</span> <span class="o">=</span> <span class="n">ipv4</span><span class="o">.</span><span class="n">Assign</span> <span class="p">(</span><span class="n">devices</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Now we create a receiving application <code class="docutils literal notranslate"><span class="pre">UdpServer</span></code> on node <code class="docutils literal notranslate"><span class="pre">mover</span></code>, and a sending application <code class="docutils literal notranslate"><span class="pre">UdpClient</span></code> on the lower-left node. These applications generate their own sequence numbers, which show up in the ns-3 tracefiles marked with <code class="docutils literal notranslate"><span class="pre">ns3::SeqTsHeader</span></code>. As in <a class="reference internal" href="#ns3-basic1"><span class="std std-ref">32.2&nbsp;&nbsp;&nbsp;A Single TCP Sender</span></a>, we use <code class="docutils literal notranslate"><span class="pre">Config::SetDefault()</span></code> and <code class="docutils literal notranslate"><span class="pre">CreateObject&lt;&gt;()</span></code> to construct the applications.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uint16_t</span> <span class="n">port</span> <span class="o">=</span> <span class="mi">80</span><span class="p">;</span>
+<span class="o">//</span> <span class="n">create</span> <span class="n">a</span> <span class="n">receiving</span> <span class="n">application</span> <span class="p">(</span><span class="n">UdpServer</span><span class="p">)</span> <span class="n">on</span> <span class="n">node</span> <span class="n">mover</span>
+<span class="n">Address</span> <span class="n">sinkaddr</span><span class="p">(</span><span class="n">InetSocketAddress</span> <span class="p">(</span><span class="n">Ipv4Address</span><span class="p">::</span><span class="n">GetAny</span> <span class="p">(),</span> <span class="n">port</span><span class="p">));</span>
+<span class="n">Config</span><span class="p">::</span><span class="n">SetDefault</span><span class="p">(</span><span class="s2">&quot;ns3::UdpServer::Port&quot;</span><span class="p">,</span> <span class="n">UintegerValue</span><span class="p">(</span><span class="n">port</span><span class="p">));</span>
+
+<span class="n">Ptr</span><span class="o">&lt;</span><span class="n">UdpServer</span><span class="o">&gt;</span> <span class="n">UdpRecvApp</span> <span class="o">=</span> <span class="n">CreateObject</span><span class="o">&lt;</span><span class="n">UdpServer</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="n">UdpRecvApp</span><span class="o">-&gt;</span><span class="n">SetStartTime</span><span class="p">(</span><span class="n">Seconds</span><span class="p">(</span><span class="mf">0.0</span><span class="p">));</span>
+<span class="n">UdpRecvApp</span><span class="o">-&gt;</span><span class="n">SetStopTime</span><span class="p">(</span><span class="n">Seconds</span><span class="p">(</span><span class="n">endtime</span><span class="o">+</span><span class="mi">60</span><span class="p">));</span>
+<span class="n">mover</span><span class="o">-&gt;</span><span class="n">AddApplication</span><span class="p">(</span><span class="n">UdpRecvApp</span><span class="p">);</span>
+
+<span class="n">Ptr</span><span class="o">&lt;</span><span class="n">Ipv4</span><span class="o">&gt;</span> <span class="n">m4</span> <span class="o">=</span> <span class="n">mover</span><span class="o">-&gt;</span><span class="n">GetObject</span><span class="o">&lt;</span><span class="n">Ipv4</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="n">Ipv4Address</span> <span class="n">Maddr</span> <span class="o">=</span> <span class="n">m4</span><span class="o">-&gt;</span><span class="n">GetAddress</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">GetLocal</span><span class="p">();</span>
+<span class="n">std</span><span class="p">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;IPv4 address of mover: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">Maddr</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="n">Address</span> <span class="n">moverAddress</span> <span class="p">(</span><span class="n">InetSocketAddress</span> <span class="p">(</span><span class="n">Maddr</span><span class="p">,</span> <span class="n">port</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>Here is the <code class="docutils literal notranslate"><span class="pre">UdpClient</span></code> sending application:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Config</span><span class="p">::</span><span class="n">SetDefault</span><span class="p">(</span><span class="s2">&quot;ns3::UdpClient::MaxPackets&quot;</span><span class="p">,</span> <span class="n">UintegerValue</span><span class="p">(</span><span class="n">packetcount</span><span class="p">));</span>
+<span class="n">Config</span><span class="p">::</span><span class="n">SetDefault</span><span class="p">(</span><span class="s2">&quot;ns3::UdpClient::PacketSize&quot;</span><span class="p">,</span> <span class="n">UintegerValue</span><span class="p">(</span><span class="n">packetsize</span><span class="p">));</span>
+<span class="n">Config</span><span class="p">::</span><span class="n">SetDefault</span><span class="p">(</span><span class="s2">&quot;ns3::UdpClient::Interval&quot;</span><span class="p">,</span>   <span class="n">TimeValue</span> <span class="p">(</span><span class="n">MicroSeconds</span> <span class="p">(</span><span class="n">interval</span><span class="p">)));</span>
+
+<span class="n">Ptr</span><span class="o">&lt;</span><span class="n">UdpClient</span><span class="o">&gt;</span> <span class="n">UdpSendApp</span> <span class="o">=</span> <span class="n">CreateObject</span><span class="o">&lt;</span><span class="n">UdpClient</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="n">UdpSendApp</span> <span class="o">-&gt;</span> <span class="n">SetRemote</span><span class="p">(</span><span class="n">Maddr</span><span class="p">,</span> <span class="n">port</span><span class="p">);</span>
+<span class="n">UdpSendApp</span> <span class="o">-&gt;</span> <span class="n">SetStartTime</span><span class="p">(</span><span class="n">Seconds</span><span class="p">(</span><span class="mf">0.0</span><span class="p">));</span>
+<span class="n">UdpSendApp</span> <span class="o">-&gt;</span> <span class="n">SetStopTime</span><span class="p">(</span><span class="n">Seconds</span><span class="p">(</span><span class="n">endtime</span><span class="p">));</span>
+<span class="n">lowerleft</span><span class="o">-&gt;</span><span class="n">AddApplication</span><span class="p">(</span><span class="n">UdpSendApp</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>We now set up tracing. The first, commented-out line enables pcap-format tracing, which we do not need here. The <code class="docutils literal notranslate"><span class="pre">YansWifiPhyHelper</span></code> object supports tracing only of “receive” (<strong>r</strong>) and “transmit” (<strong>t</strong>) records; the <code class="docutils literal notranslate"><span class="pre">PointtoPointHelper</span></code> of <a class="reference internal" href="#ns3-basic1"><span class="std std-ref">32.2&nbsp;&nbsp;&nbsp;A Single TCP Sender</span></a> also traced enqueue and drop records.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span><span class="n">wifiPhyHelper</span><span class="o">.</span><span class="n">EnablePcap</span> <span class="p">(</span><span class="n">tracebase</span><span class="p">,</span> <span class="n">devices</span><span class="p">);</span>
+
+<span class="n">AsciiTraceHelper</span> <span class="n">ascii</span><span class="p">;</span>
+<span class="n">wifiPhyHelper</span><span class="o">.</span><span class="n">EnableAsciiAll</span> <span class="p">(</span><span class="n">ascii</span><span class="o">.</span><span class="n">CreateFileStream</span> <span class="p">(</span><span class="n">tracebase</span> <span class="o">+</span> <span class="s2">&quot;.tr&quot;</span><span class="p">));</span>
+
+<span class="o">//</span> <span class="n">create</span> <span class="n">animation</span> <span class="n">file</span><span class="p">,</span> <span class="n">to</span> <span class="n">be</span> <span class="n">run</span> <span class="k">with</span> <span class="s1">&#39;netanim&#39;</span>
+<span class="n">AnimationInterface</span> <span class="n">anim</span> <span class="p">(</span><span class="n">tracebase</span> <span class="o">+</span> <span class="s2">&quot;.xml&quot;</span><span class="p">);</span>
+<span class="n">anim</span><span class="o">.</span><span class="n">SetMobilityPollInterval</span><span class="p">(</span><span class="n">Seconds</span><span class="p">(</span><span class="mf">0.1</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>If we view the animation with <code class="docutils literal notranslate"><span class="pre">netanim</span></code>, the moving node’s motion is clear. The <code class="docutils literal notranslate"><span class="pre">mover</span></code> node, however, sometimes appears to transmit back to both the fixed-row node below left and the fixed-row node below right. These transmissions represent the Wi-Fi link-layer ACKs; they appear to be sent to two fixed-row nodes because what <code class="docutils literal notranslate"><span class="pre">netanim</span></code> is actually displaying with its blue links is transmission every other node in range.</p>
+<p>We can also “view” the motion in text format by uncommenting the first line below.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span><span class="n">Simulator</span><span class="p">::</span><span class="n">Schedule</span><span class="p">(</span><span class="n">Seconds</span><span class="p">(</span><span class="n">position_interval</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">printPosition</span><span class="p">);</span>
+
+<span class="n">Simulator</span><span class="p">::</span><span class="n">Schedule</span><span class="p">(</span><span class="n">Seconds</span><span class="p">(</span><span class="n">endtime</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">stopMover</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Finally it is time to run the simulator, and print some final output.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="n">Simulator</span><span class="p">::</span><span class="n">Stop</span><span class="p">(</span><span class="n">Seconds</span> <span class="p">(</span><span class="n">endtime</span><span class="o">+</span><span class="mi">60</span><span class="p">));</span>
+  <span class="n">Simulator</span><span class="p">::</span><span class="n">Run</span> <span class="p">();</span>
+  <span class="n">Simulator</span><span class="p">::</span><span class="n">Destroy</span> <span class="p">();</span>
+
+  <span class="nb">int</span> <span class="n">pktsRecd</span> <span class="o">=</span> <span class="n">UdpRecvApp</span><span class="o">-&gt;</span><span class="n">GetReceived</span><span class="p">();</span>
+  <span class="n">std</span><span class="p">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;packets received: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">pktsRecd</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+  <span class="n">std</span><span class="p">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;packets recorded as lost: &quot;</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="n">UdpRecvApp</span><span class="o">-&gt;</span><span class="n">GetLost</span><span class="p">())</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+  <span class="n">std</span><span class="p">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;packets actually lost: &quot;</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="n">packetcount</span> <span class="o">-</span> <span class="n">pktsRecd</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="section" id="tracefile-analysis">
+<h3>32.3.1&nbsp;&nbsp;&nbsp;Tracefile Analysis<a class="headerlink" href="#tracefile-analysis" title="Permalink to this headline">¶</a></h3>
+<p>The tracefile provides no enqueue records, and Wi-Fi doesn’t have fixed links; how can we verify that packets are being forwarded correctly? One thing we <em>can</em> do with the tracefile is to look at each value of the <code class="docutils literal notranslate"><span class="pre">UdpServer</span></code> application sequence number, and record</p>
+<ul class="simple">
+<li>when it was received by node <code class="docutils literal notranslate"><span class="pre">mover</span></code></li>
+<li>when it was transmitted by any fixed-row node</li>
+</ul>
+<p>If we do this, we get output like the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">packet</span> <span class="mi">0</span> <span class="n">received</span> <span class="n">at</span> <span class="mf">0.0248642</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">0</span> <span class="n">at</span> <span class="mf">0.0201597</span>
+<span class="n">packet</span> <span class="mi">1</span> <span class="n">received</span> <span class="n">at</span> <span class="mf">0.0547045</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">0</span> <span class="n">at</span> <span class="mf">0.05</span>
+<span class="o">...</span>
+<span class="n">packet</span> <span class="mi">499</span> <span class="n">received</span> <span class="n">at</span> <span class="mf">24.9506</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">0</span> <span class="n">at</span> <span class="mf">24.95</span>
+<span class="n">packet</span> <span class="mi">500</span> <span class="n">NOT</span> <span class="n">recd</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">0</span> <span class="n">at</span> <span class="mi">25</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">0</span> <span class="n">at</span> <span class="mf">25.0019</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">0</span> <span class="n">at</span> <span class="mf">25.0035</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">0</span> <span class="n">at</span> <span class="mf">25.0071</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">0</span> <span class="n">at</span> <span class="mf">25.0097</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">0</span> <span class="n">at</span> <span class="mf">25.0159</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">0</span> <span class="n">at</span> <span class="mf">25.0281</span>
+<span class="n">packet</span> <span class="mi">501</span> <span class="n">received</span> <span class="n">at</span> <span class="mf">25.0864</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">0</span> <span class="n">at</span> <span class="mf">25.0767</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">1</span> <span class="n">at</span> <span class="mf">25.0817</span>
+<span class="n">packet</span> <span class="mi">502</span> <span class="n">received</span> <span class="n">at</span> <span class="mf">25.1098</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">0</span> <span class="n">at</span> <span class="mf">25.1</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">1</span> <span class="n">at</span> <span class="mf">25.1051</span>
+<span class="o">...</span>
+<span class="n">packet</span> <span class="mi">1000</span> <span class="n">NOT</span> <span class="n">recd</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">0</span> <span class="n">at</span> <span class="mi">50</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">1</span> <span class="n">at</span> <span class="mf">50.001</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">1</span> <span class="n">at</span> <span class="mf">50.003</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">1</span> <span class="n">at</span> <span class="mf">50.0059</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">1</span> <span class="n">at</span> <span class="mf">50.0087</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">1</span> <span class="n">at</span> <span class="mf">50.0151</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">1</span> <span class="n">at</span> <span class="mf">50.0239</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">1</span> <span class="n">at</span> <span class="mf">50.0341</span>
+<span class="n">packet</span> <span class="mi">1001</span> <span class="n">received</span> <span class="n">at</span> <span class="mf">50.082</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">0</span> <span class="n">at</span> <span class="mf">50.0683</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">1</span> <span class="n">at</span> <span class="mf">50.0722</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">2</span> <span class="n">at</span> <span class="mf">50.0773</span>
+<span class="n">packet</span> <span class="mi">1002</span> <span class="n">received</span> <span class="n">at</span> <span class="mf">50.1107</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">0</span> <span class="n">at</span> <span class="mf">50.1</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">1</span> <span class="n">at</span> <span class="mf">50.101</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">2</span> <span class="n">at</span> <span class="mf">50.106</span>
+<span class="o">...</span>
+<span class="n">packet</span> <span class="mi">1499</span> <span class="n">received</span> <span class="n">at</span> <span class="mf">74.9525</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">0</span> <span class="n">at</span> <span class="mf">74.95</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">1</span> <span class="n">at</span> <span class="mf">74.951</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">2</span> <span class="n">at</span> <span class="mf">74.9519</span>
+<span class="n">packet</span> <span class="mi">1500</span> <span class="n">NOT</span> <span class="n">recd</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">0</span> <span class="n">at</span> <span class="mi">75</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">1</span> <span class="n">at</span> <span class="mf">75.001</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">2</span> <span class="n">at</span> <span class="mf">75.0019</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">2</span> <span class="n">at</span> <span class="mf">75.0039</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">2</span> <span class="n">at</span> <span class="mf">75.005</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">2</span> <span class="n">at</span> <span class="mf">75.0084</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">2</span> <span class="n">at</span> <span class="mf">75.0124</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">2</span> <span class="n">at</span> <span class="mf">75.0277</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">2</span> <span class="n">at</span> <span class="mf">75.0361</span>
+<span class="n">packet</span> <span class="mi">1501</span> <span class="n">NOT</span> <span class="n">recd</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">0</span> <span class="n">at</span> <span class="mf">75.05</span>
+<span class="n">packet</span> <span class="mi">1502</span> <span class="n">received</span> <span class="n">at</span> <span class="mf">75.1484</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">0</span> <span class="n">at</span> <span class="mf">75.1287</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">1</span> <span class="n">at</span> <span class="mf">75.1299</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">1</span> <span class="n">at</span> <span class="mf">75.1314</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">1</span> <span class="n">at</span> <span class="mf">75.1326</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">2</span> <span class="n">at</span> <span class="mf">75.1386</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">3</span> <span class="n">at</span> <span class="mf">75.1437</span>
+<span class="n">packet</span> <span class="mi">1503</span> <span class="n">received</span> <span class="n">at</span> <span class="mf">75.1621</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">0</span> <span class="n">at</span> <span class="mf">75.15</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">1</span> <span class="n">at</span> <span class="mf">75.151</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">2</span> <span class="n">at</span> <span class="mf">75.1523</span><span class="p">,</span> <span class="n">forwarded</span> <span class="n">by</span> <span class="mi">3</span> <span class="n">at</span> <span class="mf">75.1574</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<p>That is, packets 0-499 were transmitted only by node 0. Packet 500 was never received by <code class="docutils literal notranslate"><span class="pre">mover</span></code>, but there were seven transmission attempts; these seven attempts follow the rules described in <a class="reference internal" href="wireless.html#wifi-and-collisions"><span class="std std-ref">4.2.1&nbsp;&nbsp;&nbsp;Wi-Fi and Collisions</span></a>. Packets starting at 501 were transmitted by node 0 and then later by node 1. Similarly, packet 1000 was lost, and after that each packet arriving at <code class="docutils literal notranslate"><span class="pre">mover</span></code> was first transmitted by nodes 0, 1 and 2, in that order. In other words, packets are indeed being forwarded rightward along the line of fixed-row nodes until a node is reached that is in range of <code class="docutils literal notranslate"><span class="pre">mover</span></code>.</p>
+</div>
+<div class="section" id="aodv-performance">
+<span id="index-2"></span><h3>32.3.2&nbsp;&nbsp;&nbsp;AODV Performance<a class="headerlink" href="#aodv-performance" title="Permalink to this headline">¶</a></h3>
+<p>If we change the line</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">listrouting</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="n">aodv</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>to</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">listrouting</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="n">dsdv</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>we find that the loss count goes from 4 packets out of 2000 to 398 out of 2000; for OLSR routing the loss count is 426. As we discussed in <a class="reference internal" href="ns2.html#ns2-wireless"><span class="std std-ref">31.6&nbsp;&nbsp;&nbsp;Wireless Simulation</span></a>, the loss of one data packet triggers the AODV implementation to look for a new route. The DSDV and OLSR implementations, on the other hand, only look for new routes at regularly spaced intervals.</p>
+</div>
+</div>
+<div class="section" id="exercises">
+<h2>32.4&nbsp;&nbsp;&nbsp;Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<p>In preparation.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="bibliography.html" title="33   Bibliography"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ns2.html" title="31   Network Simulations: ns-2"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, desktop edition 2.0.11</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012-2022, Peter L Dordal.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,843 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>1   An Overview of Networks &#8212; An Introduction to Computer Networks, desktop edition 2.0.11</title>
+    <link rel="stylesheet" href="_static/csbnetbook.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script type="text/javascript" src="_static/mobile.js"></script>
+    <script type="text/javascript" src="_static/rightsidebar.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="2   Ethernet Basics" href="ethernet1.html" />
+    <link rel="prev" title="Preface" href="preface.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="ethernet1.html" title="2   Ethernet Basics"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="preface.html" title="Preface"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, desktop edition 2.0.11</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">1&nbsp;&nbsp;&nbsp;An Overview of Networks</a><ul>
+<li><a class="reference internal" href="#layers">1.1&nbsp;&nbsp;&nbsp;Layers</a></li>
+<li><a class="reference internal" href="#data-rate-throughput-and-bandwidth">1.2&nbsp;&nbsp;&nbsp;Data Rate, Throughput and Bandwidth</a></li>
+<li><a class="reference internal" href="#packets">1.3&nbsp;&nbsp;&nbsp;Packets</a></li>
+<li><a class="reference internal" href="#datagram-forwarding">1.4&nbsp;&nbsp;&nbsp;Datagram Forwarding</a></li>
+<li><a class="reference internal" href="#topology">1.5&nbsp;&nbsp;&nbsp;Topology</a><ul>
+<li><a class="reference internal" href="#traffic-engineering">1.5.1&nbsp;&nbsp;&nbsp;Traffic Engineering</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#routing-loops">1.6&nbsp;&nbsp;&nbsp;Routing Loops</a></li>
+<li><a class="reference internal" href="#congestion">1.7&nbsp;&nbsp;&nbsp;Congestion</a></li>
+<li><a class="reference internal" href="#packets-again">1.8&nbsp;&nbsp;&nbsp;Packets Again</a></li>
+<li><a class="reference internal" href="#lans-and-ethernet">1.9&nbsp;&nbsp;&nbsp;LANs and Ethernet</a></li>
+<li><a class="reference internal" href="#ip-internet-protocol">1.10&nbsp;&nbsp;&nbsp;IP - Internet Protocol</a><ul>
+<li><a class="reference internal" href="#ip-forwarding">1.10.1&nbsp;&nbsp;&nbsp;IP Forwarding</a></li>
+<li><a class="reference internal" href="#the-future-of-ipv4">1.10.2&nbsp;&nbsp;&nbsp;The Future of IPv4</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dns">1.11&nbsp;&nbsp;&nbsp;DNS</a></li>
+<li><a class="reference internal" href="#transport">1.12&nbsp;&nbsp;&nbsp;Transport</a><ul>
+<li><a class="reference internal" href="#transport-communications-patterns">1.12.1&nbsp;&nbsp;&nbsp;Transport Communications Patterns</a></li>
+<li><a class="reference internal" href="#content-distribution-networks">1.12.2&nbsp;&nbsp;&nbsp;Content-Distribution Networks</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#firewalls">1.13&nbsp;&nbsp;&nbsp;Firewalls</a></li>
+<li><a class="reference internal" href="#some-useful-utilities">1.14&nbsp;&nbsp;&nbsp;Some Useful Utilities</a></li>
+<li><a class="reference internal" href="#ietf-and-osi">1.15&nbsp;&nbsp;&nbsp;IETF and OSI</a></li>
+<li><a class="reference internal" href="#berkeley-unix">1.16&nbsp;&nbsp;&nbsp;Berkeley Unix</a></li>
+<li><a class="reference internal" href="#epilog">1.17&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li><a class="reference internal" href="#exercises">1.18&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="preface.html"
+                        title="previous chapter">Preface</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="ethernet1.html"
+                        title="next chapter">2&nbsp;&nbsp;&nbsp;Ethernet Basics</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="an-overview-of-networks">
+<span id="intro"></span><h1>1&nbsp;&nbsp;&nbsp;An Overview of Networks<a class="headerlink" href="#an-overview-of-networks" title="Permalink to this headline">¶</a></h1>
+<p>Somewhere there might be a field of interest in which the order of presentation of topics is well agreed upon.</p>
+<p>Computer networking is not it.</p>
+<p>There are many interconnections in the field of networking, as in most technical fields, and it is difficult to find an order of presentation that does not involve endless “forward references” to future chapters; this is true even if – as is done here – a largely bottom-up ordering is followed. I have therefore taken here a different approach: this first chapter is a summary of the essentials – LANs, IP and TCP – across the board, and later chapters expand on the material here.</p>
+<p id="index-0">Local Area Networks, or <strong>LANs</strong>, are the “physical” networks that provide the connection between machines within, say, a home, school or corporation. LANs are, as the name says, “local”; it is the <strong>IP</strong>, or Internet Protocol, layer that provides an abstraction for connecting multiple LANs into, well, the Internet. Finally, <strong>TCP</strong> deals with transport and connections and actually sending user data.</p>
+<p>This chapter also contains some important other material. The section on <strong>datagram forwarding</strong>, central to packet-based switching and routing, is essential. This chapter also discusses packets generally, congestion, and sliding windows, but those topics are revisited in later chapters. Firewalls and network address translation are also covered here and not elsewhere.</p>
+<div class="section" id="layers">
+<h2>1.1&nbsp;&nbsp;&nbsp;Layers<a class="headerlink" href="#layers" title="Permalink to this headline">¶</a></h2>
+<p id="index-1">These three topics – LANs, IP and TCP – are often called <strong>layers</strong>; they constitute the Link layer, the Internetwork layer, and the Transport layer respectively. Together with the Application layer (the software you use), these form the “<strong>four-layer model</strong>” for networks. A layer, in this context, corresponds strongly to the idea of a programming interface or library, with the understanding that a given layer communicates directly only with the two layers immediately above and below it. An application hands off a chunk of data to the TCP library, which in turn makes calls to the IP library, which in turn calls the LAN layer for actual delivery. An application does <em>not</em> interact directly with the IP and LAN layers at all.</p>
+<p id="index-2">The LAN layer is in charge of actual delivery of packets, using LAN-layer-supplied addresses. It is often conceptually subdivided into the “physical layer” dealing with, <em>eg</em>, the analog electrical, optical or radio signaling mechanisms involved, and above that an abstracted “logical” LAN layer that describes all the digital – that is, non-analog – operations on packets; see <a class="reference internal" href="ethernet1.html#lan-layer"><span class="std std-ref">2.1.4&nbsp;&nbsp;&nbsp;The LAN Layer</span></a>. The physical layer is generally of direct concern only to those designing LAN hardware; the kernel software interface to the LAN corresponds to the logical LAN layer.</p>
+<div class="figure" id="id15">
+<span id="intro-layers"></span><img alt="Five-layer model: Application/Transport/IP/Logical LAN/Physical LAN" src="_images/layers.svg" /><p class="caption"><span class="caption-number">Fig. 1: </span><span class="caption-text">Five-layer network model</span></p>
+</div>
+<p>This LAN physical/logical division gives us the Internet <strong>five-layer model</strong>. This is less a formal hierarchy than an <em>ad hoc</em> classification method. We will return to this below in <a class="reference internal" href="#ietf-and-osi"><span class="std std-ref">1.15&nbsp;&nbsp;&nbsp;IETF and OSI</span></a>, where we will also introduce two more rather obscure layers that complete the <strong>seven</strong>-layer model.</p>
+</div>
+<div class="section" id="data-rate-throughput-and-bandwidth">
+<span id="data-rate"></span><span id="index-3"></span><h2>1.2&nbsp;&nbsp;&nbsp;Data Rate, Throughput and Bandwidth<a class="headerlink" href="#data-rate-throughput-and-bandwidth" title="Permalink to this headline">¶</a></h2>
+<p>Any one network connection – <em>eg</em> at the LAN layer – has a <strong>data rate</strong>: the rate at which bits are transmitted. In some LANs (<em>eg</em> Wi-Fi) the data rate can vary with time. <strong>Throughput</strong> refers to the overall effective transmission rate, taking into account things like transmission overhead, protocol inefficiencies and perhaps even competing traffic. It is generally measured at a higher network layer than the data rate.</p>
+<p>The term <strong>bandwidth</strong> can be used to refer to either of these, though we here use it mostly as a synonym for data rate. The term comes from radio transmission, where the width of the frequency band available is proportional, all else being equal, to the data rate that can be achieved.</p>
+<p>In discussions about TCP, the term <strong>goodput</strong> is sometimes used to refer to what might also be called “application-layer throughput”: the amount of usable data delivered to the receiving application. Specifically, retransmitted data is counted only once when calculating goodput but might be counted twice under some interpretations of “throughput”.</p>
+<p>Data rates are generally measured in kilobits per second (kbps) or megabits per second (Mbps);  the use of the lower-case “b” here denotes bits. In the context of data rates, a kilobit is 10<sup>3</sup> bits (not 2<sup>10</sup>) and a megabit is 10<sup>6</sup> bits. Somewhat inconsistently, we follow the tradition of using kB and MB to denote data <em>volumes</em> of 2<sup>10</sup> and 2<sup>20</sup> bytes respectively, with the upper-case B denoting bytes. The newer abbreviations <a class="reference external" href="https://en.wikipedia.org/wiki/Kibibyte">KiB</a> and <a class="reference external" href="https://en.wikipedia.org/wiki/Mebibyte">MiB</a> would be more precise, but the consequences of confusion are modest.</p>
+</div>
+<div class="section" id="packets">
+<span id="id1"></span><h2>1.3&nbsp;&nbsp;&nbsp;Packets<a class="headerlink" href="#packets" title="Permalink to this headline">¶</a></h2>
+<p id="index-4">Packets are modest-sized sequences of bytes, transmitted as a unit through some shared set of links. Of necessity, packets need to be prefixed with a <strong>header</strong> containing delivery information. In the common case known as <strong>datagram forwarding</strong>, the header contains a destination <strong>address</strong>; headers in networks using so-called <strong>virtual-circuit</strong> forwarding contain instead an identifier for the <em>connection</em>. Almost all networking today (and for the past 50 years) is packet-based, although we will later look briefly at some “circuit-switched” options for voice telephony.</p>
+<div class="figure" id="id16">
+<span id="intro-packet"></span><img alt="packets with one and with two headers" src="_images/packet.svg" /><p class="caption"><span class="caption-number">Fig. 2: </span><span class="caption-text">Packets with headers</span></p>
+</div>
+<p>At the LAN layer, packets can be viewed as the imposition of a buffer (and addressing) structure on top of low-level serial lines; additional layers then impose additional structure. Informally, packets are often referred to as <strong>frames</strong> at the LAN layer, and as <strong>segments</strong> at the Transport layer.</p>
+<p id="index-5">The maximum packet size supported by a given LAN (<em>eg</em> Ethernet, Token Ring or ATM) is an intrinsic attribute of that LAN. Ethernet allows a maximum of 1500 bytes of data. By comparison, TCP/IP packets originally often held only 512 bytes of data, while early Token Ring packets could contain up to 4 kB of data. While there are proponents of very large packet sizes, larger even than 64 kB, at the other extreme the ATM (Asynchronous Transfer Mode) protocol uses 48 bytes of data per packet, and there are good reasons for believing in modest packet sizes.</p>
+<p>One potential issue is how to forward packets from a large-packet LAN to (or through) a small-packet LAN; in later chapters we will look at how the IP (or Internet Protocol) layer addresses this.</p>
+<p>Generally each layer adds its own header. Ethernet headers are typically 14 bytes, IP headers 20 bytes, and TCP headers 20 bytes. If a TCP connection sends 512 bytes of data per packet, then the headers amount to 10% of the total, a not-unreasonable overhead. For one common Voice-over-IP option, packets contain 160 bytes of data and 54 bytes of headers, making the header about 25% of the total. Compressing the 160 bytes of audio, however, may bring the data portion down to 20 bytes, meaning that the headers are now 73% of the total; see <a class="reference internal" href="realtime.html#rtp-and-voip"><span class="std std-ref">25.11.4&nbsp;&nbsp;&nbsp;RTP and VoIP</span></a>.</p>
+<p>In datagram-forwarding networks the appropriate header will contain the address of the destination and perhaps other delivery information. Internal nodes of the network called <strong>routers</strong> or <strong>switches</strong> will then try to ensure that the packet is delivered to the requested destination.</p>
+<p>The concept of packets and packet switching was first introduced by Paul Baran in 1962 (<a class="reference internal" href="bibliography.html#pb62" id="id2">[PB62]</a>). Baran’s primary concern was with network survivability in the event of node failure; existing centrally switched protocols were vulnerable to central failure. In 1964, Donald Davies independently developed many of the same concepts; it was Davies who coined the term “packet”.</p>
+<p id="index-6">It is perhaps worth noting that packets are buffers built of 8-bit <em>bytes</em>, and all hardware today agrees what a byte is (hardware agrees <em>by convention</em> on the order in which the bits of a byte are to be transmitted). 8-bit bytes are universal now, but it was not always so. Perhaps the last great non-byte-oriented hardware platform, which did indeed overlap with the Internet era broadly construed, was the DEC-10, which had a 36-bit word size; a word could hold five 7-bit ASCII characters. The early Internet specifications introduced the term <strong>octet</strong> (an 8-bit byte) and required that packets be sequences of octets; non-octet-oriented hosts had to be able to convert. Thus was chaos averted. Note that there are still byte-oriented data issues; as one example, binary integers can be represented as a sequence of bytes in either <em>big-endian</em> or <em>little-endian</em> byte order (<a class="reference internal" href="udp.html#binary-data"><span class="std std-ref">16.1.5&nbsp;&nbsp;&nbsp;Binary Data</span></a>). <span class="target" id="index-7"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1700.html"><strong>RFC 1700</strong></a> specifies that Internet protocols use big-endian byte order, therefore sometimes called network byte order.</p>
+</div>
+<div class="section" id="datagram-forwarding">
+<span id="id3"></span><h2>1.4&nbsp;&nbsp;&nbsp;Datagram Forwarding<a class="headerlink" href="#datagram-forwarding" title="Permalink to this headline">¶</a></h2>
+<p id="index-8">In the datagram-forwarding model of packet delivery, packet headers contain a destination address. It is up to the intervening switches or routers to look at this address and get the packet to the correct destination.</p>
+<p>In datagram forwarding this is achieved by providing each switch with a <strong>forwarding table</strong> of ⟨destination,next_hop⟩ pairs. When a packet arrives, the switch looks up the destination address (presumed globally unique) in its forwarding table and finds the <strong>next_hop</strong> information: the immediate-neighbor address to which – or interface by which – the packet should be forwarded in order to bring it one step closer to its final destination. The next_hop value in a forwarding table is a single entry; each switch is responsible for only one step in the packet’s path. However, if all is well, the network of switches will be able to deliver the packet, one hop at a time, to its ultimate destination.</p>
+<p>The “destination” entries in the forwarding table do not have to correspond exactly with the packet destination addresses, though in the examples here they do, and they do for Ethernet datagram forwarding. However, for IP routing, the table “destination” entries will correspond to <strong>prefixes</strong> of IP addresses; this leads to a huge savings in space. The fundamental requirement is that the switch can perform a lookup operation, using its forwarding table and the destination address in the arriving packet, to determine the next hop.</p>
+<p>Just how the forwarding table is built is a question for later; we will return to this for Ethernet switches in <a class="reference internal" href="ethernet1.html#ethernet-learning-algorithm"><span class="std std-ref">2.4.1&nbsp;&nbsp;&nbsp;Ethernet Learning Algorithm</span></a> and for IP routers in <a class="reference internal" href="routing.html#routing-update"><span class="std std-ref">13&nbsp;&nbsp;&nbsp;Routing-Update Algorithms</span></a>. For now, the forwarding tables may be thought of as created through initial configuration.</p>
+<p>In the figure below, switch S1 has interfaces 0, 1 and 2, and S2 has interfaces 0,1,2,3. If A is to send a packet to B, S1 must have a forwarding-table entry indicating that destination B is reached via its interface 2, and S2 must have an entry forwarding the packet out on interface 3.</p>
+<div class="figure" id="id17">
+<span id="intro-two-switches"></span><img alt="Switches S1 and S2, with hosts A-E, and all connections made through labeled interfaces" src="_images/two_switches.svg" /><p class="caption"><span class="caption-number">Fig. 3: </span><span class="caption-text">Two switches, S1 and S2</span></p>
+<div class="legend">
+Small numeric labels are interface numbers</div>
+</div>
+<p>A complete forwarding table for S1, using interface numbers in the <code class="docutils literal notranslate"><span class="pre">next_hop</span></code> column, would be:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="55%" />
+<col width="45%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">S1</th>
+<th class="head">&#160;</th>
+</tr>
+<tr class="row-even"><th class="head">destination</th>
+<th class="head">next_hop</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-odd"><td>A</td>
+<td>0</td>
+</tr>
+<tr class="row-even"><td>C</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td>B</td>
+<td>2</td>
+</tr>
+<tr class="row-even"><td>D</td>
+<td>2</td>
+</tr>
+<tr class="row-odd"><td>E</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p>The table for S2 might be as follows, where we have consolidated destinations A and C for visual simplicity.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="55%" />
+<col width="45%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">S2</th>
+<th class="head">&#160;</th>
+</tr>
+<tr class="row-even"><th class="head">destination</th>
+<th class="head">next_hop</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-odd"><td>A,C</td>
+<td>0</td>
+</tr>
+<tr class="row-even"><td>D</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td>E</td>
+<td>2</td>
+</tr>
+<tr class="row-even"><td>B</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p>In the network diagrammed above, all links are point-to-point, and so each interface corresponds to the unique immediate neighbor reached by that interface. We can thus replace the interface entries in the <code class="docutils literal notranslate"><span class="pre">next_hop</span></code> column with the name of the corresponding <strong>neighbor</strong>. For human readers, using neighbors in the <code class="docutils literal notranslate"><span class="pre">next_hop</span></code> column is usually much more readable. S1’s table can now be written as follows (with consolidation of the entries for B, D and E):</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="55%" />
+<col width="45%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">S1</th>
+<th class="head">&#160;</th>
+</tr>
+<tr class="row-even"><th class="head">destination</th>
+<th class="head">next_hop</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-odd"><td>A</td>
+<td>A</td>
+</tr>
+<tr class="row-even"><td>C</td>
+<td>C</td>
+</tr>
+<tr class="row-odd"><td>B,D,E</td>
+<td>S2</td>
+</tr>
+</tbody>
+</table>
+<p id="index-9">A central feature of datagram forwarding is that each packet is forwarded “in isolation”; the switches involved do not have any awareness of any higher-layer logical connections established between endpoints. This is also called <strong>stateless</strong> forwarding, in that the forwarding tables have no per-connection state. <span class="target" id="index-10"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1122.html"><strong>RFC 1122</strong></a> put it this way (in the context of IP-layer datagram forwarding):</p>
+<blockquote>
+<div>To improve robustness of the communication system, gateways are designed to be stateless, forwarding each IP datagram independently of other datagrams.  As a result, redundant paths can be exploited to provide robust service in spite of failures of intervening gateways and networks.</div></blockquote>
+<p>The fundamental alternative to datagram forwarding is <strong>virtual circuits</strong>, <a class="reference internal" href="otherLANs.html#virtual-circuits"><span class="std std-ref">5.4&nbsp;&nbsp;&nbsp;Virtual Circuits</span></a>. In virtual-circuit networks, each router maintains state about each connection passing through it; different connections can be routed differently. If packet forwarding depends, for example, on per-connection information – <em>eg</em> both TCP port numbers – it is not datagram forwarding. (That said, it arguably still <em>is</em> datagram forwarding if web traffic – to TCP port 80 – is forwarded differently than all other traffic, because that rule does not depend on the specific connection.)</p>
+<p id="index-11">Datagram forwarding is sometimes allowed to use other information beyond the destination address. In theory, IP routing can be done based on the destination address and some <strong>quality-of-service</strong> information, allowing, for example, different routing to the same destination for high-bandwidth bulk traffic and for low-latency real-time traffic. In practice, most Internet Service Providers (ISPs) ignore user-provided quality-of-service information in the IP header, except by prearranged agreement, and route only based on the destination.</p>
+<p id="index-12">By convention, switching devices acting at the LAN layer and forwarding packets based on the LAN address are called <strong>switches</strong> (or, originally, bridges; some still prefer that term), while such devices acting at the IP layer and forwarding on the IP address are called <strong>routers</strong>. Datagram forwarding is used both by Ethernet switches and by IP routers, though the destinations in Ethernet forwarding tables are individual nodes while the destinations in IP routers are entire <em>networks</em> (that is, sets of nodes).</p>
+<p id="index-13">In IP routers within end-user sites it is common for a forwarding table to include a catchall <strong>default</strong> entry, matching any IP address that is nonlocal and so needs to be routed out into the Internet at large. Unlike the consolidated entries for B, D and E in the table above for S1, which likely would have to be implemented as actual separate entries, a default entry is a single record representing where to forward the packet if no other destination match is found. Here is a forwarding table for S1, above, with a default entry replacing the last three entries:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="55%" />
+<col width="45%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">S1</th>
+<th class="head">&#160;</th>
+</tr>
+<tr class="row-even"><th class="head">destination</th>
+<th class="head">next_hop</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-odd"><td>A</td>
+<td>0</td>
+</tr>
+<tr class="row-even"><td>C</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td>default</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p>Default entries make sense only when we can tell by looking at an address that it does not represent a nearby node. This is common in IP networks because an IP address encodes the destination network, and routers generally know all the local networks. It is however rare in Ethernets, because there is generally no correlation between Ethernet addresses and locality. If S1 above were an Ethernet switch, and it had some means of knowing that interfaces 0 and 1 connected directly to individual hosts, not switches – and S1 knew the addresses of these hosts – then making interface 2 a default route would make sense. In practice, however, Ethernet switches do not know what kind of device connects to a given interface.</p>
+</div>
+<div class="section" id="topology">
+<h2>1.5&nbsp;&nbsp;&nbsp;Topology<a class="headerlink" href="#topology" title="Permalink to this headline">¶</a></h2>
+<p id="index-14">In the network diagrammed in the previous section, there are no loops; graph theorists might describe this by saying the network graph is <strong>acyclic</strong>, or is a <strong>tree</strong>. In a loop-free network there is a unique path between any pair of nodes. The forwarding-table algorithm has only to make sure that every destination appears in the forwarding tables; the issue of choosing between alternative paths does not arise.</p>
+<p>However, if there are no loops then there is no <strong>redundancy</strong>: any broken link will result in partitioning the network into two pieces that cannot communicate. All else being equal (which it is not, but never mind for now), redundancy is a good thing. However, once we start including redundancy, we have to make decisions among the multiple paths to a destination. Consider, for a moment, the following network:</p>
+<div class="figure" id="id18">
+<span id="intro-topology"></span><img alt="Network S1--S2--S4--S3--S1, with paths A--S1--S2--S4--B and A--S1--S3--S4--B" src="_images/topology.svg" /><p class="caption"><span class="caption-number">Fig. 4: </span><span class="caption-text">A network with more than one path from A to B</span></p>
+</div>
+<p>Should S1 list S2 or S3 as the next_hop to B? Both paths A─S1─<strong>S2</strong>─S4─B and A─S1─<strong>S3</strong>─S4─B get there. There is no right answer. Even if one path is “faster” than the other, taking the slower path is not exactly wrong (especially if the slower path is, say, less expensive). Some sort of protocol must exist to provide a mechanism by which S1 can make the choice (though this mechanism might be as simple as  choosing to route via the first path discovered to the given destination). We also want protocols to make sure that, if S1 reaches B via S2 and the S2─S4 link fails, then S1 will switch over to the still-working S1─S3─S4─B route.</p>
+<p>As we shall see, many LANs (in particular Ethernet) prefer “tree” networks with no redundancy, while IP has complex protocols in support of redundancy (<a class="reference internal" href="routing.html#routing-update"><span class="std std-ref">13&nbsp;&nbsp;&nbsp;Routing-Update Algorithms</span></a>).</p>
+<div class="section" id="traffic-engineering">
+<span id="index-15"></span><span id="id4"></span><h3>1.5.1&nbsp;&nbsp;&nbsp;Traffic Engineering<a class="headerlink" href="#traffic-engineering" title="Permalink to this headline">¶</a></h3>
+<p>In some cases the decision above between routes A─S1─S2─S4─B and A─S1─S3─S4─B might be of material significance – perhaps the S2–S4 link is slower than the others, or is more congested. We will use the term <strong>traffic engineering</strong> to refer to any intentional selection of one route over another, or any elevation of the priority of one class of traffic. The route selection can either be directly intentional, through configuration, or can be implicit in the selection or tuning of algorithms that then make these route-selection choices automatically. As an example of the latter, the algorithms of <a class="reference internal" href="routing.html#dv-algorithm"><span class="std std-ref">13.1&nbsp;&nbsp;&nbsp;Distance-Vector Routing-Update Algorithm</span></a> build forwarding tables on their own, but those tables are greatly influenced by the administrative assignment of link costs.</p>
+<p>With pure datagram forwarding, used at either the LAN or the IP layer, the path taken by a packet is determined solely by its destination, and traffic engineering is limited to the choices made between alternative paths. We have already, however, suggested that datagram forwarding can be extended to take quality-of-service information into account; this may be used to have voice traffic – with its relatively low bandwidth but intolerance for delay – take an entirely different path than bulk file transfers. Alternatively, the network manager may simply assign voice traffic a higher priority, so it does not have to wait in queues behind file-transfer traffic.</p>
+<p>The quality-of-service information may be set by the end-user, in which case an ISP may wish to recognize it only for designated users, which in turn means that the ISP will implicitly use the traffic source when making routing decisions. Alternatively, the quality-of-service information may be set by the ISP itself, based on its best guess as to the application; this means that the ISP may be using packet size, port number (<a class="reference internal" href="#transport"><span class="std std-ref">1.12&nbsp;&nbsp;&nbsp;Transport</span></a>) and other contents as part of the routing decision. For some explicit mechanisms supporting this kind of routing, see <a class="reference internal" href="routing.html#lartc-use"><span class="std std-ref">13.6&nbsp;&nbsp;&nbsp;Routing on Other Attributes</span></a>.</p>
+<p>At the LAN layer, traffic-engineering mechanisms are historically limited, though see <a class="reference internal" href="ethernet2.html#sdn"><span class="std std-ref">3.4&nbsp;&nbsp;&nbsp;Software-Defined Networking</span></a>. At the IP layer, more strategies are available; see <a class="reference internal" href="realtime.html#quality-of-service"><span class="std std-ref">25&nbsp;&nbsp;&nbsp;Quality of Service</span></a>.</p>
+</div>
+</div>
+<div class="section" id="routing-loops">
+<span id="index-16"></span><span id="id5"></span><h2>1.6&nbsp;&nbsp;&nbsp;Routing Loops<a class="headerlink" href="#routing-loops" title="Permalink to this headline">¶</a></h2>
+<p>A potential drawback to datagram forwarding is the possibility of a <strong>routing loop</strong>: a set of entries in the forwarding tables that cause some packets to circulate endlessly. For example, in the previous picture we would have a routing loop if, for (nonexistent) destination C, S1 forwarded to S2, S2 forwarded to S4, S4 forwarded to S3, and S3 forwarded to S1. A packet sent to C would not only not be delivered, but in circling endlessly it might easily consume a large majority of the bandwidth.
+Routing loops typically arise because the creation of the forwarding tables is often “distributed”, and there is no global authority to detect inconsistencies. Even when there is such an authority, temporary routing loops can be created due to notification delays.</p>
+<p>Routing loops can also occur in networks where the underlying link topology is loop-free; for example, in the previous diagram we could, again for destination C, have S1 forward to S2 and S2 forward back to S1. We will refer to such a case as a <strong>linear</strong> routing loop.</p>
+<p>All datagram-forwarding protocols need some way of detecting and avoiding routing loops. Ethernet, for example, avoids nonlinear routing loops by disallowing loops in the underlying network topology, and avoids linear routing loops by not having switches forward a packet back out the interface by which it arrived. IP provides for a one-byte “Time to Live” (TTL) field in the IP header; it is set by the sender and decremented by 1 at each router; a packet is discarded if its TTL reaches 0. This limits the number of times a wayward packet can be forwarded to the initial TTL value, typically 64.</p>
+<p>In datagram routing, a switch is responsible only for the next hop to the ultimate destination; if a switch has a complete path in mind, there is no guarantee that the next_hop switch or any other downstream switch will continue to forward along that path. Misunderstandings can potentially lead to routing loops. Consider this network:</p>
+<div class="figure" id="id19">
+<span id="intro-fiveloop"></span><img alt="Network A--B--C--E--D--A, five in a ring" src="_images/fiveloop.svg" /><p class="caption"><span class="caption-number">Fig. 5: </span><span class="caption-text">Network consisting of five nodes in a ring</span></p>
+</div>
+<p>D might feel that the best path to B is D–E–C–B (perhaps because it believes the A–D link is to be avoided). If E similarly decides the best path to B is E–D–A–B, and if D and E both choose their next_hop for B based on these best paths, then a linear routing loop is formed: D routes to B via E and E routes to B via D. Although each of D and E have identified a usable <em>path</em>, that path is not in fact followed.
+Moral: successful datagram routing requires cooperation and a consistent view of the network.</p>
+</div>
+<div class="section" id="congestion">
+<span id="index-17"></span><span id="id6"></span><h2>1.7&nbsp;&nbsp;&nbsp;Congestion<a class="headerlink" href="#congestion" title="Permalink to this headline">¶</a></h2>
+<p>Switches introduce the possibility of congestion: packets arriving faster than they can be sent out. This can happen with just two interfaces, if the inbound interface has a higher bandwidth than the outbound interface; another common source of congestion is traffic arriving on multiple inputs and all destined for the same output.</p>
+<p>Whatever the reason, if packets are arriving for a given outbound interface faster than they can be sent, a queue will form for that interface. Once that queue is full, packets will be <strong>dropped</strong>. The most common strategy (though not the only one) is to drop any packets that arrive when the queue is full.</p>
+<p>The term “congestion” may refer either to the point where the queue is just beginning to build up, or to the point where the queue is full and packets are lost. In their paper <a class="reference internal" href="bibliography.html#cj89" id="id7">[CJ89]</a>, Chiu and Jain refer to the first point as the <strong>knee</strong>; this is where the slope of the load vs throughput graph flattens. They refer to the second point as the <strong>cliff</strong>; this is where packet losses may lead to a precipitous decline in throughput.
+Other authors use the term <strong>contention</strong> for knee-congestion.</p>
+<p>In the Internet, most packet losses are due to congestion. This is not because congestion is especially bad (though it can be, at times), but rather that other types of losses (<em>eg</em> due to packet corruption) are insignificant by comparison.</p>
+<div class="sidebar" id="index-18">
+<p class="first sidebar-title">When to Upgrade?</p>
+<p class="last">Deciding when a network really <em>does</em> have insufficient bandwidth is not a technical issue but an economic one. The number of customers may increase, the cost of bandwidth may decrease or customers may simply be willing to pay more to have data transfers complete in less time; “customers” here can be external or in-house. Monitoring of links and routers for congestion can, however, help determine exactly what <em>parts</em> of the network would most benefit from upgrade.</p>
+</div>
+<p>We emphasize that the presence of congestion does <em>not</em> mean that a network has a shortage of bandwidth. Bulk-traffic senders (though not real-time senders) attempt to send as fast as possible, and congestion is simply the network’s <strong>feedback</strong> that the maximum transmission rate has been reached. For further discussion, including alternative definitions of longer-term congestion, see <a class="reference internal" href="bibliography.html#bcl09" id="id8">[BCL09]</a>.</p>
+<p>Congestion <em>is</em> a sign of a problem in real-time networks, which we will consider in <a class="reference internal" href="realtime.html#quality-of-service"><span class="std std-ref">25&nbsp;&nbsp;&nbsp;Quality of Service</span></a>. In these networks losses due to congestion must generally be kept to an absolute minimum; one way to achieve this is to limit the acceptance of new connections unless sufficient resources are available.</p>
+</div>
+<div class="section" id="packets-again">
+<h2>1.8&nbsp;&nbsp;&nbsp;Packets Again<a class="headerlink" href="#packets-again" title="Permalink to this headline">¶</a></h2>
+<p>Perhaps the core justification for packets, Baran’s concerns about node failure notwithstanding, is that the same link can carry, at different times, different packets representing traffic to different destinations and from different senders. Thus, packets are the key to supporting <strong>shared transmission lines</strong>; that is, they support the <strong>multiplexing</strong> of multiple communications channels over a single cable.  The alternative of a separate physical line between every pair of machines grows prohibitively complex very quickly (though <strong>virtual circuits</strong> between every pair of machines in a datacenter are not uncommon; see <a class="reference internal" href="otherLANs.html#virtual-circuits"><span class="std std-ref">5.4&nbsp;&nbsp;&nbsp;Virtual Circuits</span></a>).</p>
+<p>From this shared-medium perspective, an important packet feature is the maximum packet size, as this represents the maximum time a sender can send before other senders get a chance. The alternative of unbounded packet sizes would lead to prolonged network unavailability for everyone else if someone downloaded a large file in a single 1 Gigabit packet. Another drawback to large packets is that, if the packet is corrupted, the entire packet must be retransmitted; see <a class="reference internal" href="packets.html#error-rates-and-packet-size"><span class="std std-ref">7.3.1&nbsp;&nbsp;&nbsp;Error Rates and Packet Size</span></a>.</p>
+<p id="index-19">When a router or switch receives a packet, it (generally) reads in the entire packet before looking at the header to decide to what next node to forward it. This is known as <strong>store-and-forward</strong>, and introduces a <strong>forwarding delay</strong> equal to the time needed to read in the entire packet. For individual packets this forwarding delay is hard to avoid (though some higher-end switches do implement <strong>cut-through</strong> switching to begin forwarding a packet before it has fully arrived), but if one is sending a long train of packets then by keeping multiple packets <em>en route</em> at the same time one can essentially eliminate the significance of the forwarding delay; see <a class="reference internal" href="packets.html#packet-size"><span class="std std-ref">7.3&nbsp;&nbsp;&nbsp;Packet Size</span></a>.</p>
+<p>Total packet delay from sender to receiver is the sum of the following:</p>
+<ul class="simple">
+<li><strong>Bandwidth delay</strong>, <em>ie</em> sending 1000 Bytes at 20 Bytes/millisecond will take 50 ms.
+This is a per-link delay.</li>
+<li><strong>Propagation delay</strong> due to the speed of light. For example, if you start sending
+a packet right now on a 5000-km cable across the US with a propagation speed
+of 200 m/µsec (= 200 km/ms, about 2/3 the speed of light in vacuum),
+the first bit will not
+arrive at the destination until 25 ms later. The bandwidth delay
+then determines how much after that the entire packet will take to
+arrive.</li>
+<li><strong>Store-and-forward delay</strong>, equal to the sum of the bandwidth delays out of each router along the path</li>
+<li><strong>Queuing delay</strong>, or waiting in line at busy routers. At bad moments this can exceed 1 sec, though that is rare. Generally it is less than 10 ms and often is less than 1 ms. Queuing delay is the only delay component amenable to reduction through careful engineering.</li>
+</ul>
+<p>See <a class="reference internal" href="packets.html#packet-delay"><span class="std std-ref">7.1&nbsp;&nbsp;&nbsp;Packet Delay</span></a> for more details.</p>
+</div>
+<div class="section" id="lans-and-ethernet">
+<span id="lans"></span><span id="index-20"></span><h2>1.9&nbsp;&nbsp;&nbsp;LANs and Ethernet<a class="headerlink" href="#lans-and-ethernet" title="Permalink to this headline">¶</a></h2>
+<p>A <strong>local-area network</strong>, or LAN, is a system consisting of</p>
+<blockquote>
+<div><ul class="simple">
+<li>physical links that are, ultimately, serial lines</li>
+<li>common interfacing hardware connecting the hosts to the links</li>
+<li>protocols to make everything work together</li>
+</ul>
+</div></blockquote>
+<p>We will explicitly assume that every LAN node is able to communicate with every other LAN node. Sometimes this will require the cooperation of intermediate nodes acting as switches.</p>
+<p>Far and away the most common type of (wired) LAN is Ethernet, originally described in a 1976 paper by Metcalfe and Boggs <a class="reference internal" href="bibliography.html#mb76" id="id9">[MB76]</a>. Ethernet’s popularity is due to low cost more than anything else, though the primary reason Ethernet cost is low is that high demand has led to manufacturing economies of scale.</p>
+<p id="index-21">The original Ethernet had a bandwidth of 10 Mbps (megabits per second; we will use lower-case “b” for bits and upper-case “B” for bytes), though nowadays most Ethernet operates at 100 Mbps and gigabit (1000 Mbps) Ethernet (and faster) is widely used in server rooms.
+(By comparison, as of this writing (2015) the data transfer rate to a typical faster hard disk is about 1000 Mbps.)
+Wireless (“Wi-Fi”) LANs are gaining popularity, and in many settings have supplanted wired Ethernet to end-users.</p>
+<p id="index-22">Many early Ethernet installations were unswitched; each host simply tapped in to one long primary cable that wound through the building (or floor). In principle, two stations could then transmit at the same time, rendering the data unintelligible; this was called a <strong>collision</strong>. Ethernet has several design features intended to minimize the bandwidth wasted on collisions: stations, before transmitting, check to be sure the line is idle, they monitor the line <em>while</em> transmitting to detect collisions during the transmission, and, if a collision is detected, they execute a random backoff strategy to avoid an immediate recollision. See <a class="reference internal" href="ethernet1.html#the-slot-time-and-collisions"><span class="std std-ref">2.1.5&nbsp;&nbsp;&nbsp;The Slot Time and Collisions</span></a>. While Ethernet collisions definitely reduce throughput, in the larger view they should perhaps be thought of as a part of a remarkably inexpensive shared-access mediation protocol.</p>
+<p>In unswitched Ethernets every packet is received by every host and it is up to the network card in each host to determine if the arriving packet is addressed to that host. It is almost always possible to configure the card to forward <em>all</em> arriving packets to the attached host; this poses a security threat and “password sniffers” that surreptitiously collected passwords via such eavesdropping used to be common.</p>
+<div class="sidebar" id="index-23">
+<p class="first sidebar-title">Password Sniffing</p>
+<p>In the fall of 1994 at Loyola University I remotely changed the root password on several CS-department unix machines at the other end of campus, using telnet. I told no one. Within two hours, someone else logged into one of these machines, using the new password, from a host in Europe.  Password sniffing was the likely culprit.</p>
+<p class="last">Two months later was the so-called “Christmas Day Attack” (<a class="reference internal" href="tcpB.html#isn-spoofing"><span class="std std-ref">18.3.1&nbsp;&nbsp;&nbsp;ISNs and spoofing</span></a>). One of the hosts used to launch this attack was Loyola’s hacked apollo.it.luc.edu. It is unclear the degree to which password sniffing played a role in that exploit.</p>
+</div>
+<p>Due to both privacy and efficiency concerns, almost all Ethernets today are fully switched; this ensures that each packet is delivered only to the host to which it is addressed. One advantage of switching is that it effectively eliminates most Ethernet collisions; while in principle it replaces them with a <strong>queuing</strong> issue, in practice Ethernet switch queues so seldom fill up that they are almost invisible even to network managers (unlike IP router queues). Switching also prevents host-based eavesdropping, though arguably a better solution to this problem is encryption. Perhaps the more significant tradeoff with switches, historically, was that Once Upon A Time they were expensive and unreliable; tapping directly into a common cable was dirt cheap.</p>
+<p id="index-24">Ethernet addresses are six bytes long. Each Ethernet card (or <strong>network interface</strong>) is assigned a (supposedly) unique address at the time of manufacture; this address is burned into the card’s ROM and is called the card’s <strong>physical</strong> address or <strong>hardware</strong> address or <strong>MAC</strong> (Media Access Control) address. The first three bytes of the physical address have been assigned to the manufacturer; the subsequent three bytes are a serial number assigned by that manufacturer.</p>
+<p>By comparison, IP addresses are assigned administratively by the local site. The basic advantage of having addresses in hardware is that hosts automatically know their own addresses on startup; no manual configuration or server query is necessary. It is not unusual for a site to have a large number of identically configured workstations, for which all network differences derive ultimately from each workstation’s unique Ethernet address.</p>
+<p>The network interface continually monitors all arriving packets; if it sees any packet containing a destination address that matches its own physical address, it grabs the packet and forwards it to the attached CPU (via a CPU interrupt).</p>
+<p id="index-25">Ethernet also has a designated <strong>broadcast address</strong>. A host sending to the broadcast address has its packet received by every other host on the network; if a switch receives a broadcast packet on one port, it forwards the packet out every other port. This broadcast mechanism allows host A to contact host B when A does not yet know B’s physical address; typical broadcast queries have forms such as “Will the designated server please answer” or (from the ARP protocol) “will the host with the given IP address please tell me your physical address”.</p>
+<p id="index-26">Traffic addressed to a particular host – that is, not broadcast – is said to be <strong>unicast</strong>.</p>
+<p>Because Ethernet addresses are assigned by the hardware, knowing an address does not provide any direct indication of where that address is located on the network. In switched Ethernet, the switches must thus have a forwarding-table record for each individual Ethernet address on the network; for extremely large networks this ultimately becomes unwieldy. Consider the analogous situation with postal addresses: Ethernet is somewhat like attempting to deliver mail using social-security numbers as addresses, where each postal worker is provided with a large catalog listing each person’s SSN together with their physical location. Real postal mail is, of course, addressed “hierarchically” using ever-more-precise specifiers: state, city, zipcode, street address, and name / room#. Ethernet, in other words, does not scale well to “large” sizes.</p>
+<p>Switched Ethernet works quite well, however, for networks with up to 10,000-100,000 nodes. Forwarding tables with size in that range are straightforward to manage.</p>
+<p id="index-27">To forward packets correctly, switches must know where all active destination addresses in the LAN are located; traditional Ethernet switches do this by a passive <strong>learning</strong> algorithm. (IP routers, by comparison, use “active” protocols, and some newer Ethernet switches take the approach of <a class="reference internal" href="ethernet2.html#sdn"><span class="std std-ref">3.4&nbsp;&nbsp;&nbsp;Software-Defined Networking</span></a>.) Typically a host physical address is entered into a switch’s forwarding table when a packet from that host is first <em>received</em>; the switch notes the packet’s arrival interface and <em>source</em> address and assumes that the same interface is to be used to deliver packets back to that sender. If a given destination address has not yet been seen, and thus is not in the forwarding table, Ethernet switches still have the backup delivery option of <strong>flooding</strong>: forwarding the packet to everyone by treating the destination address like the broadcast address, and allowing the host Ethernet cards to sort it out. Since this broadcast-like process is not generally used for more than one packet (after that, the switches will have learned the correct forwarding-table entries), the risks of excessive traffic and of eavesdropping are minimal.</p>
+<p>The ⟨host,interface⟩ forwarding table is often easier to think of as ⟨host,next_hop⟩, where the next_hop node is whatever switch or host is at the immediate other end of the link connecting to the given interface. In a fully switched network where each link connects only two interfaces, the two perspectives are equivalent.</p>
+</div>
+<div class="section" id="ip-internet-protocol">
+<span id="ip-overview"></span><span id="index-28"></span><h2>1.10&nbsp;&nbsp;&nbsp;IP - Internet Protocol<a class="headerlink" href="#ip-internet-protocol" title="Permalink to this headline">¶</a></h2>
+<p>To solve the scaling problem with Ethernet, and to allow support for other types of LANs and point-to-point links as well, the <strong>Internet Protocol</strong> was developed. Perhaps the central issue in the design of IP was to support universal connectivity (everyone can connect to everyone else) in such a way as to allow scaling to enormous size (in 2013 there appear to be around ~10<sup>9</sup> nodes, although IP should work to 10<sup>10</sup> nodes or more), without resulting in unmanageably large forwarding tables (currently the largest tables have about 300,000 entries.)</p>
+<p>In the early days, IP networks were considered to be “internetworks” of basic networks (LANs); nowadays users generally ignore LANs and think of the Internet as one large (virtual) network.</p>
+<p id="index-29">To support universal connectivity, IP provides a global mechanism for <strong>addressing and routing</strong>, so that packets can actually be delivered from any host to any other host. IP addresses (for the most-common version 4, which we denote <strong>IPv4</strong>) are 4 bytes (32 bits), and are part of the <strong>IP header</strong> that generally follows the Ethernet header. The Ethernet header only stays with a packet for one hop; the IP header stays with the packet for its entire journey across the Internet.</p>
+<p>An essential feature of IPv4 (and IPv6) addresses is that they can be divided into
+a <strong>network</strong> part (a prefix) and a <strong>host</strong> part (the remainder). The “legacy” mechanism for designating the IPv4 network and host address portions was to make the division according to the first few bits:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="16%" />
+<col width="12%" />
+<col width="14%" />
+<col width="11%" />
+<col width="8%" />
+<col width="39%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">first few bits</th>
+<th class="head">first byte</th>
+<th class="head">network bits</th>
+<th class="head">host bits</th>
+<th class="head">name</th>
+<th class="head">application</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>0-127</td>
+<td>8</td>
+<td>24</td>
+<td>class&nbsp;A</td>
+<td>a few very large networks</td>
+</tr>
+<tr class="row-odd"><td>10</td>
+<td>128-191</td>
+<td>16</td>
+<td>16</td>
+<td>class&nbsp;B</td>
+<td>institution-sized networks</td>
+</tr>
+<tr class="row-even"><td>110</td>
+<td>192-223</td>
+<td>24</td>
+<td>8</td>
+<td>class&nbsp;C</td>
+<td>sized for smaller entities</td>
+</tr>
+</tbody>
+</table>
+<p>For example, the original IP address allocation for Loyola University Chicago was 147.126.0.0, a class B. In binary, 147 is <strong>10</strong>010011.</p>
+<p id="index-30">IP addresses, unlike Ethernet addresses, are <strong>administratively assigned</strong>. Once upon a time, you would get your Class B network prefix from the Internet Assigned Numbers Authority, or <a class="reference external" href="https://www.iana.org/">IANA</a> (they now delegate this task), and then you would in turn assign the host portion in a way that was appropriate for your local site. As a result of this administrative assignment, an IP address usually serves not just as an <strong>endpoint identifier</strong> but also as a <strong>locator</strong>, containing embedded location information (at least in the sense of location within the IP-address-assignment hierarchy, which may not be geographical). Ethernet addresses, by comparison, are endpoint identifiers but <em>not</em> locators.</p>
+<p id="index-31">The Class A/B/C definition above was spelled out in 1981 in <span class="target" id="index-32"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc791.html"><strong>RFC 791</strong></a>, which introduced IP. Class D was added in 1986 by <span class="target" id="index-33"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc988.html"><strong>RFC 988</strong></a>; class D addresses must begin with the bits 1110. These addresses are for <strong>multicast</strong>, that is, sending an IP packet to every member of a set of recipients (ideally without actually transmitting it more than once on any one link).</p>
+<p>Nowadays the division into the network and host bits is dynamic, and can be made at different positions in the address at different levels of the network. For example, a small organization might receive a /27 address block (1/8 the size of a class-C /24) from its ISP, <em>eg</em> 200.1.130.96/<strong>27</strong>. The ISP routes to the organization based on this /27 prefix. At some higher level, however, routing might be based on the prefix 200.1.128/<strong>18</strong>; this might, for example, represent an address block assigned to the ISP (note that the first 18 bits of 200.1.130.x match 200.1.128; the first two bits of 128 and 130, taken as 8-bit quantities, are “10”).  The network/host division point is <em>not</em> carried within the IP header; routers negotiate this division point when they negotiate the next_hop forwarding information. We will return to this in <a class="reference internal" href="ipv4.html#ipdelivery"><span class="std std-ref">9.5&nbsp;&nbsp;&nbsp;The Classless IP Delivery Algorithm</span></a>.</p>
+<p id="index-34">The network portion of an IP address is sometimes called the <strong>network number</strong> or <strong>network address</strong> or <strong>network prefix</strong>. As we shall see below, most forwarding decisions are made using only the network prefix. The network prefix is commonly denoted by setting the host bits to zero and ending the resultant address with a slash followed by the number of network bits in the address: <em>eg</em> 12.0.0.0/8 or 147.126.0.0/16. Note that 12.0.0.0/8 and 12.0.0.0/9 represent different things; in the latter, the second byte of any host address extending the network address is constrained to begin with a 0-bit. An anonymous block of IP addresses might be referred to only by the slash and following digit, <em>eg</em> “we need a /22 block to accommodate all our customers”.</p>
+<p id="index-35">All hosts with the same network address (same network bits) are said to be on the same <strong>IP network</strong> and <em>must be located together on the same LAN</em>; as we shall see below, if two hosts share the same network address then they will assume they can reach each other directly via the underlying LAN, and if they cannot then connectivity fails. A consequence of this rule is that outside of the site <em>only the network bits need to be looked at to route a packet to the site</em>.</p>
+<p>Usually, all hosts (or more precisely all network interfaces) on the same physical LAN share the same network prefix and thus are part of the same IP network. Occasionally, however, one LAN is divided into multiple IP networks.</p>
+<p>Each individual LAN technology has a <strong>maximum packet size</strong> it supports; for example, Ethernet has a maximum packet size of about 1500 bytes but the once-competing Token Ring had a maximum of 4 kB. Today the world has largely standardized on Ethernet and almost entirely standardized on Ethernet packet-size limits, but this was not the case when IP was introduced and there was real concern that two hosts on separate large-packet networks might try to exchange packets too large for some small-packet intermediate network to carry.</p>
+<p id="index-36">Therefore, in addition to routing and addressing, the decision was made that IP must also support <strong>fragmentation</strong>: the division of large packets into multiple smaller ones (in other contexts this may also be called <strong>segmentation</strong>). The IP approach is not very efficient, and IP hosts go to considerable lengths to avoid fragmentation. IP does require that packets of up to 576 bytes be supported, and so a common legacy strategy was for a host to limit a packet to at most 512 user-data bytes whenever the packet was to be sent via a router; packets addressed to another host on the same LAN could of course use a larger packet size. Despite its limited use, however, fragmentation is essential conceptually, in order for IP to be able to support large packets without knowing anything about the intervening networks.</p>
+<p id="index-37">IP is a <strong>best effort</strong> system; there are no IP-layer acknowledgments or retransmissions. We ship the packet off, and hope it gets there. Most of the time, it does.</p>
+<p id="index-38">Architecturally, this best-effort model represents what is known as <strong>connectionless</strong> networking: the IP layer does not maintain information about endpoint-to-endpoint connections, and simply forwards packets like a giant LAN. Responsibility for creating and maintaining connections is left for the next layer up, the TCP layer. Connectionless networking is <em>not</em> the only way to do things: the alternative could have been some form <strong>connection-oriented</strong> internetworking, in which routers <em>do</em> maintain state information about individual connections. Later, in <a class="reference internal" href="otherLANs.html#virtual-circuits"><span class="std std-ref">5.4&nbsp;&nbsp;&nbsp;Virtual Circuits</span></a>, we will examine how virtual-circuit networking can be used to implement a connection-oriented approach; virtual-circuit switching is the primary alternative to datagram switching.</p>
+<p id="index-39">Connectionless (IP-style) and connection-oriented networking each have advantages. Connectionless networking is conceptually more reliable: if routers do not hold connection state, then they cannot <em>lose</em> connection state. The path taken by the packets in some higher-level connection can easily be dynamically rerouted. Finally, connectionless networking makes it hard for providers to bill by the connection; once upon a time (in the era of dollar-a-minute phone calls) this was a source of mild astonishment to many new users. (This was not always a given; the paper <a class="reference internal" href="bibliography.html#ck74" id="id10">[CK74]</a> considers, among other things, the possibility of per-packet accounting.)</p>
+<p>The primary advantage of connection-oriented networking, on the other hand, is that the routers are then much better positioned to accept <strong>reservations</strong> and to make <strong>quality-of-service guarantees</strong>. This remains something of a sore point in the current Internet: if you want to use Voice-over-IP, or <strong>VoIP</strong>, telephones, or if you want to engage in video conferencing, your packets will be treated by the Internet core just the same as if they were low-priority file transfers. There is no “priority service” option.</p>
+<p id="index-40">The most common form of IP packet loss is router queue overflows, representing network congestion. Packet losses due to packet corruption are rare (<em>eg</em> less than one in 10<sup>4</sup>; perhaps much less). But in a connectionless world a large number of hosts can simultaneously attempt to send traffic through one router,  in which case queue overflows are hard to avoid.</p>
+<p>Although we will often assume, for simplicity, that routers have a fixed input queue size, the reality is often a little more complicated. See <a class="reference internal" href="dynamicsB.html#aqm"><span class="std std-ref">21.5&nbsp;&nbsp;&nbsp;Active Queue Management</span></a> and <a class="reference internal" href="fairqueuing.html#queuing-alternatives"><span class="std std-ref">23&nbsp;&nbsp;&nbsp;Queuing and Scheduling</span></a>.</p>
+<div class="section" id="ip-forwarding">
+<span id="index-41"></span><span id="id11"></span><h3>1.10.1&nbsp;&nbsp;&nbsp;IP Forwarding<a class="headerlink" href="#ip-forwarding" title="Permalink to this headline">¶</a></h3>
+<p>IP routers use datagram forwarding, described in <a class="reference internal" href="#datagram-forwarding"><span class="std std-ref">1.4&nbsp;&nbsp;&nbsp;Datagram Forwarding</span></a> above, to deliver packets, but the “destination” values listed in the forwarding tables are network prefixes – representing entire LANs – instead of individual hosts. The goal of IP forwarding, then, becomes delivery to the correct LAN; a separate process is used to deliver to the final host once the final LAN has been reached.</p>
+<p>The entire point, in fact, of having a network/host division within IP addresses is so that <strong>routers need to list only the network prefixes</strong> of the destination addresses in their IP forwarding tables. This strategy is <em>the</em> key to IP scalability: it saves large amounts of forwarding-table space, it saves time as smaller tables allow faster lookup, and it saves the bandwidth and overhead that would be needed for routers to keep track of individual addresses. To get an idea of the forwarding-table space savings, there are currently (2013) around a billion hosts on the Internet, but only 300,000 or so networks listed in top-level forwarding tables.</p>
+<p>With IP’s use of network prefixes as forwarding-table destinations, matching an actual packet address to a forwarding-table entry is no longer a matter of simple equality comparison; routers must compare appropriate prefixes.</p>
+<p>IP forwarding tables are sometimes also referred to as “routing tables”; in this book, however, we make at least a token effort to use “forwarding” to refer to the packet forwarding process, and “routing” to refer to mechanisms by which the forwarding tables are maintained and updated. (If we were to be completely consistent here, we would use the term “forwarding loop” rather than “routing loop”.)</p>
+<p>Now let us look at an example of how IP forwarding (or routing) works. We will assume that all network nodes are either <strong>hosts</strong> – user machines, with a single network connection – or <strong>routers</strong>, which do packet-forwarding only. Routers are not directly visible to users, and always have at least two different network interfaces representing different networks that the router is connecting. (Machines can be both hosts and routers, but this introduces complications.)</p>
+<p>Suppose A is the sending host, sending a packet to a destination host D. The IP header of the packet will contain D’s IP address in the “destination address” field (it will also contain A’s own address  as the “source address”). The first step is for A to determine whether D is on the same LAN as itself or not; that is, whether D is <strong>local</strong>. This is done by looking at the network part of the destination address, which we will denote by D<sub>net</sub>. If this net address is the same as A’s (that is, if it is equal numerically to A<sub>net</sub>), then A figures D is on the same LAN as itself, and can use direct LAN delivery. It looks up the appropriate physical address for D (probably with the <strong>ARP</strong> protocol, <a class="reference internal" href="ipv4companions.html#address-resolution-protocol"><span class="std std-ref">10.2&nbsp;&nbsp;&nbsp;Address Resolution Protocol: ARP</span></a>), attaches a LAN header to the packet in front of the IP header, and sends the packet straight to D via the LAN.</p>
+<p>If, however, A<sub>net</sub> and D<sub>net</sub> do <em>not</em> match – D is <strong>non-local</strong> – then A looks up a router to use. Most ordinary hosts use only one router for all non-local packet deliveries, making this choice very simple. A then forwards the packet to the router, again using direct delivery over the LAN. The IP destination address in the packet remains D in this case, although the LAN destination address will be that of the router.</p>
+<p>When the router receives the packet, it strips off the LAN header but leaves the IP header with the IP destination address. It extracts the destination D, and then looks at D<sub>net</sub>. The router first checks to see if any of <em>its</em> network interfaces are on the same LAN as D; recall that the router connects to at least one additional network besides the one for A. If the answer is yes, then the router uses direct LAN delivery to the destination, as above. If, on the other hand, D<sub>net</sub> is not a LAN to which the router is connected directly, then the router consults its internal forwarding table. This consists of a list of networks each with an associated next_hop address. These ⟨net,next_hop⟩ tables compare with switched-Ethernet’s ⟨host,next_hop⟩ tables; the former type will be smaller because there are many fewer nets than hosts. The next_hop addresses in the table are chosen so that the router can always reach them via direct LAN delivery via one of its interfaces; generally they are other routers. The router looks up D<sub>net</sub> in the table, finds the next_hop address, and uses direct LAN delivery to get the packet to that next_hop machine. The packet’s IP header remains essentially unchanged, although the router most likely attaches an entirely new LAN header.</p>
+<p>The packet continues being forwarded like this, from router to router, until it finally arrives at a router that is connected to D<sub>net</sub>; it is then delivered by that final router directly to D, using the LAN.</p>
+<p id="index-42">To make this concrete, consider the following diagram:</p>
+<div class="figure" id="id20">
+<span id="intro-lans-and-routers"></span><img alt="Two LANs (200.0.0 and 200.0.1) joined via three routers R1,R2,R3" src="_images/LANs_and_routers.svg" /><p class="caption"><span class="caption-number">Fig. 6: </span><span class="caption-text">Two LANs (200.0.0 and 200.0.1) joined by three routers R1,R2,R3</span></p>
+</div>
+<p>With Ethernet-style forwarding, R2 would have to maintain entries for each of A,B,C,D,E,F. With IP forwarding, R2 has just two entries to maintain in its forwarding table: 200.0.0/24 and 200.0.1/24. If A sends to D, at 200.0.1.37, it puts this address into the IP header, notes that 200.0.0 ≠ 200.0.1, and thus concludes D is not a local delivery. A therefore sends the packet to its router R1, using LAN delivery. R1 looks up the destination network 200.0.1 in its forwarding table and forwards the packet to R2, which in turn forwards it to R3. R3 now sees that it <em>is</em> connected directly to the destination network 200.0.1, and delivers the packet via the LAN to D, by looking up D’s physical address.</p>
+<p>In this diagram, IP addresses for the ends of the R1–R2 and R2–R3 links are not shown. They could be assigned global IP addresses, but they could also use “private” IP addresses. Assuming these links are point-to-point links, they might not actually need IP addresses at all; we return to this in <a class="reference internal" href="ipv4.html#unnumbered"><span class="std std-ref">9.8&nbsp;&nbsp;&nbsp;Unnumbered Interfaces</span></a>.</p>
+<p>One can think of the network-prefix bits as analogous to the “zip code” on postal mail, and the host bits as analogous to the street address. The internal parts of the post office get a letter to the right zip code, and then an individual letter carrier (the LAN) gets it to the right address. Alternatively, one can think of the network bits as like the area code of a phone number, and the host bits as like the rest of the digits. Newer protocols that support different net/host division points at different places in the network – sometimes called <strong>hierarchical routing</strong> – allow support for addressing schemes that correspond to, say, zip/street/user, or areacode/exchange/subscriber.</p>
+<div class="sidebar" id="index-43">
+<p class="first sidebar-title">The Invertebrate Internet</p>
+<p class="last">The backbone is not as essential as it once was. Once Upon A Time, all traffic between different providers passed through the backbone.  The legacy backbone still exists, but today it is also common for traffic from large providers such as <a class="reference external" href="https://google.com">Google</a> to take a backbone-free path; such providers connect (or “peer”) directly with large residential ISPs such as <a class="reference external" href="http://comcast.com">Comcast</a>. Google refers to this as their “Edge Network”; see <a class="reference external" href="https://peering.google.com/">peering.google.com</a> and also <a class="reference internal" href="bgp.html#bgp-and-med"><span class="std std-ref">15.7.1&nbsp;&nbsp;&nbsp;MED values and traffic engineering</span></a>.</p>
+</div>
+<p>We will refer to the Internet <strong>backbone</strong> as those IP routers that specialize in large-scale routing on the commercial Internet, and which generally have forwarding-table entries covering all public IP addresses; note that this is essentially a business definition rather than a technical one. We can revise the table-size claim of the previous paragraph to state that, while there are many <em>private</em> IP networks, there are about 800,000 separate network prefixes (as of 2019) visible to the backbone. (In 2012, the year this book was started, there were about 400,000 prefixes.) A forwarding table of 800,000 entries is quite feasible; a table a hundred times larger is not, let alone a thousand times larger. For a graph of the growth in network prefixes / forwarding-table entries, see <a class="reference internal" href="bgp.html#bgp-table-size"><span class="std std-ref">15.5&nbsp;&nbsp;&nbsp;BGP Table Size</span></a>.</p>
+<p id="index-44">IP routers at non-backbone sites generally know all locally assigned network prefixes, <em>eg</em> 200.0.0/24 and 200.0.1/24 above. If a destination does not match any locally assigned network prefix, the packet needs to be routed out into the Internet at large; for typical non-backbone sites this almost always this means the packet is sent to the ISP that provides Internet connectivity. Generally the local routers will contain a catchall <strong>default</strong> entry covering all nonlocal networks; this means that the router needs an explicit entry only for locally assigned networks. This greatly reduces the forwarding-table size. The Internet backbone can be approximately described, in fact, as those routers that do <em>not</em> have a default entry.</p>
+<p>For most purposes, the Internet can be seen as a combination of end-user LANs together with point-to-point links joining these LANs to the backbone, point-to-point links also tie the backbone together. Both LANs and point-to-point links appear in the diagram above.</p>
+<p>Just how routers build their ⟨destnet,next_hop⟩ forwarding tables is a major topic itself, which we cover in <a class="reference internal" href="routing.html#routing-update"><span class="std std-ref">13&nbsp;&nbsp;&nbsp;Routing-Update Algorithms</span></a>. Unlike Ethernet, IP routers do <em>not</em> have a “flooding” delivery mechanism as a fallback, so the tables must be constructed in advance. (There is a limited form of IP broadcast, but it is basically intended for reaching the local LAN only, and does not help at all with delivery in the event that the destination network is unknown.)</p>
+<p id="index-45">Most forwarding-table-construction algorithms used on a set of routers under common management fall into either the <strong>distance-vector</strong> or the <strong>link-state</strong> category; these are described in <a class="reference internal" href="routing.html#routing-update"><span class="std std-ref">13&nbsp;&nbsp;&nbsp;Routing-Update Algorithms</span></a>. Routers <em>not</em> under common management – that is, neighboring routers belonging to different organizations – exchange information through the Border Gateway Protocol, BGP (<a class="reference internal" href="bigrouting.html#large-scale-ip-routing"><span class="std std-ref">14&nbsp;&nbsp;&nbsp;Large-Scale IP Routing</span></a>). BGP allows routing decisions to be based on a fusion of “technical” information (which sites are reachable at all, and through where) together with “policy” information representing legal or commercial agreements: which outside routers are “preferred”, whose traffic an ISP will carry even if it isn’t to one of the ISP’s customers, <em>etc</em>.</p>
+<p>Most common residential “routers” involve <strong>network address translation</strong> in addition to packet forwarding. See <a class="reference internal" href="ipv4.html#nat"><span class="std std-ref">9.7&nbsp;&nbsp;&nbsp;Network Address Translation</span></a>.</p>
+</div>
+<div class="section" id="the-future-of-ipv4">
+<span id="future"></span><h3>1.10.2&nbsp;&nbsp;&nbsp;The Future of IPv4<a class="headerlink" href="#the-future-of-ipv4" title="Permalink to this headline">¶</a></h3>
+<p id="index-46">As mentioned earlier, allocation of blocks of IP addresses is the responsibility of the Internet Assigned Numbers Authority. IANA long ago delegated the job of allocating network prefixes to individual sites; they limited themselves to handing out /8 blocks (class A blocks) to the five <strong>regional registries</strong>, which are</p>
+<ul class="simple">
+<li><a class="reference external" href="https://www.arin.net/">ARIN</a> – North America</li>
+<li><a class="reference external" href="http://www.ripe.net/">RIPE</a> – Europe, the Middle East and parts of Asia</li>
+<li><a class="reference external" href="http://www.apnic.net/">APNIC</a> – East Asia and the Pacific</li>
+<li><a class="reference external" href="http://www.afrinic.net/">AfriNIC</a> – most of Africa</li>
+<li><a class="reference external" href="http://www.lacnic.net/">LACNIC</a> – Central and South America</li>
+</ul>
+<p>As of the end of January 2011, the IANA finally ran out of /8 blocks. There is a table at <a class="reference external" href="http://www.iana.org/assignments/ipv4-address-space/ipv4-address-space.xml">http://www.iana.org/assignments/ipv4-address-space/ipv4-address-space.xml</a> of all IANA assignments of /8 blocks; examination of the table shows all have now been allocated.</p>
+<p>In September 2015, ARIN  <a class="reference external" href="https://www.arin.net/announcements/2015/20150924.html">ran out of its pool of IPv4 addresses</a>. Most of ARIN’s customers are ISPs, which can now obtain new IPv4 addresses only by buying unused address blocks from other organizations.</p>
+<p id="index-47">A few months after the IANA pool ran out in 2011, Microsoft purchased 666,624 IP addresses (2604 Class-C blocks) in a Nortel bankruptcy auction for $7.5 million. Three years later, IP-address prices fell to half that, but, by 2019, had climbed to the $20-and-up range. In that year Amazon bought a 4-million-address block (44.0.0.0/10) for $108 million, or $27/address. Prices remained in the $20 range through 2020, but by the end of 2021 had climbed to $50-$55, with several /19 blocks sold in January 2022 in that range. The market for IPv4 address blocks continues to develop, but the only real solution is widespread adoption of IPv6 with its plentiful 128-bit addresses.</p>
+<p>An IPv4 address price in the range of $20-30 is unlikely to have much impact in residential Internet access, where annual connection fees are often $600. Large organizations use NAT (<a class="reference internal" href="ipv4.html#nat"><span class="std std-ref">9.7&nbsp;&nbsp;&nbsp;Network Address Translation</span></a>) extensively, leading to the need for only a small number of globally visible addresses. The IPv4 address shortage does not even seem to have affected wireless networking. It does, however, lead to inefficient routing tables, as sites that might once have had a single /17 address block – and thus a single backbone forwarding-table entry – might now be spread over more than a hundred /24 blocks and concomitant forwarding entries.</p>
+</div>
+</div>
+<div class="section" id="dns">
+<span id="index-48"></span><h2>1.11&nbsp;&nbsp;&nbsp;DNS<a class="headerlink" href="#dns" title="Permalink to this headline">¶</a></h2>
+<p>IP addresses are hard to remember (nearly impossible in IPv6). The <strong>domain name system</strong>, or DNS (<a class="reference internal" href="ipv4companions.html#dns"><span class="std std-ref">10.1&nbsp;&nbsp;&nbsp;DNS</span></a>), comes to the rescue by creating a way to convert hierarchical text names to IP addresses. Thus, for example, one can type <code class="docutils literal notranslate"><span class="pre">www.luc.edu</span></code> instead of 147.126.1.230. Virtually all Internet software uses the same basic library calls to convert DNS names to actual addresses.</p>
+<p>One thing DNS makes possible is changing a website’s IP address while leaving the name alone. This allows moving a site to a new provider, for example, without requiring users to learn anything new. It is also possible to have several different DNS names resolve to the same IP address, and – through some modest trickery – have the http (web) server at that IP address handle the different DNS names as completely different websites.</p>
+<p>DNS is hierarchical and distributed. In looking up <code class="docutils literal notranslate"><span class="pre">cs.luc.edu</span></code> four different DNS servers may be queried: for the so-called “DNS root zone”, for <code class="docutils literal notranslate"><span class="pre">edu</span></code>, for <code class="docutils literal notranslate"><span class="pre">luc.edu</span></code> and for <code class="docutils literal notranslate"><span class="pre">cs.luc.edu</span></code>. Searching a hierarchy can be cumbersome, so DNS search results are normally cached locally. If a name is not found in the cache, the lookup may take a couple seconds. The DNS hierarchy need have nothing to do with the IP-address hierarchy.</p>
+</div>
+<div class="section" id="transport">
+<span id="id12"></span><h2>1.12&nbsp;&nbsp;&nbsp;Transport<a class="headerlink" href="#transport" title="Permalink to this headline">¶</a></h2>
+<p id="index-49">The IP layer gets packets from one node to another, but it is not well-suited to transport.  First, IP routing is a “best-effort” mechanism, which means packets can and do get lost sometimes. Additionally, data that does arrive can arrive out of order. Finally, IP only supports sending to a specific host; normally, one wants to send to a given application running on that host. Email and web traffic, or two different web sessions, should not be commingled!</p>
+<p id="index-50">The Transport layer is the layer above the IP layer that handles these sorts of issues, often by creating some sort of <em>connection</em> abstraction. Far and away the most popular mechanism in the Transport layer is the Transmission Control Protocol, or <strong>TCP</strong>. TCP extends IP with the following features:</p>
+<ul class="simple">
+<li><strong>reliability</strong>: TCP numbers each packet, and keeps track of which are lost and retransmits them after a timeout. It holds early-arriving out-of-order packets for delivery at the correct time. Every arriving data packet is acknowledged by the receiver; timeout and retransmission occurs when an acknowledgment packet isn’t received by the sender within a given time.</li>
+<li><strong>connection-orientation</strong>: Once a TCP connection is made, an application sends data simply by writing to that connection. No further application-level addressing is needed. TCP connections are managed by the operating-system kernel, not by the application.</li>
+<li><strong>stream-orientation</strong>: An application using TCP can write 1 byte at a time, or 100 kB at a time; TCP will buffer and/or divide up the data into appropriate sized packets.</li>
+<li><strong>port numbers</strong>: these provide a way to specify the receiving application for the data, and also to identify the sending application.</li>
+<li><strong>throughput management</strong>: TCP attempts to maximize throughput, while at the same time not contributing unnecessarily to network <strong>congestion</strong>.</li>
+</ul>
+<p id="index-51">TCP endpoints are of the form ⟨host,port⟩; these pairs are known as <strong>socket addresses</strong>, or sometimes as just <strong>sockets</strong> though the latter refers more properly to the operating-system objects that receive the data sent to the socket addresses.
+<strong>Servers</strong> (or, more precisely, server applications) <em>listen</em> for connections to sockets they have opened; the <strong>client</strong> is then any endpoint that <em>initiates</em> a connection to a server.</p>
+<p>When you enter a host name in a web browser, it opens a TCP connection to the server’s port 80 (the standard web-traffic port), that is, to the server socket with socket-address ⟨server,80⟩. If you have several browser tabs open, each might connect to the <em>same</em> server socket, but the connections are distinguishable by virtue of using separate ports (and thus having separate socket addresses) on the <em>client</em> end (that is, your end).</p>
+<p>A busy server may have thousands of connections to its port 80 (the web port) and hundreds of connections to port 25 (the email port). Web and email traffic are kept separate by virtue of the different ports used. All those clients to the same port, though, are kept separate because each comes from a unique ⟨host,port⟩ pair. A TCP connection is determined by the ⟨host,port⟩ socket address at <em>each</em> end; traffic on different connections does not intermingle. That is, there may be multiple independent connections to ⟨www.luc.edu,80⟩. This is somewhat analogous to certain business telephone numbers of the “<em>operators are standing by</em>” type, which support multiple callers at the same time to the same toll-free number. Each call to that number is answered by a different operator (corresponding to a different cpu process), and different calls do not “overhear” each other.</p>
+<p id="index-52">TCP uses the <strong>sliding-windows algorithm</strong>, <a class="reference internal" href="slidingwindows.html#abstract-sliding-windows"><span class="std std-ref">8&nbsp;&nbsp;&nbsp;Abstract Sliding Windows</span></a>, to keep multiple packets <em>en route</em> at any one time.  The <strong>window size</strong> represents the number of packets simultaneously in transit (TCP actually keeps track of the window size in bytes, but packets are easier to visualize). If the window size is 10 packets, for example, then at any one time 10 packets are in transit (perhaps 5 data packets and 5 returning acknowledgments). Assuming no packets are lost, then as each acknowledgment arrives the window “slides forward” by one packet. The data packet 10 packets ahead is then sent, to maintain a total of 10 packets on the wire. For example, consider the moment when the ten packets 20-29 are in transit. When ACK[20] is received, the number of packets outstanding drops to 9 (packets 21-29). To keep 10 packets in flight, Data[30] is sent. When ACK[21] is received, Data[31] is sent, and so on.</p>
+<p>Sliding windows minimizes the effect of store-and-forward delays, and propagation delays, as these then only count once for the entire windowful and not once per packet. Sliding windows also provides an automatic, if partial, brake on congestion: the queue at any switch or router along the way cannot exceed the window size. In this it compares favorably with <strong>constant-rate</strong> transmission, which, if the available bandwidth falls below the transmission rate, always leads to overflowing queues and to a significant percentage of dropped packets. Of course, if the window size is too large, a sliding-windows sender may also experience dropped packets.</p>
+<p>The ideal window size, at least from a throughput perspective, is such that it takes one round-trip time to send an entire window, so that the next ACK will always be arriving just as the sender has finished transmitting the window. Determining this ideal size, however, is difficult; for one thing, the ideal size varies with network load. As a result, TCP approximates the ideal size. The most common TCP strategy – that of so-called TCP Reno – is that the window size is slowly raised until packet loss occurs, which TCP takes as a sign that it has reached the limit of available network resources. At that point the window size is reduced to half its previous value, and the slow climb resumes. The effect is a “sawtooth” graph of window size with time, which oscillates (more or less) around the “optimal” window size. For an idealized sawtooth graph, see <a class="reference internal" href="reno.html#steady-state"><span class="std std-ref">19.1.1&nbsp;&nbsp;&nbsp;The Somewhat-Steady State</span></a>; for some “real” (simulation-created) sawtooth graphs see <a class="reference internal" href="ns2.html#cwnd-graphs"><span class="std std-ref">31.4.1&nbsp;&nbsp;&nbsp;Some TCP Reno cwnd graphs</span></a>.</p>
+<p id="index-53">While this window-size-optimization strategy has its roots in attempting to maximize the available bandwidth, it also has the effect of greatly limiting the number of packet-loss events. As a result, TCP has come to be the Internet protocol charged with reducing (or at least managing) <strong>congestion</strong> on the Internet, and – relatedly – with ensuring <strong>fairness</strong> of bandwidth allocations to competing connections. Core Internet routers – at least in the classical case – essentially have no role in enforcing congestion or fairness restrictions at all. The Internet, in other words, places responsibility for congestion avoidance cooperatively into the hands of end users. While “cheating” is possible, this cooperative approach has worked remarkably well.</p>
+<p id="index-54">While TCP is ubiquitous, the <strong>real-time</strong> performance of TCP is not always consistent: if a packet is lost, the receiving TCP host will not turn over anything further to the receiving application until the lost packet has been retransmitted successfully; this is often called <strong>head-of-line blocking</strong>. This is a serious problem for sound and video applications, which can discreetly handle modest losses but which have much more difficulty with sudden large delays. A few lost packets ideally should mean just a few brief voice dropouts (pretty common on cell phones) or flicker/snow on the video screen (or just reuse of the previous frame); both of these are better than pausing completely.</p>
+<span class="target" id="index-55"></span><p>The basic alternative to TCP is known as <strong>UDP</strong>, for User Datagram Protocol. UDP, like TCP, provides port numbers to support delivery to multiple endpoints within the receiving host, in effect to a specific process on the host. As with TCP, a UDP socket consists of a ⟨host,port⟩ pair. UDP also includes, like TCP, a checksum over the data. However, UDP omits the other TCP features: there is no connection setup, no lost-packet detection, no automatic timeout/retransmission, and the application must manage its own packetization. This simplicity should not be seen as all negative: the absence of connection setup means data transmission can get started faster, and the absence of lost-packet detection means there is no head-of-line blocking. See <a class="reference internal" href="udp.html#udp"><span class="std std-ref">16&nbsp;&nbsp;&nbsp;UDP Transport</span></a>.</p>
+<p id="index-56">The Real-time Transport Protocol, or <strong>RTP</strong>, sits above UDP and adds some additional support for voice and video applications.</p>
+<div class="section" id="transport-communications-patterns">
+<h3>1.12.1&nbsp;&nbsp;&nbsp;Transport Communications Patterns<a class="headerlink" href="#transport-communications-patterns" title="Permalink to this headline">¶</a></h3>
+<p>The two “classic” traffic patterns for Internet communication are these:</p>
+<ul class="simple">
+<li>Interactive  or bursty communications such as via ssh or telnet, with long idle times between short bursts</li>
+<li>Bulk file transfers, such as downloading a web page</li>
+</ul>
+<p>TCP handles both of these well, although its congestion-management features apply only when a large amount of data is in transit at once. Web browsing is something of a hybrid; over time, there is usually considerable burstiness, but individual pages now often exceed 1 MB.</p>
+<p id="index-57">To the above we might add <strong>request/reply</strong> operations, <em>eg</em> to query a database or to make DNS requests. TCP is widely used here as well, though most DNS traffic still uses UDP. There are periodic calls for a new protocol specifically addressing this pattern, though at this point the use of TCP is well established. If a <em>sequence</em> of request/reply operations is envisioned, a single TCP connection makes excellent sense, as the connection-setup overhead is minimal by comparison. See also <a class="reference internal" href="udp.html#rpc"><span class="std std-ref">16.5&nbsp;&nbsp;&nbsp;Remote Procedure Call (RPC)</span></a> and <a class="reference internal" href="tcpB.html#sctp"><span class="std std-ref">18.15.2&nbsp;&nbsp;&nbsp;SCTP</span></a>.</p>
+<p id="index-58">This century has seen an explosion in <strong>streaming video</strong> (<a class="reference internal" href="realtime.html#streaming-video"><span class="std std-ref">25.3.2&nbsp;&nbsp;&nbsp;Streaming Video</span></a>), in lengths from a few minutes to a few hours. Streaming radio stations might be left playing indefinitely. TCP generally works well here, assuming the receiver can get, say, a minute ahead, buffering the video that has been received but not yet viewed. That way, if there is a dip in throughput due to congestion, the receiver has time to recover. Buffering works a little less well for streaming radio, as the listener doesn’t want to get too far behind, though ten seconds is reasonable. Fortunately, audio bandwidth is smaller.</p>
+<p>Another issue with streaming video is the bandwidth demand. Most streaming-video services attempt to estimate the available throughput, and then <em>adapt</em> to that throughput by changing the video resolution (<a class="reference internal" href="realtime.html#real-time"><span class="std std-ref">25.3&nbsp;&nbsp;&nbsp;Real-time Traffic</span></a>).</p>
+<p>Typically, video streaming operates on a start/stop basis: the sender pauses when the receiver’s playback buffer is “full”, and resumes when the playback buffer drops below a certain threshold.</p>
+<p id="index-59">If the video (or, for that matter, voice audio) is <em>interactive</em>, there is much less opportunity for stream buffering. If someone asks a simple question on an Internet telephone call, they generally want an answer more or less immediately; they do not expect to wait for the answer to make it through the other party’s stream buffer. 200 ms of buffering is noticeable. Here we enter the realm of genuine real-time traffic (<a class="reference internal" href="realtime.html#real-time"><span class="std std-ref">25.3&nbsp;&nbsp;&nbsp;Real-time Traffic</span></a>). UDP is often used to avoid head-of-line blocking. Lower bandwidth helps; voice-grade communications traditionally need only 8 kB/sec, less if compression is used. On the other hand, there may be constraints on the <em>variation</em> in delivery time (known as <em>jitter</em>; see <a class="reference internal" href="realtime.html#rtcp"><span class="std std-ref">25.11.3&nbsp;&nbsp;&nbsp;RTP Control Protocol</span></a> for a specific numeric interpretation). Interactive video, with its much higher bandwidth requirements, is more difficult; fortunately, users seem to tolerate the common pauses and freezes.</p>
+<p id="index-60">Within the Transport layer, essentially all network connections involve a <strong>client</strong> and a <strong>server</strong>. Often this pattern is repeated at the Application layer as well: the client contacts the server and initiates a login session, or browses some web pages, or watches a movie. Sometimes, however, Application-layer exchanges fit the <strong>peer-to-peer</strong> model better, in which the two endpoints are more-or-less co-equals. Some examples include</p>
+<ul class="simple">
+<li>Internet telephony: there is no benefit in designating the party who place the call as the “client”</li>
+<li>Message passing in a CPU cluster, often using <a class="reference internal" href="udp.html#rpc"><span class="std std-ref">16.5&nbsp;&nbsp;&nbsp;Remote Procedure Call (RPC)</span></a></li>
+<li>The routing-communication protocols of <a class="reference internal" href="routing.html#routing-update"><span class="std std-ref">13&nbsp;&nbsp;&nbsp;Routing-Update Algorithms</span></a>. When router A reports to router B we might call A the client, but over time, as A and B report to one another repeatedly, the peer-to-peer model makes more sense.</li>
+<li>So-called peer-to-peer file-sharing, where individuals exchange files with other individuals (and as opposed to “cloud-based” file-sharing in which the “cloud” is the server).</li>
+</ul>
+<p><span class="target" id="index-61"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc5694.html"><strong>RFC 5694</strong></a> contains additional discussion of peer-to-peer patterns.</p>
+</div>
+<div class="section" id="content-distribution-networks">
+<span id="cdns"></span><span id="index-62"></span><h3>1.12.2&nbsp;&nbsp;&nbsp;Content-Distribution Networks<a class="headerlink" href="#content-distribution-networks" title="Permalink to this headline">¶</a></h3>
+<p>Sites with an extremely large volume of content to distribute often turn to a specialized communication pattern called a content-distribution network or <strong>CDN</strong>. To reduce the amount of long-distance traffic, or to reduce the round-trip time, a site replicates its content at multiple datacenters (also called <em>Points of Presence</em> (PoPs), <em>nodes</em>, <em>access points</em> or <em>edge servers</em>). When a user makes a request (<em>eg</em> for a web page or a video), the request is routed to the nearest (or approximately nearest) datacenter, and the content is delivered from there.</p>
+<div class="sidebar">
+<p class="first sidebar-title">CDN Mapping</p>
+<p class="last">For a geographical map of the servers in the <a class="reference external" href="https://www.netflix.com">NetFlix</a> CDN as of 2016, see <a class="reference internal" href="bibliography.html#bctcu16" id="id13">[BCTCU16]</a>. The map was created solely through end-user measurements. Most of the servers are in North and South America and Europe.</p>
+</div>
+<p>Large web pages typically contain both <em>static</em> content and also individualized <em>dynamic</em> content. On a typical Facebook page, for example, the videos and javascript might be considered static, while the individual wall posts might be considered dynamic. The CDN may cache all or most of the static content at each of its edge servers, leaving the dynamic content to come from a centralized server. Alternatively, the dynamic content may be replicated at each CDN edge node as well, though this introduces some real-time coordination issues.</p>
+<p>If dynamic content is <em>not</em> replicated, the CDN may include private high-speed links between its nodes, allowing for rapid low-congestion delivery to any node. Alternatively, CDN nodes may simply communicate using the public Internet. Finally, the CDN may (or may not) be configured to support fast <em>interactive</em> traffic between nodes, <em>eg</em> teleconferencing traffic, as is outlined in <a class="reference internal" href="realtime.html#cdn-intserv"><span class="std std-ref">25.6.1&nbsp;&nbsp;&nbsp;A CDN Alternative to IntServ</span></a>.</p>
+<p>Organizations can create their own CDNs, but often turn to specialized CDN providers, who often combine their CDN services with website-hosting services.</p>
+<p>In principle, all that is needed to create a CDN is a multiplicity of datacenters, each with its own connection to the Internet; private links between datacenters are also common. In practice, many CDN providers also try to build direct connections with the ISPs that serve their customers; the Google Edge Network above does this. This can improve performance and reduce traffic costs; we will return to this in <a class="reference internal" href="bgp.html#bgp-and-med"><span class="std std-ref">15.7.1&nbsp;&nbsp;&nbsp;MED values and traffic engineering</span></a>.</p>
+<p>Finding the edge server that is closest to a given user is a tricky issue. There are three techniques in common use. In the first, the edge servers are all given different IP addresses, and DNS is configured to have users receive the IP address of the closest edge server, <a class="reference internal" href="ipv4companions.html#dns"><span class="std std-ref">10.1&nbsp;&nbsp;&nbsp;DNS</span></a>. In the second, each edge server has the <em>same</em> IP address, and <em>anycast</em> routing is used to route traffic from the user to the closest edge server, <a class="reference internal" href="bgp.html#bgp-anycast"><span class="std std-ref">15.8&nbsp;&nbsp;&nbsp;BGP and Anycast</span></a>. Finally, for HTTP applications a centralized server can look up the approximate location of the user, and then redirect the web page to the closest edge server.</p>
+</div>
+</div>
+<div class="section" id="firewalls">
+<span id="index-63"></span><h2>1.13&nbsp;&nbsp;&nbsp;Firewalls<a class="headerlink" href="#firewalls" title="Permalink to this headline">¶</a></h2>
+<p>One problem with having a program on your machine listening on an open TCP port is that someone may connect and then, using some flaw in the software on your end, do something malicious to your machine. Damage can range from the unintended downloading of personal data to compromise and takeover of your entire machine, making it a distributor of viruses and worms or a steppingstone in later break-ins of other machines.</p>
+<p>A strategy known as <strong>buffer overflow</strong> (<a class="reference internal" href="security.html#stack-buffer-overflow"><span class="std std-ref">28.2&nbsp;&nbsp;&nbsp;Stack Buffer Overflow</span></a>) has been the basis for a great many total-compromise attacks. The idea is to identify a point in a server program where it fills a memory buffer with network-supplied data without careful length checking; almost any call to the C library function <code class="docutils literal notranslate"><span class="pre">gets(buf)</span></code> will suffice. The attacker then crafts an oversized input string which, when read by the server and stored in memory, overflows the buffer and overwrites subsequent portions of memory, typically containing the stack-frame pointers. The usual goal is to arrange things so that when the server reaches the end of the currently executing function, control is returned not to the calling function but instead to the attacker’s own payload code located within the string.</p>
+<p>A <strong>firewall</strong> is a mechanism to block connections deemed potentially risky, <em>eg</em> those originating from outside the site. Generally ordinary workstations do not ever need to accept connections from the Internet; client machines instead <em>initiate</em> connections to (better-protected) servers. So blocking incoming connections works reasonably well; when necessary (<em>eg</em> for games) certain ports can be selectively unblocked.</p>
+<p>The original firewalls were built into routers. Incoming traffic to servers was often blocked unless it was sent to one of a modest number of “open” ports; for non-servers, typically all inbound connections were blocked. This allowed internal machines to operate reasonably safely, though being unable to accept incoming connections is sometimes inconvenient.</p>
+<p>Nowadays per-host firewalls – in addition to router-based firewalls – are common: you can configure your workstation not to accept inbound connections to most (or all) ports regardless of whether software on the workstation requests such a connection. Outbound connections can, in many cases, also be prevented.</p>
+<p>The typical home router implements something called network-address translation (<a class="reference internal" href="ipv4.html#nat"><span class="std std-ref">9.7&nbsp;&nbsp;&nbsp;Network Address Translation</span></a>), which, in addition to conserving IPv4 addresses, also provides firewall protection.</p>
+</div>
+<div class="section" id="some-useful-utilities">
+<span id="traceroute-intro"></span><span id="utilities"></span><span id="index-64"></span><h2>1.14&nbsp;&nbsp;&nbsp;Some Useful Utilities<a class="headerlink" href="#some-useful-utilities" title="Permalink to this headline">¶</a></h2>
+<p>There exists a great variety of useful programs for probing and diagnosing networks. Here we list a few of the simpler, more common and available ones; some of these are addressed in more detail in subsequent chapters. Some of these, like <code class="docutils literal notranslate"><span class="pre">ping</span></code>, are generally present by default; others will have to be installed from somewhere.</p>
+<p id="index-65"><strong>ping</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">Ping</span></code> is useful to determine if another machine is accessible, <em>eg</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ping</span> <span class="n">www</span><span class="o">.</span><span class="n">cs</span><span class="o">.</span><span class="n">luc</span><span class="o">.</span><span class="n">edu</span>
+<span class="n">ping</span> <span class="mf">147.126.1.230</span>
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="ipv4companions.html#ping"><span class="std std-ref">10.4&nbsp;&nbsp;&nbsp;Internet Control Message Protocol</span></a> for how it works. Sometimes <code class="docutils literal notranslate"><span class="pre">ping</span></code> fails because the necessary packets are blocked by a firewall.</p>
+<p id="index-66"><strong>ifconfig</strong>, <strong>ipconfig</strong>, <strong>ip</strong></p>
+<p>To find your own IP address you can use <code class="docutils literal notranslate"><span class="pre">ipconfig</span></code> on Windows, <code class="docutils literal notranslate"><span class="pre">ifconfig</span></code> on Linux and Macintosh systems, or the newer <code class="docutils literal notranslate"><span class="pre">ip</span> <span class="pre">addr</span> <span class="pre">list</span></code> on Linux. The output generally lists all active interfaces but can be restricted to selected interfaces if desired. The <code class="docutils literal notranslate"><span class="pre">ip</span></code> command in particular can do many other things as well. The Windows command <code class="docutils literal notranslate"><span class="pre">netsh</span> <span class="pre">interface</span> <span class="pre">ip</span> <span class="pre">show</span> <span class="pre">config</span></code> also provides IP addresses.</p>
+<p id="index-67"><strong>nslookup</strong>, <strong>dig</strong> and <strong>host</strong></p>
+<p>This trio of programs, all developed by the <a class="reference external" href="http://isc.org">Internet Systems Consortium</a>, are all used for DNS lookups. They differ in convenience and options. The oldest is <code class="docutils literal notranslate"><span class="pre">nslookup</span></code>, the one with the most options (by a rather wide margin) is <code class="docutils literal notranslate"><span class="pre">dig</span></code>, and the newest and arguably most convenient for normal usage is <code class="docutils literal notranslate"><span class="pre">host</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nslookup</span> <span class="n">intronetworks</span><span class="o">.</span><span class="n">cs</span><span class="o">.</span><span class="n">luc</span><span class="o">.</span><span class="n">edu</span>
+
+<span class="n">Non</span><span class="o">-</span><span class="n">authoritative</span> <span class="n">answer</span><span class="p">:</span>
+<span class="n">Name</span><span class="p">:</span>   <span class="n">intronetworks</span><span class="o">.</span><span class="n">cs</span><span class="o">.</span><span class="n">luc</span><span class="o">.</span><span class="n">edu</span>
+<span class="n">Address</span><span class="p">:</span> <span class="mf">162.216.18.28</span>
+
+
+<span class="n">dig</span> <span class="n">intronetworks</span><span class="o">.</span><span class="n">cs</span><span class="o">.</span><span class="n">luc</span><span class="o">.</span><span class="n">edu</span>
+
+<span class="o">...</span>
+<span class="p">;;</span> <span class="n">ANSWER</span> <span class="n">SECTION</span><span class="p">:</span>
+<span class="n">intronetworks</span><span class="o">.</span><span class="n">cs</span><span class="o">.</span><span class="n">luc</span><span class="o">.</span><span class="n">edu</span><span class="o">.</span> <span class="mi">86400</span> <span class="n">IN</span>      <span class="n">A</span>       <span class="mf">162.216.18.28</span>
+<span class="o">...</span>
+
+<span class="n">host</span> <span class="n">intronetworks</span><span class="o">.</span><span class="n">cs</span><span class="o">.</span><span class="n">luc</span><span class="o">.</span><span class="n">edu</span>
+
+<span class="n">intronetworks</span><span class="o">.</span><span class="n">cs</span><span class="o">.</span><span class="n">luc</span><span class="o">.</span><span class="n">edu</span> <span class="n">has</span> <span class="n">address</span> <span class="mf">162.216.18.28</span>
+<span class="n">intronetworks</span><span class="o">.</span><span class="n">cs</span><span class="o">.</span><span class="n">luc</span><span class="o">.</span><span class="n">edu</span> <span class="n">has</span> <span class="n">IPv6</span> <span class="n">address</span> <span class="mi">2600</span><span class="p">:</span><span class="mi">3</span><span class="n">c03</span><span class="p">::</span><span class="n">f03c</span><span class="p">:</span><span class="mi">91</span><span class="n">ff</span><span class="p">:</span><span class="n">fe69</span><span class="p">:</span><span class="n">f438</span>
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="ipv4companions.html#nslookup1"><span class="std std-ref">10.1.2&nbsp;&nbsp;&nbsp;nslookup and dig</span></a>.</p>
+<p id="index-68"><strong>traceroute</strong></p>
+<p>This lists the route from you to a remote host:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">traceroute</span> <span class="n">intronetworks</span><span class="o">.</span><span class="n">cs</span><span class="o">.</span><span class="n">luc</span><span class="o">.</span><span class="n">edu</span>
+
+ <span class="mi">1</span>  <span class="mf">147.126.65.1</span> <span class="p">(</span><span class="mf">147.126.65.1</span><span class="p">)</span>  <span class="mf">0.751</span> <span class="n">ms</span>  <span class="mf">0.753</span> <span class="n">ms</span>  <span class="mf">0.783</span> <span class="n">ms</span>
+ <span class="mi">2</span>  <span class="mf">147.126.95.54</span> <span class="p">(</span><span class="mf">147.126.95.54</span><span class="p">)</span>  <span class="mf">1.319</span> <span class="n">ms</span>  <span class="mf">1.286</span> <span class="n">ms</span>  <span class="mf">1.253</span> <span class="n">ms</span>
+ <span class="mi">3</span>  <span class="mf">12.31.132.169</span> <span class="p">(</span><span class="mf">12.31.132.169</span><span class="p">)</span>  <span class="mf">1.225</span> <span class="n">ms</span>  <span class="mf">1.231</span> <span class="n">ms</span>  <span class="mf">1.193</span> <span class="n">ms</span>
+ <span class="mi">4</span>  <span class="n">cr83</span><span class="o">.</span><span class="n">cgcil</span><span class="o">.</span><span class="n">ip</span><span class="o">.</span><span class="n">att</span><span class="o">.</span><span class="n">net</span> <span class="p">(</span><span class="mf">12.123.7.46</span><span class="p">)</span>  <span class="mf">4.983</span> <span class="n">ms</span> <span class="n">cr84</span><span class="o">.</span><span class="n">cgcil</span><span class="o">.</span><span class="n">ip</span><span class="o">.</span><span class="n">att</span><span class="o">.</span><span class="n">net</span> <span class="p">(</span><span class="mf">12.123.7.170</span><span class="p">)</span>  <span class="mf">4.825</span> <span class="n">ms</span>  <span class="mf">4.812</span> <span class="n">ms</span>
+ <span class="mi">5</span>  <span class="n">cr83</span><span class="o">.</span><span class="n">cgcil</span><span class="o">.</span><span class="n">ip</span><span class="o">.</span><span class="n">att</span><span class="o">.</span><span class="n">net</span> <span class="p">(</span><span class="mf">12.123.7.46</span><span class="p">)</span>  <span class="mf">4.926</span> <span class="n">ms</span>  <span class="mf">4.904</span> <span class="n">ms</span>  <span class="mf">4.888</span> <span class="n">ms</span>
+ <span class="mi">6</span>  <span class="n">cr1</span><span class="o">.</span><span class="n">cgcil</span><span class="o">.</span><span class="n">ip</span><span class="o">.</span><span class="n">att</span><span class="o">.</span><span class="n">net</span> <span class="p">(</span><span class="mf">12.122.99.33</span><span class="p">)</span>  <span class="mf">5.043</span> <span class="n">ms</span> <span class="n">cr2</span><span class="o">.</span><span class="n">cgcil</span><span class="o">.</span><span class="n">ip</span><span class="o">.</span><span class="n">att</span><span class="o">.</span><span class="n">net</span> <span class="p">(</span><span class="mf">12.122.132.109</span><span class="p">)</span>  <span class="mf">5.343</span> <span class="n">ms</span>  <span class="mf">5.317</span> <span class="n">ms</span>
+ <span class="mi">7</span>  <span class="n">gar13</span><span class="o">.</span><span class="n">cgcil</span><span class="o">.</span><span class="n">ip</span><span class="o">.</span><span class="n">att</span><span class="o">.</span><span class="n">net</span> <span class="p">(</span><span class="mf">12.122.132.121</span><span class="p">)</span>  <span class="mf">3.879</span> <span class="n">ms</span>  <span class="mf">18.347</span> <span class="n">ms</span> <span class="n">ggr4</span><span class="o">.</span><span class="n">cgcil</span><span class="o">.</span><span class="n">ip</span><span class="o">.</span><span class="n">att</span><span class="o">.</span><span class="n">net</span> <span class="p">(</span><span class="mf">12.122.133.33</span><span class="p">)</span>  <span class="mf">2.987</span> <span class="n">ms</span>
+ <span class="mi">8</span>  <span class="n">chi</span><span class="o">-</span><span class="n">b21</span><span class="o">-</span><span class="n">link</span><span class="o">.</span><span class="n">telia</span><span class="o">.</span><span class="n">net</span> <span class="p">(</span><span class="mf">213.248.87.253</span><span class="p">)</span>  <span class="mf">2.344</span> <span class="n">ms</span>  <span class="mf">2.305</span> <span class="n">ms</span>  <span class="mf">2.409</span> <span class="n">ms</span>
+ <span class="mi">9</span>  <span class="n">nyk</span><span class="o">-</span><span class="n">bb2</span><span class="o">-</span><span class="n">link</span><span class="o">.</span><span class="n">telia</span><span class="o">.</span><span class="n">net</span> <span class="p">(</span><span class="mf">80.91.248.197</span><span class="p">)</span>  <span class="mf">24.065</span> <span class="n">ms</span> <span class="n">nyk</span><span class="o">-</span><span class="n">bb1</span><span class="o">-</span><span class="n">link</span><span class="o">.</span><span class="n">telia</span><span class="o">.</span><span class="n">net</span> <span class="p">(</span><span class="mf">213.155.136.70</span><span class="p">)</span>  <span class="mf">24.986</span> <span class="n">ms</span> <span class="n">nyk</span><span class="o">-</span><span class="n">bb2</span><span class="o">-</span><span class="n">link</span><span class="o">.</span><span class="n">telia</span><span class="o">.</span><span class="n">net</span> <span class="p">(</span><span class="mf">62.115.137.58</span><span class="p">)</span>  <span class="mf">23.158</span> <span class="n">ms</span>
+<span class="mi">10</span>  <span class="n">nyk</span><span class="o">-</span><span class="n">b3</span><span class="o">-</span><span class="n">link</span><span class="o">.</span><span class="n">telia</span><span class="o">.</span><span class="n">net</span> <span class="p">(</span><span class="mf">62.115.112.255</span><span class="p">)</span>  <span class="mf">23.557</span> <span class="n">ms</span>  <span class="mf">23.548</span> <span class="n">ms</span> <span class="n">nyk</span><span class="o">-</span><span class="n">b3</span><span class="o">-</span><span class="n">link</span><span class="o">.</span><span class="n">telia</span><span class="o">.</span><span class="n">net</span> <span class="p">(</span><span class="mf">80.91.248.178</span><span class="p">)</span>  <span class="mf">24.510</span> <span class="n">ms</span>
+<span class="mi">11</span>  <span class="n">netaccess</span><span class="o">-</span><span class="n">tic</span><span class="o">-</span><span class="mi">133837</span><span class="o">-</span><span class="n">nyk</span><span class="o">-</span><span class="n">b3</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">telia</span><span class="o">.</span><span class="n">net</span> <span class="p">(</span><span class="mf">213.248.99.90</span><span class="p">)</span>  <span class="mf">23.957</span> <span class="n">ms</span>  <span class="mf">24.382</span> <span class="n">ms</span>  <span class="mf">24.164</span> <span class="n">ms</span>
+<span class="mi">12</span>  <span class="mf">0.e1</span><span class="o">-</span><span class="mf">4.</span><span class="n">tbr1</span><span class="o">.</span><span class="n">mmu</span><span class="o">.</span><span class="n">nac</span><span class="o">.</span><span class="n">net</span> <span class="p">(</span><span class="mf">209.123.10.101</span><span class="p">)</span>  <span class="mf">24.922</span> <span class="n">ms</span>  <span class="mf">24.737</span> <span class="n">ms</span>  <span class="mf">24.754</span> <span class="n">ms</span>
+<span class="mi">13</span>  <span class="mf">207.99.53.42</span> <span class="p">(</span><span class="mf">207.99.53.42</span><span class="p">)</span>  <span class="mf">24.024</span> <span class="n">ms</span>  <span class="mf">24.249</span> <span class="n">ms</span>  <span class="mf">23.924</span> <span class="n">ms</span>
+</pre></div>
+</div>
+<p>The last router (and <code class="docutils literal notranslate"><span class="pre">intronetworks.cs.luc.edu</span></code> itself) don’t respond to the traceroute packets, so the list is not quite complete. The Windows <code class="docutils literal notranslate"><span class="pre">tracert</span></code> utility is functionally equivalent. See <a class="reference internal" href="ipv4companions.html#traceroute"><span class="std std-ref">10.4.1&nbsp;&nbsp;&nbsp;Traceroute and Time Exceeded</span></a> for further information.</p>
+<p>Traceroute sends, by default, three probes for each router. Sometimes the responses do not all come back from the same router, as happened above at routers 4, 6, 7, 9 and 10. Router 9 sent back three distinct responses.</p>
+<p>On Linux systems the <a class="reference external" href="https://en.wikipedia.org/wiki/MTR_(software)">mtr</a> command may be available as an alternative to traceroute; it repeats the traceroute at one-second intervals and generates cumulative statistics.</p>
+<p id="index-69"><strong>route</strong> and <strong>netstat</strong></p>
+<p>The commands <code class="docutils literal notranslate"><span class="pre">route</span></code>, <code class="docutils literal notranslate"><span class="pre">route</span> <span class="pre">print</span></code> (Windows), <code class="docutils literal notranslate"><span class="pre">ip</span> <span class="pre">route</span> <span class="pre">show</span></code> (Linux), and <code class="docutils literal notranslate"><span class="pre">netstat</span> <span class="pre">-r</span></code> (all systems) display the host’s local IP forwarding table. For workstations not acting as routers, this includes the route to the default router and, usually, not much else. The default route is sometimes listed as destination 0.0.0.0 with netmask 0.0.0.0 (equivalent to 0.0.0.0/0).</p>
+<p>The command <code class="docutils literal notranslate"><span class="pre">netstat</span> <span class="pre">-a</span></code> shows the existing TCP connections and open UDP sockets.</p>
+<p id="index-70"><strong>netcat</strong></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">netcat</span></code> program, often called <code class="docutils literal notranslate"><span class="pre">nc</span></code>, allows the user to create TCP or UDP connections and send lines of text back and forth. It is seldom included by default. See  <a class="reference internal" href="udp.html#netcat-udp"><span class="std std-ref">16.1.4&nbsp;&nbsp;&nbsp;netcat</span></a> and <a class="reference internal" href="tcpA.html#netcat-tcp"><span class="std std-ref">17.7.1&nbsp;&nbsp;&nbsp;netcat again</span></a>.</p>
+<p id="index-71"><strong>WireShark</strong></p>
+<p>This is a convenient combination of packet capture and packet analysis, from <a class="reference external" href="http://wireshark.org">wireshark.org</a>. See <a class="reference internal" href="tcpA.html#tcp-and-wireshark"><span class="std std-ref">17.4&nbsp;&nbsp;&nbsp;TCP and WireShark</span></a> and <a class="reference internal" href="ipv6b.html#using-ipv6"><span class="std std-ref">12.4&nbsp;&nbsp;&nbsp;Using IPv6 and IPv4 Together</span></a> for examples.</p>
+<p>WireShark was originally named Etherreal. An earlier command-line-only packet-capture program is <a class="reference external" href="http://www.tcpdump.org/">tcpdump</a>, though WireShark has greatly expanded support for packet-format decoding. Both WireShark and tcpdump support both live packet capture and reading from <code class="docutils literal notranslate"><span class="pre">.pcap</span></code> (packet capture) and <code class="docutils literal notranslate"><span class="pre">.pcapng</span></code> (next generation) files.</p>
+<p>WireShark is the only non-command-line program listed here. It is sometimes desired to monitor packets on a remote system. If X-windows is involved (<em>eg</em> on Linux), this can be done by logging in from one’s local system using <code class="docutils literal notranslate"><span class="pre">ssh</span> <span class="pre">-X</span></code>, which enables X-windows forwarding, and then starting <code class="docutils literal notranslate"><span class="pre">wireshark</span></code> (or perhaps <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">wireshark</span></code>) from the command line. Other alternatives include tcpdump and <strong>tshark</strong>; the latter is part of the WireShark distribution and supports the same packet-decoding facilities as WireShark. Finally, there is <a class="reference external" href="https://termshark.io">termshark</a>, a frontend for tshark that offers a terminal-based interface reasonably similar to WireShark’s graphical interface.</p>
+</div>
+<div class="section" id="ietf-and-osi">
+<span id="index-72"></span><span id="id14"></span><h2>1.15&nbsp;&nbsp;&nbsp;IETF and OSI<a class="headerlink" href="#ietf-and-osi" title="Permalink to this headline">¶</a></h2>
+<p>The Internet protocols discussed above are defined by the <strong>Internet Engineering Task Force</strong>, or IETF (under the aegis of the <strong>Internet Architecture Board</strong>, or IAB, in turn under the aegis of the <strong>Internet Society</strong>, ISOC). The IETF publishes “Request For Comment” or <strong>RFC</strong> documents that contain all the formal Internet standards; these are available at <a class="reference external" href="http://www.ietf.org/rfc.html">http://www.ietf.org/rfc.html</a> (note that, by the time a document appears here, the actual comment-requesting period is generally long since closed). The five-layer model is closely associated with the IETF, though is not an official standard.</p>
+<p id="index-73">RFC standards sometimes allow modest flexibility. With this in mind, <span class="target" id="index-74"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2119.html"><strong>RFC 2119</strong></a> declares official understandings for the words MUST and SHOULD. A feature labeled with MUST is “an absolute requirement for the specification”, while the term SHOULD is used when</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">there may exist valid reasons in particular circumstances to ignore a particular item, but the full implications must be understood and carefully weighed before choosing a different course.</div>
+</div>
+</div></blockquote>
+<p id="index-75">The original <strong>ARPANET</strong> network was developed by the US government’s Defense Advanced Research Projects Agency, or DARPA; it went online in 1969. The National Science Foundation began NSFNet in 1986; this largely replaced ARPANET. In 1991, operation of the NSFNet backbone was turned over to ANSNet, a private corporation. The ISOC was founded in 1992 as the NSF continued to retreat from the networking business.</p>
+<p id="index-76">Hallmarks of the IETF design approach were David Clark’s declaration</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">We reject: kings, presidents and voting.</div>
+<div class="line">We believe in: rough consensus and running code.</div>
+</div>
+</div></blockquote>
+<p>and RFC Editor <a class="reference external" href="http://www.postel.org/postel.html">Jon Postel</a>’s Robustness Principle, here stated in its <span class="target" id="index-77"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc761.html"><strong>RFC 761</strong></a>/<span class="target" id="index-78"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc793.html"><strong>RFC 793</strong></a> form:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">TCP implementations should follow a general principle of robustness: be conservative in what you do, be liberal in what you accept from others.</div>
+</div>
+</div></blockquote>
+<p>Postel’s aphorism is often shortened to “be liberal in what you accept, and conservative in what you send”. As such, it has come in for occasional criticism in recent years with regard to <em>cryptographic</em> protocols, for which lax enforcement can lead to security vulnerabilities. To be fair, however, Postel wrote this in an era when protocol specifications sometimes failed to fully spell out the rules for every possible situation, and too-strict implementations sometimes failed to interoperate. Just what <em>should</em> happen if a TCP packet arrives with the SYN bit set, for creating a new connection, and also the FIN bit, for terminating that connection? However, TCP specifications today are generally much more complete, and cryptographic protocols even moreso. One way to read Postel’s rule is that protocol implementations should be <em>as strict as necessary, but no stricter</em>.</p>
+<p id="index-79">There is a persistent – though false – notion that the distributed-routing architecture of IP was due to a US Department of Defense mandate that the original ARPAnet be built to survive a nuclear attack. In fact, the developers of IP seemed unconcerned with this. However, Paul Baran did write, in his 1962 paper outlining the concept of packet switching, that</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">If [the number of stations] is made sufficiently large, it can be shown that highly survivable system structures can be built – even in the thermonuclear era.</div>
+</div>
+</div></blockquote>
+<p>In 1977 the International Organization for Standardization, or <strong>ISO</strong>, founded the Open Systems Interconnection project, or <strong>OSI</strong>, a process for creation of new network standards. OSI represented an attempt at the creation of networking standards independent of any individual government.</p>
+<p id="index-80">The OSI project is today perhaps best known for its <strong>seven-layer</strong> networking model: between Transport and Application were inserted the <strong>Session</strong> and <strong>Presentation</strong> layers. The Session layer was to handle “sessions” between applications (including the graceful closing of Transport-layer connections, something included in TCP, and the re-establishment of “broken” Transport-layer connections, which TCP could sorely use), and the Presentation layer was to handle things like defining universal data formats (<em>eg</em> for binary numeric data, or for non-ASCII character sets), and eventually came to include compression and encryption as well.</p>
+<p>Data presentation and session management are important concepts, but in many cases it has not proved necessary, or even particularly useful, to make them into true layers. The layer approach has been very helpful in organizing networking software into separate sections, but is hard to define precisely. One approach is to declare that a layer should communicate directly only with the layers immediately above and below it. The application passes its data to the Transport layer to receive the Transport header, which passes the data to the IP layer to receive the IP header, and on to the LAN layer. Each layer can be seen as an encapsulated software object, or module, by the layer above, and each layer in turn encapsulates the packet from its parent layer by adding a new header. This is mostly true for the Transport, IP and LAN layers, but there are irregularities: the transport-layer checksum, for example, needs information from the IP layer, and may in fact end up being calculated at the LAN layer (<a class="reference internal" href="udp.html#udp-and-ip-addresses"><span class="std std-ref">16.1.3.2&nbsp;&nbsp;&nbsp;UDP and IP addresses</span></a> and <a class="reference internal" href="tcpA.html#tcp-offloading"><span class="std std-ref">17.5&nbsp;&nbsp;&nbsp;TCP Offloading</span></a>).</p>
+<p>Even allowing for these kinds of irregularities, however, it is hard to justify full-fledged layer status for the Session and Presentation actions. What often happens is that the Application layer manages its own Transport connections, and is responsible for reading and writing data directly from and to the Transport layer. The application then uses conventional libraries for Presentation actions such as encryption, compression and format translation, and for Session actions such as handling broken Transport connections and multiplexing streams of data over a single Transport connection. Version 2 of the HTTP protocol, for example, contains a subprotocol for managing multiple streams; this is generally regarded as part of the Application layer, if for no other reason than that it is not available to any other application.</p>
+<p>An opposing view is that it is possible to view the SSL/TLS transport-encryption service, <a class="reference internal" href="publickey.html#tls"><span class="std std-ref">29.5.2&nbsp;&nbsp;&nbsp;TLS</span></a>, as an example of a true Presentation layer. Applications generally read and write data directly to the SSL/TLS endpoint, which in turn <em>mostly</em> encapsulates (as a software module) the underlying TCP connection. The encapsulation is incomplete, though, in that SSL/TLS applications generally are responsible for creating their own Transport-layer (TCP) connections; see <a class="reference internal" href="publickey.html#tls-programming"><span class="std std-ref">29.5.3&nbsp;&nbsp;&nbsp;A TLS Programming Example</span></a> and the note at the end of <a class="reference internal" href="publickey.html#tlsserver"><span class="std std-ref">29.5.3.2&nbsp;&nbsp;&nbsp;TLSserver</span></a>. In the end, while the seven-layer model is reasonably popular, from a software-architecture standpoint those two extra layers aren’t really in the same league as those of the five-layer model.</p>
+<p id="index-81">OSI has its own version of IP and TCP. The IP equivalent is <strong>CLNP</strong>, the ConnectionLess Network Protocol, although OSI also defines a connection-<em>oriented</em> protocol CMNS. The TCP equivalent is TP4; OSI also defines TP0 through TP3 but those are for connection-oriented networks.</p>
+<p>It seems clear that the primary reasons the OSI protocols failed in the marketplace were their ponderous bureaucracy for protocol management, their principle that protocols be completed before implementation began, and their insistence on rigid adherence to the specifications to the point of non-interoperability; indeed, Postel’s aphorism above may have been intended as a response to this last point. In contrast, the IETF had (and still has) a “two working implementations” rule for a protocol to become a “Draft Standard”. From <span class="target" id="index-82"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2026.html"><strong>RFC 2026</strong></a>:</p>
+<dl class="docutils">
+<dt></dt>
+<dd>A specification from which at least <em>two independent and interoperable implementations</em> from different code bases have been developed, and for which sufficient successful operational experience has been obtained, may be elevated to the “Draft Standard” level. [emphasis added]</dd>
+</dl>
+<p>This rule has often facilitated the discovery of protocol design weaknesses early enough that the problems could be fixed. The OSI approach is a striking failure for the “waterfall” design model, when competing with the IETF’s cyclic “prototyping” model. However, it is worth noting that the IETF has similarly been unable to keep up with rapid changes in html, particularly at the browser end; the OSI mistakes were mostly evident only in retrospect.</p>
+<p>Trying to fit protocols into specific layers is often both futile and irrelevant. By one perspective, the Real-Time Protocol RTP lives at the Transport layer, but just above the UDP layer; others have put RTP into the Application layer. Parts of the RTP protocol resemble the Session and Presentation layers. A key component of the IP protocol is the set of various router-update protocols; some of these freely use higher-level layers. Similarly, tunneling might be considered to be a Link-layer protocol, but tunnels are often created and maintained at the Application layer.</p>
+<p id="index-84">A sometimes-more-successful approach to understanding “layers” is to view them instead as parts of a <strong>protocol graph</strong>. Thus, in the following diagram we have two protocol sublayers within the transport layer (UDP and RTP), and one protocol (ARP) not easily assigned to a layer.</p>
+<div class="figure" id="id21">
+<span id="intro-protograph"></span><img alt="Protocol graph, with TCP and UDP/RTP above IP, and ATM and Ethernet below" src="_images/protograph.svg" /><p class="caption"><span class="caption-number">Fig. 7: </span><span class="caption-text">A protocol graph</span></p>
+<div class="legend">
+TCP and UDP/RTP are above IP, and ATM and Ethernet are below</div>
+</div>
+<p>Note the thin “wasp” waist at the IP layer: there are many protocols above and below, but only one protocol at the IP layer. This universality of the IP layer has been one of the things contributing to IP’s success.</p>
+</div>
+<div class="section" id="berkeley-unix">
+<span id="bsd"></span><span id="index-85"></span><h2>1.16&nbsp;&nbsp;&nbsp;Berkeley Unix<a class="headerlink" href="#berkeley-unix" title="Permalink to this headline">¶</a></h2>
+<p>Though not officially tied to the IETF, the Berkeley Unix releases became <em>de facto</em> reference implementations for most of the TCP/IP protocols. 4.1BSD (BSD for Berkeley Software Distribution) was released in 1981, 4.2BSD in 1983, 4.3BSD in 1986, 4.3BSD-Tahoe in 1988, 4.3BSD-Reno in 1990, and 4.4BSD in 1994. Descendants today include FreeBSD, OpenBSD and NetBSD. The TCP implementations TCP Tahoe and TCP Reno (<a class="reference internal" href="reno.html#congestion-avoidance"><span class="std std-ref">19&nbsp;&nbsp;&nbsp;TCP Reno and Congestion Management</span></a>) took their names from the corresponding 4.3BSD releases.</p>
+</div>
+<div class="section" id="epilog">
+<h2>1.17&nbsp;&nbsp;&nbsp;Epilog<a class="headerlink" href="#epilog" title="Permalink to this headline">¶</a></h2>
+<p>This completes our tour of the basics. In the remaining chapters we will expand on the material here.</p>
+</div>
+<div class="section" id="exercises">
+<span id="intro-exercises"></span><h2>1.18&nbsp;&nbsp;&nbsp;Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<p><em>Exercises may be given fractional (floating point) numbers, to allow for interpolation of new exercises.</em>
+Exercises marked with a ♢ have solutions or hints at <a class="reference internal" href="solutions.html#intro-solutions"><span class="std std-ref">34.1&nbsp;&nbsp;&nbsp;Solutions for An Overview of Networks</span></a>.</p>
+<p>1.0. Give forwarding tables for each of the switches S1-S4 in the following network with destinations A, B, C, D. For the next_hop column, give the <em>neighbor</em> on the appropriate link rather than the interface number.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>A         B         C
+│         │         │
+S1────────S2────────S3
+          │
+          │
+          S4───D
+</pre></div>
+</div>
+<p>2.0. Give forwarding tables for each of the switches S1-S4 in the following network with destinations A, B, C, D. Again, use the neighbor form of next_hop rather than the interface form. Try to keep the route to each destination as short as possible. What decision has to be made in this exercise that did not arise in the preceding exercise?</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>A───S1──────S2───B
+    │       │
+    │       │
+D───S4──────S3───C
+</pre></div>
+</div>
+<p>3.0. In the network of the previous exercise, suppose that destinations directly connected to an immediate neighbor are always reached via that neighbor; <em>eg</em> S1’s forwarding table will always include ⟨B,S2⟩ and ⟨D,S4⟩. This leaves only routes to the  diagonally opposite nodes undetermined (<em>eg</em> S1 to C). Show that, no matter which next_hop entries are chosen for the diagonally opposite destinations, no routing loops can ever be formed.
+(Hint: the number of links to any diagonally opposite switch is always 2.)</p>
+<p>4.0.♢ Give forwarding tables for each of the switches A-E in the following network. Destinations are A-E themselves. Keep all route lengths the minimum possible (one hop for an immediate neighbor, two hops for everything else). If a destination is an immediate neighbor, you may list its next_hop as <strong>direct</strong> or <strong>local</strong> for simplicity. Indicate destinations for which there is more than one choice for next_hop.</p>
+<img alt="Network of five nodes, A-C-E-D-A in a square and B connected to A and C" src="_images/fivenodes.svg" /><p>5.0. Consider the following arrangement of switches and destinations. Give forwarding tables (in neighbor form) for S1-S4 that include <strong>default</strong> forwarding entries; <em>the default entries should point toward S5</em>. The default entries will thus automatically forward to the “possible other destinations” shown below right.</p>
+<p>Eliminate all table entries that are implied by the default entry (that is, if the default entry is to S3, eliminate all other entries for which the next hop is S3).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>A───S1
+    │         D
+    │         │
+C───S3────────S4─────────S5────... possible other destinations
+    │         │
+    │         E
+B───S2
+</pre></div>
+</div>
+<p>6.0. Four switches are arranged as below. The destinations are S1 through S4 themselves.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>S1──────S2
+│       │
+│       │
+S4──────S3
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line">(a). Give the forwarding tables for S1 through S4 assuming packets to adjacent nodes are sent along the connecting link, and packets to diagonally opposite nodes are sent clockwise.</div>
+<div class="line">(b). Give the forwarding tables for S1 through S4 assuming the S1–S4 link is not used at all, not even for S1⟷S4 traffic.</div>
+</div>
+<p>7.0. Suppose we have switches S1 through S4; the forwarding-table destinations are the switches themselves. The tables for S2 and S3 are as below, where the next_hop value is specified in neighbor form:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">S2: ⟨S1,S1⟩  ⟨S3,S3⟩  ⟨S4,S3⟩</div>
+<div class="line">S3: ⟨S1,S2⟩  ⟨S2,S2⟩  ⟨S4,S4⟩</div>
+</div>
+</div></blockquote>
+<p>From the above we can conclude that S2 must be directly connected to both S1 and S3 as its table lists them as next_hops; similarly, S3 must be directly connected to S2 and S4.</p>
+<div class="line-block">
+<div class="line">(a). The given tables are <em>consistent</em> with the network diagrammed in exercise 6.0. Are the tables also consistent with a network in which S1 and S4 are <em>not</em> directly connected? If so, give such a network; if not, explain why S1 and S4 must be connected.</div>
+<div class="line">(b). Now suppose S3’s table is changed to the following. Find a network layout consistent with these tables in which S1 and S4 are not directly connected. Do not add additional switches.</div>
+</div>
+<blockquote>
+<div><div class="line-block">
+<div class="line">S3: <strong>⟨S1,S4⟩</strong>  ⟨S2,S2⟩  ⟨S4,S4⟩</div>
+</div>
+</div></blockquote>
+<p>While the table for S4 is not given, you may assume that forwarding does work correctly. However, you should <em>not</em> assume that paths are the shortest possible. Hint: It follows from the S3 table above that the path from S3 to S1 starts S3 ⟶ S4; how will this path continue? The next switch along the path cannot be S1, because of the hypothesis that S1 and S4 are not directly connected.</p>
+<p>8.0. (a) Suppose a network is as follows, with the only path from A to C passing through B:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>... ──A────B────C── ...
+</pre></div>
+</div>
+<p>Explain why a single routing loop cannot include both A and C. Hint: if the loop involves destination D, how does B forward to D?</p>
+<p>(b). Suppose a routing loop follows the path A──S<sub>1</sub>──S<sub>2</sub>── … ──S<sub>n</sub>──A, where none of the S<sub>i</sub> are equal to A. Show that all the S<sub>i</sub> must be distinct. (A corollary of this is that any routing loop created by datagram-forwarding either involves forwarding back and forth between a pair of adjacent switches, or else involves an actual graph cycle in the network topology; linear loops of length greater than 1 are impossible.)</p>
+<p>9.0. Consider the following arrangement of switches:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>S1─────S4─────S10──A──E
+│      │
+│      │
+S2─────S5─────S11──B
+│      │
+│      │
+S3─────S6─────S12──C──D──F
+</pre></div>
+</div>
+<p>Suppose S1-S6 have the forwarding tables below. For each of the following destinations,  suppose a packet is sent to the destination <em>from S1</em>.</p>
+<div class="line-block">
+<div class="line">(a). A</div>
+<div class="line">(b). B</div>
+<div class="line">(c). C</div>
+<div class="line">(d).♢ D</div>
+<div class="line">(e). E</div>
+<div class="line">(f). F</div>
+</div>
+<p>Give the switches the packet will pass through, including the initial switch S1, up until the final switch S10-S12.</p>
+<blockquote>
+<div><p>S1: (A,S4), (B,S2), (C,S4), (D,S2), (E,S2), (F,S4)</p>
+<p>S2: (A,S5), (B,S5), (D,S5), (E,S3), (F,S3)</p>
+<p>S3: (B,S6), (C,S2), (E,S6), (F,S6)</p>
+<p>S4: (A,S10), (C,S5), (E,S10), (F,S5)</p>
+<p>S5: (A,S6), (B,S11), (C,S6), (D,S6), (E,S4), (F,S2)</p>
+<p>S6: (A,S3), (B,S12), (C,S12), (D,S12), (E,S5), (F,S12)</p>
+</div></blockquote>
+<p>10.0. Suppose a set of nodes A-F and switches S1-S6 are connected as shown.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>A────S1───5───S4────D
+     │         │
+     1         1
+     │         │
+B────S2───2───S5────E
+     │         │
+     8         1
+     │         │
+C────S3───4───S6────F
+</pre></div>
+</div>
+<p>The links between switches are labeled with <strong>weights</strong>, which are used by some routing applications. The weights represent the cost of using that link. You are to find the path through S1-S6 with lowest total cost (that is, with smallest sum of weights), for each of the following transmissions. For example, the lowest-cost path from A to E is A–S1–S2–S5–E, for a total cost of 1+2=3; the alternative path A–S1–S4–S5–E has total cost 5+1=6.</p>
+<div class="line-block">
+<div class="line">(a).♢ A→F</div>
+<div class="line">(b). A→D</div>
+<div class="line">(c). A→C</div>
+</div>
+<p>(d). Give the complete forwarding table for S<strong>2</strong>, where all routes are selected for lowest total cost.</p>
+<p>11.0. In exercise 7.0, the routes taken by packets A-D are reasonably direct, but the routes for E and F are rather circuitous.</p>
+<div class="line-block">
+<div class="line">(a). Assign weights to the seven links S1–S2, S2–S3, S1–S4, S2–S5, S3–S6, S4–S5 and S5–S6, as in exercise 10.0, so that destination E’s route in exercise 9.0 becomes the optimum (lowest total link weight) path.</div>
+<div class="line">(b). Assign weights to the seven links that make destination F’s route in exercise 9.0 optimal. (This will be a different set of weights from part (a).)</div>
+</div>
+<p>Hint: you can do this by assigning a weight of 1 to all links <em>except</em> to one or two “bad” links; the “bad” links get a weight of 10. In each of (a) and (b) above, the route taken will be the route that avoids all the “bad” links. You must treat (a) entirely differently from (b); there is no assignment of weights that can account for both routes.</p>
+<p>12.0. Suppose we have the following three Class C IP networks, joined by routers R1–R4. There is no connection to the outside Internet. Give the forwarding table for each router. For networks directly connected to a router (<em>eg</em> 200.0.1/24 and R1), include the network in the table but list the next hop as <strong>direct</strong> or <strong>local</strong>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>R1── 200.0.1/24
+│
+│
+│
+R4──────────R2── 200.0.2/24
+│
+│
+│
+R3── 200.0.3/24
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="ethernet1.html" title="2   Ethernet Basics"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="preface.html" title="Preface"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, desktop edition 2.0.11</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012-2022, Peter L Dordal.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

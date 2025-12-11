@@ -1,0 +1,743 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>17   TCP Transport Basics &#8212; An Introduction to Computer Networks, desktop edition 2.0.11</title>
+    <link rel="stylesheet" href="_static/csbnetbook.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script type="text/javascript" src="_static/mobile.js"></script>
+    <script type="text/javascript" src="_static/rightsidebar.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="18   TCP Issues and Alternatives" href="tcpB.html" />
+    <link rel="prev" title="16   UDP Transport" href="udp.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="tcpB.html" title="18   TCP Issues and Alternatives"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="udp.html" title="16   UDP Transport"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, desktop edition 2.0.11</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">17&nbsp;&nbsp;&nbsp;TCP Transport Basics</a><ul>
+<li><a class="reference internal" href="#the-end-to-end-principle">17.1&nbsp;&nbsp;&nbsp;The End-to-End Principle</a></li>
+<li><a class="reference internal" href="#tcp-header">17.2&nbsp;&nbsp;&nbsp;TCP Header</a></li>
+<li><a class="reference internal" href="#tcp-connection-establishment">17.3&nbsp;&nbsp;&nbsp;TCP Connection Establishment</a></li>
+<li><a class="reference internal" href="#tcp-and-wireshark">17.4&nbsp;&nbsp;&nbsp;TCP and WireShark</a></li>
+<li><a class="reference internal" href="#tcp-offloading">17.5&nbsp;&nbsp;&nbsp;TCP Offloading</a></li>
+<li><a class="reference internal" href="#tcp-simplex-talk">17.6&nbsp;&nbsp;&nbsp;TCP simplex-talk</a><ul>
+<li><a class="reference internal" href="#the-tcp-client">17.6.1&nbsp;&nbsp;&nbsp;The TCP Client</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#tcp-and-bind">17.7&nbsp;&nbsp;&nbsp;TCP and <code class="docutils literal notranslate"><span class="pre">bind()</span></code></a><ul>
+<li><a class="reference internal" href="#netcat-again">17.7.1&nbsp;&nbsp;&nbsp;<code class="docutils literal notranslate"><span class="pre">netcat</span></code> again</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#tcp-state-diagram">17.8&nbsp;&nbsp;&nbsp;TCP state diagram</a><ul>
+<li><a class="reference internal" href="#closing-a-connection">17.8.1&nbsp;&nbsp;&nbsp;Closing a connection</a></li>
+<li><a class="reference internal" href="#calling-close">17.8.2&nbsp;&nbsp;&nbsp;Calling <code class="docutils literal notranslate"><span class="pre">close()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#epilog">17.9&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li><a class="reference internal" href="#exercises">17.10&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="udp.html"
+                        title="previous chapter">16&nbsp;&nbsp;&nbsp;UDP Transport</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tcpB.html"
+                        title="next chapter">18&nbsp;&nbsp;&nbsp;TCP Issues and Alternatives</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="tcp-transport-basics">
+<span id="tcp"></span><span id="index-0"></span><h1>17&nbsp;&nbsp;&nbsp;TCP Transport Basics<a class="headerlink" href="#tcp-transport-basics" title="Permalink to this headline">¶</a></h1>
+<p>The standard transport protocols riding above the IP layer are <strong>TCP</strong> and <strong>UDP</strong>. As we saw in <a class="reference internal" href="udp.html#udp"><span class="std std-ref">16&nbsp;&nbsp;&nbsp;UDP Transport</span></a>, UDP provides simple datagram delivery to remote sockets, that is, to ⟨host,port⟩ pairs. TCP provides a much richer functionality for sending data to (connected) sockets. In this chapter we cover the basic TCP protocol; in the following chapter we cover some subtle issues related to potential data loss, some TCP implementation details, and then some protocols that serve as alternatives to TCP.</p>
+<p id="index-1">TCP is quite different in several dimensions from UDP. TCP is <strong>stream-oriented</strong>, meaning that the application can write data in very small or very large amounts and the TCP layer will take care of appropriate packetization (and also that TCP transmits a stream of bytes, not messages or records; <em>cf</em> <a class="reference internal" href="tcpB.html#sctp"><span class="std std-ref">18.15.2&nbsp;&nbsp;&nbsp;SCTP</span></a>). TCP is <strong>connection-oriented</strong>, meaning that a connection must be established before the beginning of any data transfer. TCP is <strong>reliable</strong>, in that TCP uses sequence numbers to ensure the correct order of delivery and a timeout/retransmission mechanism to make sure no data is lost short of massive network failure. Finally, TCP automatically uses the <strong>sliding windows</strong> algorithm to achieve throughput relatively close to the maximum available.</p>
+<p id="index-2">These features mean that TCP is very well suited for the transfer of large files. The two endpoints open a connection, the file data is written by one end into the connection and read by the other end, and the features above ensure that the file will be received correctly. TCP also works quite well for interactive applications where each side is sending and receiving streams of small packets. Examples of this include ssh or telnet, where packets are exchanged on each keystroke, and database connections that may carry many queries per second. TCP even works <em>reasonably</em> well for <strong>request/reply</strong> protocols, where one side sends a single message, the other side responds, and the connection is closed. The drawback here, however, is the overhead of setting up a new connection for each request; a better application-protocol design might be to allow multiple request/reply pairs over a single TCP connection.</p>
+<p>Note that the connection-orientation and reliability of TCP represent abstract features built on top of the IP layer, which supports neither of them.</p>
+<p id="index-3">The connection-oriented nature of TCP warrants further explanation.  With UDP, if a server opens a socket (the OS object, with corresponding socket address), then any client on the Internet can send to that socket, via its socket address. Any UDP application, therefore, must be prepared to check the source address of each packet that arrives. With TCP, all data arriving at a <em>connected</em> socket must come from the other endpoint of the connection. When a server S initially opens a socket s, that socket is “unconnected”; it is said to be in the LISTEN state. While it still has a socket address consisting of its host and port, a LISTENing socket will never receive data directly. If a client C somewhere on the Internet wishes to send data to s, it must first establish a connection, which will be defined by the <strong>socketpair</strong> consisting of the socket addresses (that is, the ⟨IP_addr,port⟩ pairs) at both C and S. As part of this connection process, a new <em>connected</em> child socket s<sub>C</sub> will be created; it is s<sub>C</sub> that will receive any data sent from C. Usually, the server will also create a new thread or process to handle communication with s<sub>C</sub>. Typically the server will have multiple connected children of the original socket s, and, for each one, a process attached to it.</p>
+<p>If C1 and C2 both connect to s, two connected sockets at S will be created, s<sub>1</sub> and s<sub>2</sub>, and likely two separate processes. When a packet arrives at S addressed to the socket address of s, the <em>source</em> socket address will also be examined to determine whether the data is part of the C1–S or the C2–S connection, and thus whether a read on s<sub>1</sub> or on s<sub>2</sub>, respectively, will see the data.</p>
+<p>If S is acting as an ssh server, the LISTENing socket listens on port 22, and the connected child sockets correspond to the separate user login connections; the process on each child socket represents the login process of that user, and may run for hours or days.</p>
+<p>In Chapter 1 we likened TCP sockets to telephone connections, with the server like one high-volume phone number 800-BUY-NOWW. The unconnected socket corresponds to the number everyone dials; the connected sockets correspond to the actual calls. (This analogy breaks down, however, if one looks closely at the way such multi-operator phone lines are actually configured: each typically <em>does</em> have its own number.)</p>
+<p>TCP was originally defined in <span class="target" id="index-4"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc793.html"><strong>RFC 793</strong></a>, with important updates in <span class="target" id="index-5"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1122.html"><strong>RFC 1122</strong></a>, dated October 1989. Since then there have been many miscellaneous updates; all of these have now been incorporated into a single specification <span class="target" id="index-6"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc9293.html"><strong>RFC 9293</strong></a>.</p>
+<div class="section" id="the-end-to-end-principle">
+<span id="end2end"></span><span id="index-7"></span><h2>17.1&nbsp;&nbsp;&nbsp;The End-to-End Principle<a class="headerlink" href="#the-end-to-end-principle" title="Permalink to this headline">¶</a></h2>
+<p>The End-to-End Principle is spelled out in <a class="reference internal" href="bibliography.html#src84" id="id1">[SRC84]</a>; it states in effect that transport issues are the responsibility of the endpoints in question and thus should not be delegated to the core network. This idea has been very influential in TCP design.</p>
+<p>Two issues falling under this category are data corruption and congestion. For the first, even though essentially all links on the Internet have link-layer checksums to protect against data corruption, TCP still adds its own checksum (in part because of a history of data errors introduced <em>within</em> routers). For the latter, TCP is today essentially the <em>only</em> layer that addresses congestion management.</p>
+<p>Saltzer, Reed and Clark categorized functions that were subject to the End-to-End principle this way:</p>
+<blockquote>
+<div>The function in question can completely and correctly be implemented only with the knowledge and help of the application standing at the end points of the communication system. Therefore, providing that questioned function as a feature of the communication system itself is not possible. (Sometimes an incomplete version of the function provided by the communication system may be useful as a performance enhancement.)</div></blockquote>
+<p>This does not mean that the backbone Internet should not concern itself with congestion; it means that backbone congestion-management mechanisms should not completely replace end-to-end congestion management.</p>
+</div>
+<div class="section" id="tcp-header">
+<span id="index-8"></span><span id="id2"></span><h2>17.2&nbsp;&nbsp;&nbsp;TCP Header<a class="headerlink" href="#tcp-header" title="Permalink to this headline">¶</a></h2>
+<p>Below is a diagram of the TCP header. As with UDP, source and destination ports are 16 bits. The 4-bit Data Offset field specifies the number of 32-bit words in the header; if no options are present its value is 5.</p>
+<p id="index-9">As with UDP, the checksum covers the TCP header, the TCP data and an IP “pseudo header” that includes the source and destination IP addresses. The checksum must be updated by a NAT router that modifies any header values. (Although the IP and TCP layers are theoretically separate, and <span class="target" id="index-10"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc793.html"><strong>RFC 793</strong></a> in some places appears to suggest that TCP can be run over a non-IP internetwork layer, <span class="target" id="index-11"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc793.html"><strong>RFC 793</strong></a> also explicitly defines 4-byte addresses for the pseudo header. <span class="target" id="index-12"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2460.html"><strong>RFC 2460</strong></a> officially redefined the pseudo header to allow IPv6 addresses.)</p>
+<img alt="_images/tcp_header.svg" src="_images/tcp_header.svg" /><p id="index-13">The <strong>sequence</strong> and <strong>acknowledgment</strong> numbers are for numbering the data, at the byte level. This allows TCP to send 1024-byte blocks of data, incrementing the sequence number by 1024 between successive packets, or to send 1-byte telnet packets, incrementing the sequence number by 1 each time. There is no distinction between DATA and ACK packets; all packets carrying data from A to B also carry the most current acknowledgment of data sent from B to A. Many TCP applications are largely unidirectional, in which case the sender would include essentially the same acknowledgment number in each packet while the receiver would include essentially the same sequence number.</p>
+<p id="index-14">It is traditional to refer to the data portion of TCP packets as <strong>segments</strong>.</p>
+<div class="sidebar">
+<p class="first sidebar-title">TCP History</p>
+<p class="last">The clear-cut division between the IP and TCP headers did not spring forth fully formed. See <a class="reference internal" href="bibliography.html#ck74" id="id3">[CK74]</a> for a discussion of a proto-TCP in which the sequence number (but not the acknowledgment number) appeared in the equivalent of the IP header (perhaps so it could be used for fragment reassembly).</p>
+</div>
+<p>The value of the sequence number, in <em>relative</em> terms, is the position of the first byte of the packet in the data stream, or the position of what would be the first byte in the case that no data was sent. The value of the acknowledgment number, again in relative terms, represents the byte position for the next byte expected. Thus, if a packet contains 1024 bytes of data and the first byte is number 1, then that would be the sequence number. The data bytes would be positions 1-1024, and the ACK returned would have acknowledgment number 1025.</p>
+<p id="index-15">The sequence and acknowledgment numbers, as sent, represent these relative values <em>plus</em> an <strong>Initial Sequence Number</strong>, or ISN, that is fixed for the lifetime of the connection. Each direction of a connection has its own ISN; see below.</p>
+<p>TCP acknowledgments are <strong>cumulative</strong>: when an endpoint sends a packet with an acknowledgment number of N, it is acknowledging receipt of all data bytes numbered less than N. Standard TCP provides no mechanism for acknowledging receipt of packets 1, 2, 3 and 5; the highest cumulative acknowledgment that could be sent in that situation would be to acknowledge packet 3.</p>
+<p>The TCP header defines some important flag bits; the brief definitions here are expanded upon in the sequel:</p>
+<ul class="simple" id="index-16">
+<li><strong>SYN</strong>: for SYNchronize; marks packets that are part of the new-connection handshake</li>
+<li><strong>ACK</strong>: indicates that the header Acknowledgment field is valid; that is, all but the first packet</li>
+<li><strong>FIN</strong>: for FINish; marks packets involved in the connection closing</li>
+<li><strong>PSH</strong>: for PuSH; marks “non-full” packets that should be delivered promptly at the far end</li>
+<li><strong>RST</strong>: for ReSeT; indicates various error conditions</li>
+<li><strong>URG</strong>: for URGent; part of a now-seldom-used mechanism for high-priority data</li>
+<li><strong>CWR</strong> and <strong>ECE</strong>: part of the Explicit Congestion Notification mechanism, <a class="reference internal" href="dynamicsB.html#ecn"><span class="std std-ref">21.5.3&nbsp;&nbsp;&nbsp;Explicit Congestion Notification (ECN)</span></a></li>
+</ul>
+</div>
+<div class="section" id="tcp-connection-establishment">
+<span id="id4"></span><h2>17.3&nbsp;&nbsp;&nbsp;TCP Connection Establishment<a class="headerlink" href="#tcp-connection-establishment" title="Permalink to this headline">¶</a></h2>
+<p id="index-17">TCP connections are established via an exchange known as the <strong>three-way handshake</strong>. If A is the client and B is the LISTENing server, then the handshake proceeds as follows:</p>
+<ul class="simple">
+<li>A sends B a packet with the SYN bit set (a SYN packet)</li>
+<li>B responds with a SYN packet of its own; the ACK bit is now also set</li>
+<li>A responds to B’s SYN with its own ACK</li>
+</ul>
+<img alt="_images/tcp_3wh.svg" src="_images/tcp_3wh.svg" /><p>Normally, the three-way handshake is triggered by an application’s request to connect; data can be sent only after the handshake completes. This means a one-RTT delay before any data can be sent. The original TCP standard <span class="target" id="index-18"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc793.html"><strong>RFC 793</strong></a> does allow data to be sent with the first SYN packet, as part of the handshake, but such data cannot be released to the remote-endpoint application until the handshake completes. Most traditional TCP programming interfaces offer no support for this early-data option.</p>
+<p>There are recurrent calls for TCP to support data transmission within the handshake itself, so as to achieve request/reply turnaround comparable to that with RPC (<a class="reference internal" href="udp.html#rpc"><span class="std std-ref">16.5&nbsp;&nbsp;&nbsp;Remote Procedure Call (RPC)</span></a>). We return to this in <a class="reference internal" href="tcpB.html#tcp-faster-open"><span class="std std-ref">18.5&nbsp;&nbsp;&nbsp;TCP Faster Opening</span></a>.</p>
+<p id="index-19">The three-way handshake is vulnerable to an attack known as <strong>SYN flooding</strong>. The attacker sends a large number of SYN packets to a server B. For each arriving SYN, B must allocate resources to keep track of what appears to be a legitimate connection request; with enough requests, B’s resources may face exhaustion. SYN flooding is easiest if the SYN packets are simply spoofed, with forged, untraceable source-IP addresses; see spoofing at <a class="reference internal" href="ipv4.html#ipv4-header"><span class="std std-ref">9.1&nbsp;&nbsp;&nbsp;The IPv4 Header</span></a>, and <a class="reference internal" href="tcpB.html#isn-spoofing"><span class="std std-ref">18.3.1&nbsp;&nbsp;&nbsp;ISNs and spoofing</span></a> below. SYN-flood attacks can also take the form of a large number of real connection attempts from a large number of real clients – often compromised and pressed into service by some earlier attack – but this requires considerably more resources on the part of the attacker. See <a class="reference internal" href="tcpB.html#sctp"><span class="std std-ref">18.15.2&nbsp;&nbsp;&nbsp;SCTP</span></a> for an alternative handshake protocol (unfortunately not available to TCP) intended to mitigate SYN-flood attacks, at least from spoofed SYNs.</p>
+<p id="index-20">To <strong>close</strong> the connection, a superficially similar exchange involving FIN packets may occur:</p>
+<ul class="simple">
+<li>A sends B a packet with the FIN bit set (a FIN packet), announcing that it has finished sending data</li>
+<li>B sends A an ACK of the FIN</li>
+<li>B may continue to send additional data to A</li>
+<li>When B is also ready to cease sending, it sends its own FIN to A</li>
+<li>A sends B an ACK of the FIN; this is the final packet in the exchange</li>
+</ul>
+<p>Here’s the ladder diagram for this:</p>
+<img alt="_images/tcp_close1.svg" src="_images/tcp_close1.svg" /><p>The FIN handshake is really more like two separate two-way FIN/ACK handshakes. We will return to TCP connection closing in <a class="reference internal" href="#closing"><span class="std std-ref">17.8.1&nbsp;&nbsp;&nbsp;Closing a connection</span></a>.</p>
+<p>Now let us look at the full exchange of packets in a representative connection, in which A sends strings “abc”, “defg”, and “foobar” (<span class="target" id="index-21"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3092.html"><strong>RFC 3092</strong></a>). B replies with “hello”, and which point A sends “goodbye” and closes the connection. In the following table, <em>relative</em> sequence numbers are used, which is to say that sequence numbers begin with 0 on each side. The SEQ numbers in <strong>bold</strong> on the A side correspond to the ACK numbers in <strong>bold</strong> on the B side; they both count data flowing from A to B.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="5%" />
+<col width="39%" />
+<col width="56%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"></th>
+<th class="head">A sends</th>
+<th class="head">B sends</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1</td>
+<td>SYN, <strong>seq=0</strong></td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td></td>
+<td>SYN+ACK, seq=0, <strong>ack=1</strong> (expecting)</td>
+</tr>
+<tr class="row-even"><td>3</td>
+<td>ACK, <strong>seq=1</strong>, ack=1 (ACK of SYN)</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>4</td>
+<td>“abc”, <strong>seq=1</strong>, ack=1</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>5</td>
+<td></td>
+<td>ACK, seq=1, <strong>ack=4</strong></td>
+</tr>
+<tr class="row-odd"><td>6</td>
+<td>“defg”, <strong>seq=4</strong>, ack=1</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>7</td>
+<td></td>
+<td>seq=1, <strong>ack=8</strong></td>
+</tr>
+<tr class="row-odd"><td>8</td>
+<td>“foobar”, <strong>seq=8</strong>, ack=1</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>9</td>
+<td></td>
+<td>seq=1, <strong>ack=14</strong>, “hello”</td>
+</tr>
+<tr class="row-odd"><td>10</td>
+<td><strong>seq=14</strong>, ack=6, “goodbye”</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>11,12</td>
+<td><strong>seq=21</strong>, ack=6, FIN</td>
+<td>seq=6, <strong>ack=21</strong> ;; ACK of “goodbye”, crossing packets</td>
+</tr>
+<tr class="row-odd"><td>13</td>
+<td></td>
+<td>seq=6, <strong>ack=22</strong> ;; ACK of FIN</td>
+</tr>
+<tr class="row-even"><td>14</td>
+<td></td>
+<td>seq=6, <strong>ack=22</strong>, FIN</td>
+</tr>
+<tr class="row-odd"><td>15</td>
+<td><strong>seq=22</strong>, ack=7 ;; ACK of FIN</td>
+<td>&#160;</td>
+</tr>
+</tbody>
+</table>
+<p>(We will see below that this table is slightly idealized, in that real sequence numbers do <em>not</em> start at 0.)</p>
+<p>Here is the ladder diagram corresponding to this connection:</p>
+<img alt="_images/tcp_ladder_plain.svg" src="_images/tcp_ladder_plain.svg" /><p>In terms of the sequence and acknowledgment numbers, SYNs count as 1 byte, as do FINs. Thus, the SYN counts as sequence number 0, and the first byte of data (the “a” of “abc”) counts as sequence number 1.
+Similarly, the ack=21 sent by the B side is the acknowledgment of “goodbye”, while the ack=22 is the acknowledgment of A’s subsequent FIN.</p>
+<p>Whenever B sends ACN=n, A follows by sending more data with SEQ=n.</p>
+<p id="index-22">TCP does <em>not</em> in fact transport relative sequence numbers, that is, sequence numbers as transmitted do not begin at 0. Instead, each side chooses its <strong>Initial Sequence Number</strong>, or <strong>ISN</strong>, and sends that in its initial SYN. The third ACK of the three-way handshake is an acknowledgment that the server side’s SYN response was received correctly.
+All further sequence numbers sent are the ISN chosen by that side plus the relative sequence number (that is, the sequence number as if numbering did begin at 0). If A chose ISN<sub>A</sub>=1000, we would add 1000 to all the bold entries above: A would send SYN(seq=1000), B would reply with ISN<sub>B</sub> and ack=1001,
+and the last two lines would involve ack=1022 and seq=1022 respectively. Similarly, if B chose ISN<sub>B</sub>=7000, then we would add 7000 to all the <strong>seq</strong> values in the “B sends” column and all the <strong>ack</strong> values in the “A sends” column. The table above up to the point B sends “goodbye”, with actual sequence numbers instead of relative sequence numbers, is below:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="3%" />
+<col width="45%" />
+<col width="51%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"></th>
+<th class="head">A, ISN=<strong>1000</strong></th>
+<th class="head">B, ISN=7000</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1</td>
+<td>SYN, <strong>seq=1000</strong></td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td></td>
+<td>SYN+ACK, seq=7000, <strong>ack=1001</strong></td>
+</tr>
+<tr class="row-even"><td>3</td>
+<td>ACK, <strong>seq=1001</strong>, ack=7001</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>4</td>
+<td>“abc”, <strong>seq=1001</strong>, ack=7001</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>5</td>
+<td></td>
+<td>ACK, seq=7001, <strong>ack=1004</strong></td>
+</tr>
+<tr class="row-odd"><td>6</td>
+<td>“defg”, <strong>seq=1004</strong>, ack=7001</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>7</td>
+<td></td>
+<td>seq=7001, <strong>ack=1008</strong></td>
+</tr>
+<tr class="row-odd"><td>8</td>
+<td>“foobar”, <strong>seq=1008</strong>, ack=7001</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>9</td>
+<td></td>
+<td>seq=7001, <strong>ack=1014</strong>, “hello”</td>
+</tr>
+<tr class="row-odd"><td>10</td>
+<td><strong>seq=1014</strong>, ack=7006, “goodbye”</td>
+<td>&#160;</td>
+</tr>
+</tbody>
+</table>
+<p>If B had not been LISTENing at the port to which A sent its SYN, its response would have been <strong>RST</strong> (“reset”), meaning in this context “connection refused”. Similarly, if A sent data to B before the SYN packet, the response would have been RST.</p>
+<p id="index-23">Finally, a RST can be sent by either side at any time to abort the connection. Sometimes routers along the path send “spoofed” RSTs to tear down TCP connections they are configured to regard as undesired; see <a class="reference internal" href="ipv4.html#middleboxes"><span class="std std-ref">9.7.2&nbsp;&nbsp;&nbsp;Middleboxes</span></a> and <span class="target" id="index-24"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3360.html"><strong>RFC 3360</strong></a>. Worse, sometimes external attackers are able to tear down a TCP connection with a spoofed RST; this requires brute-force guessing the endpoint port numbers and the RST sender’s current SEQ value (<span class="target" id="index-25"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc793.html"><strong>RFC 793</strong></a> does not in general require the RST packet’s ACK value to match, but see exercise 9.0). In the days of 4 kB window sizes, guessing a valid SEQ value was a one-in-a-million chance, but window sizes have steadily increased (<a class="reference internal" href="dynamicsB.html#high-bandwidth-tcp-problem"><span class="std std-ref">21.6&nbsp;&nbsp;&nbsp;The High-Bandwidth TCP Problem</span></a>); a 4 MB window size makes SEQ guessing quite feasible. See also <span class="target" id="index-26"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc4953.html"><strong>RFC 4953</strong></a> and the RST-validation fix proposed in <span class="target" id="index-27"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc5961.html"><strong>RFC 5961</strong></a> §3.2.</p>
+<p>If A sends a series of small packets to B, then B has the option of assembling them into a full-sized I/O buffer before releasing them to the receiving application. However, if A sets the <strong>PSH</strong> bit on each packet, then B should release each packet immediately to the receiving application. In Berkeley Unix and most (if not all) BSD-derived socket-library implementations, there is in fact no way to set the PSH bit; it is set automatically for each write. (But even this is not <em>guaranteed</em> as the sender may leave the bit off or consolidate several PuSHed writes into one packet; this makes using the PSH bit as a record separator difficult. In a series of runs of the program written to generate the WireShark packet trace, below, most of the time the  strings “abc”, “defg”, <em>etc</em> were PuSHed separately but occasionally they were consolidated into one packet.)</p>
+<p>As for the <strong>URG</strong> bit, imagine a telnet (or ssh) connection, in which A has sent a large amount of data to B, which is momentarily stalled processing it. The application at A wishes to abort that processing by sending the interrupt character CNTL-C. Under normal conditions, the application at B would have to finish processing all the pending data before getting to the CNTL-C; however, the use of the URG bit can enable immediate asynchronous delivery of the CNTL-C. The bit is set, and the TCP header’s Urgent Pointer field points to the CNTL-C in the current packet, far ahead in the normal data stream. The receiving application then skips ahead in its processing of the arriving data stream until it reaches the urgent data. For this to work, the receiving application process must have signed up to receive an asynchronous signal when urgent data arrives.</p>
+<p>The urgent data does appear as part of the ordinary TCP data stream, and it is up to the protocol to determine the start of the data that is to be considered urgent, and what to do with the unread, buffered data sent ahead of the urgent data. For the CNTL-C example in the telnet protocol (<span class="target" id="index-28"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc854.html"><strong>RFC 854</strong></a>), the urgent data might consist of the telnet “Interrupt Process” byte, preceded by the “Interpret as Command” escape byte, and the earlier data is simply discarded.</p>
+<p>Officially, the Urgent Pointer value, when the <strong>URG</strong> bit is set, contains the offset from the start of the current packet data to the <em>end</em> of the urgent data; it is meant to tell the receiver “you should read up to this point as soon as you can”. The original intent was for the urgent pointer to mark the last byte of the urgent data, but §3.1 of <span class="target" id="index-29"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc793.html"><strong>RFC 793</strong></a> got this wrong and declared that it pointed to the first byte <em>following</em> the urgent data. This was corrected in <span class="target" id="index-30"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1122.html"><strong>RFC 1122</strong></a>, but most implementations to this day abide by the “incorrect” interpretation. <span class="target" id="index-31"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc6093.html"><strong>RFC 6093</strong></a> discusses this and proposes, first, that the near-universal “incorrect” interpretation be accepted as standard, and, second, that developers avoid the use of the TCP urgent-data feature.</p>
+</div>
+<div class="section" id="tcp-and-wireshark">
+<span id="index-32"></span><span id="id5"></span><h2>17.4&nbsp;&nbsp;&nbsp;TCP and WireShark<a class="headerlink" href="#tcp-and-wireshark" title="Permalink to this headline">¶</a></h2>
+<p>Below is a screenshot of the <a class="reference external" href="http://www.wireshark.org/">WireShark</a> program displaying a tcpdump capture intended to represent the TCP exchange above. Both hosts involved in the packet exchange were Linux systems. Side A uses socket address ⟨10.0.0.3,45815⟩ and side B (the server) uses ⟨10.0.0.1,54321⟩.</p>
+<p>WireShark is displaying <em>relative</em> TCP sequence numbers. The first three packets correspond to the three-way handshake, and packet 4 is the first data packet. Every data packet has the flags [PSH, ACK] displayed. The data in the packet can be inferred from the WireShark Len field, as each of the data strings sent has a different length.</p>
+<img alt="_images/wireshark.png" src="_images/wireshark.png" />
+<p>The packets are numbered the same as in the table above up through packet 8, containing the string “foobar”. At that point the table shows B replying by a combined ACK plus the string “hello”; in fact, TCP sent the ACK alone and then the string “hello”; these are WireShark packets 9 and 10 (note packet 10 has Len=5). Wireshark packet 11 is then a standalone ACK from A to B, acknowledging the “hello”. WireShark packet 12 (the packet highlighted) then corresponds to table packet 10, and contains “goodbye” (Len=7); this string can be seen at the right side of the bottom pane.</p>
+<p>The table view shows A’s FIN (packet 11) crossing with B’s ACK of “goodbye” (packet 12). In the WireShark view, A’s FIN is packet 13, and is sent about 0.01 seconds after “goodbye”; B then ACKs them both with packet 14. That is, the table-view packet 12 does not exist in the WireShark view.</p>
+<p>Packets 11, 13, 14 and 15 in the table and 13, 14, 15 and 16 in the WireShark screen dump correspond to the connection closing. The program that generated the exchange at B’s side had to include a “sleep” delay of 40 ms between detecting the closed connection (that is, reading A’s FIN) and closing its own connection (and sending its own FIN); otherwise the ACK of A’s FIN traveled in the same packet with B’s FIN.</p>
+<p>The ISN for A in this example was 551144795 and B’s ISN was 1366676578. The actual pcap packet-capture file is at <a class="reference external" href="auxiliary_files/wireshark/demo_tcp_connection.pcap">demo_tcp_connection.pcap</a>.  This pcap file was generated by a TCP connection between two physical machines; for an alternative approach to observing TCP behavior see <a class="reference internal" href="mininet.html#wireshark-demos"><span class="std std-ref">30.2.2&nbsp;&nbsp;&nbsp;Mininet WireShark Demos</span></a>.</p>
+</div>
+<div class="section" id="tcp-offloading">
+<span id="index-33"></span><span id="id6"></span><h2>17.5&nbsp;&nbsp;&nbsp;TCP Offloading<a class="headerlink" href="#tcp-offloading" title="Permalink to this headline">¶</a></h2>
+<p>In the Wireshark example above, the hardware involved used <strong>TCP checksum offloading</strong>, or TCO, to have the network-interface card do the actual checksum calculations; this permits a modest amount of parallelism. As a result, the checksums for outbound packets are wrong in the capture file. WireShark has an option to disable the reporting of this. Despite the name, TCO can handle UDP packets as well.</p>
+<p>Most Ethernet (and some Wi-Fi) cards have the ability to calculate the Internet checksum (<a class="reference internal" href="packets.html#error-detection"><span class="std std-ref">7.4&nbsp;&nbsp;&nbsp;Error Detection</span></a>) over a certain range of bytes, and store the result (after taking the complement) at a designated offset. However, cards cannot, as a rule, handle the UDP and TCP “pseudo headers”. So what happens is the host system calculates the pseudo-header checksum and stores it in the normal checksum field; the LAN card then includes this pseudo-header checksum value in its own checksum calculation, and the correct result is obtained.</p>
+<p>It is also possible, with many newer network-interface cards, to offload the TCP <em>segmentation</em> process to the LAN hardware; that is, the kernel sends a very large TCP buffer – perhaps 64 KB – to the LAN hardware, along with a TCP header, and the LAN hardware divides the buffer into multiple TCP packets of at most 1500 bytes each. This is most useful when the application is writing data continuously and is known as <strong>TCP segmentation offloading</strong>, or TSO. The use of TSO requires TCO, but not vice-versa.</p>
+<p>TSO can be divided into large <em>send</em> offloading, LSO, for outbound traffic, as above, and large receive offloading, LRO, for inbound. For inbound offloading, the network card accumulates multiple inbound packets that are part of the same TCP connection, and consolidates them in proper sequence to one much larger packet. This means that the network card, upon receiving one packet, must wait to see if there will be more. This wait is very short, however, at most a few milliseconds. Specifically, all consolidated incoming packets must have the same TCP Timestamp value (<a class="reference internal" href="tcpB.html#anomalous-tcp-scenarios"><span class="std std-ref">18.4&nbsp;&nbsp;&nbsp;Anomalous TCP scenarios</span></a>).</p>
+<p>TSO is of particular importance at very high bandwidths. At 10 Gbps, a system can send or receive close to a million packets per second, and offloading some of the packet processing to the network card can be essential to maintaining high throughput. TSO allows a host system to behave as if it were reading or writing very large packets, and yet the actual packet size on the wire remains at the standard 1500 bytes.</p>
+<p>On Linux systems, the status of TCO and TSO can be checked using the command <code class="docutils literal notranslate"><span class="pre">ethtool</span> <span class="pre">--show-offload</span></code> &nbsp;<em>interface</em>. TSO can be disabled with <code class="docutils literal notranslate"><span class="pre">ethtool</span> <span class="pre">--offload</span></code> &nbsp;<em>interface</em> <code class="docutils literal notranslate"><span class="pre">tso</span> <span class="pre">off</span></code>.</p>
+</div>
+<div class="section" id="tcp-simplex-talk">
+<span id="index-34"></span><span id="id7"></span><h2>17.6&nbsp;&nbsp;&nbsp;TCP simplex-talk<a class="headerlink" href="#tcp-simplex-talk" title="Permalink to this headline">¶</a></h2>
+<p>Here is a Java version of the simplex-talk server for TCP. As with the UDP version, we start by setting up the socket, here a <code class="docutils literal notranslate"><span class="pre">ServerSocket</span></code> called <code class="docutils literal notranslate"><span class="pre">ss</span></code>. This socket remains in the LISTEN state throughout. The main <code class="docutils literal notranslate"><span class="pre">while</span></code> loop then begins with the call <code class="docutils literal notranslate"><span class="pre">ss.accept()</span></code> at the start; this call blocks until an incoming connection is established, at which point it returns the connected child socket <cite>s</cite>. The <code class="docutils literal notranslate"><span class="pre">accept()</span></code> call models the TCP protocol behavior of waiting for three-way handshakes initiated by remote hosts and, for each, setting up a new connection.</p>
+<p id="index-35">Connections will be accepted from <em>all</em> IP addresses of the server host, <em>eg</em> the “normal” IP address, the loopback address 127.0.0.1 and, if the server is multihomed, any additional IP addresses. Unlike the UDP case (<a class="reference internal" href="udp.html#udp-and-ip-addresses"><span class="std std-ref">16.1.3.2&nbsp;&nbsp;&nbsp;UDP and IP addresses</span></a>), <span class="target" id="index-36"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1122.html"><strong>RFC 1122</strong></a> requires (§4.2.3.7) that server response packets always be sent from the same server IP address that the client first used to contact the server. (See <a class="reference internal" href="tcpB.html#tcpb"><span class="std std-ref">18&nbsp;&nbsp;&nbsp;TCP Issues and Alternatives</span></a>, exercise 5.0 for an example of non-compliance.)</p>
+<p>A server application can process these connected children either serially or in parallel. The stalk version here can handle both situations, either one connection at a time (<code class="docutils literal notranslate"><span class="pre">THREADING</span> <span class="pre">=</span> <span class="pre">false</span></code>), or by creating a new thread for each connection (<code class="docutils literal notranslate"><span class="pre">THREADING</span> <span class="pre">=</span> <span class="pre">true</span></code>). Either way, the connected child socket is turned over to <code class="docutils literal notranslate"><span class="pre">line_talker()</span></code>, either as a synchronous procedure call or as a new thread. Data is then read from the socket’s associated <code class="docutils literal notranslate"><span class="pre">InputStream</span></code> using the ordinary <code class="docutils literal notranslate"><span class="pre">read()</span></code> call, versus the <code class="docutils literal notranslate"><span class="pre">receive()</span></code> used to read UDP packets. The main loop within <code class="docutils literal notranslate"><span class="pre">line_talker()</span></code> does not terminate until the client closes the connection (or there is an error).</p>
+<p>In the serial, non-threading mode, if a second client connection is made while the first is still active, then data can be sent on the second connection but it sits in limbo until the first connection closes, at which point control returns to the <code class="docutils literal notranslate"><span class="pre">ss.accept()</span></code> call, the second connection is processed, and the second connection’s data suddenly appears.</p>
+<p>In the threading mode, the main loop spends almost all its time waiting in <code class="docutils literal notranslate"><span class="pre">ss.accept()</span></code>; when this returns a child connection we immediately spawn a new thread to handle it, allowing the parent process to go back to <code class="docutils literal notranslate"><span class="pre">ss.accept()</span></code>. This allows the program to accept multiple concurrent client connections, like the UDP version.</p>
+<p>The code here serves as a very basic example of the creation of Java threads. The inner class <code class="docutils literal notranslate"><span class="pre">Talker</span></code> has a <code class="docutils literal notranslate"><span class="pre">run()</span></code> method, needed to implement the <code class="docutils literal notranslate"><span class="pre">runnable</span></code> interface. To start a new thread, we create a new <code class="docutils literal notranslate"><span class="pre">Talker</span></code> instance; the <code class="docutils literal notranslate"><span class="pre">start()</span></code> call then begins <code class="docutils literal notranslate"><span class="pre">Talker.run()</span></code>, which runs for as long as the client keeps the connection open.
+The file here is <a class="reference external" href="auxiliary_files/stalk/tcp_stalks.java">tcp_stalks.java</a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/*</span> <span class="n">THREADED</span> <span class="n">simplex</span><span class="o">-</span><span class="n">talk</span> <span class="n">TCP</span> <span class="n">server</span> <span class="o">*/</span>
+<span class="o">/*</span> <span class="n">can</span> <span class="n">handle</span> <span class="n">multiple</span> <span class="n">CONCURRENT</span> <span class="n">client</span> <span class="n">connections</span> <span class="o">*/</span>
+<span class="o">/*</span> <span class="n">newline</span> <span class="ow">is</span> <span class="n">to</span> <span class="n">be</span> <span class="n">included</span> <span class="n">at</span> <span class="n">client</span> <span class="n">side</span> <span class="o">*/</span>
+
+<span class="kn">import</span> <span class="nn">java.net.</span><span class="o">*</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">java.io.</span><span class="o">*</span><span class="p">;</span>
+
+<span class="n">public</span> <span class="k">class</span> <span class="nc">tstalks</span> <span class="p">{</span>
+
+    <span class="n">static</span> <span class="n">public</span> <span class="nb">int</span> <span class="n">destport</span> <span class="o">=</span> <span class="mi">5431</span><span class="p">;</span>
+    <span class="n">static</span> <span class="n">public</span> <span class="nb">int</span> <span class="n">bufsize</span> <span class="o">=</span> <span class="mi">512</span><span class="p">;</span>
+    <span class="n">static</span> <span class="n">public</span> <span class="n">boolean</span> <span class="n">THREADING</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span>
+
+    <span class="n">static</span> <span class="n">public</span> <span class="n">void</span> <span class="n">main</span><span class="p">(</span><span class="n">String</span> <span class="n">args</span><span class="p">[])</span> <span class="p">{</span>
+        <span class="n">ServerSocket</span> <span class="n">ss</span><span class="p">;</span>
+        <span class="n">Socket</span> <span class="n">s</span><span class="p">;</span>
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="n">ss</span> <span class="o">=</span> <span class="n">new</span> <span class="n">ServerSocket</span><span class="p">(</span><span class="n">destport</span><span class="p">);</span>
+        <span class="p">}</span> <span class="n">catch</span> <span class="p">(</span><span class="n">IOException</span> <span class="n">ioe</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;can&#39;t create server socket&quot;</span><span class="p">);</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;server starting on port &quot;</span> <span class="o">+</span> <span class="n">ss</span><span class="o">.</span><span class="n">getLocalPort</span><span class="p">());</span>
+
+        <span class="k">while</span><span class="p">(</span><span class="n">true</span><span class="p">)</span> <span class="p">{</span> <span class="o">//</span> <span class="n">accept</span> <span class="n">loop</span>
+            <span class="k">try</span> <span class="p">{</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">ss</span><span class="o">.</span><span class="n">accept</span><span class="p">();</span>
+            <span class="p">}</span> <span class="n">catch</span> <span class="p">(</span><span class="n">IOException</span> <span class="n">ioe</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;Can&#39;t accept&quot;</span><span class="p">);</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="p">}</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">THREADING</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">Talker</span> <span class="n">talk</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Talker</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+                <span class="p">(</span><span class="n">new</span> <span class="n">Thread</span><span class="p">(</span><span class="n">talk</span><span class="p">))</span><span class="o">.</span><span class="n">start</span><span class="p">();</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                <span class="n">line_talker</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span> <span class="o">//</span> <span class="n">accept</span> <span class="n">loop</span>
+    <span class="p">}</span> <span class="o">//</span> <span class="n">end</span> <span class="n">of</span> <span class="n">main</span>
+
+    <span class="n">public</span> <span class="n">static</span> <span class="n">void</span> <span class="n">line_talker</span><span class="p">(</span><span class="n">Socket</span> <span class="n">s</span><span class="p">)</span> <span class="p">{</span>
+       <span class="nb">int</span> <span class="n">port</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">getPort</span><span class="p">();</span>
+        <span class="n">InputStream</span> <span class="n">istr</span><span class="p">;</span>
+        <span class="k">try</span> <span class="p">{</span> <span class="n">istr</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">getInputStream</span><span class="p">();</span> <span class="p">}</span>
+        <span class="n">catch</span> <span class="p">(</span><span class="n">IOException</span> <span class="n">ioe</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;cannot get input stream&quot;</span><span class="p">);</span>        <span class="o">//</span> <span class="n">most</span> <span class="n">likely</span> <span class="n">cause</span><span class="p">:</span> <span class="n">s</span> <span class="n">was</span> <span class="n">closed</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;New connection from &lt;&quot;</span> <span class="o">+</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">getInetAddress</span><span class="p">()</span><span class="o">.</span><span class="n">getHostAddress</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span> <span class="n">s</span><span class="o">.</span><span class="n">getPort</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">);</span>
+        <span class="n">byte</span><span class="p">[]</span> <span class="n">buf</span> <span class="o">=</span> <span class="n">new</span> <span class="n">byte</span><span class="p">[</span><span class="n">bufsize</span><span class="p">];</span>
+        <span class="nb">int</span> <span class="nb">len</span><span class="p">;</span>
+
+        <span class="k">while</span> <span class="p">(</span><span class="n">true</span><span class="p">)</span> <span class="p">{</span>         <span class="o">//</span> <span class="k">while</span> <span class="ow">not</span> <span class="n">done</span> <span class="n">reading</span> <span class="n">the</span> <span class="n">socket</span>
+            <span class="k">try</span> <span class="p">{</span>
+                <span class="nb">len</span> <span class="o">=</span> <span class="n">istr</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">bufsize</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="n">catch</span> <span class="p">(</span><span class="n">SocketTimeoutException</span> <span class="n">ste</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">System</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;socket timeout&quot;</span><span class="p">);</span>
+                <span class="k">continue</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="n">catch</span> <span class="p">(</span><span class="n">IOException</span> <span class="n">ioe</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;bad read&quot;</span><span class="p">);</span>
+                <span class="k">break</span><span class="p">;</span>        <span class="o">//</span> <span class="n">probably</span> <span class="n">a</span> <span class="n">socket</span> <span class="n">ABORT</span><span class="p">;</span> <span class="n">treat</span> <span class="k">as</span> <span class="n">a</span> <span class="n">close</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>              <span class="o">//</span> <span class="n">other</span> <span class="n">end</span> <span class="n">closed</span> <span class="n">gracefully</span>
+            <span class="n">String</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">new</span> <span class="n">String</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">);</span>
+            <span class="n">System</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span> <span class="o">+</span> <span class="n">port</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">);</span>  <span class="o">//</span> <span class="nb">str</span> <span class="n">should</span> <span class="n">contain</span> <span class="n">newline</span>
+        <span class="p">}</span> <span class="o">//</span><span class="k">while</span> <span class="n">reading</span> <span class="kn">from</span> <span class="nn">s</span>
+
+
+        <span class="k">try</span> <span class="p">{</span><span class="n">istr</span><span class="o">.</span><span class="n">close</span><span class="p">();}</span>
+        <span class="n">catch</span> <span class="p">(</span><span class="n">IOException</span> <span class="n">ioe</span><span class="p">)</span> <span class="p">{</span><span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;bad stream close&quot;</span><span class="p">);</span><span class="k">return</span><span class="p">;}</span>
+        <span class="k">try</span> <span class="p">{</span><span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">();}</span>
+        <span class="n">catch</span> <span class="p">(</span><span class="n">IOException</span> <span class="n">ioe</span><span class="p">)</span> <span class="p">{</span><span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;bad socket close&quot;</span><span class="p">);</span><span class="k">return</span><span class="p">;}</span>
+        <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;socket to port &quot;</span> <span class="o">+</span> <span class="n">port</span> <span class="o">+</span> <span class="s2">&quot; closed&quot;</span><span class="p">);</span>
+    <span class="p">}</span> <span class="o">//</span> <span class="n">line_talker</span>
+
+    <span class="n">static</span> <span class="k">class</span> <span class="nc">Talker</span> <span class="n">implements</span> <span class="n">Runnable</span> <span class="p">{</span>
+        <span class="n">private</span> <span class="n">Socket</span> <span class="n">_s</span><span class="p">;</span>
+
+        <span class="n">public</span> <span class="n">Talker</span> <span class="p">(</span><span class="n">Socket</span> <span class="n">s</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">_s</span> <span class="o">=</span> <span class="n">s</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="n">public</span> <span class="n">void</span> <span class="n">run</span><span class="p">()</span> <span class="p">{</span>
+            <span class="n">line_talker</span><span class="p">(</span><span class="n">_s</span><span class="p">);</span>
+        <span class="p">}</span> <span class="o">//</span> <span class="n">run</span>
+    <span class="p">}</span>  <span class="o">//</span> <span class="k">class</span> <span class="nc">Talker</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="section" id="the-tcp-client">
+<span id="tcp-client"></span><span id="index-37"></span><h3>17.6.1&nbsp;&nbsp;&nbsp;The TCP Client<a class="headerlink" href="#the-tcp-client" title="Permalink to this headline">¶</a></h3>
+<p>Here is the corresponding client <a class="reference external" href="auxiliary_files/stalk/tcp_stalkc.java">tcp_stalkc.java</a>. As with the UDP version, the default host to connect to is <code class="docutils literal notranslate"><span class="pre">localhost</span></code>. We first call <code class="docutils literal notranslate"><span class="pre">InetAddress.getByName()</span></code> to perform the DNS lookup. Part of the construction of the Socket object is the connection to the desired dest and destport. Within the main <code class="docutils literal notranslate"><span class="pre">while</span></code> loop, we use an ordinary <code class="docutils literal notranslate"><span class="pre">write()</span></code> call to write strings to the socket’s associated <code class="docutils literal notranslate"><span class="pre">OutputStream</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">TCP</span> <span class="n">simplex</span><span class="o">-</span><span class="n">talk</span> <span class="n">CLIENT</span> <span class="ow">in</span> <span class="n">java</span>
+
+<span class="kn">import</span> <span class="nn">java.net.</span><span class="o">*</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">java.io.</span><span class="o">*</span><span class="p">;</span>
+
+<span class="n">public</span> <span class="k">class</span> <span class="nc">stalkc</span> <span class="p">{</span>
+
+    <span class="n">static</span> <span class="n">public</span> <span class="n">BufferedReader</span> <span class="nb">bin</span><span class="p">;</span>
+    <span class="n">static</span> <span class="n">public</span> <span class="nb">int</span> <span class="n">destport</span> <span class="o">=</span> <span class="mi">5431</span><span class="p">;</span>
+
+    <span class="n">static</span> <span class="n">public</span> <span class="n">void</span> <span class="n">main</span><span class="p">(</span><span class="n">String</span> <span class="n">args</span><span class="p">[])</span> <span class="p">{</span>
+        <span class="n">String</span> <span class="n">desthost</span> <span class="o">=</span> <span class="s2">&quot;localhost&quot;</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">length</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="n">desthost</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+        <span class="nb">bin</span> <span class="o">=</span> <span class="n">new</span> <span class="n">BufferedReader</span><span class="p">(</span><span class="n">new</span> <span class="n">InputStreamReader</span><span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="ow">in</span><span class="p">));</span>
+
+        <span class="n">InetAddress</span> <span class="n">dest</span><span class="p">;</span>
+        <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;Looking up address of &quot;</span> <span class="o">+</span> <span class="n">desthost</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span><span class="p">);</span>
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="n">dest</span> <span class="o">=</span> <span class="n">InetAddress</span><span class="o">.</span><span class="n">getByName</span><span class="p">(</span><span class="n">desthost</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">catch</span> <span class="p">(</span><span class="n">UnknownHostException</span> <span class="n">uhe</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;unknown host: &quot;</span> <span class="o">+</span> <span class="n">desthost</span><span class="p">);</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot; got it!&quot;</span><span class="p">);</span>
+
+        <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;connecting to port &quot;</span> <span class="o">+</span> <span class="n">destport</span><span class="p">);</span>
+        <span class="n">Socket</span> <span class="n">s</span><span class="p">;</span>
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Socket</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">destport</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">catch</span><span class="p">(</span><span class="n">IOException</span> <span class="n">ioe</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;cannot connect to &lt;&quot;</span> <span class="o">+</span> <span class="n">desthost</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span> <span class="n">destport</span> <span class="o">+</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">);</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="n">OutputStream</span> <span class="n">sout</span><span class="p">;</span>
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="n">sout</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">getOutputStream</span><span class="p">();</span>
+        <span class="p">}</span>
+        <span class="n">catch</span> <span class="p">(</span><span class="n">IOException</span> <span class="n">ioe</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;I/O failure!&quot;</span><span class="p">);</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="o">//============================================================</span>
+
+        <span class="k">while</span> <span class="p">(</span><span class="n">true</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">String</span> <span class="n">buf</span><span class="p">;</span>
+            <span class="k">try</span> <span class="p">{</span>
+                <span class="n">buf</span> <span class="o">=</span> <span class="nb">bin</span><span class="o">.</span><span class="n">readLine</span><span class="p">();</span>
+            <span class="p">}</span>
+            <span class="n">catch</span> <span class="p">(</span><span class="n">IOException</span> <span class="n">ioe</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;readLine() failed&quot;</span><span class="p">);</span>
+                <span class="k">return</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">buf</span> <span class="o">==</span> <span class="n">null</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>     <span class="o">//</span> <span class="n">user</span> <span class="n">typed</span> <span class="n">EOF</span> <span class="n">character</span>
+
+            <span class="n">buf</span> <span class="o">=</span> <span class="n">buf</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>          <span class="o">//</span> <span class="n">protocol</span> <span class="n">requires</span> <span class="n">sender</span> <span class="n">includes</span> \<span class="n">n</span>
+            <span class="n">byte</span><span class="p">[]</span> <span class="n">bbuf</span> <span class="o">=</span> <span class="n">buf</span><span class="o">.</span><span class="n">getBytes</span><span class="p">();</span>
+
+            <span class="k">try</span> <span class="p">{</span>
+                <span class="n">sout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">bbuf</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="n">catch</span> <span class="p">(</span><span class="n">IOException</span> <span class="n">ioe</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;write() failed&quot;</span><span class="p">);</span>
+                <span class="k">return</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span> <span class="o">//</span> <span class="k">while</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>A Python3 version of the stalk client is available at <a class="reference external" href="auxiliary_files/stalk/tcp_stalkc.py">tcp_stalkc.py</a>.</p>
+<p>Here are some things to try with THREADING=false in the server:</p>
+<ul class="simple">
+<li>start up two clients while the server is running. Type some message lines into both. Then exit the first client.</li>
+<li>start up the client before the server.</li>
+<li>start up the server, and then the client. Kill the server and then type some message lines to the client. What happens to the client? (It may take a couple message lines.)</li>
+<li>start the server, then the client. Kill the server and restart it. Now what happens to the client?</li>
+</ul>
+<p>With THREADING=true, try connecting multiple clients simultaneously to the server. How does this behave differently from the first example above?</p>
+<p>See also exercise 13.0.</p>
+</div>
+</div>
+<div class="section" id="tcp-and-bind">
+<span id="index-38"></span><span id="id8"></span><h2>17.7&nbsp;&nbsp;&nbsp;TCP and <code class="docutils literal notranslate"><span class="pre">bind()</span></code><a class="headerlink" href="#tcp-and-bind" title="Permalink to this headline">¶</a></h2>
+<p>The server version calls the <code class="docutils literal notranslate"><span class="pre">ServerSocket()</span></code> constructor, to create a socket in the LISTEN state; the local port must be specified here. The client version just calls <code class="docutils literal notranslate"><span class="pre">Socket()</span></code>, and the socket is then bound to a port by the operating system. It is also possible to create a client socket that is bound to a programmer-specified port; one application of this is to enable internal firewalls to identify the traffic class by source port. More commonly, client sockets are assigned <em>ephemeral</em> ports by the system. The Linux ephemeral port range can be found in <code class="docutils literal notranslate"><span class="pre">/proc/sys/net/ipv4/ip_local_port_range</span></code>; as of 2022 it is 32768 to 60999.</p>
+<p>In C, sockets are created with <code class="docutils literal notranslate"><span class="pre">socket()</span></code>, bound to a port with <code class="docutils literal notranslate"><span class="pre">bind()</span></code>, and placed in the LISTEN state with <code class="docutils literal notranslate"><span class="pre">listen()</span></code> or else connected to a server with <code class="docutils literal notranslate"><span class="pre">connect()</span></code>. For client sockets, the call to <code class="docutils literal notranslate"><span class="pre">bind()</span></code> may be performed implicitly by <code class="docutils literal notranslate"><span class="pre">connect()</span></code>.</p>
+<p id="index-39">If two sockets on host A are connected via TCP to two <em>different</em> servers, B1 and B2, then it is possible that the operating system will assign the <em>same</em> local port to both sockets. On systems with an exceptional number of persistent outbound connections, such port reuse may be essential, as it is otherwise possible to run out of local ports. That said, port reuse is not an option if <code class="docutils literal notranslate"><span class="pre">bind()</span></code> is called explicitly, as at the time of the call to <code class="docutils literal notranslate"><span class="pre">bind()</span></code> the operating system does not yet know if the socket is to be used for LISTENing, for which a unique local port is necessary. To help deal with this, Linux has the socket option <code class="docutils literal notranslate"><span class="pre">IP_BIND_ADDRESS_NO_PORT</span></code>, which causes <code class="docutils literal notranslate"><span class="pre">bind()</span></code> to bind an IP address to the socket but defers port binding to a later <code class="docutils literal notranslate"><span class="pre">connect()</span></code>. Apple OS X provides the <a class="reference external" href="https://www.manpagez.com/man/2/connectx/">connectx()</a> system call, which introduces similar functionality. See also <a class="reference external" href="https://blog.cloudflare.com/how-to-stop-running-out-of-ephemeral-ports-and-start-to-love-long-lived-connections/">this Cloudflare blog post</a>.</p>
+<p>Ephemeral ports were, originally, assigned more-or-less in sequence, skipping over values in use and ultimately wrapping around. This makes it easy, however, for adversaries to predict source-port numbers, so <span class="target" id="index-40"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc6056.html"><strong>RFC 6056</strong></a> proposed making a first try at a new local-port number as follows:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">try0 = next_ephemeral + hash(local_addr, remote_addr, remote_port, secret_key)</div>
+</div>
+</div></blockquote>
+<p>If that is not available, subsequent tries incremented this value successively, with appropriate wrapping to stay within the designated ephemeral-port range. (See <a class="reference internal" href="tcpB.html#isn-spoofing"><span class="std std-ref">18.3.1&nbsp;&nbsp;&nbsp;ISNs and spoofing</span></a> for a related technique with ISN generation.)</p>
+<p>This had the advantage that any <em>specific</em> remote socket would see the local ports incremented successively, which makes port reuse unlikely until the entire ephemeral-port range has been cycled through. However, a different remote socket would get another, unrelated, port-number sequence, making it very difficult for attackers to guess another connection’s port.</p>
+<p>Unfortunately, this elegant scheme introduced an unexpected problem: it enabled <strong>fingerprinting</strong> of the system that uses it, which lasted for the lifetime of the <code class="docutils literal notranslate"><span class="pre">secret_key</span></code>. This was done through the creation of many “probe” connections, and observing the behavior of the local_port value; see <a class="reference internal" href="bibliography.html#kk22" id="id9">[KK22]</a> for details. The fix is to add a fast-changing timestamp to the hash arguments above, and to increment a failed port try by a random value between 1 and 7, rather than always by 1.</p>
+<div class="section" id="netcat-again">
+<span id="netcat-tcp"></span><span id="index-41"></span><h3>17.7.1&nbsp;&nbsp;&nbsp;<code class="docutils literal notranslate"><span class="pre">netcat</span></code> again<a class="headerlink" href="#netcat-again" title="Permalink to this headline">¶</a></h3>
+<p>As with UDP (<a class="reference internal" href="udp.html#netcat-udp"><span class="std std-ref">16.1.4&nbsp;&nbsp;&nbsp;netcat</span></a>), we can use the <code class="docutils literal notranslate"><span class="pre">netcat</span></code> utility to act as either end of the TCP simplex-talk connection. As the client we can use</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">netcat</span> <span class="n">localhost</span> <span class="mi">5431</span>
+</pre></div>
+</div>
+<p>while as the server we can use</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">netcat</span> <span class="o">-</span><span class="n">l</span> <span class="o">-</span><span class="n">k</span> <span class="mi">5431</span>
+</pre></div>
+</div>
+<p>Here (but not with UDP) the <code class="docutils literal notranslate"><span class="pre">-k</span></code> option causes the server to accept multiple connections in sequence. The connections are handled one at a time, as is the case in the stalk server above with <code class="docutils literal notranslate"><span class="pre">THREADING=false</span></code>.</p>
+<p id="index-42">We can also use <code class="docutils literal notranslate"><span class="pre">netcat</span></code> to download web pages, using the <a class="reference external" href="https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol">HTTP</a> protocol. The command below sends an HTTP GET request (version 1.1; <span class="target" id="index-43"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2616.html"><strong>RFC 2616</strong></a> and updates) to retrieve part of the website for this book; it has been broken over two lines for convenience.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">echo</span> <span class="o">-</span><span class="n">e</span> <span class="s1">&#39;GET /index.html HTTP/1.1</span><span class="se">\r\n</span><span class="s1">HOST: intronetworks.cs.luc.edu</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="o">|</span>
+<span class="n">netcat</span> <span class="n">intronetworks</span><span class="o">.</span><span class="n">cs</span><span class="o">.</span><span class="n">luc</span><span class="o">.</span><span class="n">edu</span> <span class="mi">80</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">\r\n</span></code> represents the officially mandatory carriage-return/newline line-ending sequence, though <code class="docutils literal notranslate"><span class="pre">\n</span></code> will often work. The <code class="docutils literal notranslate"><span class="pre">index.html</span></code> identifies the file being requested; as <code class="docutils literal notranslate"><span class="pre">index.html</span></code> is the default it is often omitted, though the preceding <code class="docutils literal notranslate"><span class="pre">/</span></code> is still required. The webserver may support other websites as well via virtual hosting (<a class="reference internal" href="ipv4companions.html#nslookup1"><span class="std std-ref">10.1.2&nbsp;&nbsp;&nbsp;nslookup and dig</span></a>); the <code class="docutils literal notranslate"><span class="pre">HOST:</span></code> specification identifies to the server the specific site we are looking for. Version 2 of HTTP is described in <span class="target" id="index-44"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc7540.html"><strong>RFC 7540</strong></a>; its primary format is binary. (For production command-line retrieval of web pages, <a class="reference external" href="https://curl.haxx.se/">cURL</a> and <a class="reference external" href="https://www.gnu.org/software/wget/">wget</a> are standard choices.)</p>
+</div>
+</div>
+<div class="section" id="tcp-state-diagram">
+<span id="index-45"></span><span id="id10"></span><h2>17.8&nbsp;&nbsp;&nbsp;TCP state diagram<a class="headerlink" href="#tcp-state-diagram" title="Permalink to this headline">¶</a></h2>
+<p>A formal definition of TCP involves the <strong>state diagram</strong>, with conditions for transferring from one state to another, and responses to all packets from each state. The state diagram originally appeared in <span class="target" id="index-46"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc793.html"><strong>RFC 793</strong></a>; the following interpretation of the state diagram came from <a class="reference external" href="http://commons.wikimedia.org/wiki/File:Tcp_state_diagram_fixed.svg">http://commons.wikimedia.org/wiki/File:Tcp_state_diagram_fixed.svg</a> and was authored by Wikipedia users Sergiodc2, Marty Pauley, and DnetSvg. The blue arrows indicate the sequence of state transitions typically followed by the server; the brown arrows represent the client. Arrows are labeled with <strong>event / action</strong>; that is, we move from LISTEN to SYN_RECD upon receipt of a SYN packet; the action is to respond with SYN+ACK.</p>
+<img alt="_images/tcp_state_diagram_fixed2_scaled.svg" src="_images/tcp_state_diagram_fixed2_scaled.svg" /><p>In general, this finite-state-machine approach to protocol specification has proven very effective, and is now used for most protocols. It makes it very clear to the implementer how the system should respond to each packet arrival. It is also a useful model for the implementation itself. Finally, we also observe that the TCP layer within an operating system cannot easily be modeled as anything <em>other</em> than a state machine; it must respond immediately to packet and program events, without indefinite waiting, as the operating system must go on to other things.</p>
+<p id="index-47">It is visually impractical to list every possible transition within the state diagram, full details are usually left to the accompanying text. For example, although this does not appear in the state diagram above, the per-state response rules of TCP require that in the ESTABLISHED state, if the receiver sends an ACK outside the current sliding window, then the correct response is to reply with one’s own current ACK. This includes the case where the receiver <em>acknowledges data not yet sent</em>.</p>
+<p id="index-48">The ESTABLISHED state and the states below it are sometimes called the <strong>synchronized</strong> states, as in these states both sides have confirmed one another’s ISN values.</p>
+<p>Here is the ladder diagram for the 14-packet connection described above, this time labeled with TCP states.</p>
+<img alt="_images/tcp_ladder_states.svg" src="_images/tcp_ladder_states.svg" /><p id="index-49">Although it essentially never occurs in practice, it is possible for each side to send the other a SYN, requesting a connection, <strong>simultaneously</strong> (that is, the SYNs cross on the wire). The telephony analogue occurs when each party dials the other simultaneously. On traditional land-lines, each party then gets a busy signal. On cell phones, your mileage may vary. With TCP, a single connection is created. With OSI TP4, two connections are created. The OSI approach is not possible in TCP, as a connection is determined only by the socketpair involved; if there is only one socketpair then there can be only one connection.</p>
+<p id="index-50">It is possible to view connection states under either Linux or Windows with <code class="docutils literal notranslate"><span class="pre">netstat</span> <span class="pre">-a</span></code>. Most states are ephemeral, exceptions being LISTEN, ESTABLISHED, TIMEWAIT, and CLOSE_WAIT. One sometimes sees large numbers of connections in CLOSE_WAIT, meaning that the remote endpoint has closed the connection and sent its FIN, but the process at your end has not executed <code class="docutils literal notranslate"><span class="pre">close()</span></code> on its socket. Often this represents a programming error; alternatively, the process at the local end is still working on something. Given a local port number p in state CLOSE_WAIT on a Linux system, the (privileged) command <code class="docutils literal notranslate"><span class="pre">lsof</span> <span class="pre">-i</span> <span class="pre">:</span></code><em>p</em> will identify the process using port p.</p>
+<p>The reader who is implementing TCP is encouraged to consult <span class="target" id="index-51"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc793.html"><strong>RFC 793</strong></a> and updates. For the rest of us, below are a few general observations about closing connections.</p>
+<div class="section" id="closing-a-connection">
+<span id="closing"></span><h3>17.8.1&nbsp;&nbsp;&nbsp;Closing a connection<a class="headerlink" href="#closing-a-connection" title="Permalink to this headline">¶</a></h3>
+<p>The “normal” TCP close sequence is as follows:</p>
+<img alt="_images/tcp_close2.svg" src="_images/tcp_close2.svg" /><p>A’s FIN is, in effect, a promise to B not to <em>send</em> any more. However, A must still be prepared to receive data from B, hence the optional data shown in the diagram. A good example of this occurs when A is sending a stream of data to B to be sorted; A sends FIN to indicate that it is done sending, and only then does B sort the data and begin sending it back to A. This can be generated with the command, on A, <code class="docutils literal notranslate"><span class="pre">cat</span> <span class="pre">thefile</span> <span class="pre">|</span> <span class="pre">ssh</span> <span class="pre">B</span> <span class="pre">sort</span></code>. That said, the presence of the optional B-to-A data above following A’s FIN is relatively less common.</p>
+<p>In the diagram above, A sends a FIN to B and receives an ACK, and then, later, B sends a FIN to A and receives an ACK. This essentially amounts to two separate two-way closure handshakes.</p>
+<p id="index-52">Either side may elect to close the connection, just as either party to a telephone call may elect to hang up. The first side to send a FIN – A in the diagram above – takes the <strong>Active CLOSE</strong> path; the other side takes the <strong>Passive CLOSE</strong> path. In the diagram, active-closer A moves from state ESTABLISHED to FIN_WAIT_1 to FIN_WAIT_2 (upon receipt of B’s ACK of A’s FIN), and then to TIMEWAIT and finally to CLOSED. Passive-closer B moves from ESTABLISHED to CLOSE_WAIT to LAST_ACK to CLOSED.</p>
+<p>A <strong>simultaneous close</strong> – having both sides send each other FINs before receiving the other side’s FIN – is a little more likely than a simultaneous open, earlier above, though still not very. Each side would send its FIN and move to state FIN_WAIT_1. Then, upon receiving each other’s FIN packets, each side would send its final ACK and move to CLOSING. See exercises 5.0 and 6.0.</p>
+<p id="index-53">A TCP endpoint is <strong>half-closed</strong> if it has sent its FIN (thus promising not to send any more data) and is waiting for the other side’s FIN; this corresponds to A in the diagram above in states FIN_WAIT_1 and FIN_WAIT_2. With the BSD socket library, an application can half-close its connection with the appropriate call to <code class="docutils literal notranslate"><span class="pre">shutdown()</span></code>.</p>
+<p id="index-54">Unrelatedly, A TCP endpoint is <strong>half-open</strong> if it is in the ESTABLISHED state, but during a lull in the exchange of packets the other side has rebooted; this has nothing to do with the close protocol. As soon as the ESTABLISHED side sends a packet, the rebooted side will respond with RST and the connection will be fully closed.</p>
+<p>In the absence of the optional data from B to A after A sends its FIN, the closing sequence reduces to the left-hand diagram below:</p>
+<img alt="_images/tcp_closes.svg" src="_images/tcp_closes.svg" /><p>If B is ready to close immediately, it is possible for B’s ACK and FIN to be combined, as in the right-hand diagram above, in which case the resultant diagram superficially resembles the connection-opening three-way handshake. In this case, A moves directly from FIN_WAIT_1 to TIMEWAIT, following the state-diagram link labeled “FIN + ACK-of-FIN”. In theory this is rare, as the ACK of A’s FIN is generated by the kernel but B’s FIN cannot be sent until B’s process is scheduled to run on the CPU. If the TCP layer adopts a policy of <em>immediately</em> sending ACKs upon receipt of any packet, this will never happen, as the ACK will be sent well before B’s process can be scheduled to do anything. However, if B <em>delays</em> its ACKs slightly (and if it has no more data to send), then it is possible – and in fact not uncommon – for B’s ACK and FIN to be sent together. Delayed ACKs, are, as we shall see below, a common strategy (<a class="reference internal" href="tcpB.html#delayed-acks"><span class="std std-ref">18.8&nbsp;&nbsp;&nbsp;TCP Delayed ACKs</span></a>). To create the scenario of <a class="reference internal" href="#tcp-and-wireshark"><span class="std std-ref">17.4&nbsp;&nbsp;&nbsp;TCP and WireShark</span></a>, it was necessary to introduce an artificial delay to prevent the simultaneous transmission of B’s ACK and FIN.</p>
+</div>
+<div class="section" id="calling-close">
+<span id="index-55"></span><span id="id11"></span><h3>17.8.2&nbsp;&nbsp;&nbsp;Calling <code class="docutils literal notranslate"><span class="pre">close()</span></code><a class="headerlink" href="#calling-close" title="Permalink to this headline">¶</a></h3>
+<p>Most network programming interfaces provide a <code class="docutils literal notranslate"><span class="pre">close()</span></code> method for ending a connection, based on the close operation for files. However, it usually closes bidirectionally and so models the TCP closure protocol rather imperfectly.</p>
+<p>As we have seen in the previous section, the TCP close sequence is is followed more naturally if the active-closing endpoint  calls <code class="docutils literal notranslate"><span class="pre">shutdown()</span></code> – promising not to send more, but allowing for continued receiving – before the final <code class="docutils literal notranslate"><span class="pre">close()</span></code>. Here is what <em>should</em> happen at the application layer if endpoint A of a TCP connection wishes to initiate the closing of its connection with endpoint B:</p>
+<ul class="simple">
+<li>A’s application calls <code class="docutils literal notranslate"><span class="pre">shutdown()</span></code>, thereby promising not to send any more data. A’s FIN is sent to B. A’s application is expected to continue reading, however.</li>
+<li>The connection is now half-closed. On receipt of A’s FIN, B’s TCP layer knows this. If B’s application attempts to read more data, it will receive an end-of-file indication (this is typically a <code class="docutils literal notranslate"><span class="pre">read()</span></code> or <code class="docutils literal notranslate"><span class="pre">recv()</span></code> operation that returns immediately with 0 bytes received).</li>
+<li>B’s application is now done reading data, but it may or may not have more data to send. When B’s application is done sending, it calls <code class="docutils literal notranslate"><span class="pre">close()</span></code>, at which point B’s FIN is sent to A. Because the connection is already half-closed, B’s <code class="docutils literal notranslate"><span class="pre">close()</span></code> is really a second half-close, ending further transmission by B.</li>
+<li>A’s application keeps reading until it too receives an end-of-file indication, corresponding to B’s FIN.</li>
+<li>The connection is now fully closed. No data has been lost.</li>
+</ul>
+<p>It is sometimes the case that it is evident to A from the application protocol that B will not send more data. In such cases, A might simply call <code class="docutils literal notranslate"><span class="pre">close()</span></code> instead of <code class="docutils literal notranslate"><span class="pre">shutdown()</span></code>. This is risky, however, unless the protocol is crystal clear: if A calls <code class="docutils literal notranslate"><span class="pre">close()</span></code> and B later does send a little more data after all, or if B has already sent some data but A has not actually read it, A’s TCP layer may send RST to B to indicate that not all B’s data was received properly. <span class="target" id="index-56"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1122.html"><strong>RFC 1122</strong></a> puts it this way:</p>
+<blockquote>
+<div>If such a host issues a CLOSE call while received data is still pending in TCP, or if new data is received after CLOSE is called, its TCP SHOULD send a RST to show that data was lost.</div></blockquote>
+<p>If A’s RST arrives at B before all of A’s sent data has been processed by B’s application, it is entirely possible that data sent by A will be lost, that is, will never be read by B.</p>
+<p id="index-57">In the BSD socket library, A can set the <code class="docutils literal notranslate"><span class="pre">SO_LINGER</span></code> option, which causes A’s <code class="docutils literal notranslate"><span class="pre">close()</span></code> to block until A’s data has been delivered to B (or until the <code class="docutils literal notranslate"><span class="pre">SO_LINGER</span></code> timeout, provided by the user when setting this option, has expired). However, <code class="docutils literal notranslate"><span class="pre">SO_LINGER</span></code> has no bearing on the issue above; post-close data from B to A will still cause A to send a RST.</p>
+<p>In the simplex-talk program at <a class="reference internal" href="#tcp-simplex-talk"><span class="std std-ref">17.6&nbsp;&nbsp;&nbsp;TCP simplex-talk</span></a>, the client does not call <code class="docutils literal notranslate"><span class="pre">shutdown()</span></code> (it implicitly calls <code class="docutils literal notranslate"><span class="pre">close()</span></code> when it exits). When the client is done, the server calls <code class="docutils literal notranslate"><span class="pre">s.close()</span></code>. However, the fact that there is no data at all sent from the server to the client prevents the problem discussed above.</p>
+<p>It is sometimes the case that A is expected to send a large amount of data to B and then exit:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">byte</span><span class="p">[]</span> <span class="n">bbuf</span> <span class="o">=</span> <span class="n">byte</span><span class="p">[</span><span class="mi">1000000</span><span class="p">];</span>
+<span class="o">...</span>
+<span class="n">sout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">bbuf</span><span class="p">);</span>               <span class="o">//</span> <span class="n">Java</span> <span class="n">OutputStream</span> <span class="n">attached</span> <span class="n">to</span> <span class="n">the</span> <span class="n">socket</span> <span class="n">s</span>
+<span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>In this case, the close() call is supposed to result in A sending all the data before actually terminating the connection. <span class="target" id="index-58"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc793.html"><strong>RFC 793</strong></a> puts it this way:</p>
+<blockquote>
+<div>Closing connections is intended to be a graceful operation in the sense that outstanding SENDs will be transmitted (and retransmitted), as flow control permits, until all have been serviced.</div></blockquote>
+<p>The Linux interpretation of this is given in the socket(7) man page:</p>
+<blockquote>
+<div>When the socket is closed as part of <code class="docutils literal notranslate"><span class="pre">exit(2)</span></code>, it always lingers in the background.</div></blockquote>
+<p>The linger <em>time</em> is not specified. If there is an explicit <code class="docutils literal notranslate"><span class="pre">close(2)</span></code> before <code class="docutils literal notranslate"><span class="pre">exit(2)</span></code>, the <code class="docutils literal notranslate"><span class="pre">SO_LINGER</span></code> status above determines TCP’s behavior.</p>
+<p>Alternatively, A can send the data and then attempt to read from the socket. A will receive an end-of-file indication (typically 0 bytes read) as soon as the other endpoint B closes. If B waits to close until it has read all the data, this end-of-file indication will mean it is safe for A to call <code class="docutils literal notranslate"><span class="pre">s.close()</span></code>. However, B might equally well call <code class="docutils literal notranslate"><span class="pre">shutdown()</span></code> immediately on startup, as it does not intend to write any data, in which case A’s received end-of-file is <strong>not</strong> an indication it is safe to close.</p>
+<p>See also exercises 13.0 and 15.0.</p>
+</div>
+</div>
+<div class="section" id="epilog">
+<h2>17.9&nbsp;&nbsp;&nbsp;Epilog<a class="headerlink" href="#epilog" title="Permalink to this headline">¶</a></h2>
+<p>At this point we have covered the basic mechanics of TCP. The next chapter discusses, among other things, some of the subtle issues TCP must deal with in order to maintain reliability.</p>
+</div>
+<div class="section" id="exercises">
+<span id="tcpa-exercises"></span><span id="tcp-exercises"></span><h2>17.10&nbsp;&nbsp;&nbsp;Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<p><em>Exercises may be given fractional (floating point) numbers, to allow for interpolation of new exercises.</em></p>
+<p>1.0. Experiment with the TCP version of simplex-talk. How does the server respond differently with threading enabled and without, if two simultaneous attempts to connect are made, from two different client instances?</p>
+<p>2.0. Trace the states visited if nodes A and B attempt to create a TCP connection by <em>simultaneously</em> sending each other SYN packets, that then cross in the network. Draw the ladder diagram, and label the states on each side. Hint: there should be two pairs of crossing packets. A SYN+ACK counts, in the state diagram, as an ACK.</p>
+<p>3.0. Suppose nodes A and B are each behind their own NAT firewall (<a class="reference internal" href="ipv4.html#nat"><span class="std std-ref">9.7&nbsp;&nbsp;&nbsp;Network Address Translation</span></a>).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>A ──── NAT_A ──── Internet ──── NAT_B ──── B
+</pre></div>
+</div>
+<p>A and B attempt to connect to one another, using TCP; A uses source port 2000 and B uses 3000. A sends to the public IPv4 address of NAT_B, port 3000, and B sends to NAT_A, port 2000. Assume that neither NAT_A nor NAT_B changes the port numbers in outgoing packets, at least for the packets involved in this connection attempt.</p>
+<p>(a). Suppose A sends a SYN packet to (NAT_B, 3000). It will be rejected at NAT_B, as the connection was not initiated by B. However, a short while later, B sends a SYN packet to (NAT_A, 2000). Explain why this second SYN packet <em>is</em> delivered to A.</p>
+<p>(b). Now suppose A and B attempt to connect simultaneously, each sending a SYN to the other. Show that the connection succeeds.</p>
+<p>4.0. When two nodes A and B simultaneously attempt to connect to one another using the OSI TP4 protocol, two bidirectional network connections are created (rather than one, as with TCP).</p>
+<p>(a). Explain why this semantics is impossible with the existing TCP header. Hint: if a packet from ⟨A,port1⟩ arrives at ⟨B,port2⟩, how would the receiver tell to which of the two possible connections it belongs?</p>
+<p>(b). Propose an additional field in the TCP header that would allow implementation of the TP4 semantics.</p>
+<p>5.0. Simultaneous connection initiations are rare, but simultaneous connection termination is relatively common. How do two TCP nodes negotiate the simultaneous sending of FIN packets to one another? Draw the ladder diagram, and label the states on each side. Which node goes into TIMEWAIT state? Hint: there should be two pairs of crossing packets.</p>
+<p>6.0. The state diagram at <a class="reference internal" href="#tcp-state-diagram"><span class="std std-ref">17.8&nbsp;&nbsp;&nbsp;TCP state diagram</span></a> shows a dashed path from FIN_WAIT_1 to TIMEWAIT on receipt of FIN+ACK. All FIN packets contain a valid ACK field, but that is not what is meant here. Under what circumstances is this direct arc from FIN_WAIT_1 to TIMEWAIT taken? Explain why this arc can never be used during simultaneous close. Hint: consider the ladder diagram of a “normal” close.</p>
+<p>7.0. (a) Suppose you see multiple connections on your workstation in state FIN_WAIT_1. What is likely going on? Whose fault is it?</p>
+<p>(b). What might be going on if you see connections languishing in state FIN_WAIT_2?</p>
+<p>8.0. Suppose that, after downloading a file, the client host is unplugged from the network, so it can send no further packets. The server’s connection is still in the ESTABLISHED state. In each case below, use the TCP state diagram to list all states that are reachable by the server.</p>
+<div class="line-block">
+<div class="line">(a). Before being unplugged, the client was in state ESTABLISHED; <em>ie</em> it had <em>not</em> sent the first FIN.</div>
+<div class="line">(b). Before being unplugged the client had sent its FIN, and moved to FIN_WAIT_1.</div>
+</div>
+<p>Eventually, the server connection here would in fact transition to CLOSED due to repeated timeouts. For this exercise, though, assume only transitions explicitly shown in the state diagram are allowed.</p>
+<p>9.0. In <a class="reference internal" href="#tcp-connection-establishment"><span class="std std-ref">17.3&nbsp;&nbsp;&nbsp;TCP Connection Establishment</span></a> we noted that RST packets had to have a valid SEQ value, but that “<span class="target" id="index-59"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc793.html"><strong>RFC 793</strong></a> does not require the RST packet’s ACK value to match”. There is an exception for RST packets arriving at state SYN-SENT: “the RST is acceptable if the ACK field acknowledges the SYN”.  Explain the reasoning behind this exception.</p>
+<p>10.0. Suppose A and B create a TCP connection with ISN<sub>A</sub>=20,000 and ISN<sub>B</sub>=5,000. A sends three 1000-byte packets (Data1, Data2 and Data3 below), and B ACKs each. Then B sends a 1000-byte packet DataB to A and terminates the connection with a FIN. In the table below, fill in the SEQ and ACK fields for each packet shown.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="48%" />
+<col width="52%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">A sends</th>
+<th class="head">B sends</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>SYN, ISN<sub>A</sub>=20,000</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td></td>
+<td>SYN, ISN<sub>B</sub>=5,000, ACK=______</td>
+</tr>
+<tr class="row-even"><td>ACK, SEQ=______, ACK=______</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>Data1, SEQ=______, ACK=______</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td></td>
+<td>ACK, SEQ=______, ACK=______</td>
+</tr>
+<tr class="row-odd"><td>Data2, SEQ=______, ACK=______</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td></td>
+<td>ACK, SEQ=______, ACK=______</td>
+</tr>
+<tr class="row-odd"><td>Data3, SEQ=______, ACK=______</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td></td>
+<td>ACK, SEQ=______, ACK=______</td>
+</tr>
+<tr class="row-odd"><td></td>
+<td>DataB, SEQ=______, ACK=______</td>
+</tr>
+<tr class="row-even"><td>ACK, SEQ=_____, ACK=______</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td></td>
+<td>FIN, SEQ=______, ACK=______</td>
+</tr>
+</tbody>
+</table>
+<p>11.0. Suppose you are downloading a large file, and there is a progress bar showing how much of the file has been downloaded. For definiteness, assume the progress bar moves 1 mm for each megabyte received by the application, and the throughput averages 0.5 MB per second (so the progress bar normally advances at a rate of 0.5 mm/sec).</p>
+<p>You see the progress bar stop advancing for an interval of time. Suddenly, it jumps forward 5 mm, and then resumes its steady 0.5 mm/sec advance.</p>
+<p>(a). Explain the jump in terms of a lost packet and subsequent timeout and retransmission.</p>
+<p>(b). Give an approximate value for the connection winsize, assuming only one packet was lost.</p>
+<p>12.0. Suppose you are creating software for a streaming-video site. You want to limit the video read-ahead – the gap between how much has been downloaded and how much the viewer has actually watched – to approximately 1 MB; the server should pause in sending when necessary to enforce this. On the other hand, you do want the receiver to be able to read ahead by up to this much. You should assume that the TCP connection throughput will be higher than the actual video-data-consumption rate.</p>
+<div class="line-block">
+<div class="line">(a). Suppose the TCP window size happens to be exactly 1 MB. If the receiver simply reads each video frame from the TCP connection, displays it, and then pauses briefly before reading the next frame in accordance with the frame rate, explain how the flow-control mechanism of <a class="reference internal" href="tcpB.html#tcp-flow-control"><span class="std std-ref">18.10&nbsp;&nbsp;&nbsp;TCP Flow Control</span></a> will achieve the desired effect.</div>
+</div>
+<div class="line-block">
+<div class="line">(b). Applications, however, cannot control their TCP window size. Suppose the receiver application reads 1 MB ahead of what is being displayed, and then stops reading, until more can be displayed. Again, explain how the TCP flow-control mechanism will soon cause the sender to stop sending. (Specifically, the sender would never send more than winsize+1MB ahead of what was necessary.)</div>
+</div>
+<p>(It is also possible to implement sender pauses via an application-layer protocol.)</p>
+<p>13.0. Modify the simplex-talk server of <a class="reference internal" href="#tcp-simplex-talk"><span class="std std-ref">17.6&nbsp;&nbsp;&nbsp;TCP simplex-talk</span></a> so that <code class="docutils literal notranslate"><span class="pre">line_talker()</span></code> breaks out of the <code class="docutils literal notranslate"><span class="pre">while</span></code> loop as soon as it has printed the first string received (or simply remove the while loop). Once out of the <code class="docutils literal notranslate"><span class="pre">while</span></code> loop, the existing code calls <code class="docutils literal notranslate"><span class="pre">s.close()</span></code>.</p>
+<div class="line-block">
+<div class="line">(a). Start up the modified server, and connect to it with a client. Send a single message line, and use <code class="docutils literal notranslate"><span class="pre">netstat</span></code> to examine the TCP states of the client and server. What are these states?</div>
+</div>
+<div class="line-block">
+<div class="line">(b). Send two message lines to the server. What are the TCP states of the client and server?</div>
+</div>
+<div class="line-block">
+<div class="line">(c). Send three message lines to the server. Is there an error message at the client?</div>
+</div>
+<div class="line-block">
+<div class="line">(d). Send two message lines to the server, while monitoring packets with <a class="reference external" href="http://www.wireshark.org/">WireShark</a>. The WireShark filter expression <code class="docutils literal notranslate"><span class="pre">tcp.port</span> <span class="pre">==</span> <span class="pre">5431</span></code> may be useful for eliminating irrelevant traffic. What FIN packets do you see? Do you see a RST packet?</div>
+</div>
+<p>14.0. Outline a scenario in which TCP endpoint A sends data to B and then calls <code class="docutils literal notranslate"><span class="pre">close()</span></code> on its socket, and after the connection terminates B has not received all the data, even though the network has not failed. In the style of <a class="reference internal" href="#tcp-client"><span class="std std-ref">17.6.1&nbsp;&nbsp;&nbsp;The TCP Client</span></a>, A’s code might look like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">s</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Socket</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">destport</span><span class="p">);</span>
+<span class="n">sout</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">getOutputStream</span><span class="p">();</span>
+<span class="n">sout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">large_buffer</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Hint: see <a class="reference internal" href="#calling-close"><span class="std std-ref">17.8.2&nbsp;&nbsp;&nbsp;Calling close()</span></a>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="tcpB.html" title="18   TCP Issues and Alternatives"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="udp.html" title="16   UDP Transport"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, desktop edition 2.0.11</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012-2022, Peter L Dordal.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

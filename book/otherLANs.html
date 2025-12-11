@@ -1,0 +1,728 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>5   Other LANs &#8212; An Introduction to Computer Networks, desktop edition 2.0.11</title>
+    <link rel="stylesheet" href="_static/csbnetbook.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script type="text/javascript" src="_static/mobile.js"></script>
+    <script type="text/javascript" src="_static/rightsidebar.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="6   Links" href="links.html" />
+    <link rel="prev" title="4   Wireless LANs" href="wireless.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="links.html" title="6   Links"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="wireless.html" title="4   Wireless LANs"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, desktop edition 2.0.11</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5&nbsp;&nbsp;&nbsp;Other LANs</a><ul>
+<li><a class="reference internal" href="#virtual-private-networks">5.1&nbsp;&nbsp;&nbsp;Virtual Private Networks</a></li>
+<li><a class="reference internal" href="#carrier-ethernet">5.2&nbsp;&nbsp;&nbsp;Carrier Ethernet</a></li>
+<li><a class="reference internal" href="#token-ring">5.3&nbsp;&nbsp;&nbsp;Token Ring</a></li>
+<li><a class="reference internal" href="#virtual-circuits">5.4&nbsp;&nbsp;&nbsp;Virtual Circuits</a></li>
+<li><a class="reference internal" href="#asynchronous-transfer-mode-atm">5.5&nbsp;&nbsp;&nbsp;Asynchronous Transfer Mode: ATM</a><ul>
+<li><a class="reference internal" href="#atm-segmentation-and-reassembly">5.5.1&nbsp;&nbsp;&nbsp;ATM Segmentation and Reassembly</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#epilog">5.6&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li><a class="reference internal" href="#exercises">5.7&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="wireless.html"
+                        title="previous chapter">4&nbsp;&nbsp;&nbsp;Wireless LANs</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="links.html"
+                        title="next chapter">6&nbsp;&nbsp;&nbsp;Links</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="other-lans">
+<span id="id1"></span><h1>5&nbsp;&nbsp;&nbsp;Other LANs<a class="headerlink" href="#other-lans" title="Permalink to this headline">¶</a></h1>
+<p>In the wired era, one could get along quite well with nothing but Ethernet and the occasional long-haul point-to-point link joining different sites. However, there are important wired alternatives out there. Some, like token ring, are mostly of historical importance; others, like virtual circuits, are of great conceptual importance but – so far – of relatively modest day-to-day significance (though see MPLS, <a class="reference internal" href="realtime.html#mpls"><span class="std std-ref">25.12&nbsp;&nbsp;&nbsp;Multi-Protocol Label Switching (MPLS)</span></a>).</p>
+<div class="section" id="virtual-private-networks">
+<span id="vpn"></span><span id="index-0"></span><h2>5.1&nbsp;&nbsp;&nbsp;Virtual Private Networks<a class="headerlink" href="#virtual-private-networks" title="Permalink to this headline">¶</a></h2>
+<p>Suppose you want to connect to your workplace network from home. Your workplace, however, has a security policy that does not allow “outside” IP addresses to access essential internal resources. How do you proceed, without leasing a dedicated telecommunications line to your workplace?</p>
+<p id="index-1">A virtual private network, or <strong>VPN</strong>, provides a solution; it supports creation of <strong>virtual links</strong> that join far-flung nodes via the Internet. Your home computer creates an ordinary Internet connection (TCP or UDP) to a workplace <strong>VPN server</strong> (IP-layer packet encapsulation can also be used, and avoids the timeout problems sometimes created by sending TCP packets within another TCP stream; see <a class="reference internal" href="ipv4.html#mobile-ip"><span class="std std-ref">9.9&nbsp;&nbsp;&nbsp;Mobile IP</span></a>). Each end of the connection is typically associated with a software-created <strong>virtual network interface</strong>; each of the two virtual interfaces is assigned an IP address. (Virtual interfaces are not essential; VPNs created with IPsec, <a class="reference internal" href="publickey.html#ipsec"><span class="std std-ref">29.6&nbsp;&nbsp;&nbsp;IPsec</span></a>, generally omit them.) When a packet is to be sent along the virtual link, it is actually encapsulated and sent along the original Internet connection to the VPN server, wending its way through the commodity Internet; this process is called <strong>tunneling</strong>. To all intents and purposes, the virtual link behaves like any other physical link.</p>
+<p>Tunneled packets are often encrypted as well as encapsulated, though that is a separate issue. One relatively easy-to-implement example of a tunneling mechanism is to treat a TCP home-workplace connection as a serial line and send packets over it back-to-back, using PPP with HDLC; see <a class="reference internal" href="links.html#hdlc"><span class="std std-ref">6.1.5.1&nbsp;&nbsp;&nbsp;HDLC</span></a> and <span class="target" id="index-2"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1661.html"><strong>RFC 1661</strong></a> (though this can lead to the above-mentioned TCP-in-TCP timeout problems).</p>
+<p>At the workplace side, the virtual network interface in the VPN server is attached to a router or switch; at the home user’s end, the virtual network interface can now be assigned an <em>internal</em> workplace IP address. The home computer is now, for all intents and purposes, part of the internal workplace network.</p>
+<p>In the diagram below, the user’s regular Internet connection is via hardware interface <code class="docutils literal notranslate"><span class="pre">eth0</span></code>. A connection is established to Site A’s VPN server; a virtual interface <code class="docutils literal notranslate"><span class="pre">tun0</span></code> is created on the user’s machine which appears to be a direct link to the VPN server. The <code class="docutils literal notranslate"><span class="pre">tun0</span></code> interface is assigned a Site-A IP address. Packets sent via the <code class="docutils literal notranslate"><span class="pre">tun0</span></code> interface in fact travel over the original connection via <code class="docutils literal notranslate"><span class="pre">eth0</span></code> and the Internet.</p>
+<img alt="_images/vpn.svg" src="_images/vpn.svg" /><p>After the VPN is set up, the home host’s <code class="docutils literal notranslate"><span class="pre">tun0</span></code> interface appears to be locally connected to Site A, and thus the home host is allowed to connect to the private area within Site A. The home host’s forwarding table will be configured so that traffic to Site A’s private addresses is routed via interface <code class="docutils literal notranslate"><span class="pre">tun0</span></code>.</p>
+<p>VPNs are also commonly used to connect entire remote offices to headquarters. In this case the remote-office end of the tunnel will be at that office’s local router, and the tunnel will carry traffic for all the workstations in the remote office.</p>
+<p>Other applications of VPNs include trying to appear geographically to be at another location, and bypassing firewall rules blocking specific TCP or UDP ports.</p>
+<p id="index-3">To improve security, it is common for the residential (or remote-office) end of the VPN connection to use the VPN connection as the default route for all traffic <em>except</em> that needed to maintain the VPN itself. This may require a so-called <strong>host-specific</strong> forwarding-table entry at the residential end to allow the packets that carry the VPN tunnel traffic to be routed correctly via <code class="docutils literal notranslate"><span class="pre">eth0</span></code>. This routing strategy means that potential intruders cannot access the residential host – and thus the workplace internal network – through the original residential Internet access. A consequence is that if the home worker downloads a large file from a non-workplace site, it will travel first to the workplace, then back out to the Internet via the VPN connection, and finally arrive at the home.</p>
+<p id="index-4">To improve congestion response, IP packets are sometimes marked by routers that are experiencing congestion; see <a class="reference internal" href="dynamicsB.html#ecn"><span class="std std-ref">21.5.3&nbsp;&nbsp;&nbsp;Explicit Congestion Notification (ECN)</span></a>. If such marking is done to the outer, encapsulating, packet, and the marks are not transferred at the remote endpoint of the VPN to the inner, encapsulat<em>ed</em>, packet, then the marks are lost. Congestion response may suffer. <span class="target" id="index-5"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc6040.html"><strong>RFC 6040</strong></a> spells out a proper re-marking strategy in general; <span class="target" id="index-6"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc7296.html"><strong>RFC 7296</strong></a> defines re-marking for IPsec (<a class="reference internal" href="publickey.html#ipsec"><span class="std std-ref">29.6&nbsp;&nbsp;&nbsp;IPsec</span></a>). Older VPN protocols, however, may not support congestion re-marking.</p>
+</div>
+<div class="section" id="carrier-ethernet">
+<span id="index-7"></span><span id="id2"></span><h2>5.2&nbsp;&nbsp;&nbsp;Carrier Ethernet<a class="headerlink" href="#carrier-ethernet" title="Permalink to this headline">¶</a></h2>
+<p>Carrier Ethernet is a leased-line point-to-point link between two sites, where the subscriber interface at each end of the line looks like Ethernet (in some flavor). The physical path in between sites, however, need not have anything to do with Ethernet; it may be implemented however the carrier wishes. In particular, it will be (or at least appear to be) full-duplex, it will be collision-free, and its length may far exceed the maximum permitted by any IEEE Ethernet standard.</p>
+<p>As we have seen, Ethernet itself has become a kind of generic virtual interface for a wide variety of physical implementations and speeds. Carrier Ethernet takes this view to its logical conclusion: it is Ethernet <em>only</em> in terms of the endpoint interfaces; the intervening network can be anything at all.</p>
+<p>Bandwidth can be purchased in whatever increments the carrier has implemented, and uplink bandwidth can be very different from downlink. It is perfectly reasonable for the endpoint Ethernet interfaces to be much faster than the bandwidth provided, <em>eg</em> Gigabit Ethernet interfaces for a 40 Mbps link. The point of carrier Ethernet is to provide a layer of abstraction between the customers, who need only install a commodity Ethernet interface, and the provider, who can upgrade the link implementation at will without requiring change at the customer end.</p>
+<p>In a sense, carrier Ethernet is similar to the widespread practice of provisioning residential DSL and cable routers with an Ethernet interface for customer interconnection; again, the actual link technologies may not look anything like Ethernet, but the interface will.</p>
+<p>A carrier Ethernet connection looks like a virtual VPN link, but runs on top of the provider’s internal network rather than the Internet at large. Carrier Ethernet connections often provide the primary Internet connectivity for one endpoint, unlike Internet VPNs which assume both endpoints already have full Internet connectivity.</p>
+</div>
+<div class="section" id="token-ring">
+<span id="index-8"></span><span id="id3"></span><h2>5.3&nbsp;&nbsp;&nbsp;Token Ring<a class="headerlink" href="#token-ring" title="Permalink to this headline">¶</a></h2>
+<p>A significant part of the previous chapter was devoted to classic Ethernet’s collision mechanism for supporting shared media access. After that, it may come as a surprise that there is a simple multiple-access mechanism that is not only <strong>collision-free</strong>, but which supports <strong>fairness</strong> in the sense that if N stations wish to send then each will receive 1/N of the opportunities.</p>
+<p>That method is <strong>Token Ring</strong>. Actual implementations come in several forms, from Fiber-Distributed Data Interface (FDDI) to so-called “IBM Token Ring”. The central idea is that stations are connected in a ring:</p>
+<img alt="_images/tokenring.svg" src="_images/tokenring.svg" /><p>Packets will be transmitted in one direction (clockwise in the ring above). Stations in effect forward most packets around the ring, although they can also remove a packet. (It is perhaps more accurate to think of the forwarding as representing the default cable connectivity; <em>non</em>-forwarding represents the station’s momentarily breaking that connectivity.)</p>
+<p>When the network is idle, all stations agree to forward a special, small packet known as a <em>token</em>. When a station, say A, wishes to transmit, it must first wait for the token to arrive at A. Instead of forwarding the token, A then transmits its own packet; this travels around the network and is then removed by A. At that point (or in some cases at the point when A finishes transmitting its data packet) A then forwards the token.</p>
+<p>In a small ring network, the ring circumference may be a small fraction of one packet. Ring networks become “large” at the point when some packets may be entirely in transit on the ring. Slightly different solutions apply in each case. (It is also possible that the physical ring exists only within the token-ring switch, and that stations are connected to that switch using the usual point-to-point wiring.)</p>
+<p>If all stations have packets to send, then we will have something like the following:</p>
+<ul class="simple">
+<li>A waits for the token</li>
+<li>A sends a packet</li>
+<li>A sends the token to B</li>
+<li>B sends a packet</li>
+<li>B sends the token to C</li>
+<li>C sends a packet</li>
+<li>C sends the token to D</li>
+<li>…</li>
+</ul>
+<p>All stations get an equal number of chances to transmit, and no bandwidth is wasted on collisions. (A station constantly sending smaller packets will send the same number of packets as a station constantly sending larger packets, but the bandwidth will be smaller in proportion to the smaller packet size.)</p>
+<p>One problem with token ring is that when stations are powered off it is <em>essential</em> that the packets continue forwarding; this is usually addressed by having the default circuit configuration be to keep the loop closed. Another issue is that some station has to watch out in case the token disappears, or in case a duplicate token appears.</p>
+<p>Because of fairness and the lack of collisions, IBM Token Ring was once considered to be the premium LAN mechanism. As such, Token Ring hardware commanded a substantial price premium. But due to Ethernet’s combination of lower hardware costs and higher bitrates (even taking collisions into account), the latter eventually won out.</p>
+<p id="index-9">There was also a much earlier collision-free hybrid of 10 Mbps Ethernet and Token Ring known as <strong>Token Bus</strong>: an Ethernet physical network (often linear) was used with a token-ring-like protocol layer above that. Stations were physically connected to the (linear) Ethernet but were assigned identifiers that logically arranged them in a (virtual) ring. Each station had to wait for the token and only then could transmit a packet; after that it would send the token on to the next station in the virtual ring. As with “real” Token Ring, some mechanisms need to be in place to monitor for token loss.</p>
+<p>Token Bus Ethernet never caught on. The additional software complexity was no doubt part of the problem, but perhaps the real issue was that it was not necessary.</p>
+</div>
+<div class="section" id="virtual-circuits">
+<span id="index-10"></span><span id="id4"></span><h2>5.4&nbsp;&nbsp;&nbsp;Virtual Circuits<a class="headerlink" href="#virtual-circuits" title="Permalink to this headline">¶</a></h2>
+<p>Before we can get to our final LAN example, ATM, we need to detour briefly through virtual circuits.</p>
+<div class="sidebar" id="index-11">
+<p class="first sidebar-title"><a class="reference external" href="http://www.bartleby.com/119/1.html">The Road Not Taken</a></p>
+<p class="last">A close reading of Robert Frost’s poem referenced here reveals that the supposed great difference between the two roads exists only in the narrator’s retrospective imaginings; the roads were in fact “really about the same”. Perhaps this would also apply to datagram and virtual-circuit forwarding, though see below on per-connection billing.</p>
+</div>
+<p>Virtual circuits are <a class="reference external" href="http://www.bartleby.com/119/1.html">The Road Not Taken</a> by IP.</p>
+<p>Virtual-circuit switching (or routing) is an alternative to datagram switching, which was introduced in Chapter 1. In datagram switching, routers know the next_hop to each destination, and packets are addressed by <em>destination</em>. In virtual-circuit switching, routers know about end-to-end <em>connections</em>, and packets are “addressed” by a connection ID.</p>
+<p id="index-12">Before any data packets can be sent, a connection needs to be established first. For that connection, the route is computed and then each link along the path is assigned a connection ID, traditionally called the <strong>VCI</strong>, for Virtual Circuit Identifier. In most cases, VCIs are only <em>locally</em> unique; that is, the same connection may use a different VCI on each link. The lack of global uniqueness makes VCI allocation much simpler. Although the VCI keeps changing along a path, the VCI can still be thought of as identifying the connection. To send a packet, the host marks the packet with the VCI assigned to the host–router1 link.</p>
+<p id="index-13">Packets arrive at (and depart from) switches via one of several <strong>ports</strong>, which we
+will assume are numbered beginning at 0. Switches maintain a <strong>connection table</strong> indexed by ⟨VCI,port⟩ pairs; unlike a forwarding table, the connection table has a record of every connection through that switch at that particular moment. As a packet arrives, its inbound
+VCI<sub>in</sub> and inbound port<sub>in</sub> are looked up in this table; this yields an outbound ⟨VCI<sub>out</sub>,port<sub>out</sub>⟩ pair. The VCI field of the packet is then <em>rewritten</em> to VCI<sub>out</sub>, and the packet is sent via port<sub>out</sub>.</p>
+<p>Note that typically there is no source address information included in the packet (although the sender can be identified from the connection, which can be identified from the VCI at any point along the connection). Packets are identified by connection, not destination. Any node along the path (including the endpoints) can in principle look up the connection and figure out the endpoints.</p>
+<p>Note also that each switch must rewrite the VCI. Datagram switches never rewrite addresses (though they do update hopcount/TTL fields). The advantage to this rewriting is that VCIs need be unique only for a given link, greatly simplifying the naming. Datagram switches also do not make use of a packet’s arrival interface.</p>
+<p>As an example, consider the network below. Switch ports are numbered 0,1,2,3. Two paths are drawn in, one from A to F in red and one from B to D in green; each link is labeled with its VCI number in the same color.</p>
+<div class="figure">
+<img alt="_images/virtualcircuit.svg" src="_images/virtualcircuit.svg" /></div>
+<p>We will construct virtual-circuit connections between</p>
+<ul class="simple">
+<li>A and F (shown above in red)</li>
+<li>A and E</li>
+<li>A and C</li>
+<li>B and D (shown above in green)</li>
+<li>A and F again (a separate connection)</li>
+</ul>
+<p>The following VCIs have been chosen for these connections. The choices are made more or less randomly here, but in accordance with the requirement that they be unique to each link. Because links are generally taken to be bidirectional, a VCI used from S1 to
+S3 cannot be reused from S3 to S1 until the first connection closes.</p>
+<ul class="simple">
+<li>A to F: A──4──S1──6──S2──4──S4──8──S5──5──F; this path goes from S1 to S4 via S2</li>
+<li>A to E: A──5──S1──6──S3──3──S4──8──E; this path goes, for no particular reason, from S1 to S4 via S3, the opposite corner of the square</li>
+<li>A to C: A──6──S1──7──S3──3──C</li>
+<li>B to D: B──4──S3──8──S1──7──S2──8──D</li>
+<li>A to F: A──7──S1──8──S2──5──S4──9──S5──2──F</li>
+</ul>
+<p>One may verify that on any one link no two different paths use the same VCI.</p>
+<p>We now construct the actual ⟨VCI,port⟩ tables for the switches S1-S4, from the above; the table for S5 is left as an exercise. Note that either the ⟨VCI<sub>in</sub>,port<sub>in</sub>⟩ or
+the ⟨VCI<sub>out</sub>,port<sub>out</sub>⟩ can be used as the key; we cannot have the same pair in both the in columns and the out columns. It may help to display the port numbers for each switch, as in the upper numbers in following diagram of the above red connection from A to F (lower numbers are the VCIs):</p>
+<img alt="_images/linear_circuit.svg" src="_images/linear_circuit.svg" /><p>Switch <strong>S1</strong>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="21%" />
+<col width="21%" />
+<col width="22%" />
+<col width="17%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">VCI<sub>in</sub></th>
+<th class="head">port<sub>in</sub></th>
+<th class="head">VCI<sub>out</sub></th>
+<th class="head">port<sub>out</sub></th>
+<th class="head">connection</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>4</td>
+<td>0</td>
+<td>6</td>
+<td>2</td>
+<td>A⟶F #1</td>
+</tr>
+<tr class="row-odd"><td>5</td>
+<td>0</td>
+<td>6</td>
+<td>1</td>
+<td>A⟶E</td>
+</tr>
+<tr class="row-even"><td>6</td>
+<td>0</td>
+<td>7</td>
+<td>1</td>
+<td>A⟶C</td>
+</tr>
+<tr class="row-odd"><td>8</td>
+<td>1</td>
+<td>7</td>
+<td>2</td>
+<td>B⟶D</td>
+</tr>
+<tr class="row-even"><td>7</td>
+<td>0</td>
+<td>8</td>
+<td>2</td>
+<td>A⟶F #2</td>
+</tr>
+</tbody>
+</table>
+<p>Switch <strong>S2</strong>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="21%" />
+<col width="21%" />
+<col width="22%" />
+<col width="17%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">VCI<sub>in</sub></th>
+<th class="head">port<sub>in</sub></th>
+<th class="head">VCI<sub>out</sub></th>
+<th class="head">port<sub>out</sub></th>
+<th class="head">connection</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>6</td>
+<td>0</td>
+<td>4</td>
+<td>1</td>
+<td>A⟶F #1</td>
+</tr>
+<tr class="row-odd"><td>7</td>
+<td>0</td>
+<td>8</td>
+<td>2</td>
+<td>B⟶D</td>
+</tr>
+<tr class="row-even"><td>8</td>
+<td>0</td>
+<td>5</td>
+<td>1</td>
+<td>A⟶F #2</td>
+</tr>
+</tbody>
+</table>
+<p>Switch <strong>S3</strong>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="21%" />
+<col width="21%" />
+<col width="22%" />
+<col width="17%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">VCI<sub>in</sub></th>
+<th class="head">port<sub>in</sub></th>
+<th class="head">VCI<sub>out</sub></th>
+<th class="head">port<sub>out</sub></th>
+<th class="head">connection</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>6</td>
+<td>3</td>
+<td>3</td>
+<td>2</td>
+<td>A⟶E</td>
+</tr>
+<tr class="row-odd"><td>7</td>
+<td>3</td>
+<td>3</td>
+<td>1</td>
+<td>A⟶C</td>
+</tr>
+<tr class="row-even"><td>4</td>
+<td>0</td>
+<td>8</td>
+<td>3</td>
+<td>B⟶D</td>
+</tr>
+</tbody>
+</table>
+<p>Switch <strong>S4</strong>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="21%" />
+<col width="21%" />
+<col width="22%" />
+<col width="17%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">VCI<sub>in</sub></th>
+<th class="head">port<sub>in</sub></th>
+<th class="head">VCI<sub>out</sub></th>
+<th class="head">port<sub>out</sub></th>
+<th class="head">connection</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>4</td>
+<td>3</td>
+<td>8</td>
+<td>2</td>
+<td>A⟶F #1</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td>0</td>
+<td>8</td>
+<td>1</td>
+<td>A⟶E</td>
+</tr>
+<tr class="row-even"><td>5</td>
+<td>3</td>
+<td>9</td>
+<td>2</td>
+<td>A⟶F #2</td>
+</tr>
+</tbody>
+</table>
+<p>The namespace for VCIs is small, and compact (<em>eg</em> contiguous).
+Typically the VCI and port bitfields can be concatenated to produce
+a ⟨VCI,Port⟩ composite value small enough that it is suitable for use as an array index. VCIs work best as <em>local</em> identifiers. IP addresses, on the other hand, need to be globally unique, and thus are often rather sparsely distributed.</p>
+<p>Virtual-circuit switching offers the following advantages:</p>
+<ul class="simple">
+<li>connections can get quality-of-service guarantees, because the switches are aware of connections and can reserve capacity at the time the connection is made</li>
+<li>headers are smaller, allowing faster throughput</li>
+<li>headers are small enough to allow efficient support for the very small packet sizes that are optimal for voice connections. ATM packets, for instance, have 48 bytes of data; see below.</li>
+</ul>
+<p>Datagram forwarding, on the other hand, offers these advantages:</p>
+<ul class="simple">
+<li>Routers have less state information to manage.</li>
+<li>Router crashes and partial connection state loss are not a problem.</li>
+<li>If a router or link is disabled, rerouting is easy and does not affect any connection state. (As mentioned in Chapter 1, this was Paul Baran’s primary concern in his 1962 paper introducing packet switching.)</li>
+<li>Per-connection billing is very difficult.</li>
+</ul>
+<p>The last point above may once have been quite important; in the era when the ARPANET was being developed, typical daytime long-distance rates were on the order of $1/minute. It is unlikely that early TCP/IP protocol development would have been as fertile as it was had participants needed to justify per-minute billing costs for every project.</p>
+<p>It is certainly possible to do virtual-circuit switching with globally unique VCIs – say the concatenation of source and destination IP addresses and port numbers. The IP-based RSVP protocol (<a class="reference internal" href="realtime.html#rsvp"><span class="std std-ref">25.6&nbsp;&nbsp;&nbsp;RSVP</span></a>) does exactly this. However, the fast-lookup and small-header advantages of a compact namespace are then lost.</p>
+<p>Multi-Protocol Label Switching (<a class="reference internal" href="realtime.html#mpls"><span class="std std-ref">25.12&nbsp;&nbsp;&nbsp;Multi-Protocol Label Switching (MPLS)</span></a>) is another IP-based application of virtual circuits.</p>
+<p>Note that virtual-circuit switching does <em>not</em> suffer from the problem of idle channels still consuming resources, which is an issue with circuits using time-division multiplexing (<em>eg</em> shared T1 lines)</p>
+</div>
+<div class="section" id="asynchronous-transfer-mode-atm">
+<span id="atm"></span><span id="index-14"></span><h2>5.5&nbsp;&nbsp;&nbsp;Asynchronous Transfer Mode: ATM<a class="headerlink" href="#asynchronous-transfer-mode-atm" title="Permalink to this headline">¶</a></h2>
+<p>ATM is a network mechanism intended to accommodate real-time traffic as well as bulk data transfer. We present ATM here as a LAN layer, for which it is still sometimes used, but it was originally proposed as a replacement for the IP layer as well, and, to an extent, the Transport layer. These broader plans were not greeted with universal enthusiasm within the IETF. When used as a LAN layer, IP packets are transmitted over ATM as in <a class="reference internal" href="#atm-sar"><span class="std std-ref">5.5.1&nbsp;&nbsp;&nbsp;ATM Segmentation and Reassembly</span></a>.</p>
+<p>A distinctive feature of ATM is its small packet size. ATM has its roots in the telephone industry, and was therefore particularly intended to support voice. A significant source of delay in voice traffic is the packet <strong>fill time</strong>: at DS0 speeds (64 kbps), voice data accumulates at 8 bytes/ms. If we are sending 1 kB packets, this means voice is delayed by about 1/8 second, meaning in turn that when one person stops speaking, the earliest they can hear the other’s response is 1/4 second later. Slightly smaller levels of voice delay can introduce an annoying echo. Smaller packets reduce the fill time and thus the delay: when voice is sent over IP (VoIP), one common method is to send 160 bytes every 20 ms.</p>
+<p>ATM took this small-packet strategy even further: packets have 48 bytes of data, plus 5 bytes of header. Such small packets are often called <em>cells</em>. To manage such a small header, virtual-circuit routing is a necessity. IP packets of such small size would likely consume more than 50% of the bandwidth on headers, if the LAN header were included.</p>
+<p>Aside from reduced voice fill-time, other benefits to small cells are reduced store-and-forward delay and minimal queuing delay, at least for high-priority traffic. Prioritizing traffic and giving precedence to high-priority traffic is standard, but high-priority traffic is never allowed to <em>interrupt</em> transmission already begun of a low-priority packet. If you have a high-priority voice cell, and someone else has a 1500-byte packet just started, your cell has to wait about 30 cell times, because 1500 bytes is about 30 cells. However, if their low-priority traffic is instead made up of 30 cells, you have only to wait for their first cell to finish; the delay is 1/30 as much.</p>
+<p>ATM also made the decision to require <strong>fixed-size</strong> cells. The penalty for one partially used cell among many is small. Having a fixed cell size simplifies hardware design, and, in theory, allows it easier to design for parallelism.</p>
+<p>Unfortunately, the designers of ATM also chose to mandate <strong>no cell reordering</strong>. This means cells can use a smaller sequence-number field, but also makes parallel switches much harder to build. A typical parallel switch design might involve distributing incoming cells among any of several input queues; the queues would then handle the VCI lookups in parallel and forward the cells to the appropriate output queues. With such an architecture, avoiding reordering is difficult. It is not clear to what extent the no-reordering decision was related to the later decline of ATM in the marketplace.</p>
+<p id="index-15">ATM cells have 48 bytes of data and a 5-byte header. The header contains up to 28 bits of VCI information, three “type” bits, one <strong>cell-loss priority</strong>, or CLP, bit, and an 8-bit checksum over the header only. The VCI is divided into 8-12 bits of Virtual Path Identifier and 16 bits of Virtual Channel Identifier, the latter supposedly for customer use to separate out multiple connections between two endpoints. Forwarding is by full switching only, and there is no mechanism for physical (LAN) broadcast.</p>
+<div class="section" id="atm-segmentation-and-reassembly">
+<span id="atm-sar"></span><h3>5.5.1&nbsp;&nbsp;&nbsp;ATM Segmentation and Reassembly<a class="headerlink" href="#atm-segmentation-and-reassembly" title="Permalink to this headline">¶</a></h3>
+<p>Due to the small packet size, ATM defines its own mechanisms for segmentation and reassembly of larger packets. Thus, individual ATM links in an IP network are quite practical. These mechanisms are called <strong>ATM Adaptation Layers</strong>, and there are four of them: AALs 1, 2, 3/4 and 5 (AAL 3 and AAL 4 were once separate layers, which merged). AALs 1 and 2 are used only for voice-type traffic; we will not consider them further.</p>
+<p>The ATM segmentation-and-reassembly mechanism defined here is intended to apply only to large <em>data</em>; no cells are ever further subdivided. Furthermore, segmentation is always applied at the point where the data enters the network; reassembly is done at exit from the ATM path. IPv4 fragmentation, on the other hand, applies conceptually to IP packets, and may be performed by routers within the network.</p>
+<p>For AAL 3/4, we first define a high-level “wrapper” for an IP packet, called the CS-PDU (Convergence Sublayer - Protocol Data Unit). This prefixes 32 bits on the front and another 32 bits (plus padding) on the rear. We then chop this into as many 44-byte chunks as are needed; each chunk goes into a 48-byte ATM payload, along with the following 32 bits worth of additional header/trailer:</p>
+<ul class="simple">
+<li>2-bit <strong>type</strong> field:<ul>
+<li>10: begin new CS-PDU</li>
+<li>00: continue CS-PDU</li>
+<li>01: end of CS-PDU</li>
+<li>11: single-segment CS-PDU</li>
+</ul>
+</li>
+<li>4-bit sequence number, 0-15, good for catching up to 15 dropped cells</li>
+<li>10-bit MessageID field</li>
+<li>CRC-10 checksum.</li>
+</ul>
+<p>We now have a total of 9 bytes of header for 44 bytes of data; this is more than 20% overhead. This did not sit well with the IP-over-ATM community (such as it was), and so AAL 5 was developed.</p>
+<p>AAL 5 moved the checksum to the CS-PDU and increased it to 32 bits from 10 bits. The MID field was discarded, as no one used it, anyway (if you wanted to send several different types of messages, you simply created several virtual circuits). A bit from the ATM header was taken over and used to indicate:</p>
+<ul class="simple">
+<li>1: start of new CS-PDU</li>
+<li>0: continuation of an existing CS-PDU</li>
+</ul>
+<p>The CS-PDU is now chopped into 48-byte chunks, which are then used as the
+entire body of each ATM cell. With 5 bytes of header for 48 bytes of data, overhead is down to 10%. Errors are detected by the CS-PDU CRC-32. This also detects lost cells (impossible with a per-cell CRC!), as we no longer have any cell sequence number.</p>
+<p>For both AAL3/4 and AAL5, <strong>reassembly</strong> is simply a matter of stringing together consecutive cells <strong>in order of arrival</strong>, starting a new CS-PDU whenever the appropriate bits indicate this. For AAL3/4 the receiver has to strip off the 4-byte AAL3/4 headers; for AAL5 the receiver has to verify the CRC-32 checksum once all cells are received. Note that this strategy can fail without the general ATM requirement of no cell reordering, above. Different cells from different virtual circuits can be jumbled together on the ATM “backbone”, but on any one virtual circuit the cells from one higher-level packet must be sent one right after the other.</p>
+<p>A typical IP packet divides into about 20 cells. For AAL 3/4, this means a total of 200 bits devoted to CRC codes, versus only 32 bits for AAL 5. It might seem that AAL 3/4 would be more reliable because of this, but, paradoxically, it was not! The reason for this is that errors are <em>rare</em>, and so we typically have one or at most two per CS-PDU. Suppose we have only a single error, <em>ie</em> a single cluster of corrupted bits small enough that it is likely confined to a single cell. In AAL 3/4 the CRC-10 checksum will fail to detect that error (that is, the checksum of the corrupted packet will by chance happen to equal the checksum of the original packet) with probability 1/2<sup>10</sup>. The AAL 5 CRC-32 checksum, however, will fail to detect the error with probability 1/2<sup>32</sup>. Even if there are enough errors that two cells are corrupted, the two CRC-10s together will fail to detect the error with probability 1/2<sup>20</sup>; the CRC-32 is better. AAL 3/4 is more reliable only when we have errors in at least four cells, at which point we might do better to switch to an error-<em>correcting</em> code.</p>
+<p>Moral: one checksum over the entire message is often better than multiple shorter checksums over parts of the message.</p>
+</div>
+</div>
+<div class="section" id="epilog">
+<h2>5.6&nbsp;&nbsp;&nbsp;Epilog<a class="headerlink" href="#epilog" title="Permalink to this headline">¶</a></h2>
+<p>There are not many wired LANs that are not called “Ethernet”.</p>
+<p>While it is sometimes tempting (in the IP world at least) to write off ATM as a niche technology, virtual circuits are a serious conceptual alternative to datagram forwarding. As we shall see in <a class="reference internal" href="realtime.html#quality-of-service"><span class="std std-ref">25&nbsp;&nbsp;&nbsp;Quality of Service</span></a>, IP has problems handling real-time traffic, and virtual circuits offer a solution. The Internet has so far embraced only small steps towards virtual circuits (such as MPLS, <a class="reference internal" href="realtime.html#mpls"><span class="std std-ref">25.12&nbsp;&nbsp;&nbsp;Multi-Protocol Label Switching (MPLS)</span></a>), but they remain a tantalizing strategy.</p>
+</div>
+<div class="section" id="exercises">
+<span id="other-lans-exercises"></span><h2>5.7&nbsp;&nbsp;&nbsp;Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<p><em>Exercises may be given fractional (floating point) numbers, to allow for interpolation of new exercises.</em>  Exercises marked with a ♢ have solutions or hints at <a class="reference internal" href="solutions.html#otherlans-solutions"><span class="std std-ref">34.5&nbsp;&nbsp;&nbsp;Solutions for Other LANs</span></a>.</p>
+<p>1.0. Suppose remote host A uses a VPN connection to connect to host B, with IP address 200.0.0.7. A’s normal Internet connection is via device <code class="docutils literal notranslate"><span class="pre">eth0</span></code> with IP address 12.1.2.3; A’s VPN connection is via device <code class="docutils literal notranslate"><span class="pre">ppp0</span></code> with IP address 10.0.0.44. Whenever A wants to send a packet via <code class="docutils literal notranslate"><span class="pre">ppp0</span></code>, it is encapsulated and forwarded over the connection to B at 200.0.0.7.</p>
+<div class="line-block">
+<div class="line">(a). Suppose A’s IP forwarding table is set up so that all traffic to 200.0.0.7 uses <code class="docutils literal notranslate"><span class="pre">eth0</span></code> and all traffic to anywhere else uses <code class="docutils literal notranslate"><span class="pre">ppp0</span></code>. What happens if an intruder M attempts to open a connection to A at 12.1.2.3? What route will packets from A to M take?</div>
+<div class="line">(b). Suppose A’s IP forwarding table is (mis)configured so that <em>all</em> outbound traffic uses <code class="docutils literal notranslate"><span class="pre">ppp0</span></code>. Describe what will happen when A tries to send a packet.</div>
+</div>
+<p>2.0. Suppose remote host A wishes to use a TCP-based VPN connection to connect to host B, with IP address 200.0.0.7. However, the VPN software is not available for host A. Host A is, however, able to run that software on a virtual machine V <em>hosted by</em> A; A and V have respective IP addresses 10.0.0.1 and 10.0.0.2 on the virtual network connecting them. V reaches the outside world through network address translation (<a class="reference internal" href="ipv4.html#nat"><span class="std std-ref">9.7&nbsp;&nbsp;&nbsp;Network Address Translation</span></a>), with A acting as V’s NAT router. When V runs the VPN software, it forwards packets addressed to B the usual way, through A using NAT. Traffic to any other destination it encapsulates over the VPN.</p>
+<p>Can A configure its IP forwarding table so that it can make use of the VPN? If not, why not? If so, how? (If you prefer, you may assume V is a physical host connecting to a second interface on A; A still acts as V’s NAT router.)</p>
+<p>3.0. Token Bus was a proprietary Ethernet-based network. It worked like Token Ring in that a small token packet was sent from one station to the next in agreed-upon order, and a station could transmit only when it had just received the token.</p>
+<div class="line-block">
+<div class="line">(a). If the data rate is 10 Mbps and the token is 64 bytes long (the 10-Mbps Ethernet minimum packet size), what is the average wait to receive the token on an idle network with 40 stations? (The average number of stations the token must pass through is 40/2 = 20.) Ignore the propagation delay and the gap Ethernet requires between packets.</div>
+<div class="line">(b)♢. Sketch a protocol by which stations can sort themselves out to decide the order of token transmission; that is, an order of the stations S<sub>0</sub> … S<sub>n-1</sub> where station S<sub>i</sub> sends the token to station S<sub>(i+1) mod n</sub>.</div>
+</div>
+<p>4.0. <a class="reference internal" href="bibliography.html#sm90" id="id6">[SM90]</a> contained a proposal for sending IP packets over ATM as N cells as in AAL-5, followed by one cell containing the XOR of all the previous cells. This way, the receiver can recover from the loss of any one cell. Suppose N=20 here; with the SM90 mechanism, each packet would require 21 cells to transmit; that is, we always send 5% more. Suppose the <em>cell</em> loss-rate is p (presumably very small). If we send 20 cells without the SM90 mechanism, we have a probability of about 20p that any one cell will be lost, and we will have to retransmit the entire 20 again. This gives an average retransmission amount of about 20p extra packets. For what value of p do the with-SM90 and the without-SM90 approaches involve about the same total number of cell transmissions?</p>
+<p>5.0. In the example in <a class="reference internal" href="#virtual-circuits"><span class="std std-ref">5.4&nbsp;&nbsp;&nbsp;Virtual Circuits</span></a>, give the VCI table for switch S5.</p>
+<p>6.0. Suppose we have the following network:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>A───S1────────S2───B
+    │         │
+    │         │
+    │         │
+C───S3────────S4───D
+</pre></div>
+</div>
+<p>The virtual-circuit switching tables are below. Ports are identified by the node at the other end. Identify all the connections that begin at A (and so have their first connection entry in the table for S1). Give the path for each connection and the VCI on each link of the path.</p>
+<p>Switch <strong>S1</strong>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="25%" />
+<col width="25%" />
+<col width="27%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">VCI<sub>in</sub></th>
+<th class="head">port<sub>in</sub></th>
+<th class="head">VCI<sub>out</sub></th>
+<th class="head">port<sub>out</sub></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1</td>
+<td>A</td>
+<td>2</td>
+<td>S3</td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td>A</td>
+<td>2</td>
+<td>S2</td>
+</tr>
+<tr class="row-even"><td>3</td>
+<td>A</td>
+<td>3</td>
+<td>S2</td>
+</tr>
+</tbody>
+</table>
+<p>Switch <strong>S2</strong>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="25%" />
+<col width="25%" />
+<col width="27%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">VCI<sub>in</sub></th>
+<th class="head">port<sub>in</sub></th>
+<th class="head">VCI<sub>out</sub></th>
+<th class="head">port<sub>out</sub></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>2</td>
+<td>S4</td>
+<td>1</td>
+<td>B</td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td>S1</td>
+<td>3</td>
+<td>S4</td>
+</tr>
+<tr class="row-even"><td>3</td>
+<td>S1</td>
+<td>4</td>
+<td>S4</td>
+</tr>
+</tbody>
+</table>
+<p>Switch <strong>S3</strong>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="25%" />
+<col width="25%" />
+<col width="27%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">VCI<sub>in</sub></th>
+<th class="head">port<sub>in</sub></th>
+<th class="head">VCI<sub>out</sub></th>
+<th class="head">port<sub>out</sub></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>2</td>
+<td>S1</td>
+<td>2</td>
+<td>S4</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td>S4</td>
+<td>2</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<p>Switch <strong>S4</strong>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="25%" />
+<col width="25%" />
+<col width="27%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">VCI<sub>in</sub></th>
+<th class="head">port<sub>in</sub></th>
+<th class="head">VCI<sub>out</sub></th>
+<th class="head">port<sub>out</sub></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>2</td>
+<td>S3</td>
+<td>2</td>
+<td>S2</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td>S2</td>
+<td>3</td>
+<td>S3</td>
+</tr>
+<tr class="row-even"><td>4</td>
+<td>S2</td>
+<td>1</td>
+<td>D</td>
+</tr>
+</tbody>
+</table>
+<p>7.0.♢ We have the same network as the previous exercise:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>A───S1────────S2───B
+    │         │
+    │         │
+    │         │
+C───S3────────S4───D
+</pre></div>
+</div>
+<p>The virtual-circuit switching tables are below. Ports are identified by the node at the other end. Identify all the connections. Give the path for each connection and the VCI on each link of the path.</p>
+<p>Switch <strong>S1</strong>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="25%" />
+<col width="25%" />
+<col width="27%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">VCI<sub>in</sub></th>
+<th class="head">port<sub>in</sub></th>
+<th class="head">VCI<sub>out</sub></th>
+<th class="head">port<sub>out</sub></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1</td>
+<td>A</td>
+<td>2</td>
+<td>S2</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td>S3</td>
+<td>2</td>
+<td>A</td>
+</tr>
+</tbody>
+</table>
+<p>Switch <strong>S2</strong>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="25%" />
+<col width="25%" />
+<col width="27%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">VCI<sub>in</sub></th>
+<th class="head">port<sub>in</sub></th>
+<th class="head">VCI<sub>out</sub></th>
+<th class="head">port<sub>out</sub></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>2</td>
+<td>S1</td>
+<td>3</td>
+<td>S4</td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td>B</td>
+<td>2</td>
+<td>S4</td>
+</tr>
+</tbody>
+</table>
+<p>Switch <strong>S3</strong>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="25%" />
+<col width="25%" />
+<col width="27%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">VCI<sub>in</sub></th>
+<th class="head">port<sub>in</sub></th>
+<th class="head">VCI<sub>out</sub></th>
+<th class="head">port<sub>out</sub></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>2</td>
+<td>S1</td>
+<td>2</td>
+<td>S4</td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td>S4</td>
+<td>3</td>
+<td>S1</td>
+</tr>
+</tbody>
+</table>
+<p>Switch <strong>S4</strong>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="25%" />
+<col width="25%" />
+<col width="27%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">VCI<sub>in</sub></th>
+<th class="head">port<sub>in</sub></th>
+<th class="head">VCI<sub>out</sub></th>
+<th class="head">port<sub>out</sub></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>3</td>
+<td>S2</td>
+<td>2</td>
+<td>D</td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td>S2</td>
+<td>1</td>
+<td>S3</td>
+</tr>
+</tbody>
+</table>
+<p>8.0. Suppose we have the following network:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>A───S1────────S2───B
+    │         │
+    │         │
+    │         │
+C───S3────────S4───D
+</pre></div>
+</div>
+<p>Give virtual-circuit switching tables for the following connections. Route via a shortest path.</p>
+<div class="line-block">
+<div class="line">(a). A–D</div>
+<div class="line">(b). C–B, via S4</div>
+<div class="line">(c). B–D</div>
+<div class="line">(d). A–D, via whichever of S2 or S3 was <em>not</em> used in part (a)</div>
+</div>
+<p>9.0. Below is a set of switches S1 through S4. Define VCI-table entries so the virtual circuit from A to B follows the path</p>
+<blockquote>
+<div>A ⟶ S1 ⟶ S2 ⟶ S4 ⟶ S3 ⟶ S1 ⟶ S2 ⟶ S4 ⟶ S3 ⟶ B</div></blockquote>
+<p>That is, each switch is visited <em>twice</em>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>A──S1─────S2
+   │      │
+   │      │
+B──S3─────S4
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="links.html" title="6   Links"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="wireless.html" title="4   Wireless LANs"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, desktop edition 2.0.11</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012-2022, Peter L Dordal.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

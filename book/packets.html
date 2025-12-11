@@ -1,0 +1,470 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>7   Packets &#8212; An Introduction to Computer Networks, desktop edition 2.0.11</title>
+    <link rel="stylesheet" href="_static/csbnetbook.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script type="text/javascript" src="_static/mobile.js"></script>
+    <script type="text/javascript" src="_static/rightsidebar.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="8   Abstract Sliding Windows" href="slidingwindows.html" />
+    <link rel="prev" title="6   Links" href="links.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="slidingwindows.html" title="8   Abstract Sliding Windows"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="links.html" title="6   Links"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, desktop edition 2.0.11</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7&nbsp;&nbsp;&nbsp;Packets</a><ul>
+<li><a class="reference internal" href="#packet-delay">7.1&nbsp;&nbsp;&nbsp;Packet Delay</a><ul>
+<li><a class="reference internal" href="#delay-examples">7.1.1&nbsp;&nbsp;&nbsp;Delay examples</a></li>
+<li><a class="reference internal" href="#bandwidth-delay">7.1.2&nbsp;&nbsp;&nbsp;Bandwidth × Delay</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#packet-delay-variability">7.2&nbsp;&nbsp;&nbsp;Packet Delay Variability</a></li>
+<li><a class="reference internal" href="#packet-size">7.3&nbsp;&nbsp;&nbsp;Packet Size</a><ul>
+<li><a class="reference internal" href="#error-rates-and-packet-size">7.3.1&nbsp;&nbsp;&nbsp;Error Rates and Packet Size</a></li>
+<li><a class="reference internal" href="#packet-size-and-real-time-traffic">7.3.2&nbsp;&nbsp;&nbsp;Packet Size and Real-Time Traffic</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#error-detection">7.4&nbsp;&nbsp;&nbsp;Error Detection</a><ul>
+<li><a class="reference internal" href="#cyclical-redundancy-check-crc">7.4.1&nbsp;&nbsp;&nbsp;Cyclical Redundancy Check: CRC</a></li>
+<li><a class="reference internal" href="#error-correcting-codes">7.4.2&nbsp;&nbsp;&nbsp;Error-Correcting Codes</a><ul>
+<li><a class="reference internal" href="#hamming-codes">7.4.2.1&nbsp;&nbsp;&nbsp;Hamming Codes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#epilog">7.5&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li><a class="reference internal" href="#exercises">7.6&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="links.html"
+                        title="previous chapter">6&nbsp;&nbsp;&nbsp;Links</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="slidingwindows.html"
+                        title="next chapter">8&nbsp;&nbsp;&nbsp;Abstract Sliding Windows</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="packets">
+<span id="packets-chapter"></span><h1>7&nbsp;&nbsp;&nbsp;Packets<a class="headerlink" href="#packets" title="Permalink to this headline">¶</a></h1>
+<p>In this chapter we address a few abstract questions about packets, and take a close look at transmission times. We also consider how big packets should be, and how to detect transmission errors. These issues are independent of any particular set of protocols.</p>
+<div class="section" id="packet-delay">
+<span id="id1"></span><h2>7.1&nbsp;&nbsp;&nbsp;Packet Delay<a class="headerlink" href="#packet-delay" title="Permalink to this headline">¶</a></h2>
+<p id="index-0">There are several contributing sources to the delay encountered in transmitting a packet.
+On a LAN, the most significant is usually what we will call <strong>bandwidth delay</strong>: the time needed for a sender to get the packet onto the wire. This is simply the packet size divided by the bandwidth, after everything has been converted to common units (either all bits or all bytes). For a 1500-byte packet on 100 Mbps Ethernet, the bandwidth delay is 12,000 bits / (100 bits/µsec) = 120 µsec.</p>
+<p id="index-1">There is also <strong>propagation delay</strong>, relating to the propagation of the bits at the speed of light (for the transmission medium in question). This delay is the distance divided by the speed of light; for 1,000 m of Ethernet cable, with a signal propagation speed of about 230 m/µsec, the propagation delay is about 4.3 µsec. That is, if we start transmitting the 1500 byte packet of the previous paragraph at time T=0, then the first bit arrives at a destination 1,000 m away at T = 4.3 µsec, and the last bit is transmitted at 120 µsec, and the last bit arrives at T = 124.3 µsec.</p>
+<div class="sidebar" id="index-2">
+<p class="first sidebar-title">Minimizing Delay</p>
+<p class="last">Back in the last century, gamers were sometimes known to take advantage of players with slow (as in dialup) links; an opponent could be eliminated literally before he or she could respond. As an updated take on this, some financial-trading firms have set up microwave-relay links between trading centers, say New York and Chicago, in order to reduce delay. In computerized trading, milliseconds count. A direct line of sight from New York to Chicago – which we round off to 1200 km – takes about 4 ms in air, where signals propagate at essentially the speed of light c = 300 km/ms. But fiber is slower; even an absolutely straight run would take 6 ms at glass fiber’s propagation speed of 200 km/ms. In the presence of high-speed trading, this 2 ms savings is of considerable financial significance.</p>
+</div>
+<p>Bandwidth delay, in other words, tends to dominate within a LAN.</p>
+<p>But as networks get larger, propagation delay begins to dominate. This also happens as networks get faster: bandwidth delay goes down, but propagation delay remains unchanged.</p>
+<p>An important difference between bandwidth delay and propagation delay is that bandwidth delay is proportional to the amount of data sent while propagation delay is not. If we send two packets back-to-back, then the bandwidth delay is doubled but the propagation delay counts only once.</p>
+<p id="index-3">The introduction of switches leads to <strong>store-and-forward delay</strong>, that is, the time spent reading in the entire packet before any of it can be retransmitted. Store-and-forward delay can also be viewed as an additional bandwidth delay for the second link.</p>
+<p id="index-4">Finally, a switch may or may not also introduce <strong>queuing delay</strong>; this will often depend on competing traffic. We will look at this in more detail in <a class="reference internal" href="dynamicsA.html#dynamics-of-tcp"><span class="std std-ref">20&nbsp;&nbsp;&nbsp;Dynamics of TCP</span></a>, but for now note that a steady queuing delay (<em>eg</em> due to a more-or-less constant average queue utilization) looks to each sender more like propagation delay than bandwidth delay, in that if two packets are sent back-to-back and arrive that way at the queue, then the pair will experience only a single queuing delay.</p>
+<div class="section" id="delay-examples">
+<span id="id2"></span><h3>7.1.1&nbsp;&nbsp;&nbsp;Delay examples<a class="headerlink" href="#delay-examples" title="Permalink to this headline">¶</a></h3>
+<p>Case 1: A──────B</p>
+<ul class="simple">
+<li>Propagation delay is 40 µsec</li>
+<li>Bandwidth is 1 byte/µsec (1 MB/sec, 8 Mbit/sec)</li>
+<li>Packet size is 200 bytes (200 µsec bandwidth delay)</li>
+</ul>
+<p>Then the total one-way transmit time for one packet is 240 µsec = 200 µsec + 40 µsec. To send two back-to-back packets, the time rises to 440 µsec: we add one more bandwidth delay, but not another propagation delay.</p>
+<p>Case 2: A──────────────────B</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">Like the previous example except that the propagation delay is increased to 4 ms</div>
+</div>
+</div></blockquote>
+<p>The total transmit time for one packet is now 4200 µsec = 200 µsec + 4000 µsec. For two packets it is 4400 µsec.</p>
+<p>Case 3: A──────R──────B</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">We now have two links, each with propagation delay 40 µsec; bandwidth and packet size as in Case 1.</div>
+</div>
+</div></blockquote>
+<p>The total transmit time for one 200-byte packet is now  480 µsec = 240 + 240. There are two propagation delays of 40 µsec each; A introduces a bandwidth delay of 200 µsec and R introduces a store-and-forward delay (or second bandwidth delay) of 200 µsec.</p>
+<p>Case 4: A──────R──────B</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">The same as 3, but with data sent as two 100-byte packets</div>
+</div>
+</div></blockquote>
+<p>The total transmit time is now  380 µsec = 3x100 + 2x40. There are still two propagation delays, but there is only 3/4 as much bandwidth delay because the transmission of the first 100 bytes on the second link overlaps with the transmission of the second 100 bytes on the first link.</p>
+<img alt="_images/delay134.svg" src="_images/delay134.svg" /><p id="index-5">These <strong>ladder diagrams</strong> represent the full transmission; a snapshot state of the transmission at any one instant can be obtained by drawing a horizontal line. In the middle, case 3, diagram, for example, at no instant are both links active. Note that sending two smaller packets is faster than one large packet. We expand on this important point below.</p>
+<p>Now let us consider the situation when the propagation delay is the most significant component. The cross-continental US roundtrip delay is typically around 50-100 ms (propagation speed 200 km/ms in cable, 5,000-10,000 km cable route, or about 3-6000 miles); we will use 100 ms in the examples here. At a bandwidth of 1.0 Mbps, 100ms is about 12 kB, or eight full-sized Ethernet packets. At this bandwidth, we would have four packets and four returning ACKs strung out along the path. At 1.0 Gbit/s, in 100ms we can send 12,000 kB, or 800 Ethernet packets, before the first ACK returns.</p>
+<p id="index-6">At most non-LAN scales, the delay is typically simplified to the <strong>round-trip time</strong>, or <strong>RTT</strong>: the time between sending a packet and receiving a response.</p>
+<p>Different delay scenarios  have implications  for protocols: if a network is bandwidth-limited then protocols are easier to design. Extra RTTs do not cost much, so we can build in a considerable amount of back-and-forth exchange. However, if a network is delay-limited, the protocol designer must focus on minimizing extra RTTs. As an extreme case, consider wireless transmission to the moon (0.3 sec RTT), or to Jupiter (1 hour RTT).</p>
+<p>At my home I formerly had satellite Internet service, which had a roundtrip propagation delay of ~600 ms. This is remarkably high when compared to purely terrestrial links.</p>
+<p>When dealing with reasonably high-bandwidth “large-scale” networks (<em>eg</em> the Internet), propagation delay is usually much larger than bandwidth delay, and so to a first approximation bandwidth delay can be ignored. This means the bandwidth and the total delay are effectively independent. Only when propagation delay is small are the two interrelated. Because propagation delay dominates at this scale, we can often make simplifications when diagramming. In the illustration below, A sends a data packet to B and receives a small ACK in return. In (a), we show the data packet traversing several switches; in (b) we show the data packet as if it were sent along one long unswitched link, and in (c) we introduce the idealization that bandwidth delay (and thus the width of the packet line) no longer matters. (Most later ladder diagrams in this book are of this type.)</p>
+<img alt="_images/largescale.svg" src="_images/largescale.svg" /></div>
+<div class="section" id="bandwidth-delay">
+<span id="bandwidthxdelay"></span><span id="index-7"></span><h3>7.1.2&nbsp;&nbsp;&nbsp;Bandwidth × Delay<a class="headerlink" href="#bandwidth-delay" title="Permalink to this headline">¶</a></h3>
+<p>The <strong>bandwidth × delay</strong> product (usually involving round-trip delay, or RTT), represents how much we can send before we hear anything back, or how much is “pending” in the network at any one time if we send continuously. Note that, if we use RTT instead of one-way time, then half the “pending” packets will be returning ACKs. Here are a few approximate values, where 100 ms can be taken as a typical inter-continental-distance RTT:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="29%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">RTT</th>
+<th class="head">bandwidth</th>
+<th class="head">bandwidth × delay</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1 ms</td>
+<td>10 Mbps</td>
+<td>1.2 kB</td>
+</tr>
+<tr class="row-odd"><td>100 ms</td>
+<td>1.5 Mbps</td>
+<td>20 kB</td>
+</tr>
+<tr class="row-even"><td>100 ms</td>
+<td>600 Mbps</td>
+<td>8 MB</td>
+</tr>
+<tr class="row-odd"><td>100 ms</td>
+<td>1.5 Gbps</td>
+<td>20 MB</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="packet-delay-variability">
+<span id="delay-variability"></span><h2>7.2&nbsp;&nbsp;&nbsp;Packet Delay Variability<a class="headerlink" href="#packet-delay-variability" title="Permalink to this headline">¶</a></h2>
+<p>For many links, the bandwidth delay and the propagation delay are rigidly fixed quantities, the former by the bandwidth and the latter by the speed of light. This leaves queuing delay as the major source of variability.</p>
+<span class="target" id="index-8"></span><p>This state of affairs lets us define RTT<sub>noLoad</sub> to be the time it takes to transmit a packet from A to B, and receive an acknowledgment back, with no queuing delay.</p>
+<p>While this is often a reasonable approximation, it is not necessarily true that RTT<sub>noLoad</sub> is always a fixed quantity. There are several possible causes for RTT variability. On Ethernet and Wi-Fi networks there is an initial “contention period” before transmission actually begins. Although this delay is related to waiting for other senders, it is not exactly queuing delay, and a packet may encounter considerable delay here even if it ends up being the first to be sent. For Wi-Fi in particular, the uncertainty introduced by collisions into packet delivery times – even with no other senders competing – can complicate higher-level delay measurements.</p>
+<p>It is also possible that different packets are routed via slightly different paths, leading to (hopefully) minor variations in travel time, or are handled differently by different queues of a parallel-processing switch.</p>
+<p>A link’s bandwidth, too, can vary dynamically. Imagine, for example, a T1 link comprised of the usual 24 DS0 channels, in which all channels not currently in use by voice calls are consolidated into a single data channel. With eight callers, the data bandwidth would be cut by a third from 24 × DS0 to 16 × DS0. Alternatively, perhaps routers are allowed to <em>reserve</em> a varying amount of bandwidth for high-priority traffic, depending on demand, and so the bandwidth allocated to the best-effort traffic can vary. Perceived link bandwidth can also vary over time if packets are compressed at the link layer, and some packets are able to be compressed more than others.</p>
+<p>Finally, if mobile nodes are involved, then the distance and thus the propagation delay can change. This can be quite significant if one is communicating with a wireless device that is being taken on a cross-continental road trip.</p>
+<p>Despite these sources of fluctuation, we will usually assume that RTT<sub>noLoad</sub> is fixed and well-defined, especially when we wish to focus on the queuing component of delay.</p>
+</div>
+<div class="section" id="packet-size">
+<span id="index-9"></span><span id="id3"></span><h2>7.3&nbsp;&nbsp;&nbsp;Packet Size<a class="headerlink" href="#packet-size" title="Permalink to this headline">¶</a></h2>
+<p>How big should packets be? Should they be large (<em>eg</em> 64 kB) or small (<em>eg</em> 48 bytes)?</p>
+<p>The Ethernet answer to this question had to do with equitable sharing of the line: large packets would not allow other senders timely access to transmit. In any network, this issue remains a concern.</p>
+<p>On the other hand, large packets waste a smaller percentage of bandwidth on headers. However, in most of the cases we will consider, this percentage does not exceed 10% (the VoIP/RTP example in <a class="reference internal" href="intro.html#packets"><span class="std std-ref">1.3&nbsp;&nbsp;&nbsp;Packets</span></a> is an exception).</p>
+<p>It turns out that if store-and-forward switches are involved, smaller packets have much better throughput. The links on either side of the switch can be in use simultaneously, as in Case 4 of <a class="reference internal" href="#delay-examples"><span class="std std-ref">7.1.1&nbsp;&nbsp;&nbsp;Delay examples</span></a>. This is a very real effect, and has put a damper on interest in support for IP “jumbograms”. The ATM protocol (intended for both voice and data) pushes this to an extreme, with packets with only 48 bytes of data and 5 bytes of header.</p>
+<p>As an example of this, consider a path from A to B with four switches and five links:</p>
+<blockquote>
+<div>A───────R1───────R2───────R3───────R4───────B</div></blockquote>
+<p>Suppose we send either one big packet or five smaller packets. The relative times from A to B are illustrated in the following figure:</p>
+<img alt="_images/fivepacket.svg" src="_images/fivepacket.svg" /><p>The point is that we can take advantage of parallelism: while the R4–B link above is handling packet 1, the R3–R4 link is handling packet 2 and the R2–R3 link is handling packet 3 and so on. The five smaller packets <em>would</em> have five times the header capacity, but as long as headers are small relative to the data, this is not a significant issue.</p>
+<p>The sliding-windows algorithm, used by TCP, uses this idea as a continuous process: the sender sends a continual stream of packets which travel link-by-link so that, in the full-capacity case, all links may be in use at all times.</p>
+<div class="section" id="error-rates-and-packet-size">
+<span id="id4"></span><h3>7.3.1&nbsp;&nbsp;&nbsp;Error Rates and Packet Size<a class="headerlink" href="#error-rates-and-packet-size" title="Permalink to this headline">¶</a></h3>
+<p>Packet size is also influenced, to a modest degree, by the transmission error rate. For relatively high error rates, it turns out to be better to send smaller packets, because when an error does occur then the entire packet containing it is lost.</p>
+<div class="sidebar">
+<p class="first sidebar-title">Small error rates</p>
+<p class="last">Generally, if the bit error rate p is small, we can approximate the probability of error in an N-bit packet as p×N, rather than working out the exact answer (assuming bit-error independence) of 1 − (1−p)<sup>N</sup>. This approximation works best if p×N is also small. For the 1000-bit example here with p=1/10,000, the exact value of the success rate is 90.4833% versus the p×N approximation of 90%. For the 10,000-bit packet, though, the p×N approximation predicts a 100% chance of error, which is not very helpful at all.</p>
+</div>
+<p>For example, suppose that 1 bit in 10,000 is corrupted, at random, so the probability that a single bit is transmitted <em>correctly</em> is 0.9999 (this is much higher than the error rates encountered on real networks). For a 1000-bit packet, the probability that <em>every</em> bit in the packet is transmitted correctly is (0.9999)<sup>1000</sup>, or about 90.5%. For a 10,000-bit packet the probability is (0.9999)<sup>10,000</sup> ≃ 37%. For 20,000-bit packets, the success rate is below 14%.</p>
+<p>Now suppose we have 1,000,000 bits to send, either as 1000-bit packets or as 20,000-bit packets. Nominally this would require 1,000 of the smaller packets, but because of the 90% packet-success rate we will need to retransmit 10% of these, or 100 packets. Some of the retransmissions may also be lost; the total number of packets we expect to need to send is about 1,000/90% ≃ 1,111, for a total of 1,111,000 bits sent. Next, let us try this with the 20,000-bit packets. Here the success rate is so poor that each packet needs to be sent on average <em>seven times</em>; lossless transmission would require 50 packets but we in fact need 7×50 = 350 packets, or 7,000,000 bits.</p>
+<p>Moral: choose the packet size small enough that most packets do not encounter errors.</p>
+<p>To be fair, very large packets can be sent reliably on most cable links (<em>eg</em> TDM and SONET). Wireless, however, is more of a problem.</p>
+</div>
+<div class="section" id="packet-size-and-real-time-traffic">
+<span id="realtime-packet-size"></span><span id="index-10"></span><h3>7.3.2&nbsp;&nbsp;&nbsp;Packet Size and Real-Time Traffic<a class="headerlink" href="#packet-size-and-real-time-traffic" title="Permalink to this headline">¶</a></h3>
+<p>There is one other concern regarding excessive packet size. As we shall see in <a class="reference internal" href="realtime.html#quality-of-service"><span class="std std-ref">25&nbsp;&nbsp;&nbsp;Quality of Service</span></a>, it is common to commingle bulk traffic on the same links with real-time traffic. It is straightforward to give priority to the real-time traffic in such a mix, meaning that a router does not begin forwarding a bulk-traffic packet if there are any real-time packets waiting (we do need to be sure in this case that real-time traffic will not amount to so much as to starve the bulk traffic). However, once a bulk-traffic packet has begun transmission, it is impractical to interrupt it.</p>
+<p>Therefore, one component of any maximum-delay bound for real-time traffic is the transmission time for the largest <em>bulk</em>-traffic packet; we will call this the <strong>largest-packet delay</strong>. As a practical matter, most IPv4 packets are limited to the maximum Ethernet packet size of 1500 bytes, but IPv6 has an option for so-called “jumbograms” up to 2 MB in size. Transmitting one such packet on a 100 Mbps link takes about 1/6 of a second, which is likely too large for happy coexistence with real-time traffic.</p>
+</div>
+</div>
+<div class="section" id="error-detection">
+<span id="index-11"></span><span id="id5"></span><h2>7.4&nbsp;&nbsp;&nbsp;Error Detection<a class="headerlink" href="#error-detection" title="Permalink to this headline">¶</a></h2>
+<p>The basic strategy for packet error detection is to add some extra bits – formally known as an <strong>error-detection code</strong> – that will allow the receiver to determine if the packet has been corrupted in transit. A corrupted packet will then be discarded by the receiver; higher layers do not distinguish between lost packets and those never received. While packets lost due to bit errors occur much less frequently than packets lost due to queue overflows, it is essential that data be received accurately.</p>
+<p>Intermittent packet errors generally fall into two categories: low-frequency bit errors due to things like cosmic rays, and <em>interference</em> errors, typically generated by nearby electrical equipment. Errors of the latter type generally occur in <em>bursts</em>, with multiple bad bits per packet. Occasionally, a malfunctioning network device will introduce bursty errors as well.</p>
+<div class="sidebar">
+<p class="first sidebar-title">Networks v Refrigerators</p>
+<p class="last">At Loyola we once had a workstation used as a mainframe terminal that kept losing its connection. We eventually noticed that the connection dropped every time the office refrigerator kicked on. Sure enough, the cable ran directly behind the fridge; rerouting it solved the problem.</p>
+</div>
+<p>The simplest error-detection mechanism is a single parity bit; this will catch all one-bit errors. There is, however, no straightforward generalization to N bits! That is, there is no N-bit error code that catches all N-bit errors; see exercise 11.0.</p>
+<p id="index-12">The so-called <strong>Internet checksum</strong>, used by IP, TCP and UDP, is formed by taking the <em>ones-complement</em> sum of the 16-bit words of the message. Ones-complement is an alternative way of representing signed integers in binary; if one adds two positive integers and the sum does not overflow the hardware word size, then ones-complement and the now-universal <em>twos-complement</em> are identical. To form the ones-complement sum of 16-bit words A and B, first take the ordinary twos-complement sum A+B. Then, if there is an overflow bit, add it back in as low-order bit. Thus, if the word size is 4 bits, the ones-complement sum of 0101 and 0011 is 1000 (no overflow). Now suppose we want the ones-complement sum of 0101 and 1100. First we take the “exact” sum and get 1|0001, where the leftmost 1 is an overflow bit past the 4-bit wordsize. Because of this overflow, we add this bit back in, and get 0010.</p>
+<p>The 4-bit ones-complement numeric representation has two forms for zero: 0000 and 1111 (it is straightforward to verify that any 4-bit quantity plus 1111 yields the original quantity; in twos-complement notation 1111 represents -1, and an overflow is guaranteed, so adding back the overflow bit cancels the -1 and leaves us with the original number). It is a fact that the ones-complement sum is never 0000 unless all bits of all the summands are 0; if the summands add up to zero by coincidence, then the actual binary representation will be 1111. This means that we can use 0000 in the checksum to represent “checksum not calculated”, which the UDP protocol still allows over IPv4 for efficiency reasons. Over IPv6, UDP packets must include a calculated checksum (<span class="target" id="index-13"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2460.html"><strong>RFC 2460</strong></a>, §8.1).</p>
+<p>What is stored in the packet’s checksum field is the <em>complement</em> of the sum above, or 0xFFFF − sum. This means that when the receiver calculates the checksum over the same range of bytes, the value obtained should be zero.</p>
+<div class="sidebar">
+<p class="first sidebar-title">Ones’ complement</p>
+<p>Long ago, before Loyola had any Internet connectivity, I wrote a primitive UDP/IP stack to allow me to use the Ethernet to back up one machine that did not have TCP/IP to another machine that did. We used “private” IP addresses of the form 10.0.0.x. I set as many header fields to zero as I could. I paid no attention to how to implement ones-complement addition; I simply used twos-complement, for the IP header only, and did not use a UDP checksum at all. Hey, it worked.</p>
+<p class="last">Then we got a real Class B address block 147.126.0.0/16, and changed IP addresses. My software no longer worked! It turned out that, in the original version, the IP header bytes were all small enough that when I added up the 16-bit words there were no carries, and so ones-complement was the same as twos-complement. With the new addresses, this was no longer true. As soon as I figured out how to implement ones-complement addition properly, my backups worked again.</p>
+</div>
+<p>Ones-complement addition has a few properties that make numerical calculations simpler. First, when finding the ones-complement sum of a series of 16-bit values, we can defer adding in the overflow bits until the end. Specifically, we can find the ones-complement sum of the values by adding them using ordinary (twos-complement) 32-bit addition, and then forming the ones-complement sum of the upper and lower 16-bit half-words. The upper half-word here represents the accumulated overflow. See exercise 10.0.</p>
+<p>We can also find the ones-complement sum of a series of 16-bit values by concatenating them pairwise into 32-bit values, taking the 32-bit ones-complement sum of these, and then, as in the previous paragraph, forming the ones-complement sum of the upper and lower 16-bit half-words.</p>
+<p>Somewhat surprisingly, when calculating the 16-bit ones-complement sum of a series of bytes taken two at a time, it does not matter whether we convert the pairs of consecutive bytes to integers using big-endian or little-endian byte order (<a class="reference internal" href="udp.html#binary-data"><span class="std std-ref">16.1.5&nbsp;&nbsp;&nbsp;Binary Data</span></a>). The overflow from the low-order bytes is added to the high-order bytes by virtue of ordinary carries in addition, and the overflow from the high-order bytes is added to the low-order bytes by the ones-complement rule. See exercise 10.5.</p>
+<p>Finally, there is another way to look at the (16-bit) ones-complement sum: it is in fact the <em>remainder</em> upon dividing the message (seen as a very long binary number) by 2<sup>16</sup> - 1, provided we replace a remainder of 0 with the equivalent ones-complement zero value consisting of sixteen 1-bits. This is similar to the decimal “casting out nines” rule: if we add up the digits of a base-10 number, and repeat the process until we get a single digit, then that digit is the remainder upon dividing the original number by 10-1 = 9. The analogy here is that the message is looked at as a very large number written in base-2<sup>16</sup>, where the “digits” are the 16-bit words. The process of repeatedly adding up the “digits” until we get a single “digit” amounts to taking the ones-complement sum of the words. This remainder approach to ones-complement addition isn’t very practical, but it does provide a useful way to analyze ones-complement checksums mathematically.</p>
+<p>A weakness of any error-detecting code based on <em>sums</em> is that transposing words leads to the same sum, and the error is not detected. In particular, if a message is fragmented and the fragments are reassembled in the wrong order, the ones-complement sum will likely not detect it.</p>
+<p>While some error-detecting codes are better than others at detecting certain kinds of systematic errors (for example, CRC, below, is usually better than the Internet checksum at detecting transposition errors), ultimately the effectiveness of an error-detecting code depends on its length. Suppose a packet P1 is corrupted <em>randomly</em> into P2, but still has its original N-bit error code EC(P1). This N-bit code will <strong>fail</strong> to detect the error that has occurred if EC(P2) is, <em>by chance</em>, equal to EC(P1). The probability that two <em>random</em> N-bit codes will match is 1/2<sup>N</sup> (though a small random change in P1 might not lead to a uniformly distributed random change in EC(P1); see the tail end of the CRC section below).</p>
+<p>This does not mean, however, that one packet in 2<sup>N</sup> will be received incorrectly, as most packets are error-free. If we use a 16-bit error code, and only 1 packet in 100,000 is actually corrupted, then the rate at which corrupted packets will sneak by is only 1 in 100,000 × 65536, or about one in 6 × 10<sup>9</sup>. If packets are 1500 bytes, you have a good chance (90+%) of accurately transferring a terabyte, and a 37% chance (1/e) at ten terabytes.</p>
+<div class="section" id="cyclical-redundancy-check-crc">
+<span id="crc"></span><span id="index-14"></span><h3>7.4.1&nbsp;&nbsp;&nbsp;Cyclical Redundancy Check: CRC<a class="headerlink" href="#cyclical-redundancy-check-crc" title="Permalink to this headline">¶</a></h3>
+<p>The CRC error code is based on long division of polynomials, where the coefficients are integers modulo 2. The use of polynomials tends to sound complicated but in fact it eliminates the need for carries or borrowing in addition and subtraction. Together with the use of modulo-2 coefficients, this means that addition and subtraction become equivalent to XOR. We treat the message, in binary, as a giant polynomial m(X), using the bits of the message as successive coefficients (<em>eg</em> 10011011 = X<sup>7</sup> + X<sup>4</sup> + X<sup>3</sup> + X + 1). We standardize a divisor polynomial p(X) of degree N (N=32 for CRC-<strong>32</strong> codes); the full specification of a given CRC code requires giving this polynomial. (A full specification also requires spelling out the bit order within bytes.)  We append N 0-bits to m(X) (this is the polynomial X<sup>N</sup>m(X)), and divide the result by p(X). The “checksum” is the remainder r(X), of maximum degree N−1 (that is, N bits).</p>
+<p>This is a reasonably secure hash against real-world network corruption, in that it is very hard for systematic errors to result in the same hash code. However, CRC is not secure against <em>intentional</em> corruption; given an arbitrary message <code class="docutils literal notranslate"><span class="pre">msg</span></code>, there are straightforward algebraic means for tweaking the last bytes of <code class="docutils literal notranslate"><span class="pre">msg</span></code> so that the CRC code of the result is equal to any predetermined value in the appropriate range.</p>
+<p>As an example of CRC, suppose that the CRC divisor is 1011 (making this a CRC-3 code) and the message is 1001 1011 1100. Here is the division; we repeatedly subtract (using XOR) a copy of the divisor 1011, shifted so the leading 1 of the divisor lines up with the leading 1 of the previous difference. A 1 then goes on the quotient line, lined up with the last digit of the shifted divisor; otherwise a 0. There are several online calculators for this sort of thing, <em>eg</em> <a class="reference external" href="http://www.ee.unb.ca/cgi-bin/tervo/calc.pl">here</a>. Note that an extra 000 has been appended to the dividend.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>          1 0100 1101 011
+     ┌───────────────────
+1011 │ 1001 1011 1100 000
+       1011
+        ─── ─
+        010 1011 1100 000
+         10 11
+         ── ──
+         00 0111 1100 000
+             101 1
+             ─── ─
+             010 0100 000
+              10 11
+              ── ──
+              00 1000 000
+                 1011
+                 ────
+                 0011 000
+                   10 11
+                   ── ──
+                   01 110
+                    1 011
+                    ─ ───
+                    0 101
+</pre></div>
+</div>
+<p>The remainder, at the bottom, is 101; this is the N-bit CRC code. We then append the code to the original message, that is, without the added zeroes: 1001 1011 1100 101; algebraically this is X<sup>N</sup>m(X) + r(X). This is what is actually transmitted; if converted to a polynomial, it yields a remainder of zero upon division by p(X). This slightly simplifies the receiver’s job of validating the CRC code: it just has to check that the remainder is zero.</p>
+<p>CRC is easily implemented in hardware, using bit-shifting registers. Fast software implementations are also possible, usually involving handling the bits one byte at a time, with a precomputed lookup table with 256 entries.</p>
+<p>If we randomly change <em>enough</em> bits in packet P1 to create P2, then CRC(P1) and CRC(P2) are effectively independent random variables, with probability of a match 1 in 2<sup>N</sup> where N is the CRC length. However, if we change just a <em>few</em> bits then the change is <em>not</em> so random. In particular, for many CRC codes (that is, for many choices of the underlying polynomial p(X)), changing up to three bits in P1 to create a new message P2 guarantees that CRC(P1) ≠ CRC(P2). For the Internet checksum, this is not guaranteed even if we know only two bits were changed.</p>
+<p>Finally, there are also <strong>secure hashes</strong>, such as MD-5 and SHA-1 and their successors (<a class="reference internal" href="security.html#secure-hashes"><span class="std std-ref">28.6&nbsp;&nbsp;&nbsp;Secure Hashes</span></a>). Nobody knows (or admits to knowing) how to produce two messages with same hash here. However, these secure-hash codes are generally not used in network error-correction as they are <em>much</em> slower to calculate than CRC; they are generally used only for secure authentication and other higher-level functions.</p>
+</div>
+<div class="section" id="error-correcting-codes">
+<span id="index-15"></span><span id="id6"></span><h3>7.4.2&nbsp;&nbsp;&nbsp;Error-Correcting Codes<a class="headerlink" href="#error-correcting-codes" title="Permalink to this headline">¶</a></h3>
+<p>If a link is noisy, we can add an error-<em>correction</em> code (also called <em>forward error correction</em>) that allows the receiver in many cases to figure out which bits are corrupted, and fix them. This has the effect of improving the bit error rate at a cost of reducing throughput. Error-correcting codes tend to involve many more bits than are needed for error detection. Typically, if a communications technology proves to have an unacceptably high bit-error rate (such as wireless), the next step is to introduce an error-correcting code to the protocol. This generally reduces the “virtual” bit-error rate (that is, the error rate as corrected) to acceptable levels.</p>
+<p id="index-16">Perhaps the easiest error-correcting code to visualize is 2-D parity, for which we need O(N<sup>1/2</sup>) additional bits. We take N×N data bits and arrange them into a square; we then compute the parity for every column, for every row, and for the entire square; this is 2N+1 extra bits. Here is a diagram with N=4, and with even parity; the column-parity bits (in blue) are in the bottom (fifth) row and the row-parity bits (also in blue) are in the rightmost (fifth) column. The parity bit for the entire 4×4 data square is the light-blue bit in the bottom right corner.</p>
+<img alt="_images/2d_parity.svg" src="_images/2d_parity.svg" /><p>Now suppose one bit is corrupted; for simplicity, assume it is one of the data bits. Then exactly one column-parity bit will be incorrect, and exactly one row-parity bit will be incorrect. These two incorrect bits mark the column and row of the incorrect data bit, which we can then flip to the correct state.</p>
+<p>We can make N large, but an essential requirement here is that there be only a single corrupted bit per square. We are thus likely either to keep N small, or to choose a different code entirely that allows correction of multiple bits. Either way, the addition of error-correcting codes can easily increase the size of a packet significantly; some codes double or even triple the total number of bits sent.</p>
+<div class="section" id="hamming-codes">
+<span id="hamming"></span><span id="index-17"></span><h4>7.4.2.1&nbsp;&nbsp;&nbsp;Hamming Codes<a class="headerlink" href="#hamming-codes" title="Permalink to this headline">¶</a></h4>
+<p>The Hamming code is another popular error-correction code; it adds O(log N) additional bits, though if N is large enough for this to be a material improvement over the O(N<sup>1/2</sup>) performance of 2-D parity then errors must be very infrequent. If we have 8 data bits, let us number the bit positions 0 through 7. We then write each bit’s position as a binary value between 000 and 111; we will call these the <strong>position bits</strong> of the given data bit. We now add four code bits as follows:</p>
+<ol class="arabic simple">
+<li>a parity bit over all 8 data bits</li>
+<li>a parity bit over those data bits for which the first digit of the position bits is 1 (these are positions 4, 5, 6 and 7)</li>
+<li>a parity bit over those data bits for which the second digit of the position bits is 1 (these are positions 010, 011, 110 and 111, or 2, 3, 6 and 7)</li>
+<li>a parity bit over those data bits for which the third digit of the position bits is 1 (these are positions 001, 011, 101, 111, or 1, 3, 5 and 7)</li>
+</ol>
+<p>We can tell whether or not an error has occurred by the first code bit; the remaining three code bits then tell us the respective three position bits of the incorrect bit. For example, if the #2 code bit above is correct, then the first digit of the position bits is 0; otherwise it is one. With all three position bits, we have identified the incorrect data bit.</p>
+<p>As a concrete example, suppose the data word is 10110010. The four code bits are thus</p>
+<ol class="arabic simple">
+<li>0, the (even) parity bit over all eight bits</li>
+<li>1, the parity bit over the second half, 1011<strong>0010</strong></li>
+<li>1, the parity bit over the bold bits: 10<strong>11</strong>00<strong>10</strong></li>
+<li>1, the parity bit over these bold bits: 1<strong>0</strong>1<strong>1</strong>0<strong>0</strong>1<strong>0</strong></li>
+</ol>
+<p>If the received data+code is now 1011<strong>1</strong>010 0111, with the bold bit flipped, then the fact that the first code bit is wrong tells the receiver there was an error. The second code bit is also wrong, so the first bit of the position bits must be 1. The third code bit is right, so the second bit of the position bits must be 0. The fourth code bit is also right, so the third bit of the position bits is 0. The position bits are thus binary 100, or 4, and so the receiver knows that the incorrect bit is in position 4 (counting from 0) and can be flipped to the correct state.</p>
+</div>
+</div>
+</div>
+<div class="section" id="epilog">
+<h2>7.5&nbsp;&nbsp;&nbsp;Epilog<a class="headerlink" href="#epilog" title="Permalink to this headline">¶</a></h2>
+<p>The issues presented here are perhaps not very glamorous, and often play a supporting, behind-the-scenes role in protocol design. Nonetheless, their influence is pervasive; we may even think of them as part of the underlying “physics” of the Internet.</p>
+<p id="index-18">As the early Internet became faster, for example, and propagation delay became the dominant limiting factor, protocols were often revised to limit the number of back-and-forth exchanges. A classic example is the Simple Mail Transport Protocol (SMTP), amended by <span class="target" id="index-19"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1854.html"><strong>RFC 1854</strong></a> to allow multiple commands to be sent together – called pipelining – instead of individually.</p>
+<p>While there have been periodic calls for large-packet support in IPv4, and IPv6 protocols exist for “jumbograms” in excess of a megabyte, these are very seldom used, due to the store-and-forward costs of large packets as described in <a class="reference internal" href="#packet-size"><span class="std std-ref">7.3&nbsp;&nbsp;&nbsp;Packet Size</span></a>.</p>
+<p>Almost every LAN-level protocol, from Ethernet to Wi-Fi to point-to-point links, incorporates an error-detecting code chosen to reflect the underlying transportation reliability. Ethernet includes a 32-bit CRC code, for example, while Wi-Fi includes extensive error-correcting codes due to the noisier wireless environment. The Wi-Fi fragmentation option (<a class="reference internal" href="wireless.html#wifi-fragmentation"><span class="std std-ref">4.2.1.5&nbsp;&nbsp;&nbsp;Wi-Fi Fragmentation</span></a>) is directly tied to <a class="reference internal" href="#error-rates-and-packet-size"><span class="std std-ref">7.3.1&nbsp;&nbsp;&nbsp;Error Rates and Packet Size</span></a>.</p>
+</div>
+<div class="section" id="exercises">
+<span id="packets-exercises"></span><h2>7.6&nbsp;&nbsp;&nbsp;Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<p><em>Exercises may be given fractional (floating point) numbers, to allow for interpolation of new exercises.</em> Exercises marked with a ♢ have solutions or hints at <a class="reference internal" href="solutions.html#packets-solutions"><span class="std std-ref">34.7&nbsp;&nbsp;&nbsp;Solutions for Packets</span></a>.</p>
+<p>1.0. Suppose a link has a propagation delay of 20 µsec and a bandwidth of 2 bytes/µsec.</p>
+<div class="line-block">
+<div class="line">(a). How long would it take to transmit a 600-byte packet over such a link?</div>
+<div class="line">(b). How long would it take to transmit the 600-byte packet over two such links, with a store-and-forward switch in between?</div>
+</div>
+<p>2.0. Suppose the path from A to B has a single switch S in between: A───S───B. Each link has a propagation delay of 60 µsec and a bandwidth of 2 bytes/µsec.</p>
+<div class="line-block">
+<div class="line">(a). How long would it take to send a single 600-byte packet from A to B?</div>
+<div class="line">(b). How long would it take to send two back-to-back 300-byte packets from A to B?</div>
+<div class="line">(c). How long would it take to send three back-to-back 200-byte packets from A to B?</div>
+</div>
+<p>3.0.♢ Repeat parts (a) and (b) of the previous exercise, except change the per-link propagation delay from 60 µsec to 600 µsec.</p>
+<p>4.0. Suppose the path from A to B has a single switch S in between: A───S───B. The propagation delays on the A–S and S–B are 24 µsec and 35 µsec respectively. The per-packet bandwidth delays on the A–S and S–B links are 103 µsec and 157 µsec respectively. The ladder diagram below describes the sending of two consecutive packets from A to B. Label the time intervals (a) through (e) at the right edge, and give the total time for the packets to be sent.</p>
+<img alt="_images/ladder_exercise3.5.svg" src="_images/ladder_exercise3.5.svg" /><p>5.0. Now assume that the delays are the same as in exercise 4.0, except that the bandwidth delays are reversed: the A–S bandwidth delay is 157 µsec and the S–B bandwidth delay is 103 µsec. The propagation delays are unchanged. Draw the corresponding ladder diagram, and also the total time for two consecutive packets to be sent. (Hint: the total time should not change.)</p>
+<p>6.0. Again suppose the path from A to B has a single switch S in between: A───S───B. The per-link bandwidth and propagation delays are as follows:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="26%" />
+<col width="33%" />
+<col width="41%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">link</th>
+<th class="head">bandwidth</th>
+<th class="head">propagation delay</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>A──S</td>
+<td>5 bytes/µsec</td>
+<td>24 µsec</td>
+</tr>
+<tr class="row-odd"><td>S──B</td>
+<td>3 bytes/µsec</td>
+<td>13 µsec</td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">
+<div class="line">(a). How long would it take to send a single 600-byte packet from A to B?</div>
+<div class="line">(b). How long would it take to send two back-to-back 300-byte packets from A to B? Note that, because the S──B link is slower, packet 2 arrives at S from A before S has finished transmitting packet 1 to B.</div>
+</div>
+<p>7.0. Suppose in the previous exercise, the A–S link has the smaller bandwidth of 3 bytes/µsec and the S–B link has the larger bandwidth of 5 bytes/µsec. The propagation delays are unchanged. Now how long does it take to send two back-to-back 300-byte packets from A to B?</p>
+<p>8.0. Suppose we have five links, A───R1───R2───R3───R4───B. Each link has a bandwidth of 100 bytes/ms.
+Assume we model the per-link propagation delay as 0.</p>
+<div class="line-block">
+<div class="line">(a). How long would it take a single 1500-byte packet to go from A to B?</div>
+<div class="line">(b). How long would it take five consecutive 300-byte packets to go from A to B?</div>
+</div>
+<p>The diagram in <a class="reference internal" href="#packet-size"><span class="std std-ref">7.3&nbsp;&nbsp;&nbsp;Packet Size</span></a> may help.</p>
+<p>9.0. Suppose there are N equal-bandwidth links on the path between A and B, as in the diagram below,  and we wish to send M consecutive packets.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">A ─── S<sub>1</sub> ─── … ─── S<sub>N-1</sub> ─── B</div>
+</div>
+</div></blockquote>
+<p>Let BD be the bandwidth delay of a single packet on a single link, and assume the propagation delay on each link is zero. Show that the total (bandwidth) delay is (M+N-1)×BD. Hint: the total time is the sum of the time A takes to begin transmitting the last packet, and the time that last packet (or any other packet) takes to travel from A to B. Show that the former is (M-1)×BD and the latter is N×BD. Note that no packets ever have to wait at any S<sub>i</sub> because the ith packet takes exactly as long to arrive as the (i-1)th packet takes to depart.</p>
+<p>10.0. Repeat the analysis in <a class="reference internal" href="#error-rates-and-packet-size"><span class="std std-ref">7.3.1&nbsp;&nbsp;&nbsp;Error Rates and Packet Size</span></a> to compare the probable total number of bytes that need to be sent to transmit 10<sup>7</sup> bytes using</p>
+<div class="line-block">
+<div class="line">(a). 1,000-byte packets</div>
+<div class="line">(b). 10,000-byte packets</div>
+</div>
+<p>Assume the bit error rate is 1 in 16 × 10<sup>5</sup>, making the error rate per <em>byte</em> about 1 in 2 × 10<sup>5</sup>.</p>
+<p>11.0. In the text it is claimed “there is no N-bit error code that catches all N-bit errors” for N≥2 (for N=1, a parity bit works). Prove this claim for N=2.
+Hint: pick a length M, and consider all M-bit messages with a <em>single</em> 1-bit. Any such message can be converted to any other with a 2-bit error. Show, using the <a class="reference external" href="http://en.wikipedia.org/wiki/Pigeonhole_principle">Pigeonhole Principle</a>, that for large enough M two messages m<sub>1</sub> and m<sub>2</sub> must have the same error code, that is, e(m<sub>1</sub>) = e(m<sub>2</sub>). If this occurs, then the error code fails to detect the error that converted m<sub>1</sub> into m<sub>2</sub>.</p>
+<p>12.0. Consider the following four-bit numbers, with decimal values in parentheses:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">1000 (8)</div>
+<div class="line">1011 (11)</div>
+<div class="line">1101 (13)</div>
+<div class="line">1110 (14)</div>
+</div>
+</div></blockquote>
+<p>The ones-complement sum of these can be found using the division method by treating these as a four-digit hex number 0x8bde and taking the remainder mod 15; the result is 1.</p>
+<div class="line-block">
+<div class="line">(a). Find this ones-complement sum via three 4-bit ones-complement additions. To get started, note that the (exact) sum of 1000 and 1011 is 1|0011, and adding the carry bit to the low-order 4 bits gives a ones-complement sum of the first pair of 0100.</div>
+<div class="line">(b). The exact (and 8-bit twos-complement) sum of the values above is 46, or 10|1110 in binary. Find the ones-complement sum of the values by taking this exact sum and then forming the ones-complement sum of the 4-bit high and low halves. Note that this is not the same as the twos-complement sum of the halves.</div>
+</div>
+<p>13.0. Let [a,b] denote a pair of bytes a and b. The 16-bit integer corresponding to [a,b] using big-endian conversion is a×256 + b; using little-endian conversion it is a + 256×b.</p>
+<div class="line-block">
+<div class="line">(a). Find the ones-complement sum of [200,150] and [90,230] by using big-endian conversion to the respective 16-bit integers 51,350 and 23,270. Convert back to two bytes, again using big-endian conversion, at the end.</div>
+<div class="line">(b). Do the same using little-endian conversion, in which case the 16-bit integers are 38,600 and 58,970.</div>
+</div>
+<p>13.5. In the description in the text of the Internet checksum, the overflow bit was added back in after each ones-complement addition. Show that the same final result will be obtained if we add up the 16-bit words using 32-bit twos-complement arithmetic (twos-complement is the normal arithmetic on all modern hardware), and then add the upper 16 bits of the sum to the lower 16 bits. (If there is an overflow at this last step, we have to add that back in as well.)</p>
+<p>14.0. Suppose a message is 110010101. Calculate the CRC-3 checksum using the polynomial X<sup>3</sup> + 1, that is, find the 3-bit remainder using divisor 1001.</p>
+<p>15.0. The CRC algorithm presented above requires that we process one bit at a time. It is possible to do the algorithm N bits at a time (<em>eg</em> N=8), with a precomputed lookup table of size 2<sup>N</sup>. Complete the steps in the following description of this strategy for N=3 and polynomial X<sup>3</sup> + X + 1, or 1011.</p>
+<p>16.0. Consider the following set of bits sent with 2-D even parity; the data bits are in the 4×4 upper-left block and the parity bits are in the rightmost column and bottom row. Which bit is corrupted?</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌───┬───┬───┬───┬───┐
+│ 1 │ 1 │ 0 │ 1 │ 1 │
+├───┼───┼───┼───┼───┤
+│ 0 │ 1 │ 0 │ 0 │ 1 │
+├───┼───┼───┼───┼───┤
+│ 1 │ 1 │ 1 │ 1 │ 1 │
+├───┼───┼───┼───┼───┤
+│ 1 │ 0 │ 0 │ 1 │ 0 │
+├───┼───┼───┼───┼───┤
+│ 1 │ 1 │ 1 │ 0 │ 1 │
+└───┴───┴───┴───┴───┘
+</pre></div>
+</div>
+<p>17.0. (a) Show that 2-D parity can <em>detect</em> any three errors.
+| (b). Find four errors that cannot be detected by 2-D parity.
+| (c). Show that that 2-D parity cannot <em>correct</em> all two-bit errors. Hint: put both bits in the same row or column.</p>
+<p>18.0. Each of the following 8-bit messages with 4-bit Hamming code contains a single error. Correct the message.</p>
+<div class="line-block">
+<div class="line">(a)♢. 10100010 0111</div>
+<div class="line">(b). 10111110 1011</div>
+</div>
+<p>19.0. (a) What happens in 2-D parity if the corrupted bit is in the parity column or parity row?</p>
+<div class="line-block">
+<div class="line">(b). In the following 8-bit message with 4-bit Hamming code, there is an error in the <em>code</em> portion. How can this be determined?</div>
+</div>
+<blockquote>
+<div><div class="line-block">
+<div class="line">1001 1110 0100</div>
+</div>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="slidingwindows.html" title="8   Abstract Sliding Windows"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="links.html" title="6   Links"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, desktop edition 2.0.11</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012-2022, Peter L Dordal.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

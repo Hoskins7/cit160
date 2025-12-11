@@ -1,0 +1,784 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>19   TCP Reno and Congestion Management &#8212; An Introduction to Computer Networks, desktop edition 2.0.11</title>
+    <link rel="stylesheet" href="_static/csbnetbook.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script type="text/javascript" src="_static/mobile.js"></script>
+    <script type="text/javascript" src="_static/rightsidebar.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="20   Dynamics of TCP" href="dynamicsA.html" />
+    <link rel="prev" title="18   TCP Issues and Alternatives" href="tcpB.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="dynamicsA.html" title="20   Dynamics of TCP"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tcpB.html" title="18   TCP Issues and Alternatives"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, desktop edition 2.0.11</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">19&nbsp;&nbsp;&nbsp;TCP Reno and Congestion Management</a><ul>
+<li><a class="reference internal" href="#basics-of-tcp-congestion-management">19.1&nbsp;&nbsp;&nbsp;Basics of TCP Congestion Management</a><ul>
+<li><a class="reference internal" href="#the-somewhat-steady-state">19.1.1&nbsp;&nbsp;&nbsp;The Somewhat-Steady State</a><ul>
+<li><a class="reference internal" href="#a-first-look-at-fairness">19.1.1.1&nbsp;&nbsp;&nbsp;A first look at fairness</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#slow-start">19.2&nbsp;&nbsp;&nbsp;Slow Start</a><ul>
+<li><a class="reference internal" href="#tcp-reno-per-ack-responses">19.2.1&nbsp;&nbsp;&nbsp;TCP Reno Per-ACK Responses</a></li>
+<li><a class="reference internal" href="#threshold-slow-start">19.2.2&nbsp;&nbsp;&nbsp;Threshold Slow Start</a></li>
+<li><a class="reference internal" href="#slow-start-multiple-drop-example">19.2.3&nbsp;&nbsp;&nbsp;Slow-Start Multiple Drop Example</a></li>
+<li><a class="reference internal" href="#summary-of-tcp-so-far">19.2.4&nbsp;&nbsp;&nbsp;Summary of TCP so far</a></li>
+<li><a class="reference internal" href="#the-initial-value-of-cwnd">19.2.5&nbsp;&nbsp;&nbsp;The initial value of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#tcp-tahoe-and-fast-retransmit">19.3&nbsp;&nbsp;&nbsp;TCP Tahoe and Fast Retransmit</a></li>
+<li><a class="reference internal" href="#tcp-reno-and-fast-recovery">19.4&nbsp;&nbsp;&nbsp;TCP Reno and Fast Recovery</a></li>
+<li><a class="reference internal" href="#tcp-newreno">19.5&nbsp;&nbsp;&nbsp;TCP NewReno</a></li>
+<li><a class="reference internal" href="#selective-acknowledgments-sack">19.6&nbsp;&nbsp;&nbsp;Selective Acknowledgments (SACK)</a></li>
+<li><a class="reference internal" href="#tcp-and-bottleneck-link-utilization">19.7&nbsp;&nbsp;&nbsp;TCP and Bottleneck Link Utilization</a><ul>
+<li><a class="reference internal" href="#tcp-queue-sizes">19.7.1&nbsp;&nbsp;&nbsp;TCP Queue Sizes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#single-packet-losses">19.8&nbsp;&nbsp;&nbsp;Single Packet Losses</a></li>
+<li><a class="reference internal" href="#tcp-assumptions-and-scalability">19.9&nbsp;&nbsp;&nbsp;TCP Assumptions and Scalability</a></li>
+<li><a class="reference internal" href="#tcp-parameters">19.10&nbsp;&nbsp;&nbsp;TCP Parameters</a></li>
+<li><a class="reference internal" href="#epilog">19.11&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li><a class="reference internal" href="#exercises">19.12&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="tcpB.html"
+                        title="previous chapter">18&nbsp;&nbsp;&nbsp;TCP Issues and Alternatives</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="dynamicsA.html"
+                        title="next chapter">20&nbsp;&nbsp;&nbsp;Dynamics of TCP</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="tcp-reno-and-congestion-management">
+<span id="congestion-avoidance"></span><h1>19&nbsp;&nbsp;&nbsp;TCP Reno and Congestion Management<a class="headerlink" href="#tcp-reno-and-congestion-management" title="Permalink to this headline">¶</a></h1>
+<p>This chapter addresses how TCP manages congestion, both for the connection’s own benefit (to improve its throughput) and for the benefit of other connections as well (which may result in our connection <em>reducing</em> its own throughput). Early work on congestion culminated in 1990 with the flavor of TCP known as <strong>TCP Reno</strong>. The congestion-management mechanisms of TCP Reno remain the dominant approach on the Internet today, though alternative TCPs are an active area of research and we will consider a few of them in <a class="reference internal" href="newtcps.html#newtcps"><span class="std std-ref">22&nbsp;&nbsp;&nbsp;Newer TCP Implementations</span></a>.</p>
+<p>The central TCP mechanism here is for a connection to adjust its window size. A smaller winsize means fewer packets are out in the Internet at any one time, and less traffic means less congestion. A larger winsize means better throughput, up to a point. All TCPs reduce winsize when congestion is apparent, and increase it when it is not. The trick is in figuring out when and by how much to make these winsize changes. Many of the improvements to TCP have come from mining more and more information from the stream of returning ACKs.</p>
+<div class="sidebar" id="index-0">
+<p class="first sidebar-title">The Anternet</p>
+<p class="last">The Harvester Ant <em>Pogonomyrmex barbatus</em> uses a mechanism related to TCP Reno to “decide” how many ants should be out foraging at any one time <a class="reference internal" href="bibliography.html#pdg12" id="id1">[PDG12]</a>. The rate of ants leaving the nest to forage is closely tied to the rate of returning foragers; if foragers return quickly (meaning more food is available), the total number of foragers will increase (like the increasing winsize below). The ant algorithm is probabilistic, however, while most TCP algorithms are deterministic.</p>
+</div>
+<p>Recall Chiu and Jain’s definition from <a class="reference internal" href="intro.html#congestion"><span class="std std-ref">1.7&nbsp;&nbsp;&nbsp;Congestion</span></a> that the “knee” of congestion occurs when the queue first starts to grow, and the “cliff” of congestion occurs when packets start being dropped. Congestion can be managed at either point, though dropped packets can be a significant waste of resources. Some newer TCP strategies attempt to take action at the congestion knee (starting with <a class="reference internal" href="newtcps.html#tcp-vegas"><span class="std std-ref">22.6&nbsp;&nbsp;&nbsp;TCP Vegas</span></a>), but TCP Reno is a cliff-based strategy: packets must be lost before the sender reduces the window size.</p>
+<p>In <a class="reference internal" href="realtime.html#quality-of-service"><span class="std std-ref">25&nbsp;&nbsp;&nbsp;Quality of Service</span></a> we will consider some router-centric alternatives to TCP for Internet congestion management. However, for the most part these have not been widely adopted, and TCP is all that stands in the way of Internet congestive collapse.</p>
+<p id="index-1">The first question one might ask about TCP congestion management is just how did it get this job? A TCP sender is expected to monitor its transmission rate so as to <em>cooperate</em> with other senders to reduce overall congestion among the routers. While part of the goal of every TCP node is good, stable performance for its own connections, this emphasis on end-user cooperation introduces the prospect of “cheating”: a host might be tempted to maximize the throughput of its own connections at the expense of others. Putting TCP nodes in charge of congestion among the core routers is to some degree like putting the foxes in charge of the henhouse. More accurately, such an arrangement has the potential to lead to the <a class="reference external" href="http://en.wikipedia.org/wiki/Tragedy_of_the_commons">Tragedy of the Commons</a>. Multiple TCP senders share a common resource – the Internet backbone – and while the backbone is most efficient if every sender cooperates, each individual sender can improve its own situation by sending faster than allowed. Indeed, one of the arguments used by virtual-circuit routing adherents is that it provides support for the implementation of a wide range of congestion-management options under control of a central authority.</p>
+<p>Nonetheless, TCP has been quite successful at distributed congestion management. In part this has been because system vendors do have an incentive to take the big-picture view, and in the past it has been quite difficult for individual users to replace their TCP stacks with rogue versions. Another factor contributing to TCP’s success here is that most bad TCP behavior requires cooperation at the <em>server</em> end, and most server managers have an incentive to behave cooperatively. Servers generally want to distribute bandwidth fairly among their multiple clients, and – theoretically at least – a server’s ISP could penalize misbehavior. So far, at least, the TCP approach has worked remarkably well.</p>
+<div class="section" id="basics-of-tcp-congestion-management">
+<h2>19.1&nbsp;&nbsp;&nbsp;Basics of TCP Congestion Management<a class="headerlink" href="#basics-of-tcp-congestion-management" title="Permalink to this headline">¶</a></h2>
+<p>TCP’s congestion management is <strong>window-based</strong>; that is, TCP adjusts its window size to adapt to congestion. The window size can be thought of as the number of packets out there in the network; more precisely, it represents the number of packets and ACKs either in transit or enqueued. An alternative approach often used for real-time systems is <strong>rate-based</strong> congestion management, which runs into an unfortunate difficulty if the sending rate momentarily happens to exceed the available rate.</p>
+<p id="index-2">In the very earliest days of TCP, the window size for a TCP connection came from the AdvertisedWindow value suggested by the receiver, essentially representing how many packet buffers it could allocate. This value is often quite large, to accommodate large bandwidth×delay products, and so is often reduced out of concern for congestion. When winsize is adjusted downwards for this reason, it is generally referred to as the <strong>Congestion Window</strong>, or <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> (a variable name first appearing in Berkeley Unix). Strictly speaking, winsize = min(<code class="docutils literal notranslate"><span class="pre">cwnd</span></code>, AdvertisedWindow). In newer TCP implementations, the variable <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> may actually be used to mean the sender’s estimate of the number of packets in flight; see the sidebar at <a class="reference internal" href="#fast-recovery"><span class="std std-ref">19.4&nbsp;&nbsp;&nbsp;TCP Reno and Fast Recovery</span></a>.</p>
+<p>If TCP is sending over an idle network, the per-packet RTT will be RTT<sub>noLoad</sub>, the travel time with no queuing delays. As we saw in <a class="reference internal" href="slidingwindows.html#rtt-calculations"><span class="std std-ref">8.3.2&nbsp;&nbsp;&nbsp;RTT Calculations</span></a>, (RTT−RTT<sub>noLoad</sub>) is the time each packet spends in the queue. The path bandwidth is winsize/RTT, and so the number of packets in queues is winsize × (RTT−RTT<sub>noLoad</sub>) / RTT. Usually all the queued packets are at the router at the head of the bottleneck link. Note that the sender can calculate this number (assuming we can estimate RTT<sub>noLoad</sub>; the most common approach is to assume that the smallest RTT measured corresponds to RTT<sub>noLoad</sub>).</p>
+<p>TCP’s self-clocking (<em>ie</em> that new transmissions are paced by returning ACKs) guarantees that, again assuming an otherwise idle network, the queue will build only at the bottleneck router. Self-clocking means that the rate of packet transmissions is equal to the available bandwidth of the bottleneck link. There are some spikes when a burst of packets is sent (<em>eg</em> when the sender increases its window size), but in the steady state self-clocking means that packets accumulate only at the bottleneck.</p>
+<p>We will return to the case of the <em>non</em>-otherwise-idle network in the next chapter, in <a class="reference internal" href="dynamicsA.html#bottleneck-links"><span class="std std-ref">20.2&nbsp;&nbsp;&nbsp;Bottleneck Links with Competition</span></a>.</p>
+<p>The “optimum” window size for a TCP connection would be bandwidth × RTT<sub>noLoad</sub>. With this window size, the sender has exactly filled the transit capacity along the path to its destination, and has used none of the queue capacity.</p>
+<p>Actually, TCP Reno does not do this.</p>
+<p>Instead, TCP Reno does the following:</p>
+<ul class="simple">
+<li>guesses at a reasonable initial window size, using a form of polling</li>
+<li>slowly increases the window size if no losses occur, on the theory that maximum available throughput may not yet have been reached</li>
+<li>rapidly decreases the window size otherwise, on the theory that if losses occur then drastic action is needed</li>
+</ul>
+<p>In practice, this usually leaves TCP’s window size well above the theoretical “optimum”.</p>
+<p>One interpretation of TCP’s approach is that there is a time-varying “ceiling” on the number of packets the network can accept. Each sender tries to stay near but just below this level. Occasionally a sender will overshoot and a packet will be dropped somewhere, but this just teaches the sender a little more about where the network ceiling is. More formally, this ceiling represents the largest <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> that does not lead to packet loss, <em>ie</em> the <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> that at that particular moment completely fills but does not overflow the bottleneck queue. We have reached the ceiling when the queue is full.</p>
+<p id="index-3">In Chiu and Jain’s terminology, the far side of the ceiling is the “cliff”, at which point packets are lost. TCP tries to stay above the “knee”, which is the point when the queue first begins to be persistently utilized, thus keeping the queue at least partially occupied; whenever it sends too much and falls off the “cliff”, it retreats.</p>
+<p>The ceiling concept is often useful, but not necessarily as precise as it might sound. If we have reached the ceiling by <em>gradually</em> expanding the sliding-windows window size, then
+winsize will be as large as possible. But if the sender suddenly releases a burst of packets, the queue may fill and we will have reached a “temporary ceiling” without fully utilizing the transit capacity. Another source of ceiling ambiguity is that the bottleneck link may be shared with other connections, in which case the ceiling represents our connection’s particular share, which may fluctuate greatly with time. Finally, at the point when the ceiling is reached, the queue is <em>full</em> and so there are a considerable number of packets waiting in the queue; it is not possible for a sender to pull back instantaneously.</p>
+<p id="index-4">It is time to acknowledge the existence of different versions of TCP, each incorporating different congestion-management algorithms. The two we will start with are <strong>TCP Tahoe</strong> (1988) and <strong>TCP Reno</strong> (1990); the names Tahoe and Reno were originally the codenames of the Berkeley Unix distributions that included these respective TCP implementations. The ideas behind TCP Tahoe came from a 1988 paper by Jacobson and Karels <a class="reference internal" href="bibliography.html#jk88" id="id2">[JK88]</a>; TCP Reno then refined this a couple years later. TCP Reno is still in widespread use over twenty years later, and is still the undisputed TCP reference implementation, although some modest improvements (NewReno, SACK) have crept in.</p>
+<p>A common theme to the development of improved implementations of TCP is for one end of the connection (usually the sender) to extract greater and greater amounts of information from the packet flow. For example, TCP Tahoe introduced the idea that duplicate ACKs likely mean a lost packet; TCP Reno introduced the idea that returning duplicate ACKs are associated with packets that have successfully been transmitted but follow a loss. TCP Vegas (<a class="reference internal" href="newtcps.html#tcp-vegas"><span class="std std-ref">22.6&nbsp;&nbsp;&nbsp;TCP Vegas</span></a>) introduced the fine-grained measurement of RTT, to detect when RTT &gt; RTT<sub>noLoad</sub>.</p>
+<p id="index-5">It is often helpful to think of a TCP sender as having breaks between successive windowfuls; that is, the sender sends <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> packets, is briefly idle, and then sends another <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> packets. The successive windowfuls of packets are often called <strong>flights</strong>. The existence of any separation between flights is, however, not guaranteed.</p>
+<div class="section" id="the-somewhat-steady-state">
+<span id="steady-state"></span><span id="index-6"></span><h3>19.1.1&nbsp;&nbsp;&nbsp;The Somewhat-Steady State<a class="headerlink" href="#the-somewhat-steady-state" title="Permalink to this headline">¶</a></h3>
+<p>We will begin with the state in which TCP has established a reasonable guess for <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>, comfortably below the Advertised Window Size, and which largely appears to be working. TCP then engages in some fine-tuning. This TCP “steady state” – steady here in the sense of regular oscillation – is usually referred to as the <strong>congestion avoidance</strong> phase, though all phases of the process are ultimately directed towards avoidance of congestion. The central strategy is that when a packet is lost, <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> should decrease rapidly, but otherwise should increase “slowly”. This leads to slow oscillation of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>, which over time allows the average <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> to adapt to long-term changes in the network capacity.</p>
+<p>As TCP finishes each windowful of packets, it notes whether a loss occurred. The <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>-adjustment rule introduced by TCP Tahoe and <a class="reference internal" href="bibliography.html#jk88" id="id3">[JK88]</a> is the following:</p>
+<ul class="simple">
+<li>if there were no losses in the previous windowful, <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> +1</li>
+<li>if packets were lost, <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>/2</li>
+</ul>
+<p>We are informally measuring <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> in units of full packets; strictly speaking, <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is measured in bytes and is incremented by the maximum TCP segment size.</p>
+<p id="index-7">This strategy here is known as <strong>Additive Increase, Multiplicative Decrease</strong>, or AIMD;  <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>+1  is the additive increase and <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>/2 is the multiplicative decrease. Typically, setting <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>=<code class="docutils literal notranslate"><span class="pre">cwnd</span></code>/2 is a medium-term goal; in fact, TCP Tahoe briefly sets <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>=1 in the immediate aftermath of an actual timeout. With no losses, TCP will send successive windowfuls of, say, 20, 21, 22, 23, 24, …. This amounts to conservative “probing” of the network and, in particular, of the queue at the bottleneck router. TCP tries larger <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> values because the absence of loss means the current <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is below the “network ceiling”; that is, the queue at the bottleneck router is not yet overfull.</p>
+<p>If a loss occurs (including multiple losses in a single windowful), TCP’s response is to cut the window size in half. (As we will see, TCP Tahoe actually handles this in a somewhat roundabout way.) Informally, the idea is that the sender needs to respond aggressively to congestion. More precisely, lost packets mean the queue of the bottleneck router has filled, and the sender needs to dial back to a level that will allow the queue to clear. If we assume that the transit capacity is roughly equal to the queue capacity (say each is equal to N), then we overflow the queue and drop packets when <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = 2N, and so <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>/2 leaves us with <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = N, which just fills the transit capacity and leaves the queue empty.
+(When the sender sets <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>=N, the actual number of packets in transit takes at least one RTT to fall from 2N to N.)</p>
+<p>Of course, assuming any relationship between transit capacity and queue capacity is highly speculative. On a 5,000 km fiber-optic link with a bandwidth of 10 Gbps, the round-trip transit capacity would be about 60 MB, or 60,000 1kB packets. Most routers probably do not have queues that large. Queue capacities in excess of the transit capacity are common, however. On the other hand, a competing model of a long-haul high-bandwidth TCP path is that the queue size should be a small fraction of the bandwidth×delay product. We return to this in <a class="reference internal" href="#bottleneck-link-utilization"><span class="std std-ref">19.7&nbsp;&nbsp;&nbsp;TCP and Bottleneck Link Utilization</span></a> and <a class="reference internal" href="dynamicsB.html#bufferbloat1"><span class="std std-ref">21.5.1&nbsp;&nbsp;&nbsp;Bufferbloat</span></a>.</p>
+<p>Note that if TCP experiences a packet loss, and there is an actual timeout (as opposed to a packet loss detected by Fast Retransmit, <a class="reference internal" href="#fast-retransmit"><span class="std std-ref">19.3&nbsp;&nbsp;&nbsp;TCP Tahoe and Fast Retransmit</span></a>), then the sliding-window pipe has drained. No packets are in flight. No self-clocking can govern new transmissions. Sliding windows therefore needs to restart from scratch.</p>
+<p id="index-8">The congestion-avoidance algorithm leads to the classic “TCP sawtooth” graph, where the peaks are at the points where the slowly rising <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> crossed above the “network ceiling”. We emphasize that the TCP sawtooth is specific to TCP Reno and related TCP implementations that share Reno’s additive-increase/multiplicative-decrease mechanism.</p>
+<img alt="_images/TCP_sawtooth.svg" src="_images/TCP_sawtooth.svg" /><p>During periods of no loss, TCP’s <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> increases linearly; when a loss occurs, TCP sets <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>/2. This diagram is an idealization as when a loss occurs it takes the sender some time to discover it, perhaps as much as the TimeOut interval.</p>
+<p>The fluctuation shown here in the red ceiling curve is somewhat arbitrary. If there are only one or two other competing senders, the ceiling variation may be quite dramatic, but with many concurrent senders the variations may be smoothed out.</p>
+<p>For some TCP sawtooth graphs created through actual simulation, see <a class="reference internal" href="ns2.html#ns-cwnd-v-time-1"><span class="std std-ref">31.2.1&nbsp;&nbsp;&nbsp;Graph of cwnd v time</span></a> and <a class="reference internal" href="ns2.html#cwnd-graphs"><span class="std std-ref">31.4.1&nbsp;&nbsp;&nbsp;Some TCP Reno cwnd graphs</span></a>.</p>
+<div class="section" id="a-first-look-at-fairness">
+<span id="fairness1"></span><h4>19.1.1.1&nbsp;&nbsp;&nbsp;A first look at fairness<a class="headerlink" href="#a-first-look-at-fairness" title="Permalink to this headline">¶</a></h4>
+<p>The transit capacity of the path is more-or-less unvarying, as is the physical capacity of the queue at the bottleneck router. However, these capacities are also shared with other connections, which may come and go with time. This is why the ceiling does vary in real terms. If two other connections share a path with total capacity 60 packets, the “fairest” allocation might be for each connection to get about 20 packets as its share. If one of those other connections terminates, the two remaining ones might each rise to 30 packets. And if instead a fourth connection joins the mix, then after equilibrium is reached each connection might hope for a fair share of 15 packets.</p>
+<p>Will this kind of “fair” allocation actually happen? Or might we end up with one connection getting 90% of the bandwidth while two others each get 5%?</p>
+<p>Chiu and Jain <a class="reference internal" href="bibliography.html#cj89" id="id4">[CJ89]</a> showed that the additive-increase/multiplicative-decrease algorithm does indeed converge to roughly equal bandwidth sharing when two connections have a common bottleneck link, provided also that</p>
+<ul class="simple">
+<li>both connections have the same RTT</li>
+<li>during any given RTT, either both connections experience a packet loss, or neither connection does</li>
+</ul>
+<p>To see this, let <code class="docutils literal notranslate"><span class="pre">cwnd1</span></code> and <code class="docutils literal notranslate"><span class="pre">cwnd2</span></code> be the connections’ congestion-window sizes, and consider the quantity <code class="docutils literal notranslate"><span class="pre">cwnd1</span></code> − <code class="docutils literal notranslate"><span class="pre">cwnd2</span></code>. For any RTT in which there is no loss, <code class="docutils literal notranslate"><span class="pre">cwnd1</span></code> and <code class="docutils literal notranslate"><span class="pre">cwnd2</span></code> both increment by 1, and so <code class="docutils literal notranslate"><span class="pre">cwnd1</span></code> − <code class="docutils literal notranslate"><span class="pre">cwnd2</span></code> stays the same. If there is a loss, then both are cut in half and so <code class="docutils literal notranslate"><span class="pre">cwnd1</span></code> − <code class="docutils literal notranslate"><span class="pre">cwnd2</span></code> is also cut in half. Thus, over time, the original value of <code class="docutils literal notranslate"><span class="pre">cwnd1</span></code> − <code class="docutils literal notranslate"><span class="pre">cwnd2</span></code> is repeatedly cut in half (during each RTT in which losses occur) until it dwindles to inconsequentiality, at which point <code class="docutils literal notranslate"><span class="pre">cwnd1</span></code> ≃ <code class="docutils literal notranslate"><span class="pre">cwnd2</span></code>.</p>
+<p>Graphical and tabular versions of this same argument are in the next chapter, in <a class="reference internal" href="dynamicsA.html#fairness2"><span class="std std-ref">20.3&nbsp;&nbsp;&nbsp;TCP Reno Fairness with Synchronized Losses</span></a>.</p>
+<p id="index-9">The second bulleted hypothesis above we may call the <strong>synchronized-loss hypothesis</strong>. While it is very reasonable to suppose that the two connections will experience the same number of losses as a long-term <em>average</em>, it is a much stronger statement to suppose that all loss events are shared by both connections. This behavior may not occur in real life and has been the subject of some debate; see <a class="reference internal" href="bibliography.html#gv02" id="id5">[GV02]</a>. We return to this point in <a class="reference internal" href="ns2.html#basic2"><span class="std std-ref">31.3&nbsp;&nbsp;&nbsp;Two TCP Senders Competing</span></a>. Fortunately, equal-RTT fairness still holds if each connection is <em>equally likely</em> to experience a packet loss: both connections will have the same loss rate, and so, as we shall see in <a class="reference internal" href="dynamicsB.html#tcp-loss-rate-versus-cwnd"><span class="std std-ref">21.2&nbsp;&nbsp;&nbsp;TCP Reno loss rate versus cwnd</span></a>, will have the same <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>. However, convergence to fairness may take rather much longer. In <a class="reference internal" href="dynamicsA.html#fairness2"><span class="std std-ref">20.3&nbsp;&nbsp;&nbsp;TCP Reno Fairness with Synchronized Losses</span></a> we also look at some alternative hypotheses for the unequal-RTT case.</p>
+</div>
+</div>
+</div>
+<div class="section" id="slow-start">
+<span id="id6"></span><h2>19.2&nbsp;&nbsp;&nbsp;Slow Start<a class="headerlink" href="#slow-start" title="Permalink to this headline">¶</a></h2>
+<p>How do we make that initial guess as to the network capacity? What value of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> should we begin with? And even if we have a good target for <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>, how do we avoid flooding the network sending an initial burst of packets?</p>
+<p>The TCP Reno answer is known as <strong>slow start</strong>. If you are trying to guess a number in a fixed range, you are likely to use binary search. Not knowing the range for the “network ceiling”, a good strategy is to guess <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>=1 (or <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>=2) at first and keep doubling until you have gone too far. Then revert to the previous guess, which is known to have worked. At this point you are guaranteed to be within 50% of the true capacity.</p>
+<p>The actual slow-start mechanism is to increment <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> by 1 for each ACK received. This seems linear, but that is misleading: after we send a windowful of packets (<code class="docutils literal notranslate"><span class="pre">cwnd</span></code> many), we have received <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> ACKs and so have incremented <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>-many times, and so have set <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> to (<code class="docutils literal notranslate"><span class="pre">cwnd</span></code>+<code class="docutils literal notranslate"><span class="pre">cwnd</span></code>) = 2×<code class="docutils literal notranslate"><span class="pre">cwnd</span></code>. In other words, <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>=<code class="docutils literal notranslate"><span class="pre">cwnd</span></code>×2 after each <em>windowful</em> is the same as <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>+=1 after each <em>packet</em>.</p>
+<p id="index-10">Assuming packets travel together in windowfuls, all this means <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> <em>doubles</em> each RTT during slow start; this is possibly the only place in the computer science literature where exponential growth is described as “slow”. It is indeed slower, however, than the alternative of sending an entire windowful at once.</p>
+<p>Here is a diagram of slow start in action. This diagram makes the implicit assumption that the no-load RTT is large enough to hold well more than the 8 packets of the maximum window size shown.</p>
+<img alt="_images/TCP_slowstart8.svg" src="_images/TCP_slowstart8.svg" /><p>For a different case, with a much smaller RTT, see <a class="reference internal" href="#ssmultidrop"><span class="std std-ref">19.2.3&nbsp;&nbsp;&nbsp;Slow-Start Multiple Drop Example</span></a>.</p>
+<p>Eventually the bottleneck queue gets full, and drops a packet. Let us suppose this is after N RTTs, so <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>=2<sup>N</sup>. Then during the previous RTT, <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>=2<sup>N-1</sup> worked successfully, so we go back to that previous value by setting <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>/2.</p>
+<div class="section" id="tcp-reno-per-ack-responses">
+<span id="per-ack-responses"></span><h3>19.2.1&nbsp;&nbsp;&nbsp;TCP Reno Per-ACK Responses<a class="headerlink" href="#tcp-reno-per-ack-responses" title="Permalink to this headline">¶</a></h3>
+<p>During slow start, incrementing <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> by one per ACK received is equivalent to doubling <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> after each windowful. We can find a similar equivalence for the congestion-avoidance phase, above.</p>
+<p>During congestion avoidance, <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is incremented by 1 after each windowful. To formulate this as a <strong>per-ACK</strong> increase, we spread this increment of 1 over the entire windowful, which of course has size <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>. This amounts to the following upon each ACK received:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> + 1/<code class="docutils literal notranslate"><span class="pre">cwnd</span></code></div>
+</div>
+</div></blockquote>
+<p>This is a slight approximation, because <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> keeps changing, but it works well in practice. Because TCP actually measures <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> in bytes, floating-point arithmetic is normally not required; see exercise 14.0. An exact equivalent to the per-windowful incrementing strategy is <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> + 1/<code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>0</sub>, where <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>0</sub> is the value of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> at the start of that particular windowful. Another, simpler, approach is to use <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> += 1/<code class="docutils literal notranslate"><span class="pre">cwnd</span></code>, and to keep the fractional part recorded, but to use floor(<code class="docutils literal notranslate"><span class="pre">cwnd</span></code>) (the integer part of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>) when actually sending packets.</p>
+<p>Most actual implementations keep track of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> in bytes, in which case using integer arithmetic is sufficient until <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> becomes quite large.</p>
+<p id="index-11">If <strong>delayed ACKs</strong> are implemented (<a class="reference internal" href="tcpB.html#delayed-acks"><span class="std std-ref">18.8&nbsp;&nbsp;&nbsp;TCP Delayed ACKs</span></a>), then in bulk transfers one arriving ACK actually acknowledges two packets. <span class="target" id="index-12"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3465.html"><strong>RFC 3465</strong></a> permits a TCP receiver to increment <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> by 2/<code class="docutils literal notranslate"><span class="pre">cwnd</span></code> in that situation, which is the response consistent with incrementing <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> by 1 upon receipt of enough ACKs to acknowledge an entire windowful.</p>
+</div>
+<div class="section" id="threshold-slow-start">
+<span id="index-13"></span><span id="id7"></span><h3>19.2.2&nbsp;&nbsp;&nbsp;Threshold Slow Start<a class="headerlink" href="#threshold-slow-start" title="Permalink to this headline">¶</a></h3>
+<p>Sometimes TCP uses slow start even when it knows the working network capacity. After a packet loss and timeout, TCP knows that a new <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>old</sub>/2 should work. If <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> had been 100, TCP halves it to 50. The problem, however, is that after timeout there are no returning ACKs to self-clock the continuing transmission, and we do not want to dump 50 packets on the network all at once. So in restarting the flow TCP uses what might be called <strong>threshold slow start</strong>: it uses slow-start, but stops when <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> reaches the target. Specifically, on packet loss we set the variable <code class="docutils literal notranslate"><span class="pre">ssthresh</span></code> to <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>/2; this is our new target for <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>. We set <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> itself to 1, and switch to the slow-start mode (<code class="docutils literal notranslate"><span class="pre">cwnd</span></code> += 1 for each ACK). However, as soon as <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> reaches <code class="docutils literal notranslate"><span class="pre">ssthresh</span></code>, we switch to the congestion-avoidance mode (<code class="docutils literal notranslate"><span class="pre">cwnd</span></code> += 1/<code class="docutils literal notranslate"><span class="pre">cwnd</span></code> for each ACK). Note that the transition from threshold slow start to congestion avoidance is completely natural, and easy to implement.</p>
+<p>TCP will use threshold slow-start whenever it is restarting from a pipe drain; that is, every time slow-start is needed after its very first use. (If a connection has simply been <em>idle</em>, non-threshold slow start is typically used when traffic starts up again.)</p>
+<p>Threshold slow-start can be seen as an attempt at combining rapid window expansion with self-clocking.</p>
+<p id="index-14">By comparison, we might refer to the initial, non-threshold slow start as <strong>unbounded slow start</strong>. Note that unbounded slow start serves a fundamentally different purpose – initial probing to determine the network ceiling to within 50% – than threshold slow start.</p>
+<p id="index-15">Here is the TCP sawtooth diagram above, modified to show timeouts and slow start. The first two packet losses are displayed as “coarse timeouts”; the rest are displayed as if Fast Retransmit, below, were used.</p>
+<img alt="_images/TCP_sawtooth2.svg" src="_images/TCP_sawtooth2.svg" /><p><span class="target" id="index-16"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2581.html"><strong>RFC 2581</strong></a> allows slow start to begin with <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>=2.</p>
+</div>
+<div class="section" id="slow-start-multiple-drop-example">
+<span id="ssmultidrop"></span><h3>19.2.3&nbsp;&nbsp;&nbsp;Slow-Start Multiple Drop Example<a class="headerlink" href="#slow-start-multiple-drop-example" title="Permalink to this headline">¶</a></h3>
+<p>Slow start has the potential to cause multiple dropped packets at the bottleneck link; packet losses continue for quite some time because the TCP sender is slow to discover them. The network topology is as follows, where the A–R link is infinitely fast and the R–B link has a bandwidth in the R⟶B direction of 1 packet/ms.</p>
+<img alt="_images/ARB_labeled.svg" src="_images/ARB_labeled.svg" /><p>Assume that R has a queue capacity of 100, not including the packet it is currently forwarding to B, and that ACKs travel instantly from B back to A. In this and later examples we will continue to use the Data[N]/ACK[N] terminology of <a class="reference internal" href="slidingwindows.html#sliding-windows"><span class="std std-ref">8.2&nbsp;&nbsp;&nbsp;Sliding Windows</span></a>, beginning with N=1; TCP numbering is not done quite this way but the distinction is inconsequential.</p>
+<p>When A uses slow-start here, the successive windowfuls will almost immediately begin to overlap. A will send one packet at T=0; it will be delivered at T=1. The ACK will travel instantly to A, at which point A will send two packets. From this point on, ACKs will arrive regularly at A at a rate of one per second. Here is a brief chart:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="9%" />
+<col width="19%" />
+<col width="26%" />
+<col width="25%" />
+<col width="21%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Time</th>
+<th class="head">A receives</th>
+<th class="head">A sends</th>
+<th class="head">R sends</th>
+<th class="head">R’s queue</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>&#160;</td>
+<td>Data[1]</td>
+<td>Data[1]</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td>ACK[1]</td>
+<td>Data[2],Data[3]</td>
+<td>Data[2]</td>
+<td>Data[3]</td>
+</tr>
+<tr class="row-even"><td>2</td>
+<td>ACK[2]</td>
+<td>4,5</td>
+<td>3</td>
+<td>4,5</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td>ACK[3]</td>
+<td>6,7</td>
+<td>4</td>
+<td>5..7</td>
+</tr>
+<tr class="row-even"><td>4</td>
+<td>ACK[4]</td>
+<td>8,9</td>
+<td>5</td>
+<td>6..9</td>
+</tr>
+<tr class="row-odd"><td>5</td>
+<td>ACK[5]</td>
+<td>10,11</td>
+<td>6</td>
+<td>7..11</td>
+</tr>
+<tr class="row-even"><td>..</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>N</td>
+<td>ACK[N]</td>
+<td>2N,2N+1</td>
+<td>N+1</td>
+<td>N+2 .. 2N+1</td>
+</tr>
+</tbody>
+</table>
+<p>At T=N, R’s queue contains N packets. At T=100, R’s queue is full. Data[200], sent at T=100, will be delivered and acknowledged at T=200, giving it an RTT of 100. At T=101, R receives Data[202] and Data[203] and drops the latter one. Unfortunately, A’s timeout interval must of course be greater than the RTT, and so A will not detect the loss until, at an absolute minimum, T=200. At that point, A has sent packets up through Data[401], and the 100 packets Data[203], Data[205], …, Data[401] have all been lost. In other words, at the point when A <em>first</em> receives the news of one lost packet, in fact at least 100 packets have already been lost.</p>
+<p>Fortunately, unbounded slow start generally occurs only once per connection.</p>
+</div>
+<div class="section" id="summary-of-tcp-so-far">
+<h3>19.2.4&nbsp;&nbsp;&nbsp;Summary of TCP so far<a class="headerlink" href="#summary-of-tcp-so-far" title="Permalink to this headline">¶</a></h3>
+<p>So far we have the following features:</p>
+<ul class="simple">
+<li>Unbounded slow start at the beginning</li>
+<li>Congestion avoidance with AIMD once some semblance of a steady state is reached</li>
+<li>Threshold slow start after each loss</li>
+<li>Each threshold slow start transitioning naturally to congestion avoidance</li>
+</ul>
+<p>Here is a table expressing the slow-start and congestion-avoidance phases in terms of manipulating <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="36%" />
+<col width="20%" />
+<col width="25%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>phase</td>
+<td><code class="docutils literal notranslate"><span class="pre">cwnd</span></code> change, loss</td>
+<td colspan="2"><code class="docutils literal notranslate"><span class="pre">cwnd</span></code> change, no loss</td>
+</tr>
+<tr class="row-even"><td></td>
+<td>per window</td>
+<td>per window</td>
+<td>per ACK</td>
+</tr>
+<tr class="row-odd"><td>slow start</td>
+<td><code class="docutils literal notranslate"><span class="pre">cwnd</span></code>/2</td>
+<td><code class="docutils literal notranslate"><span class="pre">cwnd</span></code> *= 2</td>
+<td><code class="docutils literal notranslate"><span class="pre">cwnd</span></code> += 1</td>
+</tr>
+<tr class="row-even"><td>cong avoid</td>
+<td><code class="docutils literal notranslate"><span class="pre">cwnd</span></code>/2</td>
+<td><code class="docutils literal notranslate"><span class="pre">cwnd</span></code> +=1</td>
+<td><code class="docutils literal notranslate"><span class="pre">cwnd</span></code> += 1/<code class="docutils literal notranslate"><span class="pre">cwnd</span></code></td>
+</tr>
+</tbody>
+</table>
+<div class="sidebar">
+<p class="first sidebar-title">Viewing <code class="docutils literal notranslate"><span class="pre">cwnd</span></code></p>
+<p class="last">Linux users can view the current values of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> and <code class="docutils literal notranslate"><span class="pre">ssthresh</span></code>, as well as a host of other TCP statistics, using the command <code class="docutils literal notranslate"><span class="pre">ss</span> <span class="pre">--tcp</span> <span class="pre">--info</span></code>.</p>
+</div>
+<p>The problem TCP often faces, in both slow-start and congestion-avoidance phases, is that when a packet is lost the sender will not detect this until much later (at least until the bottleneck router’s current queue has been sent); by then, it may be too late to avoid further losses.</p>
+</div>
+<div class="section" id="the-initial-value-of-cwnd">
+<span id="initial-cwnd"></span><span id="index-17"></span><h3>19.2.5&nbsp;&nbsp;&nbsp;The initial value of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><a class="headerlink" href="#the-initial-value-of-cwnd" title="Permalink to this headline">¶</a></h3>
+<p>So far we have been assuming that slow start begins with <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> equal to one packet, the value proposed in  <a class="reference internal" href="bibliography.html#jk88" id="id8">[JK88]</a>. But 1988 was quite a while ago, and the initial <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> has been creeping up. A decade later, <span class="target" id="index-18"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2414.html"><strong>RFC 2414</strong></a> proposed setting the initial <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> (used on startup and after a timeout) to between two and four packets, with a maximum size of 3×1460 (three packets if the maximum Ethernet packet size of 1500 bytes is used). For a while following, the most common value was two packets. Then <span class="target" id="index-19"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc6928.html"><strong>RFC 6928</strong></a>, in 2013, proposed an “experimental” change to an initial value of up to ten packets, where each can be 1460 bytes. This ten-packet value is now in relatively common use.</p>
+<p>This increase in the initial <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> value has mostly to do with the steadily increasing capacity of the Internet, and the decreased likelihood that a single extra packet will make a material difference. Still, the basic behavior of slow start remains the same.</p>
+<p>Non-Reno TCPs also implement something like slow start, though it may look slightly different. TCP BBR (<a class="reference internal" href="newtcps.html#tcp-bbr"><span class="std std-ref">22.16&nbsp;&nbsp;&nbsp;TCP BBR</span></a>), for example, has a STARTUP mode that serves the same function as TCP Reno slow start.</p>
+</div>
+</div>
+<div class="section" id="tcp-tahoe-and-fast-retransmit">
+<span id="fast-retransmit"></span><span id="index-20"></span><h2>19.3&nbsp;&nbsp;&nbsp;TCP Tahoe and Fast Retransmit<a class="headerlink" href="#tcp-tahoe-and-fast-retransmit" title="Permalink to this headline">¶</a></h2>
+<p>TCP Tahoe has one more important feature. Recall that TCP ACKs are cumulative; if packets 1 and 2 have been received and now Data[4] arrives, but not yet Data[3], all the receiver can (and must!) do is to send back another ACK[2]. Thus, from the sender’s perspective, if we send packets 1,2,3,4,5,6 and get back ACK[1], ACK[2], ACK[2], ACK[2], ACK[2],
+we can infer two things:</p>
+<ul class="simple">
+<li>Data[3] got lost, which is why we are stuck on ACK[2]</li>
+<li>Data 4,5 and 6 probably <em>did</em> make it through, and triggered the three duplicate ACK[2]s (the three ACK[2]s following the first ACK[2]).</li>
+</ul>
+<p>The <strong>Fast Retransmit</strong> strategy is to resend Data[N] when we have received three dupACKs for Data[N-1]; that is, four ACK[N-1]’s in all. Because this represents a packet loss, we also set
+<code class="docutils literal notranslate"><span class="pre">ssthresh</span></code> = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>/2, set <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>=1, and begin the threshold-slow-start phase. The effect of this is typically to reduce the delay associated with the lost packet from that of a full timeout, typically 2×RTT, to just a little over a single RTT. The lost packet is now discovered <em>before</em> the TCP pipeline has drained. However, at the end of the next RTT, when the ACK of the retransmitted packet will return, the TCP pipeline <em>will</em> have drained, hence the need for slow start.</p>
+<p>TCP Tahoe included all the features discussed so far: the <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>+=1 and <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>=<code class="docutils literal notranslate"><span class="pre">cwnd</span></code>/2 responses, slow start and Fast Retransmit.</p>
+<p>Fast Retransmit waits for the <em>third</em> dupACK to allow for the possibility of moderate packet reordering. Suppose packets 1 through 6 are sent, but they arrive in the order 1,3,4,2,6,5, perhaps due to a router along the way with an architecture that is strongly parallelized.
+Then the ACKs that would be sent back would be as follows:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="47%" />
+<col width="53%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Received</th>
+<th class="head">Response</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Data[1]</td>
+<td>ACK[1]</td>
+</tr>
+<tr class="row-odd"><td>Data[3]</td>
+<td>ACK[1]</td>
+</tr>
+<tr class="row-even"><td>Data[4]</td>
+<td>ACK[1]</td>
+</tr>
+<tr class="row-odd"><td>Data[2]</td>
+<td>ACK[4]</td>
+</tr>
+<tr class="row-even"><td>Data[6]</td>
+<td>ACK[4]</td>
+</tr>
+<tr class="row-odd"><td>Data[5]</td>
+<td>ACK[6]</td>
+</tr>
+</tbody>
+</table>
+<p>Waiting for the third dupACK is in most cases a successful compromise between responsiveness to lost packets and reasonable evidence that the data packet in question is actually lost.</p>
+<p>However, a router that does more substantial delivery reordering would wreck havoc on connections using Fast Retransmit. In particular, consider the router R in the diagram below; when sending packets to B it might in principle wish to alternate on a packet-by-packet basis between the path via R1 and the path via R2. This would be a mistake; if the R1 and R2 paths had different propagation delays then this strategy would introduce major packet reordering. R should send all the packets belonging to any one TCP connection via a single path.</p>
+<img alt="_images/ARB_two_route.svg" src="_images/ARB_two_route.svg" /><p>In the real world, routers generally go to considerable lengths to accommodate Fast Retransmit; in particular, use of multiple paths for a single TCP connection is almost universally frowned upon. Some actual data on packet reordering can be found in <a class="reference internal" href="bibliography.html#vp97" id="id9">[VP97]</a>; the author suggests that a switch to retransmission on the second dupACK would be risky.</p>
+</div>
+<div class="section" id="tcp-reno-and-fast-recovery">
+<span id="fast-recovery"></span><span id="index-21"></span><h2>19.4&nbsp;&nbsp;&nbsp;TCP Reno and Fast Recovery<a class="headerlink" href="#tcp-reno-and-fast-recovery" title="Permalink to this headline">¶</a></h2>
+<p>Fast Retransmit requires a sender to set <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>=1 because the pipe has drained and there are no arriving ACKs to pace transmission. Fast Recovery is a technique that often allows the sender to avoid draining the pipe, and to move from <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> to <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>/2 in the space of a single RTT. TCP Reno is TCP Tahoe with the addition of Fast Recovery.</p>
+<p>The idea is to use the arriving dupACKs to pace retransmission. We make the assumption that each arriving dupACK indicates that <em>some</em> data packet following the lost packet has been delivered successfully; it turns out not to matter which one. On discovery of the lost packet through Fast Retransmit, the goal is to set <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>=<code class="docutils literal notranslate"><span class="pre">cwnd</span></code>/2; the next step is to figure out how many dupACKs we have to wait for before we can resume transmissions of new data.</p>
+<p>Initially, at least, we assume that only one data packet is lost, though in the following section we will see that multiple losses can be handled via a slight modification of the Fast Recovery strategy.</p>
+<p id="index-22">During the recovery process, there is a problem with the direct use of sliding windows: the lost packet “pins” the lower end of the window until that packet is successfully retransmitted, so for the duration of the recovery period the window cannot slide forward. The official specification of fast recovery, originally in <span class="target" id="index-23"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2001.html"><strong>RFC 2001</strong></a> and now in <span class="target" id="index-24"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc5681.html"><strong>RFC 5681</strong></a>, describes retransmission in terms of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> <strong>inflation</strong> and <strong>deflation</strong>. If C is the value of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> at the time of the loss, then <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is steadily inflated to 1.5×C, allowing for the original window plus half a windowful more of new data. At the point the lost packet is successfully retransmitted, the window is “deflated” to <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = C/2; at this point the lower end of the window slides forward by C, and the upper end of the window does not move. This all works out, but can be a bit hard to follow.</p>
+<p id="index-25">Instead we will use the concept of Estimated FlightSize, or <strong>EFS</strong>, which is the sender’s best guess at the number of outstanding packets. Under normal circumstances, EFS is the same as <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>. The crucial Fast Recovery observation is that EFS should be decremented by 1 for each arriving dupACK, because the arrival of each dupACK means one less packet is in transit, and so transmission of new packets can resume when EFS is reduced to half of the original value of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>. Our EFS approach is equivalent to the inflationary approach at least when slow start is not involved.</p>
+<div class="sidebar">
+<p class="first sidebar-title">Linux <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> <em>is</em> Estimated FlightSize</p>
+<p class="last">This chapter defines <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> to be the sender winsize strictly construed. As such, packet N+<code class="docutils literal notranslate"><span class="pre">cwnd</span></code> cannot be sent until packet N is ACKed. However, the Linux kernel actually uses <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> as a synonym for Estimated FlightSize, which simplifies the Fast-Recovery code. This usage applies, in fact, to all TCP varieties, though it often makes little difference. See <a class="reference external" href="http://elixir.free-electrons.com/linux/v4.13.9/source/net/ipv4/tcp_output.c#L1733">tcp_cwnd_test()</a>.</p>
+</div>
+<p>We first outline the general case, and then look at a specific example. Let <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = N, and suppose packet 1 is lost (packet numbers here may be taken as relative). Until packet 1 is retransmitted, the sender can only send up through packet N (Data[N] can be sent only after ACK[0] has arrived at the sender). The receiver will send N−1 dupACK[0]s representing packets 2 through N.</p>
+<p>At the point of the third dupACK, when the loss of Data[1] is discovered, the sender calculates as follows:
+EFS had been <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = N. Three dupACKs have arrived, representing three later packets no
+longer in flight, so EFS is now N−3. At this point the sender realizes a packet has been lost, which makes EFS = N−4 briefly, but that packet is then immediately retransmitted, which brings EFS back to N−3.</p>
+<p>The sender expects at this point to receive N−4 more dupACKs, followed by one new ACK for the retransmission of the packet that was lost. This last ACK will be for the entire original windowful.</p>
+<p>The new target for <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is N/2 (for simplicity, we will assume N is even). So, we wait for N/2 − 3 more dupACKs to arrive, at which point EFS is N−3−(N/2−3) = N/2. <em>After</em> this point the sender will resume sending new packets; it will send one new packet for each of the N/2−1 subsequently arriving dupACKs (recall that there are N−1 dupACKs in all). These new transmissions will be Data[N+1] through Data[N+(N/2−1)].</p>
+<p>After the last of the dupACKs will come the ACK corresponding to the retransmission of the lost packet; it will be ACK[N], acknowledging all of the original windowful. At this point, there are N/2 − 1 unacknowledged packets Data[N+1] through Data[N+(N/2)−1]. The sender now sends Data[N+N/2] and is thereby able to resume sliding windows with <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = N/2: the sender has received ACK[N] and has exactly one full windowful outstanding for the new value N/2 of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>. That is, we are right where we are supposed to be.</p>
+<p>Here is a diagram illustrating Fast Recovery for <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>=10. Data[10] is lost.</p>
+<img alt="_images/fastrecovery.svg" src="_images/fastrecovery.svg" /><p>Data[9] elicits the initial ACK[9], and the nine packets Data[11] through Data[19] each elicit a dupACK[9]. We denote the dupACK[9] elicited by Data[N] by dupACK[9]/N; these are shown along the upper right. Unless SACK TCP (below) is used, the sender will have no way to determine N or to tell these dupACKs apart. When dupACK[9]/13 (the third dupACK) arrives at the sender, the sender uses Fast Recovery to infer that Data[10] was lost and retransmits it. At this point EFS = 7: the sender has sent the original batch of 10 data packets, plus Data[19], and received one ACK and three dupACKs, for a total of 10+1-1-3 = 7. The sender has also inferred that Data[10] is lost (EFS −= 1) but then retransmitted it (EFS += 1). Six more dupACK[9]’s are on the way.</p>
+<p>EFS is decremented for each subsequent dupACK arrival; after we get two more dupACK[9]’s, EFS is 5. The next dupACK[9] (dupACK[9]/16) reduces EFS to 4 and so allows us transmit Data[20] (which promptly bumps EFS back up to 5). We have</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="47%" />
+<col width="53%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">receive</th>
+<th class="head">send</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>dupACK[9]/16</td>
+<td>Data[20]</td>
+</tr>
+<tr class="row-odd"><td>dupACK[9]/17</td>
+<td>Data[21]</td>
+</tr>
+<tr class="row-even"><td>dupACK[9]/18</td>
+<td>Data[22]</td>
+</tr>
+<tr class="row-odd"><td>dupACK[9]/19</td>
+<td>Data[23]</td>
+</tr>
+</tbody>
+</table>
+<p>We emphasize again that the TCP sender does not see the numbers 16 through 19 in the receive column above; it determines when to begin transmission by counting dupACK[9] arrivals.</p>
+<div class="sidebar">
+<p class="first sidebar-title">Working Backwards</p>
+<p class="last">Figuring out when a fast-recovery sender should resume transmissions of new data is error-prone. Perhaps the simplest approach is to work backwards from the retransmitted lost packet: it should trigger at the receiver an ACK for the entire original windowful. When Data[10] above was lost, the “stuck” window was Data[10]-Data[19]. The retransmitted Data[10] thus triggers ACK[19]; when ACK[19] arrives, <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> should be 10/2 = 5 so Data[24] should be sent. That in turn means the four packets Data[20] through Data[23] must have been sent earlier, via Fast Recovery. There are 10−1 = 9 dupACKs, so to send on the last four we must start with the sixth. The diagram above indeed shows new Fast Recovery transmissions beginning with the sixth dupACK.</p>
+</div>
+<p>The next thing to arrive at the sender side is the ACK[19] elicited by the retransmitted Data[10]; at the point Data[10] arrives at the receiver, Data[11] through Data[19] have already arrived and so the cumulative-ACK response is ACK[19]. The sender responds to ACK[19] with Data[24], and the transition to <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>=5 is now complete.</p>
+<p>During sliding windows without losses, a sender will send <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> packets per RTT. If a “coarse” timeout occurs, typically it is not discovered until after at least one complete RTT of link idleness; there are additional underutilized RTTs during the slow-start phase. It is worth examining the Fast Recovery sequence shown in the illustration from the perspective of underutilized bandwidth. The diagram shows three round-trip times, as seen from the sender side. During the first RTT, the ten packets Data[9]-Data[18] are sent. The second RTT begins with the sending of Data[19] and continues through sending Data[22], along with the retransmitted Data[10]. The third RTT begins with sending Data[23], and includes through Data[27]. In terms of recovery efficiency, the RTTs send 9, 5 and 5 packets respectively (we have counted Data[10] twice); this is remarkably close to the ideal of reducing <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> to 5 instantaneously.</p>
+<p>Using the fast-recovery description in terms of inflation from <span class="target" id="index-26"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc5681.html"><strong>RFC 5681</strong></a>, inflation would begin at the point the sender resumed transmitting new packets, at which point <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> would be incremented for each dupACK. In the diagram above, at the instant labeled “send Data[24]” on the sender side, <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> would momentarily become 15, representing the window Data[10]..Data[24]. As soon as the sender realized that the lost packet Data[10] had been acknowledged, via ACK[19], <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> would immediately deflate to 5, representing the window Data[20]..Data[24]. For a diagram illustrating <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> inflation and deflation, see <a class="reference internal" href="ns3.html#running-basic1-in-ns3"><span class="std std-ref">32.2.1&nbsp;&nbsp;&nbsp;Running the Script</span></a>.</p>
+<p id="index-27">There is one more addition to Fast Recovery, described in <span class="target" id="index-28"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3042.html"><strong>RFC 3042</strong></a>, and known as <strong>Limited Transmit</strong>. As described above, transmission of new data begins with the third dupACK, which is the point at which Fast Recovery is initiated. Limited Transmit means that one new data packet is also transmitted for each of the first two dupACKs, on a “just in case” basis. These two transmissions are “borrowed” against future forward motion of the send window; the value of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is not changed and the first “skipped” packet is not retransmitted. If there was no packet loss, and the dupACKs simply resulted from packet reordering, no harm is done. Otherwise, Fast Retransmit gets a slightly earlier start. For small window sizes this can make a significant difference.</p>
+</div>
+<div class="section" id="tcp-newreno">
+<span id="index-29"></span><span id="id10"></span><h2>19.5&nbsp;&nbsp;&nbsp;TCP NewReno<a class="headerlink" href="#tcp-newreno" title="Permalink to this headline">¶</a></h2>
+<p>TCP NewReno, described in <a class="reference internal" href="bibliography.html#jh96" id="id11">[JH96]</a> and <span class="target" id="index-30"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2582.html"><strong>RFC 2582</strong></a> (currently <span class="target" id="index-31"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc6582.html"><strong>RFC 6582</strong></a>), is a modest tweak to Fast Recovery which greatly improves handling of the case when two or more packets are lost in a windowful. It is generally considered to be a part of contemporary TCP Reno. We again describe it in terms of Estimated FlightSize rather than in terms of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> inflation and deflation.</p>
+<p>If two data packets are lost and the first is retransmitted, the receiver will acknowledge data up to just before the second packet, and then continue sending dupACKs of this until the second lost packet is also retransmitted. These ACKs of data up to just before the second packet are sometimes called <strong>partial ACKs</strong>, because retransmission of the first lost packet did not result in an ACK of all the outstanding data. The NewReno mechanism uses these partial ACKs as evidence to retransmit later lost packets, and also to keep pacing the Fast Recovery process.</p>
+<p>In the diagram below, packets 1 and 4 are lost in a window 0..11 of size 12. Initially the sender will get dupACK[0]’s; the first 11 ACKs (dashed lines from right to left) are ACK[0] and 10 dupACK[0]’s. When packet 1 is successfully retransmitted on receipt of the third dupACK[0], the receiver’s response will be ACK[3] (the heavy dashed line). This is the first partial ACK (a full ACK would have been ACK[12]). On receipt of any partial ACK during the Fast Recovery process, TCP NewReno assumes that the immediately following data packet was lost and retransmits it immediately; the sender does not wait for three dupACKs because if the following data packet had not been lost, no instances of the partial ACK would ever have been generated, even if packet reordering had occurred.</p>
+<p>The TCP NewReno sender response here is, in effect, to treat each partial ACK as a dupACK[0], except that the sender <em>also</em> retransmits the data packet that – based upon receipt of the partial ACK – it is able to infer is lost. NewReno continues pacing Fast Recovery by whatever ACKs arrive, whether they are the original dupACKs or later partial ACKs or dupACKs.</p>
+<img alt="_images/newreno.svg" src="_images/newreno.svg" /><p>When the receiver’s first ACK[3] arrives at the sender, NewReno infers that Data[4] was lost and resends it; this is the second heavy data line. No dupACK[3]’s need arrive; as mentioned above, the sender can infer from the single ACK[3] that Data[4] is lost. The sender also responds as if another dupACK[0] had arrived, and sends Data[17].</p>
+<p>The arrival of ACK[3] signals a reduction in the EFS by 2: one for the inference that Data[4] was lost, and one as if another dupACK[0] had arrived; the two transmissions in response (of Data[4] and Data[17]) bring EFS back to where it was.  At the point when Data[16] is sent the actual (not estimated) flightsize is 5, not 6, because there is one less dupACK[0] due to the loss of Data[4]. However, once NewReno resends Data[4] and then sends Data[17], the actual flightsize is back up to 6.</p>
+<p>There are four more dupACK[3]’s that arrive. NewReno keeps sending new data on receipt of each of these; these are Data[18] through Data[21].</p>
+<p>The receiver’s response to the retransmitted Data[4] is to send ACK[16]; this is the cumulative of all the data received up to that moment. At the point this ACK arrives back at the sender, it had just sent Data[21] in response to the fourth dupACK[3]; its response to ACK[16] is to send the next data packet, Data[22]. <em>The sender is now back to normal sliding windows</em>, with a <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> of 6. Similarly, the Data[17] immediately following the retransmitted Data[4] elicits an ACK[17] (this is the first Data[N] to elicit an exactly matching ACK[N] since the losses began), and the corresponding response to the ACK[17] is to continue with Data[23].</p>
+<p>As with the previous Fast Recovery example, we consider the number of packets sent per RTT; the diagram shows four RTTs as seen from the sender side.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="24%" />
+<col width="52%" />
+<col width="12%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">RTT</th>
+<th class="head">First packet</th>
+<th class="head">Packets sent</th>
+<th class="head">count</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>first</td>
+<td>Data[0]</td>
+<td>Data[0]-Data[11]</td>
+<td>12</td>
+</tr>
+<tr class="row-odd"><td>second</td>
+<td>Data[12]</td>
+<td>Data[12]-Data[15], Data[1]</td>
+<td>5</td>
+</tr>
+<tr class="row-even"><td>third</td>
+<td>Data[16]</td>
+<td>Data[16]-Data[20], Data[4]</td>
+<td>6</td>
+</tr>
+<tr class="row-odd"><td>fourth</td>
+<td>Data[21]</td>
+<td>Data[21]-Data[26]</td>
+<td>6</td>
+</tr>
+</tbody>
+</table>
+<p>Again, after the loss is detected we segue to the new <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> of 6 with only a single missed packet (in the second RTT). NewReno is, however, only able to send one retransmitted packet per RTT.</p>
+<p>Note that TCP Newreno, like TCPs Tahoe and Reno, is a <strong>sender-side</strong> innovation; the receiver does not have to do anything special. The next TCP flavor, SACK TCP, requires receiver-side modification.</p>
+</div>
+<div class="section" id="selective-acknowledgments-sack">
+<span id="sack"></span><span id="index-32"></span><h2>19.6&nbsp;&nbsp;&nbsp;Selective Acknowledgments (SACK)<a class="headerlink" href="#selective-acknowledgments-sack" title="Permalink to this headline">¶</a></h2>
+<p>A traditional TCP ACK is a cumulative acknowledgment of all data received up to that point. If Data[1002] is received but not Data[1001], then all the receiver can send is a duplicate ACK[1000]. This does indicate that <em>something</em> following Data[1001] made it through, but nothing more.</p>
+<p>To provide greater specificity, TCP now provides a <strong>Selective ACK</strong> (SACK) option, implemented at the receiver. If this is available, the sender does not have to guess from
+dupACKs what has gotten through. The receiver can send an ACK that says:</p>
+<ul class="simple">
+<li>All packets up through 1000 have been received (the cumulative ACK)</li>
+<li>All packets up through 1050 have been received <em>except for</em> 1001, 1022, and 1035.</li>
+</ul>
+<p>The second line is the SACK part. Almost all TCP implementations now support this.</p>
+<p>Specifically, SACKs include the following information; the additional data beyond the cumulative ACK is included in a TCP Option field.</p>
+<ul class="simple">
+<li>The latest cumulative ACK</li>
+<li>The <em>three</em> most recent blocks of consecutive packets received</li>
+</ul>
+<p>Thus, if we have lost 1001, 1022, 1035, and now 1051, and the highest
+received is 1060, the SACK might say:</p>
+<ul class="simple">
+<li>All packets up through 1000 have been received</li>
+<li>1060-1052 have been received</li>
+<li>1050-1036 have been received</li>
+<li>1034-1023 have been received</li>
+</ul>
+<p>From this the sender know 1001s and 1022 were not received, but nothing about the packets in between. However, if the sender has been paying close attention to the previous SACKs received, it likely already knows that all packets 1002 through 1021 have been received.</p>
+<p>The term <strong>SACK TCP</strong> is typically used to mean that the receiving side supports selective ACKs, and the sending side is a straightforward modification of TCP Reno to take advantage of them.</p>
+<p>In practice, selective ACKs provide at best a modest performance improvement in many situations; TCP NewReno does rather well, in moderate-loss environments. The paper <a class="reference internal" href="bibliography.html#ff96" id="id12">[FF96]</a> compares Tahoe, Reno, NewReno and SACK TCP, in situations involving from one to four packet losses in a single RTT. While Classic Reno performed poorly with two packet losses in a single RTT and extremely poorly with three losses, the three-loss NewReno and SACK TCP scenarios played out remarkably similarly. Only when connections experienced four losses in a single RTT did SACK TCP’s performance start to pull slightly ahead of that of NewReno.</p>
+</div>
+<div class="section" id="tcp-and-bottleneck-link-utilization">
+<span id="bottleneck-link-utilization"></span><h2>19.7&nbsp;&nbsp;&nbsp;TCP and Bottleneck Link Utilization<a class="headerlink" href="#tcp-and-bottleneck-link-utilization" title="Permalink to this headline">¶</a></h2>
+<p>Consider a TCP Reno sender with no competing traffic. As <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> saws up and down, what happens to throughput? Do those halvings of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> result in at least a dip in throughput? The answer depends to some extent on the size of the queue ahead of the bottleneck link, relative to the transit capacity of the path. As was discussed in <a class="reference internal" href="slidingwindows.html#rtt-calculations"><span class="std std-ref">8.3.2&nbsp;&nbsp;&nbsp;RTT Calculations</span></a>, when <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is less than the transit capacity, the link is less than 100% utilized and the queue is empty. When <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is more than the transit capacity, the link is saturated (100% utilized) and the queue has about (<code class="docutils literal notranslate"><span class="pre">cwnd</span></code> − transit_capacity) packets in it.</p>
+<p>The diagram below shows two TCP Reno teeth; in the first, the queue capacity exceeds the path transit capacity and in the second the queue capacity is a much smaller fraction of the total.</p>
+<img alt="_images/link_utilization.svg" src="_images/link_utilization.svg" /><p>In the first diagram, the bottleneck link is always 100% utilized, even at the left edge of the teeth. In the second the interval between loss events (the left and right margins of the tooth) is divided into a <strong>link-unsaturated</strong> phase and a <strong>queue-filling phase</strong>. In the unsaturated phase, the bottleneck link utilization is less than 100% and the queue is empty; in the later phase, the link is saturated and the queue begins to fill.</p>
+<p>Consider again the idealized network below, with an R–B bandwidth of 1 packet/ms.</p>
+<img alt="_images/ARB_labeled.svg" src="_images/ARB_labeled.svg" /><p>We first consider the queue ≥ transit case. Assume that the total RTT<sub>noLoad</sub> delay is 100 ms, mostly due to propagation delay; this makes the bandwidth×delay product 100 packets. The question for consideration is to what extent TCP Reno, once slow-start is over, sometimes leaves the R–B link idle.</p>
+<p>The R–B link will be saturated at all times provided A always keeps 100 packets in transit, that is, we always have <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> ≥ 100 (<a class="reference internal" href="slidingwindows.html#rtt-calculations"><span class="std std-ref">8.3.2&nbsp;&nbsp;&nbsp;RTT Calculations</span></a>). If <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>min</sub> = 100, then <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>max</sub> = 2×<code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>min</sub> = 200. For this to be the maximum, the queue capacity must be at least 99, so that the path can accommodate 199 packets without loss: 100 packets in transit plus 99 packets in the queue. In general, TCP Reno never leaves the bottleneck link idle as long as the queue capacity in front of that link is at least as large as the path round-trip transit capacity.</p>
+<p>Now suppose instead that the queue size is 49, or about 50% of the transit capacity. Packet loss will occur when <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> reaches 150, and so <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>min</sub> = 75. Qualitatively this case is represented by the second diagram above, though the queue-to-network_ceiling proportion illustrated there is more like 1:8 than 1:3. There are now periods when the R–B link is idle. During RTT intervals when <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>=75, throughput will be 75% of the maximum and the R–B link will be idle 25% of the time.</p>
+<p>However, <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> will be 75 just for the first RTT following the loss. After 25 RTTs, <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> will be back up to 100, and the link will be saturated. So we have 25 RTTs with an average <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> of 87.5 (=&amp;75+100)/2), meaning the link is 87.5% saturated, followed by 50 RTTs where the link is 100% saturated. The long-term average here is 95.8% utilization of the bottleneck link. This is not bad at all, given that using 10% of the link bandwidth on packet headers is almost universally considered reasonable. Furthermore, at the point when <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> drops after a loss to <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>min</sub>=75, the queue must have been full. It may take one or two RTTs for the queue to drain; during this time, link utilization will be even higher.</p>
+<p>If most or all of the time the bottleneck link is saturated, as in the first diagram, it may help to consider the average queue size. Let the queue capacity be C<sub>queue</sub> and the transit capacity be C<sub>transit</sub>, with C<sub>queue</sub> &gt; C<sub>transit</sub>. Then <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> will vary from a maximum of C<sub>queue</sub>+C<sub>transit</sub> to a minimum of what works out to be (C<sub>queue</sub>-C<sub>transit</sub>)/2 + C<sub>transit</sub>. We would expect an average queue size about halfway between these, less the C<sub>transit</sub> term: 3/4×C<sub>queue</sub> - 1/4×C<sub>transit</sub>. If C<sub>queue</sub>=C<sub>transit</sub>, the expected average queue size should be about C<sub>queue</sub>/2.</p>
+<p>See exercises 12.0 and 12.5.</p>
+<div class="section" id="tcp-queue-sizes">
+<span id="tcp-queue-size"></span><span id="index-33"></span><h3>19.7.1&nbsp;&nbsp;&nbsp;TCP Queue Sizes<a class="headerlink" href="#tcp-queue-sizes" title="Permalink to this headline">¶</a></h3>
+<p>From the perspective of link utilization, the previous section suggests that router queues be larger rather than smaller. A queue capacity at least as large as transit capacity seems like an excellent choice. To configure a router this way, we first make an educated guess at the average RTT, and then multiply this by the output bandwidth to get the desired queue capacity.  For an average RTT of 50 ms, a bandwidth of 1 Gbps leads to a queue capacity of about 6 MB, or 4000 packets of 1500 bytes each. If the numbers rise to 100 ms and 10 Gbps, queue capacity needs to be 125 MB.</p>
+<p>Unfortunately, while large queues are helpful when the traffic consists exclusively of bulk TCP transfers, they introduce proportionately large queuing delays that can wreak havoc on real-time traffic. A bottleneck router with a queue size matching a flow’s bandwidth×delay product will <em>double</em> the RTT for that flow, at points when the queue is full. Worse, if the goal is 100% TCP link utilization always, then the router queue must be sized for the highest-bandwidth flow with the longest RTT; shorter TCP connections will encounter a queue much larger than necessary. This problem of large queue capacity leading to excessive delay is known as <strong>bufferbloat</strong>; we will return to it at <a class="reference internal" href="dynamicsB.html#bufferbloat1"><span class="std std-ref">21.5.1&nbsp;&nbsp;&nbsp;Bufferbloat</span></a>.</p>
+<p>Because of the delay problems brought on by large queues, TCP connections must sometimes pass through bottleneck routers with small queues.  In this case a tooth of a TCP Reno connection is divided into a large link-unsaturated phase and a small queue-filling phase.</p>
+<p>The <em>need</em> for large buffers, if near-100% queue utilization is the goal, is to a large degree specific to the TCP Reno sawtooth. Some other TCP implementations (in particular TCP Vegas, <a class="reference internal" href="newtcps.html#tcp-vegas"><span class="std std-ref">22.6&nbsp;&nbsp;&nbsp;TCP Vegas</span></a>), do not overfill the queue. However, TCP Vegas does not compete well with TCP Reno, at least with traditional FIFO queuing (<a class="reference internal" href="dynamicsA.html#queuing1"><span class="std std-ref">20.1&nbsp;&nbsp;&nbsp;A First Look At Queuing</span></a>) (but see <a class="reference internal" href="fairqueuing.html#fqbufferbloat"><span class="std std-ref">23.6.1&nbsp;&nbsp;&nbsp;Fair Queuing and Bufferbloat</span></a>).</p>
+<p>The worst case for TCP link utilization is if the queue size is close to zero. Using again a bandwidth×delay product 100 of packets, a zero-sized queue will mean that <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>max</sub> will be 100 (or 101), and so <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>min</sub> will be 50. Link utilization therefore ranges, over the lifetime of the tooth, from a low of 50/100 = 50% to a high of 100%; the average utilization is <strong>75%</strong>. While this is not ideal, and while some non-Reno TCP variants have attempted to improve this figure, 75% link utilization is not all that bad, and can be compared with the 10% of the bandwidth consumed as packet headers (though that figure assumes 512 bytes of data per packet, which is low). (A literally zero-sized queue will not work at all well; one reason – though not the only one – is that TCP Reno sends a two-packet burst whenever <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is incremented.)</p>
+<p>Traffic mix has a major influence on the appropriate queue size. For example, the analysis of the previous section assumed a single long-term TCP connection. The link-utilization situation improves with increasing numbers of TCP connections, at least if the losses are unsynchronized, because the halving of one connection’s <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> has a proportionately smaller impact on the total queue use. In <a class="reference internal" href="bibliography.html#akm04" id="id13">[AKM04]</a> it is shown that for a router with N TCP connections with unsynchronized losses, a queue size of (RTT<sub>average</sub> × bandwidth)/√N is sufficient to keep the link almost always saturated. Larger values of N here are typically associated with “core” (backbone) routers. The paper <a class="reference internal" href="bibliography.html#egmr05" id="id14">[EGMR05]</a> proposes even smaller buffer capacities, on the order of the logarithm of the maximum window size. The argument makes two important assumptions, however: first, that we are willing to tolerate a link utilization somewhat less than 100% (though greater than 75%), and second, perhaps more importantly, that TCP is modified so as to spread out any packet bursts – even bursts of size two – over small intervals of time.</p>
+<p>There are other problems created by too-small queues, even if we are willing to accept 75% link utilization. Internet traffic, not unlike city-bus traffic, tends to “bunch up”; queues serve as a way to keep these packet bunches from leading to unnecessary losses. For one example of unexpected traffic bunching, see <a class="reference internal" href="ns2.html#transient-queue-peaks"><span class="std std-ref">31.4.1.3&nbsp;&nbsp;&nbsp;Transient queue peaks</span></a>. Increased traffic randomization helps reduce the need for very large queues, but may increase the bunching effect. Internet “core” routers see more highly randomized traffic than end-user or “edge” routers; queues in the latter are often the most difficult to configure.</p>
+<p>We will return to the issue of link utilization in <a class="reference internal" href="ns2.html#throughput1"><span class="std std-ref">31.2.6&nbsp;&nbsp;&nbsp;Single-sender Throughput Experiments</span></a> and (for two senders) <a class="reference internal" href="ns2.html#bandwidth-and-link-utilization"><span class="std std-ref">31.3.10.2&nbsp;&nbsp;&nbsp;Higher bandwidth and link utilization</span></a>, using the ns simulator to get experimental data. See also exercise 12.0.</p>
+<p>Finally, the queue capacity does not necessarily have to remain static. We will return to this point in <a class="reference internal" href="dynamicsB.html#aqm"><span class="std std-ref">21.5&nbsp;&nbsp;&nbsp;Active Queue Management</span></a>. Furthermore, many queue-size problems ultimately spring from the fact that all traffic is being dumped into a single FIFO queue; we will look at alternative queuing strategies in <a class="reference internal" href="fairqueuing.html#queuing-alternatives"><span class="std std-ref">23&nbsp;&nbsp;&nbsp;Queuing and Scheduling</span></a>. For a particular example related to bufferbloat, see <a class="reference internal" href="fairqueuing.html#fqbufferbloat"><span class="std std-ref">23.6.1&nbsp;&nbsp;&nbsp;Fair Queuing and Bufferbloat</span></a>.</p>
+</div>
+</div>
+<div class="section" id="single-packet-losses">
+<span id="id15"></span><h2>19.8&nbsp;&nbsp;&nbsp;Single Packet Losses<a class="headerlink" href="#single-packet-losses" title="Permalink to this headline">¶</a></h2>
+<p>Again assuming no competition on the bottleneck link, the TCP Reno additive-increase policy has a simple consequence: at the end of each tooth, only a single packet will be lost.</p>
+<p>To see this, let A be the sender, R be the bottleneck router, and B be the receiver:</p>
+<img alt="_images/ARB1.svg" src="_images/ARB1.svg" /><p>Let T be the bandwidth delay at R, so that packets leaving R are spaced at least time T apart. A will therefore transmit packets T time units apart, except for those times when <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> has just been incremented and A sends a pair of packets back-to-back. Let us call the second packet of such a back-to-back pair the “extra” packet. To simplify the argument slightly, we will assume that the two packets of a pair arrive at R essentially simultaneously.</p>
+<p>Only an extra packet can result in an increase in queue utilization; every other packet arrives after an interval T from the previous packet, giving R enough time to remove a packet from its queue.</p>
+<p>A consequence of this is that <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> will reach the sum of the transit capacity and the queue capacity without R dropping a packet. (This is not necessarily the case if a <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> this large were sent as a single burst.)</p>
+<p>Let C be this combined capacity, and assume <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> has reached C. When A executes its next <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> += 1 additive increase, it will as usual send a pair of back-to-back packets. The second of this pair – the extra – is doomed; it will be dropped when it reaches the bottleneck router.</p>
+<p>At this point there are C = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> − 1 packets outstanding, all spaced at time intervals of T. Sliding windows will continue normally until the ACK of the packet just before the lost packet arrives back at A. After this point, A will receive only dupACKs. A has received C = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>−1 ACKs since the last increment to <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>, but must receive C+1 = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> ACKs in order to increment <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> again. This will not happen, as no more new ACKs will arrive until the lost packet is transmitted.</p>
+<p>Following this, <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is reduced and the next sawtooth begins; the only packet that is lost is the “extra” packet of the previous flight.</p>
+<p>See <a class="reference internal" href="ns2.html#single-losses"><span class="std std-ref">31.2.3&nbsp;&nbsp;&nbsp;Single Losses</span></a> for experimental confirmation, and exercise 15.0.</p>
+</div>
+<div class="section" id="tcp-assumptions-and-scalability">
+<h2>19.9&nbsp;&nbsp;&nbsp;TCP Assumptions and Scalability<a class="headerlink" href="#tcp-assumptions-and-scalability" title="Permalink to this headline">¶</a></h2>
+<p>In the TCP design portrayed above, several embedded assumptions have been made. Perhaps the most important is that <strong>every loss is treated as evidence of congestion</strong>. As we shall see in the next chapter, this fails for high-bandwidth TCP (when rare random losses become significant); it also fails for TCP over wireless (either Wi-Fi or other), where lost packets are much more common than over Ethernet. See <a class="reference internal" href="dynamicsB.html#high-bandwidth-tcp-problem"><span class="std std-ref">21.6&nbsp;&nbsp;&nbsp;The High-Bandwidth TCP Problem</span></a> and <a class="reference internal" href="dynamicsB.html#lossy-link-tcp-problem"><span class="std std-ref">21.7&nbsp;&nbsp;&nbsp;The Lossy-Link TCP Problem</span></a>.</p>
+<p>The TCP <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>-increment strategy – to increment <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> by 1 for each RTT – has some assumptions of scale. This mechanism works well for cross-continent RTT’s on the order of 100 ms, and for <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> in the low hundreds. But if <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = 2000, then it takes 100 RTTs – perhaps 20 seconds – for <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> to grow 10%; linear increase becomes <em>proportionally</em> quite slow. Also, if the RTT is very long, the <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> increase is slow. The absolute set-by-the-speed-of-light minimum RTT for geosynchronous-satellite Internet is 480 ms, and typical satellite-Internet RTTs are close to 1000 ms. Such long RTTs also lead to slow <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> growth; furthermore, as we shall see below, such long RTTs mean that these TCP connections compete poorly with other connections. See <a class="reference internal" href="dynamicsB.html#satellite-link-tcp-problem"><span class="std std-ref">21.8&nbsp;&nbsp;&nbsp;The Satellite-Link TCP Problem</span></a>.</p>
+<p>Another implicit assumption is that if we have a lot of data to transfer, we will send all of it in one single connection rather than divide it among multiple connections. The web http protocol violates this routinely, though. With multiple short connections, <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> may never properly converge to the steady state for any of them; TCP Reno does not support carrying over what has been learned about <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> from one connection to the next. A related issue occurs when a connection alternates between relatively idle periods and full-on data transfer; most TCPs set <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>=1 and return to slow start when sending resumes after an idle period.</p>
+<p>Finally, TCP’s Fast Retransmit assumes that routers do not significantly reorder packets.</p>
+</div>
+<div class="section" id="tcp-parameters">
+<h2>19.10&nbsp;&nbsp;&nbsp;TCP Parameters<a class="headerlink" href="#tcp-parameters" title="Permalink to this headline">¶</a></h2>
+<p>In TCP Reno’s Additive Increase, Multiplicative Decrease strategy, the increase increment is 1.0 and the decrease factor is 1/2. It is natural to ask if these values have some especial significance, or what are the consequences if they are changed.</p>
+<p>Neither of these values plays much of a role in determining the average value of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>, at least in the short term; this is largely dictated by the path capacity, including the queue size of the bottleneck router. It seems clear that the exact value of the increase increment has no bearing on congestion; the per-RTT increase is too small to have a major effect here. The decrease factor of 1/2 <em>may</em> play a role in responding promptly to incipient congestion, in that it reduces <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> sharply at the first sign of lost packets. However, as we shall see in <a class="reference internal" href="newtcps.html#tcp-vegas"><span class="std std-ref">22.6&nbsp;&nbsp;&nbsp;TCP Vegas</span></a>, TCP Vegas in its “normal” mode manages quite successfully with an Additive Decrease strategy, decrementing <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> by 1 at the point it detects approaching congestion (to be sure, it detects this well before packet loss), and, by some measures, responds better to congestion than TCP Reno. In other words, not only is the exact value of the AIMD decrease factor not critical for congestion management, but multiplicative decrease itself is not mandatory.</p>
+<p>There are two informal justifications in <a class="reference internal" href="bibliography.html#jk88" id="id16">[JK88]</a> for a decrease factor of 1/2. The first is in slow start: if at the Nth RTT it is found that <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = 2<sup>N</sup> is too big, the sender falls back to <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>/2 = 2<sup>N-1</sup>, which is known to have worked without losses the previous RTT. However, a change here in the decrease policy might best be addressed with a concomitant change to slow start; alternatively, the reduction factor of 1/2 might be left still to apply to “unbounded” slow start, while a new factor of 𝛽 might apply to threshold slow start.</p>
+<p>The second justification for the reduction factor of 1/2 applies directly to the congestion avoidance phase; written in 1988, it is quite remarkable to the modern reader:</p>
+<blockquote>
+<div>If the connection is steady-state running and a packet is dropped, it’s probably because a new connection started up and took some of your bandwidth…. [I]t’s probable that there are now exactly two conversations sharing the bandwidth. I.e., you should reduce your window by half because the bandwidth available to you has been reduced by half. <a class="reference internal" href="bibliography.html#jk88" id="id17">[JK88]</a>, §D</div></blockquote>
+<p>Today, busy routers may have thousands of simultaneous connections. To be sure, Jacobson and Karels go on to state, “if there are more than two connections sharing the bandwidth, halving your window is conservative – and being conservative at high traffic intensities is probably wise”. This advice remains apt today.</p>
+<p>But while they do not play a large role in setting <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> or in avoiding “congestive collapse”, it turns out that these increase-increment and decrease-factor values of 1 and 1/2 respectively play a <em>great</em> role in <strong>fairness</strong>: making sure competing connections get the bandwidth allocation they “should” get. We will return to this in <a class="reference internal" href="dynamicsA.html#fairness2"><span class="std std-ref">20.3&nbsp;&nbsp;&nbsp;TCP Reno Fairness with Synchronized Losses</span></a>, and also <a class="reference internal" href="dynamicsB.html#aimd-revisited"><span class="std std-ref">21.4&nbsp;&nbsp;&nbsp;AIMD Revisited</span></a>.</p>
+</div>
+<div class="section" id="epilog">
+<h2>19.11&nbsp;&nbsp;&nbsp;Epilog<a class="headerlink" href="#epilog" title="Permalink to this headline">¶</a></h2>
+<p>TCP Reno’s core congestion algorithm is based on algorithms in Jacobson and Karel’s 1988 paper <a class="reference internal" href="bibliography.html#jk88" id="id18">[JK88]</a>, now twenty-five years old, although NewReno and SACK have been almost universally added to the standard “Reno” implementation.</p>
+<p>There are also broad changes in TCP usage patterns. Twenty years ago, the vast majority of all TCP traffic represented downloads from “major” servers. Today, over half of all Internet TCP traffic is peer-to-peer rather than server-to-client. The rise in online video streaming creates new demands for excellent TCP real-time performance.</p>
+<p>In the next chapter we will examine the dynamic behavior of TCP Reno, focusing in particular on fairness between competing connections, and on other problems faced by TCP Reno senders. Then, in <a class="reference internal" href="newtcps.html#newtcps"><span class="std std-ref">22&nbsp;&nbsp;&nbsp;Newer TCP Implementations</span></a>, we will survey some attempts to address these problems.</p>
+</div>
+<div class="section" id="exercises">
+<span id="reno-exercises"></span><h2>19.12&nbsp;&nbsp;&nbsp;Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<p><em>Exercises may be given fractional (floating point) numbers, to allow for interpolation of new exercises.</em> Exercises marked with a ♢ have solutions or hints at <a class="reference internal" href="solutions.html#reno-solutions"><span class="std std-ref">34.14&nbsp;&nbsp;&nbsp;Solutions for TCP Reno and Congestion Management</span></a>.</p>
+<p>1.0. Consider the following network, with each link other than the first having a bandwidth delay of 1 packet/second. Assume ACKs travel instantly from B to R (and thus to A). Assume there are no propagation delays, so the RTT<sub>noLoad</sub> is 4; the bandwidth×RTT product is then 4 packets. If A uses sliding windows with a window size of 6, the queue at R1 will eventually have size 2.</p>
+<img alt="_images/linear_bottleneck2.svg" src="_images/linear_bottleneck2.svg" /><p>Suppose A uses <strong>threshold</strong> slow start (<a class="reference internal" href="#threshold-slow-start"><span class="std std-ref">19.2.2&nbsp;&nbsp;&nbsp;Threshold Slow Start</span></a>) with <code class="docutils literal notranslate"><span class="pre">ssthresh</span></code> = 6, and with <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> initially 1.  Complete the table below until two rows after <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = 6; for these final two rows, <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> has reached <code class="docutils literal notranslate"><span class="pre">ssthresh</span></code> and so A will send only one new packet for each ACK received. Assume the queue at R1 is large enough that no packets are dropped. How big will the queue at R1 grow?</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="14%" />
+<col width="18%" />
+<col width="16%" />
+<col width="29%" />
+<col width="16%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">T</th>
+<th class="head">A sends</th>
+<th class="head">R1 queues</th>
+<th class="head">R1 sends</th>
+<th class="head">B receives/ACKs</th>
+<th class="head"><code class="docutils literal notranslate"><span class="pre">cwnd</span></code></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>1</td>
+<td></td>
+<td>1</td>
+<td></td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>2</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>4</td>
+<td>2,3</td>
+<td>3</td>
+<td>2</td>
+<td>1</td>
+<td>2</td>
+</tr>
+<tr class="row-odd"><td>5</td>
+<td></td>
+<td></td>
+<td>3</td>
+<td></td>
+<td>2</td>
+</tr>
+<tr class="row-even"><td>6</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>7</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>8</td>
+<td>4,5</td>
+<td>5</td>
+<td>4</td>
+<td>2</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p>Note that if, instead of using slow start, A simply sends the initial windowful of 6 packets all at once, then the queue at R1 will initially hold 6-1 = 5 packets.</p>
+<p>2.0. Consider the following network from <a class="reference internal" href="#ssmultidrop"><span class="std std-ref">19.2.3&nbsp;&nbsp;&nbsp;Slow-Start Multiple Drop Example</span></a>, with links labeled with bandwidths in packets/ms. Assume ACKs travel instantly from B to R (and thus to A).</p>
+<img alt="_images/ARB_labeled.svg" src="_images/ARB_labeled.svg" /><p>A begins sending to B using unbounded slow start, beginning with Data[1] at T=0. Initially, <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = 1. Write out a table of packet transmissions and deliveries assuming R’s maximum queue size is 4 (not counting the packet currently being forwarded). Stop with the arrival at A of the first dupACK triggered by the arrival at B of the packet that followed the first packet that was dropped by R. No retransmissions will occur by then.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="13%" />
+<col width="17%" />
+<col width="17%" />
+<col width="15%" />
+<col width="29%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">T</th>
+<th class="head">A sends</th>
+<th class="head">R queues</th>
+<th class="head">R drops</th>
+<th class="head">R sends</th>
+<th class="head">B receives/ACKs</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Data[1]</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>Data[1]</td>
+<td>&#160;</td>
+</tr>
+</tbody>
+</table>
+<p>3.0. Consider the network from exercise 2.0 above. A again begins sending to B using unbounded slow start, but this time R’s queue size is 2, not counting the packet currently being forwarded. Make a table showing all packet transmissions by A, all packet drops by R, and other columns as are useful. Assume no <strong>re</strong>transmission mechanism is used at all (no timeouts, no fast retransmit), and that A sends new data only when it receives new ACKs (dupACKs, in other words, do not trigger new data transmissions). With these assumptions, new data transmissions will eventually cease; continue the table until all transmitted data packets are received by B.</p>
+<p>4.0. Suppose a connection starts with <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>=1 and increments <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> by 1 each RTT with no loss, and sets <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> to <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>/2, rounding down, on each RTT with at least one loss. Lost packets are <strong>not retransmitted</strong>, and propagation delays dominate so each windowful is sent more or less together. Packets 5, 13, 14, 23 and 30 are lost. What is the window size each RTT, up until the first 40 packets are sent? What packets are sent each RTT? Hint: in the first RTT, Data[1] is sent. There is no loss, so in the second RTT <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = 2 and Data[2] and Data[3] are sent.</p>
+<p>5.0. Suppose TCP Reno is used to transfer a large file over a path with bandwidth high enough that, during slow start, <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> can be treated as doubling each RTT as in <a class="reference internal" href="#slow-start"><span class="std std-ref">19.2&nbsp;&nbsp;&nbsp;Slow Start</span></a>. Assume the receiver places no limits on window size.</p>
+<div class="line-block">
+<div class="line">(a). How many RTTs will it take for the window size to first reach ~8,000 packets (about 2<sup>13</sup>), assuming unbounded slow start is used and there are no packet losses?</div>
+<div class="line">(b). Approximately how many packets will have been sent and acknowledged by that point?</div>
+<div class="line">(c). Now assume the bandwidth is 100 packets/ms and the RTT is 80 ms, making the bandwidth×delay product 8,000 packets. What fraction of the total bandwidth will have been used by the connection up to the point where the window size reaches 8000? Hint: the total bandwidth is 8,000 packets per RTT.</div>
+</div>
+<p>6.0. (a) Repeat the diagram in <a class="reference internal" href="#fast-recovery"><span class="std std-ref">19.4&nbsp;&nbsp;&nbsp;TCP Reno and Fast Recovery</span></a>, done there with <code class="docutils literal notranslate"><span class="pre">cwnd</span></code>=10, for a window size of 8. Assume as before that the lost packet is Data[10]. There will be seven dupACK[9]’s, which it may be convenient to tag as dupACK[9]/11 through dupACK[9]/17. Be sure to indicate clearly when sending resumes.</p>
+<div class="line-block">
+<div class="line">(b). Suppose you try to do this with a window size of 6. Is this window size big enough for Fast Recovery still to work? If so, at what dupACK[9]/N does new data transmission begin? If not, what goes wrong?</div>
+</div>
+<p>7.0. Suppose the window size is 100, and Data[1001] is lost. There will be 99 dupACK[1000]’s sent, which we may denote as dupACK[1000]/1002 through dupACK[1000]/1100. TCP Reno is used.</p>
+<div class="line-block">
+<div class="line">(a). At which dupACK[1000]/N does the sender start sending new data?</div>
+<div class="line">(b). When the retransmitted data[1001] arrives at the receiver, what ACK is sent in response?</div>
+<div class="line">(c). When the acknowledgment in (b) arrives back at the sender, what data packet is sent?</div>
+</div>
+<p>Hint: express EFS in terms of dupACK[1000]/N, for N≥1004. The third dupACK is dupACK[1000]/1004; what is EFS at that point after retransmission of Data[1001]?</p>
+<p>8.0. Suppose the window size is 40, and Data[1001] is lost. Packet 1000 will be ACKed normally. Packets 1001-1040 will be sent, and 1002-1040 will each trigger a duplicate ACK[1000].</p>
+<div class="line-block">
+<div class="line">(a). What actual data packets trigger the first three dupACKs? (The first ACK[1000] is triggered by Data[1000]; don’t count this one as a duplicate.)</div>
+<div class="line">(b). After the third dupACK[1000] has been received and the lost data[1001] has been retransmitted, how many packets/ACKs should the sender estimate as in flight?</div>
+</div>
+<p>When the retransmitted Data[1001] arrives at the receiver, ACK[1040] will be sent back.</p>
+<div class="line-block">
+<div class="line">(c). What is the first Data[N] sent for which the response is ACK[N], for N&gt;1000?</div>
+<div class="line">(d). What is the first N for which Data[N+20] is sent in response to ACK[N] (this represents the point when the connection is back to normal sliding windows, with a window size of 20)?</div>
+</div>
+<p>9.0. Recall (<a class="reference internal" href="#slow-start"><span class="std std-ref">19.2&nbsp;&nbsp;&nbsp;Slow Start</span></a>) that during slow start <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is incremented by 1 for each arriving ACK, resulting in the transmission of two new data packets. Suppose slow-start is modified so that, on each ACK, <em>three</em> new packets are sent rather than two; <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> will now triple after each RTT, taking values 1, 3, 9, 27, ….</p>
+<div class="line-block">
+<div class="line">(a). For each arriving ACK, by how much must <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> now be incremented?</div>
+<div class="line">(b). Suppose a path has mostly propagation delay. Progressively larger windowfuls are sent, with sizes successive powers of 3, until a <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> is reached where a packet loss occurs. What window size can the sender be reasonably sure <em>does</em> work, based on earlier experience?</div>
+</div>
+<p>10.0. Suppose in the example of <a class="reference internal" href="#tcp-newreno"><span class="std std-ref">19.5&nbsp;&nbsp;&nbsp;TCP NewReno</span></a>, Data[4] had <em>not</em> been lost.</p>
+<div class="line-block">
+<div class="line">(a). When Data[1] is received, what ACK would be sent in response?</div>
+<div class="line">(b). At what point in the diagram is the sender able to resume ordinary sliding windows with <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = 6?</div>
+</div>
+<p>11.0. Suppose in the example of <a class="reference internal" href="#tcp-newreno"><span class="std std-ref">19.5&nbsp;&nbsp;&nbsp;TCP NewReno</span></a>, Data[1] and Data[2] had been lost, but not Data[4].</p>
+<div class="line-block">
+<div class="line">(a). The third dupACK[0] is sent in response to what Data[N]?</div>
+<div class="line">(b). When the retransmitted Data[1] reaches the receiver, ACK[1] is the response. When this ACK[1] reaches the sender, which Data packets are sent in response?</div>
+</div>
+<p>12.0. Suppose two TCP connections have the same RTT and share a bottleneck link, on which there is no other traffic. The size of the bottleneck queue is negligible when compared to the bandwidth × RTT<sub>noLoad</sub> product. Loss events occur at regular intervals, and are completely synchronized. Show that the two connections together will use 75% of the total bottleneck-link capacity, as in <a class="reference internal" href="#bottleneck-link-utilization"><span class="std std-ref">19.7&nbsp;&nbsp;&nbsp;TCP and Bottleneck Link Utilization</span></a> (there done for a single connection).</p>
+<p>See also Exercise 16.0 of chapter <a class="reference internal" href="dynamicsB.html#dynamics-of-tcp-b"><span class="std std-ref">21&nbsp;&nbsp;&nbsp;Further Dynamics of TCP</span></a>.</p>
+<p>13.0. In <a class="reference internal" href="#bottleneck-link-utilization"><span class="std std-ref">19.7&nbsp;&nbsp;&nbsp;TCP and Bottleneck Link Utilization</span></a> we showed that, if the bottleneck router queue capacity was 50% of a TCP Reno connection’s transit capacity, and there was no other traffic, then the bottleneck-link utilization would be 95.8%.</p>
+<div class="line-block">
+<div class="line">(a). Suppose the queue capacity is 1/3 of the transit capacity. Show the bottleneck link utilization is 11/12, or 91.7%. Draw a diagram of the tooth, and find the relative lengths of the link-unsaturated and queue-filling phases. You may round off <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>max</sub> to 4/3 the transit capacity (the value of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> just before the packet loss; the exact value of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code><sub>max</sub> is higher by 1).</div>
+<div class="line">(b).♢ Derive a formula for the link utilization in terms of the ratio <strong>f</strong>&lt;1 of queue capacity to transit capacity. Make the same simplifying assumption as in part (a).</div>
+</div>
+<p>14.0. In <a class="reference internal" href="#per-ack-responses"><span class="std std-ref">19.2.1&nbsp;&nbsp;&nbsp;TCP Reno Per-ACK Responses</span></a> we stated that the per-ACK response of a TCP sender was to increment <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> as follows:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> + 1/<code class="docutils literal notranslate"><span class="pre">cwnd</span></code></div>
+</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line">(a). What is the corresponding formulation if the window size is in fact measured in bytes rather than packets? Let <code class="docutils literal notranslate"><span class="pre">SMSS</span></code> denote the sender’s maximum segment size, and let <code class="docutils literal notranslate"><span class="pre">bwnd</span></code> = <code class="docutils literal notranslate"><span class="pre">SMSS</span></code>×<code class="docutils literal notranslate"><span class="pre">cwnd</span></code> denote the congestion window as measured in bytes. Hint: solve this last equation for <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> and plug the result in above.</div>
+<div class="line">(b). What is the appropriate formulation of <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> = <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> + 1/<code class="docutils literal notranslate"><span class="pre">cwnd</span></code> if delayed ACKs are used (<a class="reference internal" href="tcpB.html#delayed-acks"><span class="std std-ref">18.8&nbsp;&nbsp;&nbsp;TCP Delayed ACKs</span></a>) and we still want <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> to be incremented by 1 for each windowful? Assume we are back to measuring <code class="docutils literal notranslate"><span class="pre">cwnd</span></code> in packets.</div>
+</div>
+<p>15.0. In <a class="reference internal" href="#single-packet-losses"><span class="std std-ref">19.8&nbsp;&nbsp;&nbsp;Single Packet Losses</span></a> we simplified the argument slightly by assuming that when A sent a pair of packets, they arrived at R “essentially simultaneously”.</p>
+<p>Give a scenario in which it is not the “extra” packet (the second of the pair) that is lost, but the packet that follows it. Hint: see <a class="reference internal" href="ns2.html#single-sender-phase-effects"><span class="std std-ref">31.3.4.1&nbsp;&nbsp;&nbsp;Single-sender phase effects</span></a>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="dynamicsA.html" title="20   Dynamics of TCP"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="tcpB.html" title="18   TCP Issues and Alternatives"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, desktop edition 2.0.11</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012-2022, Peter L Dordal.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>
