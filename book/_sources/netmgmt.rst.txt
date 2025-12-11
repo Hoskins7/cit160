@@ -1,0 +1,2311 @@
+.. sectnum::
+   :start: 21
+
+.. _FCAPS:
+.. _netmgmt:
+
+Network Management and SNMP
+*****************************
+
+Network management, broadly construed, consists of all the administrative actions taken to keep a network running efficiently. This may include a number of non-technical considerations, |eg| staffing the help desk and negotiating contracts with vendors, but we will restrict attention exclusively to the technical aspects of network management.
+
+.. index::
+	single: FCAPS
+
+The ISO and the International Telecommunications Union have defined a formal model for telecommunications and network management. The original model defined five areas of concern, and was sometimes known as FCAPS after the first letter of each area:
+
++ fault
++ configuration
++ accounting
++ performance
++ security
+
+Most non-ISP organizations have little interest in network accounting (the A in FCAPS is often replaced with "administration" for that reason, but that is a rather vague category). Network security is arguably its own subject entirely. As for the others, we can identify some important subcategories:
+
+**fault**: 
+
++ **device management**: monitoring of all switches, routers, servers and other network hardware to make sure they are running properly.
++ **server management**: monitoring of the network's application layer, that is, all network-based software services; these include login authentication, email, web servers, business applications and file servers.
++ **link management**: monitoring of long-haul links to ensure they are working.
+
+**configuration**:
+
++ network **architecture**: the overall design, including topology, switching vs routing and subnet layout.
++ **configuration management**: arranging for the consistent configuration of large numbers of network devices.
++ **change management**: how does a site roll out new changes, from new IP addresses to software updates and patches?
+
+**performance**: 
+
++ **traffic management**: using the techniques of :ref:`queuing alternatives` to allocate bandwidth shares (and perhaps bucket sizes) among varying internal or external clients or customers.
++ **service-level management**: making sure that agreed-upon service targets -- |eg| bandwidth -- are met (depending on the focus, this could also be placed in the fault category).
+
+.. index::
+	single: SNMP
+	single: Simple Network Management Protocol
+
+While all these aspects are important, technical network management narrowly construed often devolves to an emphasis on fault management and its companion, reliability management: making sure nothing goes wrong, and, when it does, fixing it promptly. It is through fault management that some network providers achieve the elusive availability goal of 99.999% uptime.
+
+.. sidebar:: SNMP *versus* Management
+
+	While SNMP is a very important *tool* for network management, it *is* just a tool. Network management is the process of making decisions to achieve the goals outlined above, subject to resource constraints. SNMP simply provides some input for those decisions.
+
+By far the most common device-monitoring protocol, and the primary focus for this chapter, is the **Simple Network Management Protocol** or **SNMP** (:ref:`SNMP`). This protocol allows a device to report information about its current operational state; for example, a switch or router may report the configuration of each interface and the total numbers of bytes and packets sent via each interface. 
+
+
+Implicit in any device-monitoring strategy is initial device **discovery**: the process by which the monitor learns of new devices. The ping protocol (:ref:`ping`) is common here, though there are other options as well; for example, it is possible to probe the UDP port on a node used for SNMP -- usually 161. As was the case with router configuration (:ref:`routing update`), manual entry is simply not a realistic alternative.
+
+.. sidebar:: SNMP and the Application Layer
+
+	SNMP can be studied entirely from a network-management perspective, but it also makes an excellent self-contained case study of the application layer. Like essentially all applications, SNMP defines rules for client and server roles and for the format of requests and responses. SNMP also contains its own authentication mechanisms (:ref:`snmp community` and :ref:`SNMPv3 security`), generally unrelated to any operating-system-based login authentication.
+
+.. index::
+	single: NMS
+	single: Network Management System
+
+It is a practical necessity, for networks of even modest size, to automate the job of checking whether everything is working properly. Waiting for complaints is not an option. Such a monitoring system is known as a **network management system** or **NMS**; there are a wide range of both proprietary and open-source NMS's available. At its most basic, an NMS consists of a library of scripts to discover new network devices and then to poll each device (possibly but not necessarily using SNMP) at regular intervals. Generally the data received is recorded and analyzed, and alarms are sounded if a failure is detected.
+
+.. index::
+	single: CMIP
+	single: CMOT
+
+When SNMP was first established, there was a common belief that it would soon be replaced by the OSI's Common Management Interface Protocol. **CMIP** is defined in the International Telecommunication Union's X.711 protocol and companion protocols. CMIP uses the same ASN.1 syntax as SNMP, but has a richer operations set. It remains the network management protocol of choice for OSI networks, and was once upon a time believed to be destined for adoption in the TCP/IP world as well. 
+
+But it was not to be. TCP/IP-based network-equipment vendors never supported CMIP widely, and so any network manager had to support SNMP as well. With SNMP support essentially universal, there was never a need for a site to bother with CMIP.
+
+CMIP, unlike SNMP, is supported over TCP, using the CMIP Over Tcp, or **CMOT**, protocol. One advantage of using TCP is the elimination of uncertainty as to whether a request or a reply was received.
+
+.. index::
+	single: network architecture
+	single: architecture, network
+
+Network Architecture
+======================
+
+Before turning to SNMP in depth, we offer a few references to other parts of this book relating to **network architecture**. At the LAN and Internetwork layers local to a site, perhaps the main issues are redundancy, bandwidth and cost. Cabling between buildings, in particular, needs to provide redundancy. See :ref:`spanning tree` and :ref:`vlan` for some considerations at the Ethernet level, and :ref:`subnets versus switching`. 
+
+Next, a site must determine what sort of connection to the Internet it will have. ISP contracts vary greatly in terms of bandwidth, burst bandwidth, and agreed-upon responses in the event of an outage. Some aspects of service-level specification appear in :ref:`token bucket` and :ref:`AF`.
+
+Organizations with geographically dispersed internal networks -- ISPs and larger corporations -- must decide how their internal sites should be connected. Should they communicate over the public Internet? Should a VPN be used (:ref:`vpn`)? Or should private lines (such as SONET, :ref:`SONET`, or carrier Ethernet, :ref:`carrier Ethernet`) be leased between sites? If private lines are used, link monitoring becomes essential.
+
+One increasingly important architectural decision at the application layer is the extent to which network software services are outsourced to the cloud, and run on remote servers managed by third parties. 
+
+.. _SNMP:
+
+SNMP Basics
+=============
+
+SNMP is far and away the most popular protocol for supporting network device monitoring. At its most basic level, SNMP allows polling of individual designated device attributes, such as the system name or the number of packets received via interface ``eth0``. Attributes may, however, be organized into records, sets and tables. Tables may be indexed contiguously, like an array -- |eg| interface[1], interface[2], interface[3], |etc| -- or sparsely -- |eg| interface[1], interface[32767].
+
+.. index::
+	single: managed device, SNMP
+
+While the simplest routers and switches may have quite limited provisions for SNMP, virtually all "serious" networking hardware provides extensive support, for both standard sets of "basic" device attributes and for proprietary attributes as well. Devices with significant SNMP support are sometimes referred to as **managed** devices. 
+
+.. index::
+	single: agent, SNMP
+	single: manager, SNMP
+	single: SNMP agents and managers
+	single: Net-SNMP
+
+An SNMP node that replies to requests for information is known as an **SNMP agent**. The network node doing the SNMP querying is known as the **manager**; it may be part of an NMS or -- more simply -- be a standalone tool known as an SNMP browser or MIB browser (where MIB stands for Management Information Base, below). While most MIB browsers are understood to have a graphical user interface, there are also command-line tools to make SNMP queries, such as the ``snmpget`` and ``snmpwalk`` commands of the Net-SNMP project at `net-snmp.org <http://www.net-snmp.org>`_. These can be invoked by scripting languages to build a simple if rudimentary NMS.
+
+SNMP runs exclusively over UDP. The choice of UDP was made to avoid the connection overhead of what was envisioned to be a simple request-reply protocol; if a manager polls 1,000 devices once a minute, that is 2,000 packets in all over UDP but might easily be 8,000 packets with TCP and the necessary SYN/FIN packets. This may be especially significant when the network is congested to near the point of failure.
+
+The use of UDP does raise two problems: lost packets and having more data than will fit in one packet. For the simplest case of manager-initiated data requests, a manager can handle packet loss by polling a device until a response is received. If a response (or even a request) is too big, the usual strategy is to use IP-layer fragmentation (:ref:`IPv4 fragmentation` and :ref:`ipv6 fragmentation`). This is not ideal, but as most SNMP data stays within local and organizational networks it is at least workable.
+
+Another consequence of the use of UDP is that every SNMP device needs an IP address. For devices acting at the IP layer and above, this is not an issue, but an Ethernet switch or hub has no need of an IP address for its basic function. Devices like switches and hubs that are to use SNMP must be provided with a suitable IP interface and address.  Sometimes, for security, these IP addresses for SNMP management are placed on a private, more-or-less hidden subnet.
+
+SNMP also supports the **writing** of attributes to devices, thus implementing a remote-configuration mechanism. As writing to devices has rather more security implications than reading from them, this mechanism must be used with care. Even for read-only SNMP, however, security is an important issue; see :ref:`SNMP community` and :ref:`SNMPv3 security`.
+
+Writing to agents may be done either to configure the network behavior of the device -- |eg| to bring an interface up or down, or to set an IP address -- or specifically to configure the SNMP behavior of the agent.
+
+.. index::
+	single: traps, SNMP
+
+Finally, SNMP supports asynchronous notification through its **traps** mechanism: a device can be configured to report an error immediately rather than wait until asked. While traps are quite important at many sites, we will largely ignore them here.
+
+SNMP is sometimes used for server monitoring as well as device monitoring; alternatively, simple scripts can initiate connections to services and discern at least something about their readiness. It is one thing, however, to verify that an email server is listening on TCP port 25 and responds with the correct :rfc:`5321` (originally :rfc:`821`) EHLO message; it is another to verify that messages are accepted and then actually delivered.
+
+.. index::
+	single: SNMP versions
+
+.. _SNMP versions:
+
+SNMP versions
+--------------
+
+SNMP has three official versions, SNMPv1, SNMPv2 and SNMPv3. SNMPv1 made its first appearance in 1988 in a collection of RFCs starting with :rfc:`1065` (updated in :rfc:`1155`); the current definition for "core" attribute reporting was released as :rfc:`1213` in 1991. We will return to this below in :ref:`mib2`.
+
+SNMPv2 was introduced in 1993 with :rfc:`1441`. Loosely speaking, SNMPv2 expanded on the basic information, starting with :rfc:`1442` (currently :rfc:`2578`), and also introduced improved techniques for managing tables. 
+
+SNMPv2 also included a proposed security mechanism, but it was largely rejected by the marketplace. Ultimately, a version of SNMPv2 that used the SNMPv1 "community" security mechanism (:ref:`SNMP community`) was introduced; see :rfc:`1901`. This "community"-security version became known as SNMPv2\ **c**.
+
+SNMPv3 then finally delivered a model for reasonably effective security. The "User-based Security Model" or **USM** was first proposed in 1998 in :rfc:`2264`; the final 2002 version is in :rfc:`3414`.
+
+
+
+.. index::
+	single: Object ID, SNMP
+	single: OID, SNMP
+
+.. _SNMP naming:
+
+SNMP Naming and OIDs
+=====================
+
+A central part of the SNMP protocol is how to **name** each device attribute in a consistent manner. The naming scheme chosen was the **Object Identifier**, or **OID**, hierarchy.
+
+Starting in 1985, the International Standards Organization (`ISO <http://www.iso.org>`_) and the standardization sector of the International Telecommunications Union (`ITU-T <http://www.itu.int/en/ITU-T>`_, then known as CCITT) developed the Object Identifier scheme for naming anything in the world that needed naming. Names, or OIDs, consist of strings of non-negative integers. In textual representation these component integers are often written separated by periods, |eg| 1.3.6.1; the notation { 1 3 6 1 } is also used. The scheme is standardized in ITU-T X.660. 
+
+All OIDs used by SNMP begin with the prefix 1.3.6.1. For example, the ``sysName`` attribute corresponds to OID 1.3.6.1.2.1.1.5. The prefix 1.3.6.1.2.1 is known as ``mib-2``, and the one-step-longer prefix 1.3.6.1.2.1.1 is ``system``. Occasionally we will abuse notation and act as if names referred to single additional levels rather than full prefixes, |eg| the latter two names in ``mib-2.system.sysName``. 
+
+The basic SNMP read operation is ``Get()`` (sent via the ``GetRequest`` protocol message), which takes an OID as parameter. The agent receiving the ``Get`` request will, if authentication checks out and if the OID corresponds to a valid attribute, return a pair consisting of the OID and the attribute value. We will return to this in :ref:`SNMP Get`, and see how multiple attribute values can be requested in a single operation.
+
+OIDs form a tree or hierarchy; the immediate child nodes of, say, 1.3.6.1 of length 4 are all nodes 1.3.6.1.N of length 5. The root node, with this understanding, is anonymous; OIDs are sometimes rendered with a leading "." to emphasize this: .1.3.6.1. Alternatively, the numbers can be thought of as labels on the *arcs* of the tree rather than the nodes. 
+
+There is no intrinsic way to distinguish internal OID nodes -- prefixes -- from leaf OID nodes that correspond to actual named objects. Context is essential here.
+
+It is common to give the numeric labels at any specific level human-readable string equivalents. The three nodes immediately below the root are, with their standard string equivalents
+
++ itu-t(0)
++ iso(1)
++ joint-iso-itu-t(2)
+
+The string equivalents can be thought of as external data; when OIDs are encoded only the numeric values are included.
+
+OID naming has been adopted in several non-SNMP contexts as well. ISO and ITU-T both use OIDs to identify official standards documents. The X.509 standard uses OID naming in encryption certificates; see :rfc:`5280`. The X.500 directory standard also uses OIDs; the related :rfc:`4524` defines several OID classes prefixed by 0.9.2342.19200300.100.1. As a non-computing example, `Health Level Seven <http://www.hl7.org/>`_ names US healthcare information beginning with the OID prefix 2.16.840.1.113883. 
+
+As mentioned above, SNMP uses OIDs beginning with 1.3.6.1; in the OID tree these levels correspond to
+
++ iso(1)
++ org(3): organizations
++ dod(6): the US Department of Defense, the original sponsor of the Internet
++ internet(1), apparently the only sublevel of DOD
+
+Here is a portion of the OID tree showing a few other assignments in the iso subtree, and highlighting the 1.3.6.1 prefix above. More entries are available from `oid-info.com/get <http://oid-info.com/get>`_.
+
+    |     itu-t(0)
+    |     **iso(1)**
+    |         standard(0)
+    |         registration-authority(1)
+    |         member-body(2)
+    |         **identified-organization(3)**
+    |             nist(5)
+    |             **dod(6)**
+    |             icd-ecma(12) (European Computer Manufacturers Association)
+    |             oiw(14) (OSE Implementers Workshop)
+    |             edifactboard(15)
+    |             ewos(16)  (European Workshop on Open Systems)
+    |             osf(22)  (Open Software Foundation)
+    |             nordunet(23)
+    |             nato(26)
+    |             icao(27) (International Civil Aviation Organization)
+    |             ...
+    |             amazon(187) (the author has no idea if Amazon currently uses this)
+    |     joint-iso-itu-t(2)
+
+.. index::
+	single: ASN.1
+
+This SNMP 1.3.6.1 prefix is spelled out in :rfc:`1155` via the syntax
+
+::
+
+           internet      OBJECT IDENTIFIER ::= { iso org(3) dod(6) 1 }
+
+which means that the string ``internet`` has the type ``OBJECT IDENTIFIER`` and its actual value is the list to the right of ``::=``: 1.3.6.1. The use of ``iso`` here represents the OID *prefix* .1, conceptually different from just the level iso(1). The formal syntax here is **ASN.1**, as defined by the ITU-T standard X.680. We will expand on this below in :ref:`ASN.1`, though the presentation will mostly be informal; further details can be found at http://www.itu.int/en/ITU-T/asn1/Pages/introduction.aspx.
+
+After the above, :rfc:`1155` then defines the OID prefixes for management information, ``mgmt``, and for private-vendor use, ``private``, as
+
+::
+
+            mgmt          OBJECT IDENTIFIER ::= { internet 2 }
+            private       OBJECT IDENTIFIER ::= { internet 4 }
+
+Again, ``internet`` represents the newly defined prefix 1.3.6.1. Most general-purpose SNMP OIDs begin with the ``mgmt`` prefix. The ``private`` prefix is for OIDs representing vendor-specific information; for example, the prefix 1.3.6.1.4.1.\ **9** has been delegated to Cisco Systems, Inc. :rfc:`1155` states that both the mgmt and private prefixes are delegated by the IAB to the IANA.
+
+Responsibility for assigning names that begin with a given OID prefix can easily be delegated. The Internet Activities Board, for example, is in charge of 1.3.6.1. (According to :rfc:`1155`, this delegation by the Department of Defense to the IAB was never made officially; the IAB just began using it.)
+
+.. _MIBs:
+
+MIBs
+==========
+
+A MIB, or **Management Information Base**, is a set of definitions that associate OIDs with specific attributes, and, along the way, associates each numeric level of the OIDs with a symbolic name. For example, below is the set of so-called ``System`` definitions in the core :rfc:`1213` MIB known as MIB-2 (:ref:`mib2`). The ``mib-2`` and ``system`` prefixes are first defined as
+
+::
+
+            mib-2          OBJECT IDENTIFIER ::= { mgmt 1 }
+            system         OBJECT IDENTIFIER ::= { mib-2 1 }
+
+that is, 1.3.6.1.2.1 and 1.3.6.1.2.1.1 respectively. The ``system`` definitions, which represent actual attributes that can be retrieved, are as follows
+
+::
+
+ sysDescr	{ system 1 }
+ sysObjectID	{ system 2 }
+ sysUpTime	{ system 3 }
+ sysContact	{ system 4 }
+ sysName	{ system 5 }
+ sysLocation	{ system 6 }
+ sysServices	{ system 7 }
+
+Most of these attributes represent string values that need to be administratively defined; we will return to these in :ref:`mib2`.
+
+The MIB is *not* the actual attributes themselves; the set of all ⟨OID,value⟩ pairs stored by an SNMP manager -- perhaps the result of a single set of queries, perhaps the result of a sequence of queries over time -- is sometimes known as the management database, or MDB, though that term is not as universal.
+
+Colloquially, a MIB can be either the abstract set of OID definitions or a particular ASCII file that defines the set. The latter must be run through a **MIB compiler** to be used by other software; users of a MIB browser generally find the information much more useful if the appropriate MIB file is loaded before making SNMP queries. Some RFCs can be read directly by the MIB compiler, which knows to edit out the non-MIB discussion.
+
+.. index::
+	single: Net-SNMP
+
+The Net-SNMP package contains SNMP agents for Linux and Macintosh computers (Microsoft has their own SNMP-agent software), and command-line tools for making SNMP queries; these latter tools are also available for Windows. The sysName value, for example, can be retrieved with the ``snmpget`` command
+
+::
+
+  snmpget -v1 -c public localhost 1.3.6.1.2.1.1.5.0
+
+The OID here corresponds to { system 5 0 }; the final 0 represents a SNMP convention that indicates this is a scalar value and is not part of a table. See :ref:`MIB browsing` for further examples.
+
+MIBs serve as both documentation and data. As documentation, they tell the implementer of a given SNMP agent what information is to be returned for each OID request. As data, they serve to translate numeric OIDs into human-readable data. For example, if the above ``snmpget`` command understands the appropriate MIB (|eg| because the MIB file is in the right place), we can type
+
+::
+
+ snmpget -v1 -c public localhost sysName.0
+
+It is not uncommon for an installation to involve several hundred different (possibly overlapping) MIBs, each defining a different portion of the OID tree. This is particularly true of the ``private`` subtree 1.3.6.1.4.1, for which one might have a separate MIB file for each manufacturer and device.
+
+.. index::
+	single: data types, SNMPv1
+	single: SNMPv1 data types
+	
+.. _SNMPv1 data types:
+
+SNMPv1 Data Types
+====================
+
+SNMP uses OIDs as the indexes for retrieval of attributes. The attributes themselves can have the following types, as of :rfc:`1155`:
+
+====================	=======================================================================
+Datatype		Description
+====================	=======================================================================
+INTEGER			A 32-bit integer
+OCTET STRING		Either a text string or a network address
+Counter			A non-negative INTEGER that increases from 0, and can wrap around. 
+Gauge			An INTEGER that can rise and fall but that never wraps around
+TimeTicks		An INTEGER used to measure time in 1/100ths of a second
+OBJECT IDENTIFIER	An OID appearing as data
+IpAddress		An IPv4 address, as an OCTET STRING of fixed length 4
+NetworkAddress		An IpAddress, in theory allowing for other kinds of addresses later
+Opaque			Any other data, ultimately an OCTET STRING
+====================	=======================================================================
+
+The type of the ``sysName`` attribute, for example, is OCTET STRING.
+
+When SNMP data values are returned by an agent, they are tagged with their type. Thus, the receiver can  See :ref:`snmp encoding` for further details.
+
+When the INTEGER type is used to represent an enumerated type, the value of zero must not be used; an example is the status type ``up(1)``, ``down(2)``, ``testing(3)``.
+
+.. index::
+	single: ASN.1
+
+.. _ASN.1:
+
+ASN.1 Syntax and SNMP
+===========================
+
+We have already seen the ASN.1 definition of some OBJECT IDENTIFIERs in :ref:`SNMP naming`. 
+
+The attribute corresponding to any single OID is always a scalar type, |eg| one of the above. However, SNMP also uses some composite type definitions:
+
+ | SEQUENCE { *fieldname1* *type1*, *fieldname2* *type2*, ... }: This defines a **record** type.
+
+ | SEQUENCE OF *type*: This defines a homogeneous list -- an array or table -- of objects of type *type*. In most cases, *type* represents a SEQUENCE type, and so the list is a list of records, or table in the database sense.
+
+Note the importance of the keyword OF here to distinguish records from lists.
+
+.. index::
+	single: OBJECT-TYPE, SNMP
+
+The OBJECT-TYPE macro is heavily used in MIB definitions. It has the format
+
+ | *objname* ``OBJECT-TYPE``
+ |  ``SYNTAX``  *type*
+ |  ``ACCESS``  read-write *or* read-only *or* write-only *or* not-accessible
+ |  ``STATUS``  mandatory *or* optional *or* obsolete
+ |  ``DESCRIPTION`` *descriptive string*
+ |  ``INDEX``   *OID used for table indexing*
+ |  ``::=``	*OID assigned to objname*
+
+The *objname*, sometimes called the OBJECT DESCRIPTOR, is intended to be globally unique. The value for ``SYNTAX`` must be a valid ASN.1 syntax specification; see :ref:`mib2` for examples. The values for ``ACCESS`` and ``STATUS`` are, in each case, one of the literal strings shown above. The value for ``DESCRIPTION`` is optional. 
+
+Many of the objects so defined will represent tables or other higher-level structures; in this case the Object ID of the last line will represent an internal node of the OID tree rather than a leaf node, and the ACCESS will be ``not-accessible``. It is not that the table is actually inaccessible, but rather that the attributes must be retrieved one by one rather than collectively.
+
+Here is a concrete simple example; other examples appear in the following section. The OID value of ``ifEntry`` here is 1.3.6.1.2.1.2.2.1.
+
+::
+
+          ifInOctets OBJECT-TYPE
+              SYNTAX  Counter
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The total number of octets received on the
+                      interface, including framing characters."
+              ::= { ifEntry 10 }
+
+
+.. index::
+	single: SMI
+
+The data type definitions and the above ASN.1 syntax used for  are collectively known as the **structure of management information**, or SMI. The SMI in effect defines all the types and structures needed by the various MIBs. For SNMPv1, the SMI is defined in :rfc:`1155`.
+
+.. index::
+	single: tables, SNMP
+
+.. _tables:
+.. _SNMP tables:
+
+SNMP Tables
+==============
+
+We have seen in :ref:`MIBs` how SNMP organizes the OID names for the ``system`` group, which consists of scalar values. Each agent attribute is assigned a permanent OID name; |eg| { system 5 0 } is the full OID for the ``sysName`` attribute. OIDs for scalar (non-table) attributes always include a final ".0". 
+
+Most agent data, however, comes in the form of **tables**, that is, lists of records. In SNMP, they are sometimes referred to as *conceptual* tables, as the SNMP agent offering the table is often not responsible for its storage or physical organization. In this sense, SNMP tables resemble database "views". 
+
+These tables can be accessed by linear search or by primary key lookup; the key can be a single attribute or a set of attributes and is known as the **index**. SNMP does not support secondary keys on tables, though it would in principle be possible for an agent to present the same data in two tables, each with a different index (a related example of this trick appears in :ref:`matrix`). 
+
+SNMP tables are almost always small enough that the agent keeps all the records in main memory; database-style concerns about disk-storage organization and indexing are not an issue.
+
+As in databases, an SNMP table index acts as a *constraint*, disallowing two distinct rows with identical index values. When an SNMP table mirrors a "real" table (|eg| the IP forwarding table), problems sometimes occur when the SNMP index is too "small" -- has too few attributes -- and so the SNMP table may not be able to accurately represent the original table. See :ref:`ip-forward mib` for an example. 
+
+In the world of databases, a key with too *many* attributes may fail to capture an important constraint; it may also be less efficient. Neither is a concern with SNMP, with the exception of tables that support row creation, which we may take to be a special case. SNMP table indexes may thus sometimes include attributes that from a database perspective would likely be omitted from the key; again, see :ref:`ip-forward mib` for examples. 
+
+
+We will look here at three examples of SNMPv1 tables, each part of MIB-2. The goal right now is to present how the tabular structure is mapped onto the underlying OID-tree structure; we will return to the syntactic definition of tables in :ref:`interfaces group` and to the semantics of each table in :ref:`MIB-2`. SNMPv2 has made some modest improvements to how tables are defined.
+
+The first example will be the SNMP **interface table**, ``ifTable``. For each network interface (|eg| loopback, Ethernet 0, Ethernet 1, Wireless 0, Point-to-Point 0, |etc|) a collection of attributes including the device name, MTU, bitrate, physical address, and the number of bytes and packets received and sent. The index here (as we shall see later) is an abstractly assigned interface number, known as ``ifIndex``. Here is some sample data, *not* showing all columns that the actual MIB-2 table includes, and not (yet) showing any OIDs. The header of the index column, ifIndex, is in italic; the value is a single integer. The ``eth0`` interface has a higher number for packets than bytes (octets) because the 32-bit ``inOctets`` value has wrapped around.
+
+===========	=======	=======	============	==============	==============
+*ifIndex*	name	MTU	bitrate		inOctets	inPackets
+===========	=======	=======	============	==============	==============
+1		lo	16436	10,000,000	171		3
+2		eth0	1500	100,000,000	37155014	1833455677	
+3		eth1	1500	100,000,000	0		0
+4		ppp0	1420	0		2906687015	2821825
+===========	=======	=======	============	==============	==============
+
+.. sidebar:: Routes
+
+	Although the data here is mostly a mash-up of records from different sources, the 10.38.0.0 route below was a VPN route using the ``ppp0`` tunnel above. Otherwise, workstation forwarding tables often have just two entries, for the local subnet and the default route.
+
+The SNMP **routing table**, ``ipRouteTable``, based on the IP forwarding table of :ref:`IP overview`, has a column representing the destination network, a variety of status and information columns (|eg| for RouteAge), and a NextHop column; the index is the destination-network attribute. Again, here is some sample data with the index column again in italic. The index here -- an IP address -- is a compound object: a list of four integers. We return to this below.
+
+=============	==============	=======	===============	=============
+*dest*		mask		metric	next_hop	type
+=============	==============	=======	===============	=============
+0.0.0.0		0.0.0.0		1	192.168.1.1	indirect(4)
+10.0.0.0	255.255.255.0	0	0.0.0.0		direct(3)
+10.38.0.0	255.255.0.0	1	192.168.4.1	indirect(4)
+=============	==============	=======	===============	=============
+
+(The ``type`` column indicates whether the destination is local or nonlocal; the host is on subnet 10.0.0.0/24 and so the middle entry involves local delivery. The use of ``indirect(4)`` and ``direct(3)`` is an example of an SNMP enumerated type.)
+
+The indexing of the interfaces table is (usually) **dense**: the values for ``ifIndex`` are typically consecutive numbers. The routing table, on the other hand, has a **sparse** index: the index values are likely nowhere near one another.
+
+The **TCP Connections table** ``tcpConnTable`` lists every TCP connection together with its connection state as in :ref:`TCP state diagram`; one can obtain this on most Linux, Windows or Macintosh systems with the command ``netstat -a``. The index in this case consists of the *four* attributes of the connection-defining socketpair: the local address, the local port, the remote address and the remote port. In this table, the only attribute not part of the index is an integer representing the connection state (again represented by an SNMP enumerated type).
+
+===============	===============	===============	===============	===============
+*localAddr*	*localPort*	*remoteAddr*	*remotePort*	state
+===============	===============	===============	===============	===============
+10.0.0.3	31895		147.126.1.209	993		established(5)
+10.0.0.3	40113		74.125.225.98	80		timeWait(11)
+10.0.0.3	20459		10.38.2.42	22		established(5)
+===============	===============	===============	===============	===============
+
+
+SNMP has adopted conventions for how tabular data such as the above is to be encoded in the OID tree. The first step in this strategy is to define, statically, an OID prefix for the subtree representing the table; in this section we will denote this by **T** (later, in :ref:`interfaces group`, we will see that **T** often represents two OID levels of the form Table.Entry, or T.E). Each attribute of the table (that is, each column) is then assigned a non-leaf OID by appending successive integers to the table prefix, starting at 1. For example, the root prefix for the interfaces table is **T** = 1.3.6.1.2.1.2.2.1, known as ``ifEntry``. The columns shown in the fraction of the interfaces table above have the following OIDs:
+
++---------------------------------+-----------------------------------------+
+| OID				  | table column                            |
++=================================+=========================================+
+| ``{ ifEntry 1 }`` or **T**.1	  | The interface number, ``ifIndex``       |
++---------------------------------+-----------------------------------------+
+| ``{ ifEntry 2 }`` or **T**.2	  | The interface name or description       |
++---------------------------------+-----------------------------------------+
+| ``{ ifEntry 4 }`` or **T**.4	  | The interface MTU                       |
++---------------------------------+-----------------------------------------+
+| ``{ ifEntry 5 }`` or **T**.5	  | The interface bitrate                   |
++---------------------------------+-----------------------------------------+
+| ``{ ifEntry 10 }`` or **T**.10  | The number of inbound octets (bytes)    |
++---------------------------------+-----------------------------------------+
+| ``{ ifEntry 11 }`` or **T**.11  | The number of inbound unicast packets   |
++---------------------------------+-----------------------------------------+
+
+
+The second step is to establish a convention for converting the index attributes to a list of integers that can be used as an **OID suffix** identifying a particular row. This index OID suffix is then appended to the attribute OID prefix (identifying the column) to obtain the full OID (with no trailing .0 this time) that represents the name of the table data value.
+
+For the case of the interfaces table, the interface number is used as a single-level OID suffix. The ``eth1`` value for ``inOctets`` thus has OID name **T**.10.3: 10 is the number assigned to the ``inOctets`` column and 3 is the ``ifIndex`` value for the ``eth1`` row. Written in full, this is 1.3.6.1.2.1.2.2.1.\ **10**.\ **3**. Note this numbering has the form **T**.col.row, the transposition of the more common programming-language row-first convention T[row][col].
+
+For the routing and TCP tables presented here, IPv4 addresses are written in dotted-decimal notation, |eg| 10.38.0.0, and then converted to four levels of OID suffix, |eg| .10.38.0.0. (Note that 10.38.0.0 has the same *textual* representation as an IPv4 address and as a four-level OID suffix (though a leading '.' has been added here to the latter), but *logically* they are entirely different things). 
+
+This OID-suffix encoding may seem obvious, but this is deceptive, and in :ref:`tcp-mib` we will see a newer convention in which the IPv4 address 10.38.0.0 would be encoded as the OID suffix .\ **1**\ .\ **4**\ .10.38.0.0, where the **1** denotes an IPv4 address (2 for IPv6) and the **4** denotes the address length as an OCTET STRING. The present rule, for the .10.38.0.0 four-level encoding, comes from :rfc:`2578`, §7.7; the ``IpAddress`` type (for IPv4 only) is defined as ``IMPLICIT OCTET STRING (SIZE (4))`` (in :rfc:`1155`), of predetermined length. An IP address *might* have been encoded as a single OID level using the address as a single unsigned 32-bit integer, but this option was not chosen. 
+
+In the routing table above, the nextHop column is assigned the number 7, so the nextHop for 10.38.0.0 thus has the OID **T**.7.10.38.0.0. 
+
+The OID suffix encoding used for indexing has nothing to do with the ASN.1 BER encoding used for data values, :ref:`snmp encoding`.
+
+For the TCP connections table, the two IP addresses involved each translate to four-level OID chunks, as in the routing table, and the two port numbers each translate to one-level chunks; the resultant OID suffix for the state of the first connection in the table above would be
+
+
+
+ |  .10.0.0.3.\ *31895*.147.126.1.209.\ *993*
+
+where, for clarity, the port-number levels are shown in italic. The state column is assigned the identifier 1, so this would all be appended to **T**.1 (it is common, but, as we see here, not universal, for column-number assignment to begin with the index columns).
+
+Here is a column-oriented diagram of the interfaces-table fragment from above. As we have been doing, the table prefix is denoted **T** and nodes are labeled **T**.col.row. The topmost T and the first row (with the **T**.col OIDs) are internal nodes; these are drawn with the heavier, blue boxes. The lower four rows, with black boxes, are leaf nodes.
+
+.. image::	images/netmgmt/mini_interface_cols.svg
+
+The diagram above emphasizes the arrangement into columns. The actual OID tree structure, however, is as in the diagram below; all the leaf nodes in one column above are actually sibling nodes.
+
+.. image::	images/netmgmt/mini_interface_tree.svg
+
+In all three tables here, the index columns are part of the table data. This is unnecessary; all the index columns are of necessity encoded in the full OID of any table entry. In SNMPv2 it is required (though not necessarily enforced) to in effect omit the index columns from the table as presented by the agent (though they are still declared); see :ref:`SNMPv2 Indexes`.
+
+We also note that, in all three tables here (and in most SNMP tables that serve purely as sources of information), new rows cannot be added via the SNMP manager. Some SNMP tables, however, do support row creation; see :ref:`row additions`.
+
+.. _SNMP GET:
+
+SNMP Operations
+================
+
+As mentioned earlier, the fundamental read operation is ``Get()``; the protocol message itself is known as ``GetRequest``, and also contains the authentication information (that is, the community string for SNMPv1 and SNMPv2c). A request-id is included so multiple outstanding ``GetRequest``\ s aren't mixed up.
+
+.. index::
+	single: VarBind list
+
+The ``GetRequest`` message can contain a *list* of OIDs (actually encoded as a list of ⟨OID,null⟩ pairs called a ``VarBind`` list). A single-OID get simply entails a ``VarBind`` list of length 1.
+
+The agent receiving the ``GetRequest`` validates the authentication and then, if successful, looks up each OID in the received list to find the corresponding value. The filled-in ``VarBind`` list of all ⟨OID,value⟩ pairs is returned.
+
+If any value cannot be found, |eg| because the OID represented an interior node of the OID tree instead of an actual value, or because the OID lay outside the portion of the OID tree that the request was authorized to access, then in SNMPv1 *no* values are returned. Only if every OID in the list corresponds to a valid value is a list of all the ⟨OID,value⟩ pairs returned. SNMPv2 later relaxed this rule to allow the return of whatever individual requests were successful.
+
+If the exact OID is not known -- which is often the case for tabular data -- the ``GetNext()`` operation can be used. It works like ``Get()``, except that for each OID *oid* in the request list the agent finds the **next leaf OID** strictly following *oid* in lexicographical order, which we will call *oidʹ*. The agent then includes the pair ⟨\ *oidʹ*,\ *value*⟩ in its response, where *value* is the value corresponding to *oidʹ*. Note that in the ``GetNext()`` case *oidʹ* is not previously known to the manager. Note also that SNMP *always* returns, with each value, the corresponding OID, which for tabular data encodes the full index for the value.
+
+The ``GetNext()`` operation allows a manager to **walk** through any subtree of the OID tree. If the root of the subtree is prefix **T**, then the first call is to GetNext(**T**). This returns ⟨oid\ :sub:`1`,value\ :sub:`1`⟩. The next call to GetNext has parameter oid\ :sub:`1`; the agent returns ⟨oid\ :sub:`2`,value\ :sub:`2`⟩. The manager continues with the series of GetNext calls until, finally, the subtree is exhausted and the agent returns either an error or else (more likely) an ⟨oid\ :sub:`N`,value\ :sub:`N`⟩ for which oid\ :sub:`N` is no longer an extension of the original prefix p. 
+
+As an example, let us start with the prefix 1.3.6.1.2.1.1, the start of the ``system`` group. The first call to ``GetNext()`` will return the pair
+
+  ⟨1.3.6.1.2.1.1.\ **1.0**, sysDescr_value⟩
+
+The OID 1.3.6.1.2.1.1.\ **1.0** is the first leaf node below the interior node 1.3.6.1.2.1.1. 
+
+The second call to GetNext will take OID 1.3.6.1.2.1.1.\ **1.0** as parameter and ``GetNext()`` will return
+
+  ⟨1.3.6.1.2.1.1.\ **2.0**, sysObjectID_value⟩
+
+Here, the OID returned is the next leaf node strictly following 1.3.6.1.2.1.1.\ **1.0**. The process will continue on through {system 3 0}, {system 4 0}, |etc|, until an OID is found that is *not* part of the system group. As we have seen, this will likely be the first entry of the interfaces group, ``ifNumber.0``, with OID 1.3.6.1.2.1.\ **2**\ .1.0.
+
+The action of ``GetNext()`` is particularly useful when retrieving a table, such as the interfaces table presented in the preceding section. In that example the index values are consecutive integers, and so an SNMP manager could likely guess them. However, guessing the index values for the other two tables -- the IP forwarding table and the TCP connections table -- would be well nigh impossible. And without the index values, we do not have a complete OID.
+
+Consider again the partial-column version of the interfaces table as diagrammed in this format:
+
+.. image::	images/netmgmt/mini_interface_cols.svg
+
+Let us initially call GetNext(**T**). The next leaf node is the upper left black box, with OID **T**.1.1. The call to GetNext(**T**) returns the pair ⟨\ **T**.1.1,1⟩. We now continue with a call to GetNext(**T**.1.1); this returns ⟨\ **T**.1.2,2⟩ and represents the black box immediately below the first one. The next two calls to ``GetNext()`` return, successively, ⟨\ **T**.1.3,3⟩ and ⟨\ **T**.1.4,4⟩.
+
+Now we call GetNext(**T**.1.4). The next leaf node following is the first leaf node in the *second* column, **T**.2.1; the value returned is ⟨\ **T**.2.1,"lo"⟩. The next three calls to GetNext, each time supplied with parameter the value returned by the previous ``GetNext()``, return the next three values making up the second, ``ifDesc`` column of the table. 
+
+At the bottom of the second column, the call to GetNext(**T**.2.4) returns the ⟨OID,value⟩ pair that is the first leaf node of the third column, ⟨\ **T**.3.1,16436⟩. At the bottom of the third column, ``GetNext()`` jumps to the top of the fourth column, and so on. In this manner ``GetNext()`` iterates through the entire table, one column at a time.
+
+When we finally get to the last leaf node of the table, shown here as the lower-right **T**.11.4 (though the actual ``ifTable`` has additional columns). The call to GetNext(**T**.11.4) returns something outside the table. It will either return an error -- in the event that there is no next OID that the manager is authorized to receive -- or the next leaf node up and to the right of T. (In the normal MIB-2 collection, this is would be the first entry of the ``atTable`` table.) 
+
+Either way, the manager receiving the data can tell that its request for GetNext(**T**.11.4) has gone past the end of table **T**, and so **T** has been completely traversed.
+
+Here is a diagram of the above sequence of ``GetNext()`` operations involved in traversing our partial interfaces table; it shows the GetNext(**T**.11.4) at the table's lower right returning the beyond-the-table ⟨OID,value⟩ pair ⟨\ **A**,avalue⟩:
+
+.. image::	images/netmgmt/getnext_sequence.svg
+
+Some manager utilities performing this kind of table retrieval -- often called a "walk" -- will present the data in the order retrieved, one column at a time, and some will (perhaps as an option) format the data visually to look more like a table. See Net-SNMP's ``snmpwalk`` and ``snmptable`` in :ref:`MIB browsing`. 
+
+.. _multi-col get:
+
+Multi-attribute ``Get()``
+---------------------------
+
+A single ``Get()/GetNext()`` request can in fact include a list of attributes to be retrieved. This provides an efficient way to request entire rows of a table.
+
+A manager in general does not know all the index values of a table, but likely *does* know all the column OIDs (as in the blue full-length row above). The manager can speed up the table-retrieval process by asking for entire rows at a time. The first such ``GetNext()`` might be
+
+ | GetNext(**T**.1, **T**.2, **T**.3, **T**.4, **T**.10, **T**.11)
+
+These are the OIDs of the blue full-length row; these are all non-leaf OIDs. The result is the list of pairs
+
+ | ⟨\ **T**.1.1,1⟩, ⟨\ **T**.2.1,"lo"⟩, ⟨\ **T**.3.1,16436⟩, ⟨\ **T**.4.1,10000000⟩, ⟨\ **T**.10.1,171⟩, ⟨\ **T**.11.1,3⟩
+
+That is, the table's entire first row is returned (where we are assuming again that the only columns are 1, 2, 3, 4, 10 and 11). The next call to ``GetNext()`` would use the OIDs returned above:
+
+ | GetNext(**T**.1.1, **T**.2.1, **T**.3.1, **T**.4.1, **T**.10.1, **T**.11.1)
+
+This would then return the table's entire second row, and so on. When we got to the very last row, the call
+
+ | GetNext(**T**.1.4, **T**.2.4, **T**.3.4, **T**.4.4, **T**.10.4, **T**.11.4)
+
+would return (assuming now that the columns shown are the only columns that exist)
+
+ | ⟨\ **T**.2.1,"lo"⟩, ⟨\ **T**.3.1,16436⟩, ⟨\ **T**.4.1,10000000⟩, ⟨\ **T**.10.1,171⟩, ⟨\ **T**.11.1,3⟩, ⟨\ **A**,avalue⟩ 
+
+where **A** is the next leaf OID above and to the right of **T** (assuming no error). At this point the manager knows, as in the single-attribute-get case, that the entire table has been retrieved.
+
+It does not matter whether the manager uses this multi-attribute form of ``GetNext()`` to return all the columns of the relevant table, or only the subset of columns in which the manager is interested.
+
+We will see in :ref:`GetBulk` that SNMPv2 introduced an operation ``GetBulk()`` that can return multiple rows of multiple columns in a single operation. 
+
+Tables are not necessarily static. New dynamic interfaces may be added, and new routes and TCP connections are added all the time. A manager reading a table using the single-attribute form of ``GetNext()`` may find that only the latter part of a new row is retrieved, or, alternatively, that the first part of a deleted row is retrieved. The multi-attribute ``GetNext()`` offers a little more protection from this.
+
+.. _set:
+
+``Set()``
+-----------
+
+SNMP also allows a ``Set()`` operation. Not all attributes are writable, of course, and a manager must have write authority for those that *are* writable. And there is no ``SetNext()``; the exact OID of each value must be supplied. 
+
+In the system group, the ``sysName`` attribute is writable. It has OID 1.3.6.1.2.1.1.5.0; to update this we would invoke
+
+ | Set(1.3.6.1.2.1.1.5.0, "newsysname")
+
+Like ``Get()``, ``Set()`` can be invoked on multiple attributes. Suppose table **T** has three columns **T**.1, **T**.2 and **T**.3, and two rows:
+
+======= ======= =======
+**T**.1	**T**.2	**T**.3
+======= ======= =======
+10	eth0	3.14159
+11	eth1	2.71828
+======= ======= =======
+
+We can then change the second ``eth1`` row to ⟨11,ppp1,0.577216⟩ with
+
+  Set( (**T**.2.11,ppp1), (**T**.3.11,0.577216) ) 
+
+We cannot change the indexing this way, but see :ref:`row additions`.
+
+The semantics for multi-attribute ``Set()`` explicitly require -- and still require -- that either all the assignments succeed, or all fail; that is, multi-attribute ``Set()`` operations are **atomic**. (The usual reason for a failure is that the manager issuing the ``Set()`` lacked write permission for some item.) SNMPv1 had the same all-or-nothing rule for multi-attribute ``Get()``, but that requirement was relaxed in SNMPv2. The all-or-nothing ``Set()`` semantics mean that certain updates cannot end up completed only half-way. 
+
+The multi-attribute ``Set()`` semantics do *not* mean, however, that near-simultaneous assignments by different managers are **serialized**. Suppose, for example, two separate managers both attempt to update attributes specified by OIDs **X** and **Y**, one to 10 and 100 and the other to 20 and 200. If the updates are scheduled at about the same time,
+
+ | Set((**X**,10), (**Y**,100))
+ | Set((**X**,20), (**Y**,200))
+
+then it is possible for the Set()s to be performed in the order (**X**,20), (**X**,10), (**Y**,100), (**Y**,200), leaving **X** = 10 and **Y** = 200. See :ref:`testandincr` for a workaround.
+
+.. index::
+	single: MIB browsers
+
+.. _MIB browsing:
+
+MIB Browsing
+===============
+
+Tools for individual SNMP reading are widely available, and are very helpful for viewing what is going on. 
+
+.. index::
+	single: Net-SNMP
+
+We have already mentioned the Net-SNMP package. The command ``snmpget`` issues a single (perhaps multi-attribute) ``Get()`` request; the very similar ``snmpgetnext`` issues a GetNext request. The command ``snmpwalk`` takes an OID representing the root of a subtree, and returns everything in that subtree. Here is an example that assumes the snmp agent on localhost is configured to use community string "tengwar" (see :ref:`snmp community`):
+
+::
+
+ snmpwalk -v 1 -c tengwar localhost 1.3.6.1.2.1.2.2
+
+The OID here is that of ``ifTable``. Multiple OIDs are permitted for ``snmpget`` and ``snmpgetnext`` but not for ``snmpwalk``.
+
+If the appropriate MIB files are loaded, the above command can also be entered as
+
+::
+
+ snmpwalk -v 1 -c tengwar localhost ifTable
+
+This entails putting the RFC1213-MIB file into a special directory (|eg| $HOME/.snmp/mibs), and then either adding a line like
+
+::
+
+ mibs +RFC1213-MIB
+
+to the snmp.conf file, or by including the MIB name on the command line:
+
+::
+
+ snmpwalk -v 1 -c tengwar -m RFC1213-MIB localhost ifTable
+
+Note that ``RFC1213-MIB`` is the identifier assigned to the MIB file in its first line, as below, and *not* necessarily the name of the file containing the MIB.
+
+::
+
+ RFC1213-MIB DEFINITIONS ::= BEGIN
+
+If the appropriate MIB file is loaded, the OIDs may be displayed symbolically rather than numerically, but the data presentation will not change:
+
+::
+
+    iso.3.6.1.2.1.1.5.0 = STRING: "valhal"       ;; without MIB
+ RFC1213-MIB::sysName.0 = STRING: "valhal"       ;; with MIB
+
+(Actually, if the data is of type Object ID, then without the MIB the OID will be displayed numerically, and with the appropriate MIB all or part of it may be displayed symbolically.)
+
+Finally, the Net-SNMP manager package includes ``snmptable``, which is like ``snmpwalk`` except that the data is displayed as a table rather than one column at a time. For the ``snmptable`` command, the appropriate MIB file *must* be installed.
+Net-SNMP comes with a mib browser with a graphical interface, ``tkmib``.
+
+The personal edition of the `iReasoning MIB browser <http://www.ireasoning.com/mibbrowser.shtml>`_ is not open-source, but it *is* free, and works well on Windows, Macs and Linux; SNMPv3 is not supported. The license does prohibit the publication of benchmark tests without consent.
+
+.. index::
+	single: MIB-2
+
+.. _mib2:
+.. _mib-2:
+
+MIB-2
+==========
+
+We can now turn to the MIB that represents the core of SNMPv1 data, known as MIB-2, and defined in :rfc:`1213`. The "2" here -- often represented with a Roman numeral: MIB-II -- represents the second iteration of the definition, but it is still part of SNMPv\ **1**. The predecessor MIB-1 was first documented in :rfc:`1066`, 1988.
+
+As we saw in :ref:`MIBs`, the MIB-2 OID prefix is 1.3.6.1.2.1.
+
+MIB-2 has since been extended. We look at a few extensions below in :ref:`sysORTable`, :ref:`ifXTable`, :ref:`tcp-mib` and :ref:`ip-forward mib`. In general, serious network management should make use of these newer versions. However, MIB-2 is still an excellent place to get started, even if partly obsolete.
+
+The original MIB-2 is divided into ten groups, not all of which are in current use:
+
++ ``system(1)``:	above
++ ``interfaces(2)``: above, in brief
++ ``at(3)``: the ARP cache, :ref:`Address Resolution Protocol`
++ ``ip(4)``: including the IP forwarding table used as an example above
++ ``icmp(5)``: information about ICMP, :ref:`ICMP`
++ ``tcp(6)``: including the TCP connections table used as an example above
++ ``udp(7)``: information about UDP activity
++ ``egp(8)``: information about the now-obsolete EGP protocol, replaced by BGP
++ ``transmission(10)``: never used
++ ``snmp(11)``: about the SNMP agent itself
+
+Originally group 9 was for CMOT, above, but this entry is commented out in :rfc:`1213` (though it does not appear at all in MIB-1). 
+
+The ``at`` group is officially deprecated; the same ARP-cache information is available within the ``ip`` group. The EGP protocol has been entirely replaced by BGP, and management of BGP routers is highly specialized; :rfc:`4273` contains a BGP MIB but private MIBs are almost universally used here as well.
+
+The transmission group was included anticipating the day when "definitions for managed transmission media are defined". This day has not come to pass.
+
+The Net-SNMP agent implementation returns nothing for the egp and transmission groups.
+
+.. _system group:
+
+The system Group
+---------------------
+We have already looked at this in :ref:`MIBs` and will not say much more, except to note that several of the entries in this group must be manually configured. This can be done either through editing of the configuration file, |eg| ``snmpd.conf``, or else (in the case of ``read-write`` attributes) by using SNMP itself.
+
+.. index::
+	single: Net-SNMP
+
+The ``sysObjectID`` value represents a vendor-specific OID for this particular system's SNMP agent. For example, the Net-SNMP package installed on my system returns 1.3.6.1.4.1.8072.3.2.10. The 1.3.6.1.4.1 is the root of the ``private``, vendor-specific, OID tree, and 8072 has been assigned to the Net-SNMP project. This often represents, in practice, the way an SNMP manager can figure out the vendor of an agent, and thus determine what vendor-specific information to query. One can use the 8072 discovered here to ask for the subtree 1.3.6.1.4.1.8072, and find all sorts of Net-SNMP-specific information. Similarly, on one particular Windows XP installation with Microsoft Network Monitoring installed, the sysObjectID value is 1.3.6.1.4.1.\ **311**.1.1.3.1.1; 311 is the OID level assigned to Microsoft in the private subtree 1.3.6.1.4.1. 
+
+The system group has been expanded in SNMPv2 with an Object Resource table, ``sysORTable``; see :ref:`sysORTable`.
+
+.. _interfaces group:
+
+Table definitions and the interfaces Group
+----------------------------------------------
+
+The interfaces group consists of a single INTEGER value ``ifNumber`` representing the number of current network interfaces (including "down" interfaces), and the interfaces table partially introduced earlier. We take the opportunity here to outline exactly how MIB table definitions -- and enumerated types -- are structured using ASN.1.
+
+Some of the interfaces-group definitions have later been updated. See, for example, :rfc:`2863`, which also redefines the group to use the additional features of the SNMPv2 SMI. We will return to an extension of the interfaces group in :ref:`ifXTable`.
+
+MIB table definitions almost always involve a two-level process: an OID is defined for the table, and then a second OID is defined for a **table entry**, that is, for one row of the table. This second OID is usually generated from the first by appending ".1", and it is this second OID that represents the table prefix in the sense of :ref:`tables`, denoted there by **T**.
+
+The actual ASN.1, slightly annotated, is as follows:
+
+::
+
+          ifTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF IfEntry       -- note UPPER-CASE-I IfEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of interface entries.  The number of
+                      entries is given by the value of ifNumber."
+              ::= { interfaces 2 }              -- that is, 1.3.6.1.2.1.2.2
+
+          ifEntry OBJECT-TYPE                   -- note lower-case-i ifEntry
+              SYNTAX  IfEntry                   -- note UPPER-CASE-I IfEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An interface entry containing objects at the
+                      subnetwork layer and below for a particular interface."
+              INDEX   { ifIndex }
+              ::= { ifTable 1 }                 -- that is, 1.3.6.1.2.1.2.2.1
+
+Both these entries are ``not-accessible`` as they do not represent leaf nodes. The second declaration above is for the lower-case-i ``ifEntry``; the next definition in :rfc:`1213` is for the UPPER-CASE-I version. The latter represents the complete list of all columns of an ifEntry/IfEntry object, together with their types from (in most cases) :ref:`SNMPv1 data types`. The ``PhysAddress`` type is defined in :rfc:`1213` as a synonym for ``OCTET STRING``. Definitions for the OID associated with each column comes later.
+
+It is ``ifEntry`` that represents an actual row, and thus includes an ``INDEX`` entry to specify the attribute or attributes that make up the primary key for that row.
+
+We now define **I**\ fEntry:
+
+::
+
+          IfEntry ::=
+              SEQUENCE {
+                  ifIndex            INTEGER,
+                  ifDescr            DisplayString,
+                  ifType             INTEGER,
+                  ifMtu              INTEGER,
+                  ifSpeed            Gauge,
+                  ifPhysAddress      PhysAddress,
+                  ifAdminStatus      INTEGER,
+                  ifOperStatus       INTEGER,
+                  ifLastChange       TimeTicks,
+                  ifInOctets         Counter,
+                  ifInUcastPkts      Counter,
+                  ifInNUcastPkts     Counter,
+                  ifInDiscards       Counter,
+                  ifInErrors         Counter,
+                  ifInUnknownProtos  Counter,
+                  ifOutOctets        Counter,
+                  ifOutUcastPkts     Counter,
+                  ifOutNUcastPkts    Counter,
+                  ifOutDiscards      Counter,
+                  ifOutErrors        Counter,
+                  ifOutQLen          Gauge,
+                  ifSpecific         OBJECT IDENTIFIER
+              }
+
+.. sidebar:: Attributes
+
+	There can be a certain eye-glazing tedium in some of SNMP's lengthy attribute lists, such as the one above. This can be replaced by panic in a hurry, though, when a problem has arisen and the proper attribute to diagnose it doesn't seem to be included anywhere.
+
+It would have been possible to plug in the above definition of **I**\ fEntry into the ``SYNTAX`` specification of the previous **i**\ fEntry, but that is cumbersome. The **I**\ fEntry definition is not a stand-alone ``OBJECT-TYPE`` and does not have its own OID.
+
+If all we wanted to do was to implement the interfaces table using the shortest possible OIDs, we would not have created separate ifTable and ifEntry OIDs. This would mean, however, that we could not use the ``OBJECT-TYPE`` macro to define ``ifTable``, which would have been less consistent (especially as the ASN.1 syntax also determines the packet encoding, as in :ref:`SNMP encoding`). Essentially every table prefix in SNMP is defined using two additional OID levels, as here, rather than one.
+
+.. index::
+	single: ifIndex
+
+We now turn to the 22 specific interface attributes. Here is the definition for the first, ``ifIndex``; it defines column 1 of the interfaces table to be, in effect, ifEntry.1. As we are now talking about a leaf node, once the OID suffix is appended to represent the index, the ``ACCESS`` is no longer ``not-accessible``.
+
+::
+
+          ifIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "A unique value for each interface.  Its value ranges 
+                      between 1 and the value of ifNumber.  The value for each 
+                      interface must remain constant at least from one 
+                      reinitialization of the entity's network management system 
+                      to the next reinitialization."
+              ::= { ifEntry 1 }
+
+The ``DESCRIPTION`` clearly indicates that the values for ``ifIndex``, used to specify interfaces, are to be consecutive integers. Compliance with this rule has been an early casualty, for various reasons, and is formally withdrawn in :rfc:`2863`. Some vendors simply number physical interfaces non-consecutively. In other cases, there is some underlying issue with consecutive numbering. For example, one of the author's systems running Net-SNMP returns ``ifNumber`` = 3, and then the following table values:
+
+==============	===========
+``ifIndex``	``ifName``
+==============	===========
+1		lo
+2		eth0
+549		ppp0
+==============	===========
+
+It turns out that ppp0 is a virtual interface corresponding to a VPN tunnel, :ref:`VPN`, and the underlying tunnel regularly fails and is then automatically re-instantiated. Each time it does so, the ``ifIndex`` is incremented by 1. 
+
+The rule that interfaces be numbered consecutively was formally deprecated in :rfc:`2863`, an SNMPv2 update of the interface group. This, in turn, makes the ``ifNumber`` value rather less useful than it might be; most SNMP tables are not associated with a count attribute and seem to do just fine.
+
+Most SNMP data values correspond straightforwardly with attributes defined by the hardware and the underlying operating system. The ``ifIndex`` value does not, at least not necessarily. Generally the agent must maintain at least some state to keep the ``ifIndex`` value consistent. In some cases, the ``ifIndex`` value may be taken from the relative position of the interface in some internal operating-system table. This is not, however, universally the case, as with the ``ifIndex`` value of 549 for ppp0 in the table above. 
+
+The ``ifIndex`` value is widely used throughout SNMP, and is often referenced in other tables. SNMPv2 even defines a special type (a TEXTUAL CONVENTION) for it, named ``InterfaceIndex`` (:ref:`SNMPv2 SMI`).
+
+As we mentioned earlier, there is no reason to include ``ifIndex`` as an actual column in the table; the value of ``ifIndex`` can always be calculated from the OID of any component of the row. The SNMPv2 approach here -- basically to define ``ifIndex`` as ``not-accessible`` -- is described below in :ref:`SNMPv2 Indexes`.
+
+.. index::
+	single: ifDescr
+
+The ``ifDescr`` is a textual description of the interface; it is usually the device name associated with the interface. :rfc:`1213` states "this string should include the name of the manufacturer, the product name and the version of the hardware interface", but this is inconsistent with Linux device-naming conventions. The current rule is that it is merely unique.
+
+.. index::
+	single: enumerated type, SNMP
+	single: SNMP enumerated type
+	single: ASN.1 enumerated type
+	single: ifType, SNMP
+
+The ``ifType`` attribute is our first example of how ASN.1 handles **enumerated types**. The value is a small integer and the hardware type associated with each integer is spelled out as follows. The majority of the networking technologies in this 1991 list have pretty much vanished from the face of the earth.
+
+::
+
+          ifType OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          other(1),          -- none of the following
+                          regular1822(2),
+                          hdh1822(3),
+                          ddn-x25(4),
+                          rfc877-x25(5),
+                          ethernet-csmacd(6),
+                          iso88023-csmacd(7),
+                          iso88024-tokenBus(8),
+                          iso88025-tokenRing(9),
+                          iso88026-man(10),
+                          starLan(11),
+                          proteon-10Mbit(12),
+                          proteon-80Mbit(13),
+                          hyperchannel(14),
+                          fddi(15),
+                          lapb(16),
+                          sdlc(17),
+                          ds1(18),           -- T-1
+                          e1(19),            -- European equiv. of T-1
+                          basicISDN(20),
+                          primaryISDN(21),   -- proprietary serial
+                          propPointToPointSerial(22),
+                          ppp(23),
+                          softwareLoopback(24),
+                          eon(25),            -- CLNP over IP [11]
+                          ethernet-3Mbit(26),
+                          nsip(27),           -- XNS over IP
+                          slip(28),           -- generic SLIP
+                          ultra(29),          -- ULTRA technologies
+                          ds3(30),            -- T-3
+                          sip(31),            -- SMDS
+                          frame-relay(32)
+                      }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The type of interface, distinguished according to
+                      the physical/link protocol(s) immediately 'below'
+                      the network layer in the protocol stack."
+              ::= { ifEntry 3 }
+
+.. index::
+	single: IANA
+
+A more serious problem is that over two hundred new technologies are unlisted here. To address this, the values for ``ifType`` have been placed under control of the IANA, as defined in ``IANAifType``; see :rfc:`2863` and https://www.iana.org/assignments/ianaiftype-mib/ianaiftype-mib. The IANA can then add new types without formally updating any RFC.
+
+For the meaning of ``ifMtu``, the interface MTU, see :ref:`IPv4 fragmentation`. The 32-bit ``ifSpeed`` value will be unusable once speeds exceed 2 Gbps; :rfc:`2863` defines an ``ifHighSpeed`` object with speed measured in units of Mbps. This entry is part of the ``ifXTable`` table, :ref:`ifXTable`. :rfc:`2863` also clarifies that, for virtual interfaces that do not really have a bandwidth, the value to be reported is zero (though in the example earlier the loopback interface ``lo`` was reported to have a bandwidth of 10 Mbps). The ``ifPhysAddress`` is, on Ethernets, the Ethernet address of the interface. 
+
+The ``ifAdminStatus`` and ``ifOperStatus`` attributes are enumerated types: up(1), down(2), testing(3). If the ``ifAdminStatus`` is up(1), and the ``ifOperStatus`` disagrees, then there is a likely hardware malfunction. The ``ifLastChange`` attribute reflects the last time, in TimeTicks, there was a change in ``ifOperStatus``.
+
+The next eleven entries count bytes, packets and errors. The ``ifInOctets`` and ``ifOutOctets`` count bytes received and sent (including framing bytes, :ref:`framing`, if applicable). The problem with these is that they may wrap around too fast: in 34 seconds at 1 Gbps. The MIB-2 values are still used, but are generally supplemented with 64-bit counters defined in ``ifXTable``, :ref:`ifXTable`. 
+
+The packet counters are for unicast packets, non-unicast packets, discarded packets, errors, and, for inbound packets only, packets with unknown protocols. The count of non-unicast packets is separated in ``ifXTable`` into separate counts of broadcast and multicast packets.
+
+The interface queue length is available in ``ifOutQLen``. It takes a considerable amount of traffic to make this anything other than 0. :rfc:`1213` says nothing about the timescale for averaging the queue length.
+
+The last member of the classic MIB-2 interfaces group is ``ifSpecific``, which has type ObjectID. It was to return an OID that may be queried for additional ifType-specific information about the interface. It was formally deprecated in :rfc:`2233`.
+
+
+The ip Group
+-------------------
+
+The ip group contains several scalar attributes and three tables. 
+
+The first two attributes are writable: 
+
++ ``ipForwarding``: a Boolean attribute to enable or disable forwarding
++ ``ipDefaultTTL``: the default TTL in outgoing packets (:ref:`IPv4 header`)
+
+The next scalar attributes are as follows. Here and later, we summarize these informally.
+
++ ``ipInReceives``: the number of received IP packets
++ ``ipInHdrErrors``: the number of apparent IP packets received with header errors
++ ``ipInAddrErrors``: the number of IP packets received with bad destination addresses
++ ``ipForwDatagrams``: the number of forwarded IP packets
++ ``ipInUnknownProtos``: the number of received IP packets with unknown higher-level protocol
++ ``ipInDiscards``: the number of received IP packets that had no errors, but which were still discarded due to resource limits
++ ``ipInDelivers``: the number of received IP packets delivered locally
++ ``ipOutRequests``: the number of IP packets originated by this node for delivery elsewhere
++ ``ipOutDiscards``: the number of outbound IP packets discarded due to resource limits
++ ``ipOutNoRoutes``: the number of outbound IP packets for which there was no route in the IP forwarding table
++ ``ipReasmTimeout``: the value, in seconds, of the IP fragment-reassembly timer
++ ``ipReasmReqds``: the number of IP proper fragments received that needed reassembly at this node (forwarded fragments are reassembled at their destination)
++ ``ipReasmOKs``: the number of fragmented IP packets successfully reassembled
++ ``ipReasmFails``: the number of fragmented IP packets *not* successfully reassembled
++ ``ipFragFails``: primarily, packets that needed fragmentation but their Dont Fragment bit (:ref:`IPv4 fragmentation`) was set
++ ``ipFragCreates``: the number of IP fragments created by this node
++ ``ipRoutingDiscards``: the number of packets that should have been forwarded, but were discarded due to resource limits
+
+The first table is the ``ipAddrTable``, a list of all IP addresses assigned to this node together with interfaces and netmasks. 
+
+The second table is the ``ipRouteTable``, that is, the forwarding table. We looked briefly at this in :ref:`tables`. Note that the index consists solely of the destination IP address ``ipRouteDest``, which is not sufficient for CIDR-based forwarding in which the forwarding-table key is the ⟨dest,netmask⟩ pair. Traffic to 10.38.0.0/16 might be routed differently than traffic to 10.38.0.0/24!
+
+This table contains four attributes ``ipRouteMetric1`` through ``ipRouteMetric4``. :rfc:`1213` states that unused metrics should be set to -1, but many agents simply omit such columns entirely. Agents may similarly omit ``ipRouteAge``.
+
+The third table is ``ipNetToMediaTable``, which is the ARP-cache table and which replaces a similar now-deprecated table in the at group. The ``ipNetToMedia`` table adds one column, ``ipNetToMediaType``, not present in the at-group table; this column indicates whether an physical-to-IP-address mapping is invalid(2), dynamic(3) or static(4). Most ARP entries are dynamic.
+
+For an updated version of the ip group, see :ref:`ip-mib` and :ref:`ip-forward mib`.
+
+The icmp Group
+----------------------
+
+The icmp group consists of 26 counters for various ICMP events. ICMP Echo Request (ping request) packets have their own counter.
+
+The tcp Group
+--------------------
+
+The tcp group includes the following scalars:
+
++ ``tcpRtoAlgorithm``: the method for calculating the retransmission timeout, normally vanj(4) for the Jacobson-Karels algorithm in :ref:`TCP RTO`. 
++ ``tcpRtoMin``: the minimum TCP retransmission timeout, in milliseconds
++ ``tcpRtoMax``: the maximum TCP retransmission timeout, again in ms
++ ``tcpMaxConn``: if the system imposes a static cap on the number of allowed TCP connections, that is returned. Most systems have no static cap, though, and return -1.
++ ``tcpActiveOpens``: the number of TCP connections opened from this node; specifically, the number of TCP state transitions CLOSED → SYN_SENT
++ ``tcpPassiveOpens``: literally, the number of TCP state transitions LISTEN → SYN_RECD
++ ``tcpAttemptFails``: the number of TCP connections that went to CLOSED without ever being ESTABLISHED
++ ``tcpEstabResets``: the number of TCP connections that went from ESTABLISHED or CLOSE_WAIT directly to CLOSED, via RST packets
++ ``tcpCurrEstab``: the number of TCP connections currently in either state ESTABLISHED or state CLOSE_WAIT
++ ``tcpInSegs``: the count of received TCP packets, including errors and duplicates (though duplicate *reception* is relatively rare)
++ ``tcpOutSegs``: the count of sent TCP packets, *not* including retransmissions
++ ``tcpRetransSegs``: the count of TCP packets with at least one retransmitted byte; the packet may also contain new data
++ ``tcpInErrs``: the number of TCP packets received with errors, including checksum errors
++ ``tcpOutRsts``: the number of RST packets sent
+
+Perhaps surprisingly, there is no counter provided for total number of TCP *bytes* sent or received. There is also no entry for the congestion-management strategy, |eg| Reno v NewReno v TCP Cubic (:ref:`newTCPs`). 
+
+The tcp group also includes the ``tcpConnTable`` table, which lists, for each connection (identified by ⟨localAddress,localPort,remoteAddress,remotePort⟩) the connection state. We looked at this earlier in :ref:`SNMP tables`. The table is noteworthy in that four of its five columns are part of the INDEX. A consequence is that to extract all the information from the table, a manager need only retrieve the ``tcpConnState`` column: the other four attributes will all be encoded in the OID index that is returned with each ``tcpConnState`` value.
+
+We will look at the newer SNMPv2 replacement in :ref:`TCP-MIB`.
+
+The udp Group
+--------------------
+
+The udp group contains the following scalars:
+
++ ``udpInDatagrams``: a count of the number of UDP packets received and deliverable to a socket
++ ``udpNoPorts``: a count of UDP packets received but undeliverable because the port was not open
++ ``udpInErrors``: a count of the number of UDP packets undeliverable due to any other errors
++ ``udpOutDatagrams``: a count of the number of UDP packets sent
+
+The udp group also contains the table ``udpTable``. This table lists those UDP ports that the node has open. The table rows have the form ⟨localAddr,localPort⟩, with both columns included in the index. If a UDP socket accepts connections from anywhere, the localAddr will appear as 0.0.0.0.
+
+The snmp Group
+-------------------
+
+The SNMP group consists of 28 SNMP status and error attributes, numbered from 1 to 30 with 7 and 23 not used.
+
+.. index::
+	single: community, SNMP
+	single: agent configuration, SNMP
+	single: SNMP agent configuration
+
+.. _snmp community:
+
+SNMPv1 communities and security
+=================================
+
+An SNMPv1 manager authenticates itself to an agent by providing a string known as a **community** string that is a combination of both userid and password. That is, the single string identifies the manager (or manager group) and at the same time authenticates the manager. 
+
+The community string identifies a manager as a member of a designated "community", in the conventional use of the word, of managers. Of course, at many sites there will be only one manager that interacts with any given agent.
+
+Community strings are sent unencrypted, and so are vulnerable to sniffing. Even sniffing is not always necessary; far and away the most popular value -- the default for many agents -- is the string "public". While the community string can be made obscure, and changed frequently, these are not enough; the only appropriate security practice today is to use SNMPv3 authentication (:ref:`SNMPv3 security`).
+
+If a manager sends an incorrect community string, then in SNMPv1 and SNMPv2c there is no reply. SNMPv3 relaxed this rule somewhat, :ref:`snmpv3 engines`.
+
+.. index::
+	single: Net-SNMP
+
+A single agent can support multiple community strings. Each community has an associated subset of the MIB (a *view*) that it allows. For example, an agent can be configured so that the community string "system" allows the manager access to the ``system`` group, the community string "tengwar" allows access to the entire MIB-2 group, and the community string "galadriel" allows access to the preceding plus the ``private`` group(s). Using Net-SNMP (the most common agent on Linux and Macintosh machines) this would be achieved by the following entries in the ``snmpd.conf`` file:
+
+::
+
+ rocommunity  system    default   1.3.6.1.2.1.1
+ rocommunity  tengwar   default   1.3.6.1.2.1
+ rocommunity  galadriel default   -V mib2+private
+
+ view   mib2+private included  1.3.6.1.2.1
+ view   mib2+private included  1.3.6.1.4.1
+
+In order that the galadriel community could contain two disconnected OID subtrees, it was necessary to make use of the View-based Access Control Model (VACM). Community galadriel has access to the OID-tree view named "mib2+private"; this view is in turn defined in the last two lines above.
+
+For our purposes here, VACM can be seen as an implementation mechanism for specifying what portion of the OID tree is accessible to a given community. VACM allows read and write permissions to be granted to specific OID trees, and also to be excluded from specific subtrees (|eg| table columns). Using the "mask" mechanism, access can even be granted to specific rows of a table. We return to VACM for SNMPv3 very briefly in :ref:`VACM for SNMPv3`.
+
+.. index::
+	single: Microsoft SNMP agent
+
+On Microsoft operating systems, an SNMP agent is generally included but must be enabled, |eg| from "Windows components" or "Programs and Features". After that, the agent must still be configured. This is done by accessing "Services" (|eg| through Control Panel → Administrative Tools or by launching services.msc), selecting "SNMP service", and clicking on "Properties". This applet only allows setting the community name and read vs write permissions; specifying collections of visible OID subtrees (views) is not supported here (though it may be via SNMP itself).
+
+The community mechanism *can* offer a reasonable degree of security, if community names are changed frequently and if eavesdropping is not a concern. Perhaps the real problem with community-based security is that just how much information can leak out if an attacker knows the community string  is not always well understood. SNMP access can reveal a site's complete network and host structure, including VPNs, subnets, TCP connections, host-to-host trust relationships, and much more. Most sites block the SNMP port 161 at their firewall; some even go so far as to run SNMP only on a "hidden" network largely invisible even within the organization.
+
+.. index::
+	single: VACM
+
+The view model for OID-tree access is formalized in :rfc:`3415` as part of SNMPv3; it is called the View-based Access Control Model or **VACM**. It allows the creation of named views. The ``vacmAccessTable`` spells out the viewing rights assigned to a given VACM **group**, which, in a rough sense, corresponds to an SNMPv1/SNMPv2c community. VACM supports, in addition to views consisting of disjoint unions of OID subtrees, table views that limit access to a specific set of columns. 
+
+.. index::
+	single: BER
+	single: basic encoding rules
+
+.. _snmp encoding:
+.. _ASN.1 encoding:
+
+SNMP and ASN.1 Encoding
+========================
+
+When SNMP data is entered into a packet, it is encoded according to the ASN.1 Basic Encoding Rules, or **BER**. This is a hierarchical syntax-driven binary encoding strategy in which each atomic value (INTEGER, OCTET STRING, OBJECT IDENTIFIER, |etc|) is *tagged* with its type, and each compound structure is also tagged. This means that the receiver can understand a complex packet format *without* prior knowledge of its structure. The BER rules are part of the ITU standard `X.690 <http://www.itu.int/ITU-T/studygroups/com17/languages/X.690-0207.pdf>`_. (ASN.1 also supports several other encoding-rule formats, including the human-readable XML Encoding Rules, but SNMP uses BER.)
+
+The general representation of an object is a "type-length-value" triple of the following form; the ``type`` tag makes the data self-identifying.
+
+.. image::	images/netmgmt/type_length_contents.svg
+
+The first two bits of the ``type`` field, the ``class`` bits, identify the context. **Universal** types such as INTEGER and OBJECT IDENTIFIER have class bits 00; **application-specific** types such as Counter32 and TimeTicks have class bits 01.
+
+The third bit is 0 for **p**\ rimitive types and 1 for **c**\ onstructed types such as STRUCTURE.
+
+The rest of the first byte is the type tag. If a second byte is needed, the tag bits of the first byte are 11111. 
+
+Primitive Types
+---------------------
+
+The standard ASN.1 universal-type primitive tag values used by SNMP are as follows:
+
+=======	===================================================================
+00000	NULL
+00010	INTEGER
+00100	OCTET STRING
+00110	OBJECT IDENTIFIER
+=======	===================================================================
+
+SNMP also defines several application-specific tags (the following are from :rfc:`2578`):
+
+=======	===================================================================
+00000	IpAddress
+00001	Counter32
+00010	Gauge32
+00011	TimeTicks
+00100	Opaque
+00110	Counter64
+=======	===================================================================
+
+The second field of the type-length-value structure is the length of the ``value`` portion, in bytes. Most lengths of primitive types will fit into a single byte. If a data item is longer than 127 bytes (true for many composite types), the multi-byte integer encoding below is used.
+
+The actual data is then encoded into the ``value`` field. For nonnegative integers, the integer is converted to a twos-complement bitstring and then encoded in as few bytes as possible, provided there is at least one leading 0-bit to represent the sign. Similarly, negative numbers must have at least one leading 1-bit to represent the sign. 
+
+For example, 127 can be encoded as a length=1 INTEGER with ``value`` byte 0111 1111, while 128 must be encoded as a length=2 integer with ``value`` bytes 0000 0000 and 1000 0000. The second ``value`` byte represents 128, but the first byte represents the sign; without the first byte  the INTEGER represented by a length of 1 and a ``value`` byte of 1000 0000 is −128. Similarly, to encode decimal 10,000,000 (0x989680), four ``value`` bytes are needed as otherwise the leading bit would be 1 and the number would be interpreted as negative.
+
+For OCTET STRINGs, the string bytes are placed in the ``value`` portion and the number of bytes is placed in the ``length`` portion. 
+
+Object IDs are generally encoded using one byte per level; there are two exceptions. First, the initial two levels x.y of the OID are encoded using a single level with value 40×x + y; all SNMP OIDs begin with 1.3 and so the first byte is 43 (0x2b). Second, if a level is greater than 127, it is encoded as multiple bytes. The first bit of the last byte is 0; the first bit of each of the preceding bytes is 1. The seven remaining bits of each byte contain the bits of the OID level. For example, 1.3.6.1.2.1.\ **128**.9 would have a ``value`` encoding of the following bytes in hexadecimal:
+
+ | 2b 06 01 02 01 **81** **00** 09
+
+where **128** is represented as the two seven-bit blocks 0000001 0000000 and the first block is prefixed by 1 and the second block by 0. Note that the encoding of 128 in an OID is quite different from the encoding of 128 as an INTEGER.
+
+Composite Types
+-------------------
+Now that we have the encodings of the primitive types we can build structures. For composite types the P/C bit will be set to 1. The only universal composite type we will consider is
+
+=======	===================================================================
+10000	SEQUENCE and SEQUENCE OF 
+=======	===================================================================
+
+There are also several application-specific composite types; the first three bits of the tag field for these will be 101.
+
+=======	===================================================================
+00000   Get-Request 
+00001   Get-Next-Request 
+00010   Get-Response 
+00011   Set-Request 
+00100   Trap 
+=======	===================================================================
+
+
+A ``VarBind`` pair is encoded in SNMPv1 as
+
+::
+
+ SEQUENCE { name OBJECT IDENTIFIER, value ObjectSyntax }
+
+``ObjectSyntax`` is specified as a ``CHOICE`` that can contain any of the tagged SNMP primitive types above; the ``CHOICE`` syntax adds no bytes so the ``value`` is simply encoded as above. The ``VarBind`` pair ⟨1.3.6.1.2.1.1.3.0, 8650000⟩ -- the OID is ``sysUpTime`` and the value is 24 hours -- would then be represented in hexadecimal bytes as below; the hexadecimal representation of 8650000 is 0x83d600. 
+
+.. image::	images/netmgmt/varbind.svg
+
+The first byte of 0x30 marks this as a SEQUENCE; recall that the ``type`` byte for a SEQUENCE has a P/C bit of 1 and five low-order bits of 10000, for a numeric value of 48 decimal or 0x30.
+
+The ``VarBindList`` is defined to be a ``SEQUENCE OF VarBind``. If we have only the single ``VarBind`` above, the resultant enclosing ``VarBindList`` would be as follows; the ``length`` field is 0x12 = 18.
+
+ | **30** **12** 30 10 06 08 2b 06 01 02 01 01 03 00 02 04 00 83 d6 00
+
+The BER encoding rules do not stop with the ``VarBindList``. A slightly simplified ASN.1 specification for an entire SNMPv1 Get-Request packet portion (or "protocol data unit") is
+
+::
+
+ SEQUENCE {
+	request-id   INTEGER, 
+	error-status INTEGER, 
+	error-index  INTEGER, 
+	variable-bindings VarBindList
+ }
+
+The encoding of the whole packet would also be by the above BER rules.
+
+The BER encoding mechanism represents a very different approach from the fixed-field layout of, say, the IP and TCP headers (:ref:`IPv4 header` and :ref:`TCP header`). The latter approach is generally quite a bit more compact, as only four bytes are needed for a larger integer versus six under BER, and no bytes are used for SEQUENCE specifications. The biggest advantage of the SNMP BER approach, however, is that all objects, from entire packets down to individual values, are **self-describing**. Given the variety of types used by SNMP, the fact that many are of variable length, and the fact that value "readers" such as MIB browsers often operate without having all the type-specifying MIBs loaded, this self-describing feature is quite useful.
+
+.. _snmpv2:
+
+SNMPv2
+=============
+
+SNMPv2 introduced multiple evolutionary changes: to the SMI, to various MIBs, and to the basic protocol operation. Many new MIBs were added. SNMPv2 also contained a proposal for improved security, but this was not widely adopted. Eventually most of the SNMP community settled on SNMPv2\ **c**, the version of SNMPv2 that stayed with the community-based security model.
+
+Most of the specification of SNMPv2c is in :rfc:`1901` through :rfc:`1909`.
+
+Generally SNMPv1 and SNMPv2c agents and managers can interoperate quite easily. Essentially all SNMPv2 agents also support SNMPv1 queries, and answer according to the version of the request received. There is slightly greater confusion between SNMPv1 and SNMPv2 MIB files, but almost all browsers and managers support both.
+
+.. _SNMPv2 SMI:
+
+SNMPv2 SMI and Data Types
+-----------------------------
+
+.. index::
+	single: OBJECT-IDENTITY, SNMP
+
+SNMPv2 introduced the ``OBJECT-IDENTITY`` macro, which acts like the ``OBJECT-TYPE`` macro except that it leaves out the SYNTAX clause; it serves as a way to define OIDs separately from syntax. In the ``OBJECT-TYPE`` macro, the ``ACCESS`` attribute is renamed ``MAX-ACCESS``, and a new access option ``read-create`` (for reading plus row creation) is added.
+
+SNMPv2 also provided new 64-bit versions of some of the basic types, and added some other types. These definitions are in :rfc:`2578`, originally :rfc:`1442`. A very practical problem with SNMPv1 is that, for example, the 32-bit ``inOctets`` counter can wrap around in 34 seconds at 1 Gbps.
+
+The INTEGER type remains, now declared synonymous with Integer32. The SNMPv1 Counter and Gauge types have been replaced with Counter32 and Gauge32, and 64-bit versions of both -- Counter64 and Gauge64 -- were added (Gauge64 was added somewhat later, in :rfc:`2856`).
+
+A BITS type, for representing individual bits in a word, was also added.
+
+The OBJECT IDENTIFIER type was formally limited to 128 levels.
+
+.. index::
+	single: TEXTUAL-CONVENTION, SNMP
+
+SNMPv2 also introduced the ``TEXTUAL-CONVENTION`` macro, which is an alternative name for a type (or a primary name for an enumerated type) together with a description of what the type is actually to represent. Examples include ``OwnerString``, which is an OCTET STRING intended to describe a management station and perhaps its human operator, ``EntryStatus`` which is an enumerated type meant to be used for row additions (:ref:`RMON`), and ``InterfaceIndex``, which is meant to be the number of an interface appearing in the MIB-2 ``ifTable``, :ref:`interfaces group`, but used in another table. For casual MIB reading, textual conventions can simply be thought of as types.
+
+.. index::
+	single: noSuchObject, SNMP
+
+.. _SNMPv2 semantics:
+
+SNMPv2 Get Semantics
+-----------------------
+When an SNMPv1 agent receives a list of OIDs as part of a ``Get()`` request, and one or more of them is unavailable, then an error is returned. Under SNMPv2, the agent returns a list containing the appropriate value for each valid OID. For request OIDs for which the agent is not able to return an actual value, the special value ``noSuchInstance`` (for missing table entries with legal column specifications) or ``noSuchObject`` (for other missing values) is substituted.
+
+The ``Set()`` semantics remain unchanged: an SNMPv2 agent does not update any of the OID values in the request unless it is able to update all of them.
+
+.. index::
+	single: GetBulk, SNMPv2
+
+.. _GetBulk:
+
+SNMPv2 GetBulk()
+----------------------
+
+SNMPv2 introduced the GetBulk operation as an extension of GetNext. A manager includes an integer N in its request and the agent then iterates the action of ``GetNext()`` N times. All N results (which can each represent an entire row) can then be returned in a single operation. 
+
+
+For example, suppose a table **T** has five rows indexed by 11-15, and three columns with OIDs **T**.1 through **T**.3. The OIDs for the table are as follows:
+
+============	============	============
+============	============	============
+**T**.1.11	**T**.2.11	**T**.3.11
+**T**.1.12	**T**.2.12	**T**.3.12
+**T**.1.13	**T**.2.13	**T**.3.13
+**T**.1.14	**T**.2.14	**T**.3.14
+**T**.1.15	**T**.2.15	**T**.3.15
+============	============	============
+
+
+Then a GetBulk request for (**T**.1,\ **T**.2,\ **T**.3) with a repetition count of 3 will return the first three rows, with the following OIDs:
+
+ | **T**.1.11  **T**.2.11 **T**.3.11
+ | **T**.1.12  **T**.2.12 **T**.3.12
+ | **T**.1.13  **T**.2.13 **T**.3.13
+
+To continue, the next such request would include OIDs (**T**.1.13, **T**.2.13, **T**.3.13) and the result (again assuming a count of 3) would be of values with these OIDs:
+
+ | **T**.1.14  **T**.2.14 **T**.3.14
+ | **T**.1.15  **T**.2.15 **T**.3.15
+ | **T**.2.11  **T**.3.11 **A**
+
+where **A** is the next leaf OID above and to the right of **T**.
+
+Note the third row of the second request: the first leaf OID following **T**.1.15 -- the last row of column 1 -- is **T**.2.11, that is, the first row of column 2. Similarly, **T**.3.11 follows **T**.2.15. As **T**.3.15 is the last leaf OID in the table, its leaf-OID successor (**A**) is outside the table.
+
+
+The GetBulk request format actually partitions the list of requested OIDs into two parts: those OIDs that are to be requested only once and those for which the request is repeated. Two additional parameters besides the OID list are included: ``non-repeaters`` indicating the number of OIDs to be requested only once and ``max-repetitions`` indicating the number of times the remaining OIDs are retrieved.
+
+As with GetNext, it is possible that a request for rows of the table will return ⟨OID,value⟩ pairs outside the table, that is, following the table in the OID-tree order. 
+
+If the total number of OIDs in the request is N ≥ ``non-repeaters``, then the return packet will contain a list of ⟨OID,value⟩ variable bindings of up to length 
+
+ | ``non-repeaters`` + (N − ``non-repeaters``)×\ ``max-repetitions``
+
+GetBulk has considerable potential to return more data than there is room for, so an agent may return fewer repetitions as it sees fit.
+
+
+.. _SNMPv2 Indexes:
+
+SNMPv2 Indexes
+--------------------
+
+As we saw in :ref:`tables`, in SNMPv1 the index columns were included in the table. Because every attribute returned by an agent comes paired with the attribute's OID, and because the OID of a table item encodes the row and thus the index value, index columns are unnecessary except in rare cases (one such case is when *all* table columns are part of the index, as in ``udpTable``). 
+
+SNMPv2 deals with this by requiring the usual INDEX clause in the ASN.1 tableEntry definition, but then when the tableIndex attribute is defined with OBJECT-TYPE it is assigned a MAX-ACCESS of ``not-accessible``. Here is an example from the sysORTable of :ref:`sysORTable`; it is the second "not-accessible" that represents the change.
+
+::
+
+   sysOREntry OBJECT-TYPE
+       SYNTAX     SysOREntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "An entry (conceptual row) in the sysORTable."
+       INDEX      { sysORIndex }
+       ::= { sysORTable 1 }
+
+    ...
+
+   sysORIndex OBJECT-TYPE
+       SYNTAX     INTEGER (1..2147483647)
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION ...
+       ::= { sysOREntry 1 }
+
+
+The ``INDEX`` attribute appears in the declaration of ``sysOREntry`` in the usual way. But it is now classed as an **auxiliary object**, and access to ``sysORIndex`` is ``not-accessible``; in SNMPv1 it would have been ``read-only`` and thus an ordinary column.
+
+When direct access to index attributes is suppressed this way, the index data is still available in the accompanying OID, but it is no longer tagged by type as in :ref:`snmp encoding`. The ``sysORIndex`` value above, for example, would appear as a single OID level, but the manager would have to use the MIB to determine that it was meant as an INTEGER and not a TimeTicks or Counter. An IPv4 address used as an index would appear in the OID as four levels, readily recognizable as an IPv4 address *provided* the manager knew where to look. When STRING values appear in the index, the lack of an index column can be a particular nuisance; for example, the only indication of the username "alice" in the ``usmUserTable`` of :ref:`usmUserTable` might be the OID fragment 97.108.105.99.101, representing the ASCII codes for the letters a.l.i.c.e.
+
+Generally, an SNMPv2 agent will send back the ``noSuchObject`` special value (see :ref:`SNMPv2 semantics`) when asked for a ``not-accessible`` auxiliary object.
+
+.. index::
+	single: TestAndIncr
+
+.. _testandincr:
+
+``TestAndIncr``
+---------------
+
+SNMPv2 introduced the ``TestAndIncr`` textual convention, which introduces something of an aberration to the usual semantics of ``Set()``. The underlying type is INTEGER, in the range 0..2\ :sup:`31`\ −1, and ``Get()`` works the usual way. However, if **TI** is the OID name of a ``TestAndIncr`` object, then Set(**TI**,\ *val*) never sets the value of **TI** to *val*. Instead, if the value of the object is *already* equal to *val*, then the ``Set()`` succeeds and the value of the object is incremented, that is, set to *val* + 1. If the value of the object is not equal to *val*, an error occurs and no change is made.
+
+A ``TestAndIncr`` object acts like a kind of semaphore, though not exactly as there is no way to decrement the object (though the value does wrap around from 2\ :sup:`31`-1 back to 0). The goal here is to provide a voluntary mechanism to enforce **serialization** when more than one manager may be writing to the same set of attributes. 
+
+As we saw at the example at the end of :ref:`set`, such serialization is not automatic. But now let us revisit that example using ``TestAndIncr``. Recall that two managers are updating attributes with OIDs **X** and **Y**; this time, however, they agree also to include a ``TestAndIncr`` object with OID **TI**. Then serialization is assured as long as each manager executes each multi-attribute ``Set()`` in the following form, where *val* := Get(**TI**) means that the manager uses ``Get()`` to retrieve the value of **TI** and stores it in its own local variable *val*.
+
+ | *val* := Get(**TI**)
+ | Set((**TI**,\ *val*), (**X**,\ *xval*), (**Y**,\ *yval*))
+
+To see this, suppose manager B's Get(**TI**) occurs after manager A's Set(**TI**,\ *val*) has incremented *val*. Then manager B's ``Set()`` operations occur even later, after A's ``Set()`` has completed. The alternative is that both managers ``Get()`` the same value *val*. Let A be the manager who first succeeds with Set(**TI**,\ *val*). Now the other manager -- B -- will have its Set(**TI**,\ *val*) fail, as the value stored at **TI** is now *val*\ +1. Thus *all* of B's ``Set()`` operations will fail. 
+
+A consequence here is that manager B will have to try again, probably immediately. However, the likelihood of conflict is low, and B can expect to succeed soon. 
+
+Usually only one ``TestAndIncr`` object needs to be provided for an entire table, not one per row. For an actual example, see :ref:`usmUserTable`.
+
+.. index::
+	single: augmentation, SNMP
+	
+.. _augmentation:
+
+Table Augmentation
+------------------------------------------
+
+SNMPv2 introduced a mechanism for extending an existing table by adding, in effect, more columns, known as **augmentation**. In the new table-entry definition, instead of an ``INDEX`` clause there is an ``AUGMENTS`` clause; the argument to which is a table-entry name for the existing table to be extended. The new table-entry row will be indexed by whatever attributes indexed the table-entry in the AUGMENTS clause. 
+
+For example, the ``ifXTable`` augments the MIB-2 ``ifTable``, meaning in essence that the ``ifXTable`` is automatically indexed by ``ifTable``'s index, ``ifIndex``. Here is the ``ifXEntry`` definition that establishes that:
+
+:: 
+
+ ifXEntry        OBJECT-TYPE
+    SYNTAX      IfXEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing additional management information
+            applicable to a particular interface."
+    AUGMENTS    { ifEntry }
+    ::= { ifXTable 1 }
+
+The intent here is that every ifTable row is now extended to include the nineteen additional values defined for ``IfXEntry``; that is, there is a one-to-one correspondence between rows if ``ifTable`` and ``ifXTable``.
+
+If, on the other hand, the new table extends only a few rows of the original table, |ie| is a **sparse** extension, then the new table entry should have an INDEX clause that repeats that of the original table. An example is the EtherLike-MIB of :ref:`etherlike`, in which the ``dot3StatsTable`` extends the MIB-2 ``ifTable`` by providing additional information for those interfaces that behave like Ethernets. The ``dot3StatsEntry`` definition is
+
+::
+
+       dot3StatsEntry OBJECT-TYPE
+           SYNTAX     Dot3StatsEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION "Statistics for a particular interface to an ethernet-like medium."
+           INDEX       { dot3StatsIndex }
+           ::= { dot3StatsTable 1 }
+
+The INDEX is ``dots3StatsIndex``, which is then defined as follows; note the statement in the DESCRIPTION (and the REFERENCE) that the dot3StatsIndex is to correspond to ``ifIndex``.
+
+::
+
+       dot3StatsIndex OBJECT-TYPE
+           SYNTAX      InterfaceIndex
+           MAX-ACCESS  read-only  
+           STATUS      current
+           DESCRIPTION "An index value that uniquely identifies an interface 
+                       to an ethernet-like medium.  The interface identified 
+                       by a particular value of this index is the same interface
+                       as identified by the same value of ifIndex."
+           REFERENCE   "RFC 2863, ifIndex"
+           ::= { dot3StatsEntry 1 }
+
+Finally, it is possible that a new table has a many-to-one, or **dense**, correspondence to the rows (or a subset of the rows) of an existing table. In this case, the new table will have an INDEX clause that will include the index attributes of the original table, and one or more additional attributes. An example is the EtherLike-MIB ``dot3CollTable``, which keeps, for each interface, a set of histogram buckets giving, for each N, a count of the number of packets that experienced exactly N collisions before successful transmission. The ``dot3CollEntry`` definition is as follows: 
+
+::
+
+       dot3CollEntry OBJECT-TYPE
+           SYNTAX      Dot3CollEntry
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION ...
+           INDEX       { ifIndex, dot3CollCount }
+           ::= { dot3CollTable 1 }
+
+The ``ifIndex`` entry in the INDEX represents the original table, as before except that here there is also a second, new INDEX attribute, ``dot3CollCount``.
+
+.. _sysORTable:
+
+SNMPv2 MIB Changes
+------------------------------------------
+
+The core MIB for SNMPv2 -- essentially the SNMPv2 version of MIB-2 -- is :rfc:`3418`, originally :rfc:`1450`. 
+
+Some changes appear under the MIB-2 OID prefix: 1.3.6.1.2.1. SNMPv2 also defines a prefix 1.3.6.1.6 specifically for SNMPv2 information.
+
+This MIB adds the Object Resource table, ``sysORTable``, to the system group. It also slightly modifies the mib-2.snmp group and provides a new snmp group under the SNMPv2 1.3.6.1.6 prefix.
+
+``sysORTable``
+------------------------------------------
+
+
+The original system group contained the attribute ``sysObjectID`` that identifies the agent and at the same time suggests a private OID tree that could provide additional information about the agent (:ref:`system group`). 
+
+The ``sysORTable``, 1.3.6.1.2.1.1.9 or mib-2.system.9,  is an attempt to extend this. It consists of a list of OIDs that can be queried for further agent information; each OID also has an associated description string and a ``sysORUpTime`` value indicating the time that OID was added. 
+
+For example, my system lists the following (where snmpModules = 1.3.6.1.6.3 and mib-2 = 1.3.6.1.2.1):
+
+======================	==============================
+======================	==============================
+snmpModules.11.3.1.1	Message Processing MIB
+snmpModules.15.2.1.1	User-based security MIB
+snmpModules.10.3.1.1	SNMP management architecture
+snmpModules.1		SNMPv2	information	
+mib-2.49		TCP
+mib-2.4			IP
+mib-2.50		UDP
+snmpModules.16.2.2.1	VACM			
+snmpModules.13.3.1.3	SNMP notification
+mib-2.92		SNMP notification logging
+======================	==============================
+
+Each of the above OID prefixes can theoretically then be accessed for further information. Unfortunately, on my system several of them are not configured, and a query returns nothing, but ``sysORTable`` does not know that. 
+
+.. index::
+	single: ifXTable, SNMP
+	single: extended interface table, SNMP
+	single: interface table, extended, SNMP
+
+.. _ifXTable:
+
+
+IF-MIB and ``ifXTable``
+------------------------------------------
+
+
+:rfc:`2863` has addressed the problems with ``ifSpeed`` and the byte counters by introducing a new table, ``ifXTable`` (formerly ``ifExtnsTable`` with OID mib-2.31.1.2. As such, it is still under the aegis of the MIB-2 OID, but outside the traditional interfaces group. It does use the SNMPv2 SMI.
+
+The ``ifXTable`` table includes definitions for "high capacity" 64-bit counters for in and out octets, in and out unicast packets, in and out multicast packets and in and out broadcast packets. It also includes the ``ifHighSpeed`` attribute for interface speed, still a 32-bit quantity but now measured in units of 1 Mbps.
+
+The full definition of an ``ifXTable`` row is as follows:
+
+::
+
+ IfXEntry ::=
+    SEQUENCE {
+        ifName                  DisplayString,
+        ifInMulticastPkts       Counter32,
+        ifInBroadcastPkts       Counter32,
+        ifOutMulticastPkts      Counter32,
+        ifOutBroadcastPkts      Counter32,
+        ifHCInOctets            Counter64,
+        ifHCInUcastPkts         Counter64,
+        ifHCInMulticastPkts     Counter64,
+        ifHCInBroadcastPkts     Counter64,
+        ifHCOutOctets           Counter64,
+        ifHCOutUcastPkts        Counter64,
+        ifHCOutMulticastPkts    Counter64,
+        ifHCOutBroadcastPkts    Counter64,
+        ifLinkUpDownTrapEnable  INTEGER,
+        ifHighSpeed             Gauge32,
+        ifPromiscuousMode       TruthValue,
+        ifConnectorPresent      TruthValue,
+        ifAlias                 DisplayString,
+        ifCounterDiscontinuityTime TimeStamp
+    }
+
+The original MIB-2 interfaces group counted multicast and broadcast packets together, |eg| in ``ifInNUcastPkts``.
+
+
+.. _etherlike:	
+
+ETHERLIKE-MIB 
+------------------------------------------
+
+
+:rfc:`3635` (originally :rfc:`1650`) defines a MIB for "Ethernet-like" interfaces. The primary goal is to enable the collection of statistics on collisions and other Ethernet-specific behaviors. Several new tables are defined.
+
+The table ``dot3StatsTable`` contains additional per-interface attributes; the name refers to the IEEE designation for Ethernet of 802.3. The table represents a sparse extension of the original ``ifTable``, in the sense of :ref:`augmentation` (where this table was used as the example).
+
+The rows of the table mostly consist of counters for various errors and other noteworthy conditions:
+
++ Alignment errors: the number of bits in the frame is not divisible by 8
++ CRC checksum failure
++ Frames that experienced exactly one collision
++ Frames that experienced more than one collision
++ Signal quality errors. SQE is specific to 10 Mbps Ethernet
++ Deferred transmissions; when the station tried to send, the line was not idle
++ Late collisions: the only way a collision can occur after the slot time is passed is if the physical Ethernet is too big or if collision-detection is failing. See :ref:`The Slot Time and Collisions`
++ Excessive collisions: the frame experienced 16 collisions and the sender gave up
++ Other hardware errors (``dot3StatsInternalMacTransmitErrors`` and ``dot3StatsInternalMacReceiveErrors``)
++ Carrier sense errors ("carrier sense" refers to the collision-detection mechanism; there is no actual carrier)
++ Frames longer than 1500 octets
++ For Ethernets that encode data as symbols (|eg| 100 Mbps Ethernet's 4B/5B), frames arriving with a corrupted symbol
+
+
+There is also an attribute to describe the Ethernet chipset.
+
+The ``dot3HCStatsTable`` is like the ``dot3StatsTable`` except its counters are 64 bits instead of 32 bits.
+
+The table ``dot3CollTable`` lists, for each N, how many packets experienced exactly N collisions before successful transmission or discard. Ethernet generally allows a maximum N of 16. The table is indexed by the pair ⟨\ ``ifIndex``,N⟩. The ``dot3StatsTable`` contains this information for N=0,1,16.
+
+The table ``dot3ControlTable`` contains information on those Ethernet-like interfaces that also support the so-called MAC Control sublayer; the ``dot3PauseTable`` is similar.
+
+.. _bridge-mib:
+
+BRIDGE-MIB
+----------------
+
+:rfc:`1286` (now :rfc:`4188`) defined basic management information for Ethernet switches; this is often complemented by vendor-specific MIBs. 
+
+This MIB contains basic information about the switch, such as the number of ports. The ``dot1dStp`` section covers information about the spanning-tree protocol (:ref:`spanning tree`). Perhaps the most interesting member of this MIB is the ``dot1dTpFdb`` table, which contains the forwarding table: the map from MAC addresses to ports created by the Ethernet learning algorithm (:ref:`Ethernet learning algorithm`). The name ``dot1dTpFdb`` is an abbreviation of the IEEE 802.1D standard, Transparent bridging protocol, Forwarding database. 
+
+By using this table, a network manager can trace the origin of a packet with a given MAC address. If a switch S1 has seen the packet, the ``dot1dTpFdb`` table reveals the switch port by which the packet arrived. If that port leads to another switch, S2, the process is repeated; if the port represents a non-switch port, then the packet originated wherever the other end of that port's cable terminates. Typically, this allows determination of the office or apartment unit or hotel room where a device was connected. This tracing is quite hard to evade, short of breaking into the wiring closet or compromising the switch itself.
+
+This table can also be used to alert network managers whenever a different device is plugged into an office Ethernet jack, although here MAC-address spoofing (changing the new device's MAC address to match the first device's MAC address) can be used to avoid detection. 
+
+This strategy for identifying a device's physical location does not work quite as well for Wi-Fi, though it can be used to identify the access point. Wi-Fi, however, generally requires the presentation of credentials; this gives an alternative approach for tracking users.
+
+The MIB does *not* contain information about whether internal switch queues have had to drop packets, though some vendor-specific MIBs can be used instead.
+
+IP-MIB and IP-Forward MIB
+------------------------------------------
+
+
+The MIB-2 ip group is really about two separate things: strictly local information about IP packets and delivery, and the forwarding table, which affects a much larger collection of nodes. All nodes have local IP information, but only routers do significant forwarding. It did not take long for these two subgroups to separate. 
+
+The IP-Forward MIB began in :rfc:`1354`, just over a year after the original MIB-2 in :rfc:`1312`; this created a new home for forwarding-table information. By the time the first SNMPv2 MIB for the ip group came out in :rfc:`2011`, the ``ipRouteTable`` once part of that group was declared obsolete.
+
+.. _ip-mib:
+
+IP-MIB
+``````````
+The current version of the IP-MIB is :rfc:`4293`. It allows enabling or disabling of forwarding (``ipForwarding``, setting the default TTL (``ipDefaultTTL``), and, for IPv4 only (as it is not a configurable parameter for IPv6) the fragment-reassembly timeout (``ipReasmTimeout``).
+
+When IP addresses appear in these tables, the defining entry is almost always prefaced by an object of type InetAddressType, which can take values ipv4(1) and ipv6(2) (and a few other values for special cases).  
+
+Two tables are devoted to IP statistics: the ``ipSystemStatsTable`` for system-wide IP information and the ``ipIfStatsTable`` for interface-specific information. Each table includes the IP address type (that is the IP version) in its index, meaning that separate statistics are kept for IPv4 and IPv6 traffic. The system table is indexed by the IP address type alone; the interface table is indexed by that and the interface number (the MIB-2 ``ifIndex``).
+
+The ``ipIfStatsTable`` contains, for each interface, counts of packets (and octets) in and out for broadcast, multicast and unicast, counts of forwarded, reassembled and fragmented packets, counts of packets with any of several kinds of errors, and related additional counts. An entry for the counter refresh rate is also provided. When appropriate, 64-bit counters are provided; usually the equivalent 32-bit counter is *also* provided. The ``ipSystemStatsTable`` provides all-interface summaries of these same counts.
+
+The tables ``ipv4InterfaceTable`` and ``ipv6InterfaceTable`` represent information about what IP addresses are assigned to each interface. These are indexed by the interface index alone, meaning that the tables cannot accurately represent an interface with more than one IP address of the same type. 
+
+Additional IP-address information is contained in the ``ipAddressPrefixTable`` primarily for IPv6 and the ``ipAddressTable`` for both IPv4 and IPv6. These tables contain information about what IP addresses are assigned to what interfaces and where these addresses came from (|eg| DHCP, :ref:`DHCP`, or Prefix Discovery, :ref:`prefix discovery`). Indexed by the IP address itself (and also the ``ipAddressAddrType``), these tables thus support the possibility that one interface has multiple IP addresses (this is particularly common for IPv6). 
+
+
+The ``ipNetToPhysicalTable`` represents the map from local IP addresses to physical LAN addresses, as created by either ARP for IPv4 or Neighbor Discovery for IPv6. In addition to the interface, the IP address and the physical address, tle table also contains a timestamp indicating when a given entry was last updated or refreshed, an indication of whether the address mapping is dynamic, static or invalid, and, finally, an attribute ``ipNetToPhysicalState``. The values for this last are ``reachable(1)``, ``stale(2)`` for expired reachability, ``delay(3)`` and ``probe(4)`` relating to active updates of the reachability, ``invalid(5)``, ``unknown(6)`` and ``incomplete(7)`` indicating that ARP is in progress. See :ref:`ARP finer points`.
+
+There is also a simple version of the forwarding table known as the Default Router Table. This contains a list of "default", or, more accurately, "initially configured" routes. While this does represent a genuine forwarding table, it is intended for nodes that do not act as routers and do not engage in routing-update protocols. The table represents a list of "default" routes by IP address and interface, and also contains route-lifetime and route-preference values. 
+
+
+The ``ipv6RouterAdvertTable`` is used for specifying timers and other attributes of IPv6 router advertisements, :ref:`router advertisement`.
+
+
+Finally, the IP-MIB contains two tables for ICMP statistics" ``icmpStatsTable`` and ``icmpMsgTable``. The latter keeps track, for example, of how many pings (``ICMP Echo``) and other ICMP messages were sent out; see :ref:`ICMP`.
+
+
+.. _ip-forward mib:
+
+IP-Forward MIB
+``````````````````
+
+Information specific to a host's IP-forwarding capability was first split out from the MIB-2 ip group in :rfc:`1354`; it was updated to SNMPv2 in :rfc:`2096` and the current version is :rfc:`4292`. The original MIB-2 ip group left off at OID mib-2.ip.23; the new IP-Forward MIB begins at mib-2.ip.24. 
+
+There have been three iterations of an SNMP-viewable IP forwarding table since the original :rfc:`1213` ip group's ``ipRouteTable`` at mib-2.ip.21. Here are all four:
+
++ ``ipRouteTable``
++ ``ipForwardTable``
++ ``ipCidrRouteTable``
++ ``inetCidrRouteTable``
+
+Each new version has formally deprecated its predecessors.
+
+The first replacement was ``ipForwardTable``, described in :rfc:`1354`. It defines the OID ``ipForward`` to be mib-2.ip.24; the new table is at ``ipForward``.2. This table added several routing attributes, but perhaps more importantly changed the indexing. The index for ``ipRouteTable`` was the IP destination network ``ipRouteDest``, alone. The new table's index also includes a quality-of-service attribute ``ipForwardPolicy``, usually representing the IPv4 Type of Service field (now usually known as the DS field, :ref:`IPv4 header`). This inclusion allows the ``ipForwardTable`` to accurately represent routing based on ⟨dest,QoS⟩, as discussed in :ref:`routing update`. Such routing is sometimes called "multipath" routing, because it allows multiple paths to a given destination based on different QoS values. However, the mask length is *not* included in the index, making ``ipForwardTable`` inadequate for representing CIDR routing.
+
+The index also includes the next_hop, which for the actual forwarding table does not make sense -- the next_hop is what one is looking up, given the destination -- but which works fine for SNMP. See the comments about SNMP indexes with more attributes than expected in :ref:`tables`. The index even includes an attribute ``ipForwardProto`` that represents the routing-update protocol that is the source of the table entry: ``icmp(4)``, ``rip(8)`` (a common distance-vector implementation), ``is-is(9)`` and ``ospf(13)``  (two link-state implementations) and ``bgp(14)``. 
+
+In addition to the next_hop, this table also includes attributes for ``ipForwardType`` (|eg| local vs remote), ``ipForwardAge`` (the time since the last update), ``ipForwardInfo``, ``ipForwardNextHopAS``, and several routing metrics. The purpose of ``ipForwardInfo`` is to provide an OID that can be accessed to provide additional information specific to the routing-update algorithm in use. The ``ipForwardNextHopAS`` allows the specification of the next_hop Autonomous System number, usually relevant only when BGP (:ref:`BGP`) is involved. (If the AS number is not relevant, it is set to zero.)
+
+The second iteration of the SNMP-viewable IP forwarding table is ``ipCidrRouteTable``, appearing in :rfc:`2096` and located at ``ipForward``.4 (and returning to the practice of calling it a "route" rather than a "forward" table). This table adds the address mask, ``ipCidrRouteMask``, to the index, finally allowing distinct routes to 10.38.0.0/16 and 10.38.0.0/24. The quality-of-service field ``ipCidrRouteTos`` remains in the index (as does the destination), and is now firmly identified with the IPv4 Type of Service (DS) field. The routing-update algorithm was dropped from the index. 
+
+This table also adds an attribute ``ipCidrRouteStatus`` of type ``RowStatus`` and used for the creation and deletion of entire rows (that is, forwarding table entries) under the control of SNMP. We will return to this process in :ref:`adding rows`.
+
+.. index::
+	inetCidrRouteTable, SNMP
+
+The third (and still current) version of the IP forwarding table is ``inetCidrRouteTable``, introduced in :rfc:`4292` and located at ``ipForward``.7. The main change introduced by this table is the extension to support IPv6: the IP-address columns (|eg| for destination and next_hop) have companion columns for the address *type*: ``ipv4(1)`` and ``ipv6(2)``. See :ref:`tcp-mib` for further details.
+
+The next_hop attribute (now two columns, with the addition of the address type) is still part of the index. 
+
+The address *mask* used in ``ipCidrRouteTable`` is now updated to be a prefix length, ``inetCidrRoutePfxLen``. The quality-of-service field ``inetCidrRoutePolicy`` is an Object ID, declared to be "an opaque object without any defined semantics"; that is, it is at the implementer's discretion. The IPv4 ToS/DS field evolved in IPv6 to the Traffic Class field, :ref:`IPv6 header`. 
+
+Finally, routes are no longer required to list a single associated interface. The table makes use of the ``InterfaceIndexOrZero`` textual convention of :rfc:`2863`, covering just this situation.
+
+
+
+.. _tcp-mib:
+
+TCP-MIB
+------------------------------------------
+
+
+:rfc:`4022` contains some extensions to MIB-2's tcp group. The SNMPv2-based MIB embedded in :rfc:`4022` repeats the MIB-2 tcp group and then adds new features within the mib-2.tcp (1.3.6.1.2.1.6) tree. :rfc:`1213` stopped at mib-2.tcp.15; :rfc:`4022` defines new objects starting at mib-2.tcp.17. 
+
+The new ``tcpConnectionTable`` is defined at mib-2.tcp.19, versus the original ``tcpConnTable`` at mib-2.tcp.13. The newer table supports IPv6; like the ``inetCidrRouteTable`` above, each IP-address column now also has a companion address-type column, and addresses themselves are represented as OCTET STRINGs preceded by a length byte. This follows the rules for ``InetAddressType`` and ``InetAddress`` of :rfc:`4001`, and the OID-suffix-encoding rules of :rfc:`2851` §4.1. Because the length of an ``InetAddress`` isn't known in advance, the length must be included.
+
+For IPv4 users used to the earlier ``tcpConnTable``, this means that there are extra 1.4.'s prefixing the IPv4 addresses in the index, as in this example of host 10.0.0.5 connecting from port 54321 to web server 147.126.1.230:
+
+ | tcpConnectionState.\ **1**.\ **4**.\ 10.0.0.5.54321.\ **1**.\ **4**.\ 147.126.1.230.80
+
+The new table also includes a column representing the process ID of the process that has open the local end of the connection.
+
+This table adheres to the SNMPv2 convention that index columns are not included in the data -- the attributes are marked ``not-accessible``. There are only two accessible columns, ``tcpConnectionState`` and ``tcpConnectionProcess``.
+
+TCP-MIB does *not* make available per-interface TCP statistics, |eg| the number of TCP bytes sent by ``eth0``. Nor does it make available per-connection statistics such as packet-loss and retransmission counts or total bytes transmitted each way. 
+
+
+.. _adding rows:
+.. _row additions:
+
+Table Row Creation
+===========================
+
+SNMPv2 also refined the mechanisms by which a manager can add a row to an agent's table. In principle, adding a row to a table is done with the ``Set()`` operation. Imagine a table **T** with three columns ``indexT``, ``fruitT`` and ``primeT`` corresponding to **T**.1, **T**.2 and **T**.3. Imagine also that, right now, the table has three rows with ``indexT`` values 10, 11 and 12:
+
+===============	==============	===============
+``indexT``	``fruitT``	``primeT``
+**T**.1		**T**.2		**T**.3
+===============	==============	===============
+10		apple		37
+11		blueberry	59
+12		cantaloupe	67
+===============	==============	===============
+
+.. index::
+	single: durian
+
+Then a new row ⟨13,durian,101⟩ might be added with the following multi-attribute ``Set()`` operation. The entries of the new row will have OIDs **T**.1.13, **T**.2.13 and **T**.3.13, and all we have to do to create the row is assign to these. Note that we are assigning to OIDs that, in the agent's current database, do not yet exist.
+
+
+ | Set((\ **T**.1.13,13), (\ **T**.2.13,durian), (\ **T**.3.13,101))
+
+Of course, this raises some questions. Will the agent actually allow this? What happens if these ``Set()`` operations are performed individually rather than as a group? Is there any way to *delete* this newly added row? And, more seriously, what happens if some *other* manager tries to insert at the same time the row ⟨13,feijoa,103⟩?
+
+We now turn to the specific row-creation mechanism of RMON.
+
+.. index::
+	single: RMON
+
+.. _RMON:
+
+RMON
+-------------
+
+RMON, for Remote MONitoring, was an early attempt (first appearing in :rfc:`1271` eight months after MIB-2's :rfc:`1213`) at having an SNMP agent take on some monitoring responsibilities of its own. The current version is in :rfc:`2819`. The original RMON, now often called RMON1, only implemented LAN-layer monitoring, but this was later extended to the IP and Transport layers in RMON2, :rfc:`4502`. We will here consider only RMON1.
+
+RMON implements only passive monitoring; there is no capability for the remote agent to send out its own SNMP queries, or even pings (though see :ref:`PING-MIB`). Monitoring is implemented by putting the designated interface into promiscuous mode (:ref:`classic Ethernet`) and capturing all traffic. In modern fully-switched Ethernets, hosts simply do not see traffic not actually addressed to them, and so RMON would need to be implemented on a switch or router to be of much practical use.
+
+An agent's RMON activity is controlled by an SNMP manager through the insertion of new rows in various **control tables**. The mechanism for doing this is our primary concern here.
+
+RMON statistics are divided into ten groups, of which we will consider only the following:
+
++ **statistics**: counts of errors and counts of packets in size ranges 0-64, 65-127, 128-255, 255-511, 512-1023 and 1024-1518 octets.
++ **history**: The statistics group data, taken at regular intervals
++ **hosts**: The Ethernet senders and receivers seen by an interface
++ **host top N**: The top-N senders or receivers
++ **matrix**: Information on traffic by ⟨sender,receiver⟩ pair
+
+
+.. _RMON statistics:
+
+Statistics (and use of EntryStatus)
+`````````````````````````````````````````
+
+The ``etherStatsTable`` is, by default, empty, and is indexed by ``etherStatsIndex`` which is an opaque INTEGER. The column ``etherStatsDataSource`` represents the OID of a specific interface number as defined by ``ifTable``; for example, the interface with ``ifNumber`` = 6 would be represented by mib-2.2.2.1.1.6. One column, ``etherStatsStatus``, has type ``EntryStatus`` as follows:
+
+::
+
+               valid(1),
+               createRequest(2),
+               underCreation(3),
+               invalid(4)
+
+The attributes ``etherStatsDataSource`` and ``etherStatsStatus`` were initially ``read-write``, which was later changed to status ``read-create`` as they can only be written to as part of the creation of a new row. There is one more ``read-create`` attribute, ``etherStatsOwner``, which is a manager-supplied string identifying that particular manager (perhaps by IP address and hostname and, if a human is involved, appropriate additional identification).
+
+To enable statistics collection, the SNMP manager creates a row in the agent's ``etherStatsTable`` by setting the three attributes ``Status``, ``DataSource`` and ``Owner`` (where we have left off the attribute-name prefix ``etherStats`` for readability). Once this is done and the ``Status`` is set to ``valid``, the agent begins collecting data about the desired interface. The manager can read the data as it desires, by accessing that particular row. Data collection ends when the manager sets the ``etherStatsStatus`` for the row to ``invalid``, though it is up to the agent whether the row is actually deleted at that point.
+
+The ``etherStatsIndex`` column is not actually writable, but the manager must still select a value for the index. One approach is to read the entire table and identify the first unused index value. Other managers, however, may be creating new rows in the agent at the same moment, and so a row index that was available moments before may now be unavailable. We return below to how such conflicts are prevented. One common strategy for reducing the chance of row-creation collisions is to choose a value for the index at random.
+
+
+It is often possible for a manager to create the desired row with a single ``Set()`` operation. However, :rfc:`2819` requires that the the ``Status`` attribute in a request for creation of a new row must be ``createRequest``, and a second ``Set()`` operation is therefore always required to transition to ``valid``.
+
+If **T** is the tree OID ``etherStatsEntry`` and 157 is the manager's chosen index, and the manager wants to monitor ``ifIndex`` = 6, it could send the following as a single operation.
+
+ | Set((**T**.Status.137,createRequest), (**T**.DataSource.137,mib-2.2.2.1.1.6), (**T**.Owner.137,\ *owner*))
+
+at which point the agent will create the row with status ``underCreation``. The value ``createRequest`` is used only in manager requests and never appears in actual rows on the agent. The manager will then follow with
+
+ | Set(**T**.Status.137,valid)
+
+
+If the manager wants or needs to create the entry piecemeal, it can do so as follows:
+
+ | Set(**T**.Status.137, createRequest)
+ | Set(**T**.DataSource.137, mib-2.2.2.1.1.6)
+ | Set(**T**.Owner.137, *owner*)
+ | ...
+ | Set(**T**.Status.137, valid)
+
+Immediately following the first Set(**T**.Status.137, createRequest) the agent will again create the row and mark it as ``underCreation``, but this time the new row will be missing several columns. 
+
+The ``Status`` attribute must be specified in the very first ``Set()`` operation for the row.
+
+
+Existing rows may not have their ``Status`` set to ``createRequest``. The primary legal state transitions are as follows:
+
+.. image::	images/netmgmt/statediagram1.svg
+
+
+
+In some cases, a row can be edited by the manager by changing the status from ``valid`` back to ``underCreation``. However, many specific row-creation implementations require that no changes can be made after a row is marked ``valid``. To change an existing row in such a case, the row should be marked ``invalid`` and a new row created.
+
+These transition rules for ``createRequest`` prevent two managers from simultaneously creating rows with the same index. Suppose, for example, that managers |MA| and |MB| each attempt to create a new row 137 by executing
+
+ | Set(**T**.Status.137, createRequest)
+
+If |MA|'s Set() request is the first to be acted upon, row 137's ``Status`` becomes ``underCreation``. Later, when |MB|'s Set() request is processed, the row will no longer be nonexistent. So, from the diagram above, |MB|'s arriving ``createRequest`` is invalid: there is no ``createRequest`` arc from any node other than ``nonexistent``. |MB|'s Set() operation above, and therefore any of |MB|'s other Set() operations, will fail.
+
+This strategy is meant to prevent only accidental row-creation conflict; it will not prevent |MB| from hijacking |MA|'s row, or from marking it as ``invalid`` (and thus effectively deleting it). But this is generally understood as an inconsequential risk; legitimate managers should be trustable.
+
+.. |MA| replace:: M\ :sub:`A`
+.. |MB| replace:: M\ :sub:`B`
+
+Any authorized SNMP manager can read all the ``etherStatsTable`` records; there is no requirement that only the creator of a row can read that row.  
+
+It is quite possible for multiple rows to be created all referring to the same interface, |eg| by multiple managers. Although it is not forbidden, there is no reason for one manager to create two rows for the same interface.
+
+The four-state ``EntryStatus`` type appeared in the original SNMPv1 :rfc:`1271`. Updates to RMON to SNMPv2 have left ``EntryStatus`` alone, but SNMPv2 has also introduced the six-state ``RowStatus`` type which is more likely to be used by new MIBs. We will turn to this in :ref:`rowstatus`.
+
+.. index::
+	single: history, RMON
+
+.. _History:
+
+History
+```````````````````````
+
+The history group allows for collection of a series of samples of data from the Statistics group, above, at regular intervals. The group consists of two tables, ``historyControlTable`` where the manager creates rows to manage the process, and ``etherHistoryTable`` containing the actual data.
+
+The ``historyControlTable`` contains entries for (again omitting the ``historyControl`` prefix from attribute names) ``DataSource``, representing the interface to be examined, and the ``Status`` and ``Owner`` attributes as above. As with the ``etherStatsTable``, when the manager creates a new row it specifies a value for the index, with full name ``historyControlIndex``, again perhaps chosen at random.
+
+The manager must also specify two additional attributes: ``Interval`` representing the time in seconds between data-collection events, and ``BucketsRequested`` representing the *requested* maximum number of interface records to be kept by the agent. When the agent reaches the maximum, each new record replaces the oldest previous record.
+
+The control table contains one agent-created attribute: ``BucketsGranted`` indicating the actual maximum number of interface records to be kept.
+
+Once the control table row is marked ``valid``, the agent starts accumulating one statistics record for the specified interface every ``Interval`` seconds. These records are numbered consecutively; the number of a given record is its ``SampleIndex``. The agent keeps only ``BucketsRequested`` records, so once ``SampleIndex`` reaches that value then, whenever record N is added, record N − ``BucketsRequested`` is deleted. 
+
+All this data collected by the agent is stored in ``etherHistoryTable``, which contains columns for all the statistics in ``etherStatsTable`` except for the counts of packets in the various size ranges. The table is indexed by the pair of values ``Index`` corresponding to ``etherControlIndex`` and the record number ``SampleIndex``. As such, this table is the disjoint union of multiple independent series of consecutively numbered records, one series for each ``Index`` value in the control table, that is, one series for each manager request.
+
+As an example, suppose the manager asked for history statistics to be kept for a given interface at a rate of once a minute, the ``BucketsGranted`` is 70, and the control-index value for this request is 491. After one hour, the table contains records with sample indexes 1-60; the full row-index values are ⟨491,1⟩ through ⟨491,60⟩. After one hour and eleven minutes, record ⟨491,71⟩ replaces record ⟨491,1⟩. After two hours, records with sample indexes of 51-120 are available. The manager might return once an hour and retrieve the most recent 60 records.
+
+A manager might also create *two* control-table records, one holding 25 records taken at 1-hour intervals and another holding 60 records taken at 1-minute intervals. If all is well, that manager might download the first table once a day, and entirely ignore the second table. The manager always has available these 1-minute records for the last hour, though, and can access them as needed if a problem arises (perhaps signaled by something else entirely).
+
+A manager can easily retrieve only its own rows from the ``etherHistoryTable``. Let **T** be the root of the ``etherHistoryTable``, which has columns 1-15. Suppose again a manager has created its controlTable row with a value for ``historyControlIndex`` of 491; the manager can then retrieve the first of its data rows with the following; note that each OID contains the column number and *part* of the row index.
+
+ | GetNext(\ **T**.1.491, **T**.2.491, ..., **T**.15.491)
+
+If the history-table rows associated with 491 have sample-index values ranging from 37 to 66, the above GetNext() will return the row indexed by ⟨491,37⟩; that is, the values paired with the following OIDs:
+
+ |  **T**.1.491.37, **T**.2.491.37, ..., **T**.15.491.37
+
+Subsequent GetNext()s will return the subsequent rows associated with control entry 491: row ⟨491,38⟩, row ⟨491,39⟩, |etc|. If the ``etherHistoryTable`` had been indexed in the reverse order, with the sample index first and the ``historyControlIndex`` second, a substantial linear search would be necessary to locate the first row with a given value for the control index.
+
+Hosts
+````````````````````
+
+The host group allows an agent to keep track of what other hosts -- in RMON1 identified by their Ethernet address -- are currently active. 
+
+Like the ``historyControlTable``, the ``hostControlTable`` allows a manager to specify ``DataSource``, ``Status`` and ``Owner``; the manager also specifies ``TableSize``. 
+
+Once the control-table entry is ``valid``, the agent starts recording hosts in the ``hostTable``, which is indexed by the control-table index and the host Ethernet address. The agent also records each new host's ``CreationOrder`` value, an integer record number starting at 1.  
+
+The ``hostTable`` also maintains counters for the following per-host attributes; these are updated whenever the agent sees another packet to or from that host. We will revisit these in the ``hostTopNTable``, following.
+
++ InPackets
++ OutPackets
++ InOctets
++ OutOctets
++ OutErrors
++ OutBroadcastPkts
++ OutMulticastPkts
+
+When the number of host entries for a particular control-table index value exceeds ``TableSize`` -- that is, the new host's ``CreationOrder`` would exceed ``TableSize``, old entries are removed *and all hosts in the table are given updated* ``CreationOrder`` *values*. That is, if the table of size three contains entries for hosts A, B and C with ``creationOrder`` values of 1, 2 and 3, and host D comes along, then A will be deleted and B, C and D will be given ``creationOrder`` values of 1, 2 and 3 respectively. This is quite different from the record-number assignments in the ``etherHistoryTable``, where the ``SampleIndex`` record numbers are immutable.
+
+A consequence of this is that the ``CreationOrder`` values are always contiguous integers starting at 1.
+
+Entries are deleted based on order of creation, not order of last update. The ``hostTable`` does not even have an attribute representing the time a given host's entry (or entries) was last updated.
+
+As a convenience, the data in ``hostTable`` is also made available in ``hostTimeTable``, but there indexed by the control-table index and the ``CreationOrder`` time. This makes for potentially faster lookup; for example, the manager always knows that the record with ``CreationOrder`` = 1 is the oldest record. More importantly, this alternative index allows the manager to download the most recent entries in a single step.
+
+Whenever a host is deleted because the table is full, the ``CreationOrder`` values assigned to other hosts all change, and so the indexing to ``hostTimeTable`` changes. Thus, a manager downloading rows from ``hostTimeTable`` one at a time must be prepared for the possibility that what had earlier been row 3 is now row 2, and that a host might be duplicated or skipped. To help managers deal with this, the *control* table has an entry ``LastDeleteTime`` representing the time -- in TimeTicks since startup -- of the last deletion and thus ``CreationOrder`` renumbering. If a manager sees that this value changes, it can, for example, start the data request over from the beginning.
+
+.. index::
+	single: Host Top N, RMON
+
+.. _host top N:
+
+Host Top N
+`````````````````````````
+
+The ``hostTopN`` table is a report prepared by the agent about the top N entries (where N is manager-supplied) in the ``hostTable``, over an interval of time. The manager specifies in the control table the ``Status`` and ``Owner`` attributes, the ``HostIndex`` control-table index value from ``hostControlTable``, and also the ``Duration`` (in seconds) and the ``RateBase`` indicating which of the following ``hostTable`` statistics is to be used in the ranking:
+
++ InPackets
++ OutPackets
++ InOctets
++ OutOctets
++ OutErrors
++ OutBroadcastPkts
++ OutMulticastPkts
+
+The value of N is in the attribute ``RequestedSize``; the agent *may* reduce this and communicates any change (or lack of it) through the attribute ``GrantedSize``. 
+
+Once the control-table row becomes ``valid``, the agent then starts maintaining counters for all the entries in the part of ``hostTable`` indexed by ``HostIndex``, and at the end of the ``Duration`` sorts the data and places its top-N results in the ``hostTopN`` table. If, during the interval, some hosts were removed from the ``hostTable`` because the table was full, the results may be inaccurate.
+
+All result statistics are ``inaccessible`` until the ``Duration`` has elapsed and the particular ``hostTopN`` report has run its course, at which point the results become ``read-only``.
+
+
+
+.. index::
+	single: Matrix, RMON
+	
+.. _Matrix:
+
+Matrix
+``````````````````````
+
+The matrix group allows an agent to collect information on traffic flow indexed by the source and destination addresses. The manager begins the process by supplying attributes for ``Status``, ``Owner``, the usual ``Index``, the interface ``DataSource``, and the maximum table size. 
+
+Once the row is valid, the agent begins collecting, for every ⟨source,destination⟩ pair, counts of the number of packets, octets and errors. The record for ⟨A,B⟩ counts these things sent by A; the corresponding record for ⟨B,A⟩ counts the reverse direction. The actual ``matrixSDTable`` is indexed by the manager-supplied ``Index`` value and the source and destination Ethernet addresses in that order.
+
+A companion table (or view) is also maintained called ``matrixDSTable``, that lists the same information but indexed by destination first and then source. This view is not present to supply information about the reverse direction; that would be obtained by reversing source and destination in the ``matrixSDTable``. Rather, the ``matrixDSTable`` allows a manager to extract all information about a single *destination* D in a single SNMP tree-walk operation of the prefix ``matrixDSTable``.\ ``Index``.D. This is similar to the indexing discussion at the end of :ref:`history`. See exercise |RMON matrix|.
+
+
+
+
+
+.. _rowstatus:
+
+SNMPv2 RowStatus
+------------------------------------------
+
+RMON made do with four values for its ``EntryStatus`` attribute: ``createRequest``, ``underCreation``, ``valid`` and ``invalid``. SNMPv2 still supports ``EntryStatus``, but the preferred form is the six-value ``RowStatus``, :rfc:`2579`, with options
+
++ ``active``: like ``valid``
++ ``notReady``: the agent knows that the row is not complete
++ ``notInService``: the row is complete, but has not yet been activated
++ ``createAndGo``: like ``createRequest`` followed by ``valid``
++ ``createAndWait``: like ``createRequest``
++ ``destroy``: like ``invalid``
+
+The ``createAndGo`` option allows a manager to make a single new-row request to the agent, and, if successful, the agent will immediately set the row status to ``active``. Using ``EntryStatus`` requires two steps: first to set the new row to ``underCreation`` and then to set it to ``valid``.
+
+The manager can ask for any status except ``notReady``. Every row created will, however, be marked at the agent with one of ``notReady``, ``notInService`` or ``active``. 
+
+As with ``EntryStatus``, the manager must still choose an index value. Pseudorandom selection remains appropriate in many cases, but the agent may also supply, if the MIB file supports it, a ``recommendedNextIndex`` attribute. 
+
+Here is a simplified ``RowStatus`` state-transition diagram. Not all links to ``destroy``, or from a node back to itself, are shown. See :rfc:`2579`, p 9, for more details.
+
+.. image::	images/netmgmt/statediagram2.svg
+
+After the manager issues a ``createAndWait``, the agent fills in the attributes provided by the manager, and any other default attributes it has available. The manager, if desired, can now ``Get()`` the entire row, and find out what values are still missing. These values will be reported as ``noSuchInstance``. Alternatively, the manager may simply know that it has more attributes to ``Set()``. 
+
+If the agent knows the row is missing attributes necessary for activation, it will set the ``RowStatus`` to ``notReady``, otherwise to ``notInService``. A ``notInService`` row can, of course, still have undefined ``read-only`` attributes that the agent will later set after activation. A ``notInService`` row can also still have attributes the manager intends to set before activation, but the agent has given default values in the interim.
+ 
+Once the manager has set all the attributes required for activation, it sets the ``RowStatus`` attribute to ``active``, and agent activity begins.
+
+As with ``EntryStatus``, two managers cannot simultaneously create the same row. If they were to try to do so, the second would be attempting to set ``RowStatus`` to ``createAndWait`` or ``createAndGo`` for a row entry that already existed, but from the diagram such a transition is not allowed.
+
+.. _PING-MIB:
+
+PING-MIB
+----------------------
+
+The idea behind the ping MIB is to allow a manager to ask an agent to repeatedly ping a target, :ref:`ping`, and then to report the success rate. Cisco Systems has a ping MIB at ftp://ftp.cisco.com/pub/mibs/v2/CISCO-PING-MIB.my, but we will use the IETF alternative in :rfc:`2925`/:rfc:`4560`. The latter is officially titled DISMAN-PING-MIB (DISMAN is short for DIStributed MANagement). Both ping MIBs make use of the ``RowStatus`` convention of the previous section.
+
+The manager can ping the target itself, *if* there are no firewalls in the way, but the result may likely be different from that obtained by the agent.
+
+The actual MIB supports multiple types of ``ping`` besides the usual ICMP Echo Request, but we will consider only the latter.
+
+The DISMAN version has control table ``pingCtlTable`` and the results appear in ``pingResultsTable``; in the Cisco version the same table is used for both control and results. The results include the minimum, maximum and average RTT, the number of pings sent and the number of responses. The results table also has an attribute ``OperStatus`` to indicate whether the test has stopped.
+
+The ``pingCtlTable`` contains a wide range of options for the actual ping request, including options to specify the outgoing IP address for multihomed agents. The more familiar options, however, include 
+
++ ``pingCtlTargetAddress``: and address type, as IPv6 is supported
++ ``pingCtlDataSize``: how big each ping packet is
++ ``pingCtlTimeout``: how long before the agent gives up on any one ping
++ ``pingCtlProbeCount``: the number of pings to be sent
++ ``pingCtlFrequency``: the interval between pings
+
+The table also includes ``pingCtlRowStatus`` of type ``RowStatus``, above, and ``pingCtlOwnerIndex`` of type ``SnmpAdminString``, which is a fancier way of identifying the manager than the RMON ``Owner`` attributes, and which can include some SNMPv3 credentials as desired.
+
+The new row is created, ``RowStatus`` is set to ``active`` (perhaps through ``createAndGo``), and the test begins. 
+
+By setting the control table's ``RowStatus`` to ``destroy``, a manager can attempt to halt a ping series in progress.
+
+.. _snmpv3 security:
+
+
+SNMPv3
+=====================
+
+SNMP version 3 added authentication and encryption to SNMPv2c, but made relatively few other changes except to nomenclature. The original definitions are in :rfc:`3410` through :rfc:`3415`; :rfc:`3410` first appeared as :rfc:`2570`.  SNMPv3 introduced the User Security Model, or **USM**, in which agents allow manager access only if the manager has presented an appropriate **key**, derived ultimately from a passphrase. The agent's response can be either digitally signed or encrypted, as desired.
+
+SNMPv3 did make several terminology changes. Any SNMP node -- either manager or agent -- is now known as an SNMP **entity**. An entity is divided into two parts; the first is the SNMP **engine** consisting of the message dispatcher, the message processor, and the security and access-control subsystems. The second part consists of the various SNMP **applications**, consisting, for agents, primarily of the command responder (responding to ``Get()`` and ``GetNext()``, |etc|). One goal of this architectural division is to separate the applications from the authentication mechanisms. Another goal, however, is to provide a framework in which future new applications can easily be supported.
+
+It is the SNMP engine that must implement all the new security provisions.
+
+What Could Possibly Go Wrong?
+-------------------------------
+
+:rfc:`3414` analyzes the the risks of inadequate SNMP security, and identifies two primary and two secondary threats. The primary threats are as follows:
+
++ Unauthorized **modification** of information in transit: that is, **man-in-the-middle** attacks in which A's message to B is intercepted and modified by an intermediate node M.
++ **Masquerade**: unauthorized operations by a manager (or agent) masquerading as an authorized entity. Use of guessed or cracked passwords would fall into this category.
+
+The secondary threats are these:
+
++ **Message Stream Modification**: This includes re-ordering messages, and, perhaps most importantly, **replay attacks**. For example, even if no keys are ever discovered, an attacker might learn that a certain message causes a certain server to reboot. Retransmitting that message could have serious consequences.
++ **Disclosure**: reading by an eavesdropper of the management information in transit. 
+
+All but the last, disclosure, can be addressed by appropriate digital signatures and timestamps; encryption is only needed when disclosure is an active concern. Because disclosure is not always a significant concern, and perhaps because when :rfc:`2574` was written in 1999 the unlicensed export of encryption technology from the United States was illegal, SNMPv3 defines two separate new levels of security:
+
++ authentication-only, addressing modification, masquerade and replay
++ encryption, addressing the above and disclosure
+
+These correspond to three values for the ``snmpSecurityLevel`` textual convention (in which "priv" abbreviates "privacy"):
+
++ ``noAuthNoPriv``: no authentication
++ ``authNoPriv``: authentication, but no encryption
++ ``authPriv``: encryption of all messages
+
+Encryption (privacy) implies authentication; encrypted messages also include the authentication signatures described below.
+
+.. _crypto fun:
+
+Cryptographic Fundamentals
+----------------------------
+
+SNMPv3 authentication is based on **cryptographic hash functions**: functions which take a data string of arbitrary length and return a fixed-length hash, in such a way that 
+
++ Knowing the hash value sheds no practical light on the original data
++ Given a hash value, there is no feasible way to find a message yielding that hash
+
+Further details are at :ref:`secure hashes`.
+
+The Internet checksum of :ref:`Error Detection` fails as a cryptographic hash, for example, because given a message m and a hash value hʹ, one can calculate hash(m) = h and then append to m a two-byte string based on hʹ−h, yielding a message mʹ for which hash(mʹ) = hʹ.
+
+The two cryptographic hash functions originally supported by SNMPv3 in :rfc:`3414` are `MD5 <http://en.wikipedia.org/wiki/MD5>`_, which produces a 128-bit hash, and `SHA-1 <http://en.wikipedia.org/wiki/SHA-1>`_, which produces a 160-bit hash. Since the publication of :rfc:`3414` in 2002, vulnerabilities in each of these hash functions have been discovered. The SNMP framework in principle allows easy substitution of new hash functions, but :rfc:`7860`, standardizing the use of the `SHA-2 <http://en.wikipedia.org/wiki/SHA-2>`_ family, did not appear even in draft form until 2013.
+
+If two parties share a secret key k, the basic hash-based way to sign a message m is to append to it the value hash(m⏜k), where m⏜k is the result of appending k to m. An eavesdropper will see m and hash(m⏜k) but this will provide no information about k, and, similarly, an attacker will, given a message m, not be able to generate the value hash(m⏜k) without knowing k. Because some hash functions are vulnerable to the so-called "length-extension attack" when used this way, the actual signature is often slightly more involved (:ref:`passwords` and :ref:`HMAC`), but hash(m⏜k) is a good example of the basic concept.
+
+The SNMP encryption mechanism is also based on shared secret keys (:ref:`encryption`); that is, public-key encryption is not used. :rfc:`3414` describes the use of the `Data Encryption Standard cipher <http://en.wikipedia.org/wiki/Data_Encryption_Standard>`_, or DES, which uses 56-bit keys. Later, :rfc:`3826` introduced the use of the `Advanced Encryption Standard <http://en.wikipedia.org/wiki/Advanced_Encryption_Standard>`_ cipher, or AES, which in SNMP users a 128-bit key. (Both DES and AES are discussed briefly in :ref:`block cipher`.) DES is, if anything, even more vulnerable than MD5 and SHA-1, due to the limited key length; AES is a much stronger choice.
+
+Shared-secret encryption is based, abstractly, on an encrypting function E(p,k) that takes a plaintext message p and a key k and returns the encrypted ciphertext. Similarly, there is a decrypting function D(c,k) that takes an encrypted ciphertext message c and the key k and returns the original plaintext.
+
+ 
+
+
+
+.. index::
+	single: SNMPv3 engines
+	single: engines, SNMPv3
+
+.. _snmpv3 engines:
+
+SNMPv3 Engines
+-----------------
+
+The SNMPv3 engine is the component of an SNMP entity charged with ensuring security. Each SNMPv3 engine -- manager or agent -- has an identifier known as the **snmpEngineID**. This is a string that, by default, incorporates the node's IP or Ethernet address and additional standard information. While it is common to leave this default setting unchanged, it is also possible to replace it using a site-based naming scheme, perhaps including the organization name and a locally assigned serial number; see :rfc:`3411`.
+
+In any SNMPv3 exchange, one SNMPv3 engine is designated **authoritative**. For a ``Get()`` or ``Set()`` request, or any other request that requires a response, it is always the agent that is authoritative. It is the job of the authoritative engine to validate the message received from the other engine. 
+
+For either authentication-only or encrypting security levels, the nonauthoritative engine must present a pair consisting of the following:
+
++ ``userName``: a human-readable string identifying a person or manager-computer
++ ``authParameters``: a string holding data specific to the authentication/encryption mechanism in use that serves to authenticate the user. This might be thought of as a passphrase, except one goal is never to send passphrases in the clear.
+
+The authoritative engine must keep a table of all the ``userName`` values it recognizes, and, for each, the appropriate key with which to validate the user.
+
+Any SNMPv3 engine also keeps track of two 32-bit attributes
+
++ ``snmpEngineTime``: the number of seconds since the engine last rebooted
++ ``snmpEngineBoots``: the number of times the engine has rebooted
+
+The pair of these, which we will abbreviate as ⟨Time,Boots⟩, uniquely identifies a point in time for an entity (to the nearest second). They are used to prevent replay attacks; two messages sent more than one second apart will never have the same ⟨Time,Boots⟩ timestamp.
+
+Note that keeping track of ``snmpEngineBoots`` implies that the entity have some form of persistent storage. 
+
+When a nonauthoritative engine (for our purposes, the manager) wants to send a request to an authoritative engine (the agent), the first step is to find out the agent's ``snmpEngineID`` and then its current ⟨Time,Boots⟩ value. This is done through an initial two-step discovery process. The first request contains an empty ``varBindList``, an empty engineID, a username of the empty string and a security level of ``noAuthNoPriv``. The authoritative side sends a response containing its engineID. The second step is to send a request, again with an empty ``varBindList`` but now containing a valid ⟨username,key⟩ pair. The value for ⟨Time,Boots⟩ is ⟨0,0⟩. The authoritative engine now responds with a message including its actual ⟨Time,Boots⟩.
+
+
+
+Message Authentication
+------------------------
+
+After discovering the authoritative engine's ⟨Time,Boots⟩, the nonauthoritative engine stores the authoritative engine's ``snmpEngineBoots`` and also the difference between the authoritative engine's ``snmpEngineTime`` and its own clock time. It can now use this difference to approximate the authoritative engine's ``snmpEngineTime`` at any point in the future. Every message from the nonauthoritative engine will include its estimate of the authoritative engine's current ⟨Time,Boots⟩ value. Relative drift between the two engines' clocks will eventually mean this estimate fails, but, as we shall see, it can be expected to be close enough for quite a while.
+
+The authoritative engine accepts a non-empty request only if all three of the following hold, where Time and Boots are the values submitted by the nonauthoritative engine and ``snmpEngineTime`` and ``snmpEngineBoots`` are the authoritative engine's own values:
+
++ Boots = ``snmpEngineBoots``
++ ``snmpEngineBoots`` < 2\ :sup:`31` − 1
++ Time and ``snmpEngineTime`` differ by less than 150 seconds
+
+The maximum allowable clock drift, in other words, is 150 seconds. If the two clocks drift by more than that, the nonauthoritative side must again go through the synchronization process outlined at the end of the previous section.
+
+The actual message signing is based on a shared secret key, ``authKey``, negotiated previously between user and agent. Because the key is usually specific to the agent, it is sometimes called a *local* key, **kl**. 
+
+.. _passwords:
+
+Passwords and Keys
+---------------------
+
+
+Users are identified by ``userName`` values, and also (usually) have human-readable passwords. These passwords must be converted first into keys, in such a way that each ⟨user,agent⟩ pair has its own unique key. We will start with a mechanism commonly used for authentication-only security; it is similar for both the MD5 and SHA-1 hashes. We will denote the hash function (either MD5 or SHA-1) by ``hash()``. 
+
+The first step is to create a **digest** based on the password. It would suffice in principle to set the digest to hash(password). In order to make the password→key conversion process relatively slow, however, so as to hamper brute-force attacks, Appendix A of :rfc:`3414` recommends repeating the password (logically, at least) to fill a buffer 2\ :sup:`20` bytes in length. The ``hash()`` function is then applied to this megabyte string. (For another perspective on intentionally slow password operations, see :ref:`password hashes`.)
+
+The next step is to take the engineID of the agent for which the user is generating this particular key and take the hash of the concatenation of the digest, engineID and digest again:
+
+ | **kl** = hash(digest⏜engineID⏜digest)
+
+This is now the ⟨user,agent⟩ shared key, or *local* key. It must be entered (or computed) on the agent, and stored there. For MD5 it is 16 bytes long; for SHA-1 it is 20 bytes long.
+
+This mechanism is, strictly speaking, optional; an agent does not know how manager keys were generated, and thus cannot enforce any particular mechanism when a manager's key is later changed as below. Any secure way to generate a unique key **kl** for each user and each agent would be sufficient. The mechanism here, though, has the advantage that any manager node can compute a user's local key directly from the password and the agent engineID; no keys need be stored by the manager. This allows a manager to use one password for multiple agents; compromise of any one agent and its attendant local key **kl** should not affect the security of other agents or of the original password.
+
+.. index::
+	single: HMAC
+
+Message Signing
+------------------
+
+An SNMP message **mesg** is now signed by a local key **kl** using the **Hash Message Authentication Code**, or HMAC (:rfc:`2104`), as follows:
+
++ **kl** is extended to a 64-byte **ek** by padding with zeroes.
++ A constant string **ipad** is formed by repeating the octet 0x36 64 times.
++ A constant string **opad** is formed by repeating 0x5c 64 times.
++ Set **k1** = **ek** XOR **ipad**.
++ Set **k2** = **ek** XOR **opad**. 
+
+The ``authParameter`` field -- the actual digital signature -- is now set to be the first 12 bytes of 
+
+  | hash(**k2**\ ⏜hash(\ **k1**\ ⏜\ **mesg**))
+
+This is slightly more complicated than the hash(**mesg**\ ⏜\ **kl**) mechanism suggested in :ref:`crypto fun`, in order to make it more resistant to potential vulnerabilities in the hash() function; see :ref:`HMAC`.
+
+The receiver can replicate this ``authParameter`` calculation and verify that it matches the value transmitted in the packet.
+
+.. _key change:
+
+Key Changes
+------------------------------------
+
+Suppose a user wants to change his or her password, and thus the key **k**. The manager will need to communicate the new key to the agent in such a way that it is not exposed to eavesdroppers. Here is the mechanism, where, again, ``hash()`` is either MD5 or SHA-1 as appropriate; we will use N to denote the length in bytes of the result of ``hash()`` (either 16 or 20).
+
+The original key is here denoted ``oldkey`` and the new key is ``newkey``.
+
+The manager first chooses a string ``random`` of N bytes chosen as randomly as possible. A second N-byte string ``delta`` is then calculated as follows:
+
+ | ``temp`` = ``hash(oldkey⏜random)``
+ | ``delta`` = ``temp`` XOR ``newkey``
+
+At this point, ``random`` and ``delta`` are sent -- in the clear -- from the manager to the agent. The agent can use ``random`` and ``oldkey`` to compute ``temp``, and thus ``newkey`` = ``delta`` XOR ``temp``. An eavesdropper cannot use ``random`` to find out anything about ``temp`` without knowing ``oldkey``, and cannot get anything useful out of ``delta`` unless either ``newkey`` or ``temp`` is known.
+
+The actual process is to combine ``random`` and ``delta`` into a single 2N-byte **keyChange** string, written to one of the key-change columns of ``usmUserTable``, :ref:`usmUserTable`.
+
+Note that if an eavesdropper saves ``random`` and ``delta``, and later discovers the user's ``oldkey``, then ``newkey`` can be calculated easily. Using the language of :ref:`forward secrecy`, forward secrecy fails badly. However, if an eavesdropper later discovers ``newkey``, there is no obvious way to find ``oldkey``; see exercise |keychange|.
+
+To improve forward secrecy, and to simplify mass key generation generally, :rfc:`2786` outlines an experimental mechanism to use Diffie-Hellman-Merkle key exchange (:ref:`diffie-hellman`) to create and change keys, instead of the process above. 
+
+
+Creating Additional Users
+----------------------------
+
+Suppose we want to add user "alice" to an agent, together with Alice's local key **kl**. The problem is that there is no pre-existing shared key, and so no way to transmit **kl** to the agent via SNMP without risk of eavesdropping.
+
+One solution is to require **out-of-band** account creation, that is, for Alice to log on to the agent via, perhaps, an ssh or direct serial-line connection, and enter there her name and password. This works, but is awkward on a large network.
+
+The usual way is to create an account for Alice by **cloning** some other account on the agent. We will assume that an initial account has been created as in :ref:`passwords` for user "master". Cloning the account just requires specification of the names "master" and "alice"; no keys need be sent. The second step is to update the password for the new "alice" account, which is done via the key-change mechanism of the previous section. We look at the details of the cloning procedure in the next section.
+
+.. _VACM for SNMPv3:
+
+VACM for SNMPv3
+------------------
+
+For SNMPv1 and SNMPv2c, VACM created associations between community strings and security groups, an then between security groups and permitted views of the OID tree. For SNMPv3, user names replace community strings.
+
+There are three primary VACM tables, defined in :rfc:`3415`. The first is ``vacmSecurityToGroupTable``, indexed by the "security model" and the "security name". For SNMPv3 the model is 3 and the security name is the username; the SNMPv3 rows of the table are thus effectively indexed by the username. It is not unreasonable to have a separate security group for each user, |eg| "grppld" for user "pld". 
+
+The second table is ``vacmAccessTable``, indexed by security group, security model (community or SNMPv3) and security level (|eg| ``authNoPriv``). The table can be used to look up a named view for each of "read" and "write" privileges (also "trap" privileges, if desired). (This table is also indexed by "contextName", but often there is only one contextName, the default.)
+
+Finally, the named views themselves are stored in ``vacmViewTreeFamilyTable``, indexed by view name and an OID prefix representing an OID subtree. A given view *v* consists of all the OID prefixes *op* for which ⟨\ *v*,\ *op*⟩ appears in the table. Some prefixes may have an associated "mask", typically to allow access to a designated table *row*, and some prefixes may represent exclusion of that subtree from the view. Typical view names are "_all_", "_none_" and "systemonly"; we created a view "mib2+private" in :ref:`snmp community`. 
+
+.. index::
+	single: usmUserTable
+
+.. _usmUserTable:
+
+The ``usmUserTable``
+```````````````````````
+
+Now it is time to look at the actual table in which agents store user names and their associated authentication credentials, ``usmUserTable``. It has the attributes below, which should all be prefixed by ``usmUser``; the index attributes are the first two, ``EngineID`` and ``Name``. We will consider only those attributes related to authentication-only security.
+
+=====================	===================================================================
+``EngineID``		usually the agent's own engineID
+``Name``		|eg| "alice"
+``SecurityName``	usually the same as ``Name``
+``CloneFrom``		an indication of the row this entry is cloned from
+``AuthProtocol``	MD5 or SHA-1
+``AuthKeyChange``	the ⟨random, delta⟩ keyChange object of :ref:`key change`
+``OwnAuthKeyChange``	the same but with different permissions; see below
+``PrivProtocol``	used for encryption
+``PrivKeyChange``	used for encryption
+``OwnPrivKeyChange``	used for encryption
+``Public``		used for confirming key changes; see below
+``StorageType``		hopefully ``permanent``, meaning values persist between reboots
+``Status``		of type ``RowStatus``, for row insertion
+=====================	===================================================================
+
+One can think of the table as also having an implicit ``authKey`` column, representing the local key corresponding to ``Name``, that is never directly readable or writable. :rfc:`3414` states flatly "the ``authKey`` is not accessible via SNMP." However, the agent must still keep the ``authKey`` somewhere, tied to the ``Name``, so it can validate a given user based on the ``Name`` and ``authParameter`` supplied in a request.
+
+Because ``EngineID`` is usually the agent's own ``EngineID``, the table is *de facto* indexed just by ``Name``.
+
+Recall that, as was discussed in :ref:`SNMPv2 Indexes`, the index attributes, ``EngineID`` and ``Name``, will not be directly accessible, but will be encoded in the OID associated with every other retrieved attribute. The username "alice" will thus be encoded, using the ASCII string encoding, as 97.108.105.99.101, not necessarily easily readable by human managers.
+
+We are now in a position explain the cloning process and the key-change process as they play out with this table.
+
+A specific semantic rule for this table is that the use of ``Set()`` to assign a ⟨random, delta⟩ keyChange object to ``AuthKeyChange`` or ``OwnAuthKeyChange`` causes that user's hidden ``authKey`` to be updated via the process of :ref:`key change`. The user cannot confirm directly that this change succeeded, as a read of these keyChange attributes returns the empty string, so the usual recommended strategy is also to write a random value to the ``Public`` attribute; because ``Set()`` operations are atomic, a change to the latter means the former change succeeded as well.
+
+Because it is possible for multiple managers to be updating the table simultaneously, a single ``TestAndIncr`` object named ``usmUserSpinLock`` may be used to enforce serialization, as in :ref:`testandincr`. So the full recommended sequence for updating a key is as follows, where *keyChange* is the ⟨random, delta⟩ keyChange object and *index* encodes the ``EngineID`` and the ``Name``:
+
+ | *rand* = *random value chosen by the manager*
+ | *val* := Get(usmUserSpinLock)
+ | Set((``usmUserSpinLock``, *val*), (``AuthKeyChange``.\ *index*, *keyChange*), (``Public``.\ *index*, *rand*))
+
+This is repeated as necessary until ``Get(Public)`` returns *rand*, indicating that the ``Set()`` operations all succeeded.
+
+The above applies for a key change being done by someone with write privileges to the ``AuthKeyChange`` column of ``usmUserTable``. 
+
+An alternative to granting ordinary users write access to the ``AuthKeyChange`` column is to have them use the column ``OwnAuthKeyChange`` instead. Any user may attempt to write to this column, but the write will only succeed if the userName by which the request is authenticated is equal to the ``Name`` representing the index for this particular keyChange. In other words, anyone with write access to the ``OwnAuthKeyChange`` column can change his or her *own* key, and *only* his or her own key. Write access to this column must still be granted, however. As we will see below in :ref:`cloning`, this security option is of relatively little practical significance.
+
+To clone a new user from an existing one, the first step is to choose the row to be cloned, represented by the OID of an index value. Call this *cloneRow*, and let *index* again encode the ``EngineID`` and ``Name``:
+
+ | *val* := Get(usmUserSpinLock)
+ | Set((\ ``usmUserSpinLock``, *val*), (``CloneFrom``.\ *index*, *cloneRow*), (``Status``.\ *index*, ``createAndWait``))
+
+Typically the key change is then executed before changing the ``Status`` to ``active``, though this is not required.
+
+.. index::
+	Net-SNMP and SNMPv3
+
+Creating Accounts in Net-SNMP
+``````````````````````````````````
+
+To create an initial account, the configuration files are used. On the author's installation of Net-SNMP version 5.7.x (in 2016), the administratively written configuration file is /etc/snmp/snmpd.conf and the system-written configuration file is /var/lib/snmp/snmpd.conf; the latter contains ``snmpEngineBoots`` and other persistent SNMP data. The following line goes in this second file, with SNMP shut down (some earlier versions of Net-SNMP required that it be placed in /var/net-snmp/snmpd.conf). Its effect is to create an SNMPv3 user named "master" with MD5-authentication password "saskatchewan".
+
+ | ``createUser master MD5 saskatchewan``
+
+When SNMP is then started, the line above is replaced by something like the following (on a single line) in /var/lib/snmp/snmpd.conf:
+
+ | ``usmUser 1 3 0x80001f8880889cb038b1aca650 "master" "master" NULL \`` 
+ |   ``.1.3.6.1.6.3.10.1.1.2 0x7293f49a82fc950f5c344efd94dbb7db .1.3.6.1.6.3.10.1.2.1 0x 0x``
+
+The new localized key is 0x7293f49a82fc950f5c344efd94dbb7db; the first hex string beginning 0x80001 is the engineID.
+
+For this new account to be authorized to do anything, we must also add the following permissions entry to /etc/snmp/snmpd.conf:
+
+ | ``rwuser master``
+
+The effect of this entry is to create an entry (on SNMP restart) in ``vacmSecurityToGroupTable``  associating user "master" with its own security group (Net-SNMP names it "grpmaster"), and then an entry in the ``vacmAccessTable`` granting this new group SNMPv3 read and write access to the entire OID tree. (In general we could also have used "rouser", except that we will need "master" to be able to create new users.) 
+
+After permissions (at least read permissions) are enabled, the following snmpget should work 
+
+ | ``snmpget -v 3 -u master -l authNoPriv -a MD5 -A saskatchewan localhost 1.3.6.1.2.1.1.4.0``
+
+The hostname is "localhost" if this is being run on the same machine that the Net-SNMP agent is running on; it can also of course be run remotely.
+
+We can make this a little shorter by editing the Net-SNMP per-user manager configuration file $HOME/.snmp/snmp.conf to add the following lines:
+
+ | ``defSecurityName master``
+ | ``defAuthType MD5``
+ | ``defSecurityLevel authNoPriv``
+ | ``defAuthPassphrase saskatchewan``
+
+Now the snmpget command can be shortened to
+
+ |  ``snmpget -v 3 localhost 1.3.6.1.2.1.1.4.0``
+
+If we take the password, "saskatchewan", and repeat it to 2\ :sup:`20` bytes, the MD5 checksum is 0x3da9dbfc3a78acb675e436746e1f4f8a; this is the "digest" of :ref:`passwords`. From the /var/lib/snmp/snmpd.conf file (or from the created usmUser entry above) we find the engineID is 0x80001f8880889cb038b1aca650. If we convert these two strings to binary data, concatenate them as digest⏜engineID⏜digest, and take the MD5 checksum, we indeed get
+
+ | 7293f49a82fc950f5c344efd94dbb7db
+
+which is exactly the key entry in the /var/lib/snmp/snmpd.conf file.
+
+.. _cloning:
+
+Cloning in Net-SNMP
+~~~~~~~~~~~~~~~~~~~~~~~
+
+We can now **clone** this account while SNMP is running, using the ``snmpusm`` command-line utility. The following line creates an account "pld" cloned from "master", using the master account (and assuming that master is an rwuser and not an rouser); we have abbreviated by *auth* the full credentials ``-u master -l authNoPriv -a MD5 -A saskatchewan``. We have switched from "localhost" to *HOST* to emphasize that this can be run remotely.
+
+..
+
+ | ``snmpusm -v3`` *auth* *HOST* ``create pld master``
+
+We then change the password to "ramblers", *still using the authority of user "master"*; the ``-Ca`` option tells snmpusm to change only the authentication key.
+
+..
+
+ | ``snmpusm -v3`` *auth* ``-Ca`` *HOST* ``passwd saskatchewan ramblers pld``
+	
+But before new user pld can do anything, we must grant access. We *can* again edit /etc/snmp/snmpd.conf on the machine running the Net-SNMP agent, adding the directive ``rouser pld`` (granting read-only access this time) and then restarting SNMP. We can also, however, manipulate the VACM tables of :ref:`VACM for SNMPv3` using the Net-SNMP ``snmpvacm`` command, which works remotely:
+
+..
+
+ | ``snmpvacm -v3`` *auth* *HOST* ``createSec2Group 3 pld grppld``
+ | ``snmpvacm -v3`` *auth* *HOST* ``createAccess grppld 3 2 0 _all_ _none_ _none_``
+
+These two commands create entries in the ``vacmSecurityToGroupTable`` and the ``vacmAccessTable`` respectively. The parameters following ``grppld`` in the second command include the USM security model (3), the authNoPriv security level (2), a placeholder (0) for the ``contextmatch`` flag which we are not using, and the views ``_all_`` and ``_none_`` predefined by Net-SNMP. The command here gives ``grppld`` read access to everything, and write access to nothing (the second ``_none_`` denies access for creation of notifications such as traps).
+
+After all this, user pld can then issue an snmpget using pld's own credentials with
+
+ | ``snmpget -v 3 -u pld -l authNoPriv -a MD5 -A ramblers`` *HOST* ``1.3.6.1.2.1.1.4.0``
+
+If user pld is to be able to change pld's password (key), write-access must be granted at least to the ``usmUserAuthKeyChange`` column of ``usmUserTable``. We do this by adding the appropriate OID to the write view for user pld. Views are maintained in the ``vacmViewTreeFamilyTable`` as an association between the view name and a list of OIDs. 
+
+The first step is to add the ``usmUserAuthKeyChange`` column, 1.3.6.1.6.3.15.1.2.2.1.6, to user pld's view. The command below can be applied alone, so that the ``usmUserAuthKeyChange`` column is the *only* object to which user pld can write, or as part of a series of ``createView`` statements adding a series of OID subtrees to ``pldwriteview``. (An OID can be removed from a view with the ``deleteView`` option.) In the following commands we are still using the initial ``master`` account for *auth*.
+
+ | ``snmpvacm -v3`` *auth* *HOST* ``createView pldwriteview 1.3.6.1.6.3.15.1.2.2.1.6``
+
+Now we apply this new view, ``pldwriteview``, to pld's group, grppld. We must first clear the previously granted access.
+
+ | ``snmpvacm -v3`` *auth* *HOST* ``deleteAccess grppld 3 2``
+ | ``snmpvacm -v3`` *auth* *HOST* ``createAccess grppld 3 2 0 _all_ pldwriteview _none_``
+
+The password can now be changed from "ramblers" to "ignatius" as follows:
+
+ | ``snmpusm -v3 -u pld -l authNoPriv -a MD5 -A ramblers -Ca`` *HOST*  ``passwd ramblers ignatius pld``
+
+We granted pld access here to the entire ``usmUserAuthKeyChange`` column. In principle this might be risky, as it allows user pld to write to the key-changing column for *any* user. One potential approach here is to grant user pld access only to pld's own row in ``usmUserAuthKeyChange``; this has the following rather cumbersome OID (in which the last four levels 3.112.108.100 spell out the three-byte string "pld" in ASCII):
+
+::
+
+ 1.3.6.1.6.3.15.1.2.2.1.6.17.128.0.31.136.128.22.41.105.105.47.232.188.86.0.0.0.0.3.112.108.100
+
+Another approach might be to grant pld write access to the ``usmUserOwnAuthKeyChange`` column. The semantics of this column, outlined above in :ref:`usmUserTable`, are such that key-change requests are accepted only for the user who signed the request. This would prevent user pld from even attempting to change anyone else's password. 
+
+But the risk of full ``usmUserAuthKeyChange`` access is minimal: a request authenticated by user pld can only change the password of another user, say bob, *if bob's previous password is known to pld*, as keychange objects must incorporate the old key/password. But if that password is known, then the password can just as easily be changed by authenticating the request as user bob rather than as user pld. In any event, the Net-SNMP ``snmpusm`` command does not support writing to ``usmUserOwnAuthKeyChange``.
+
+The command ``snmpusm`` does not support making general modifications; if a USM entry here is made incorrectly, it may be necessary to delete and re-create it. 
+
+
+Exercises
+============
+
+\ 1. Consider the table below. The first column is the index. 
+
+=======	=======	========
+index	count	veggie
+=======	=======	========
+1	401	kale
+3	523	kohlrabi
+57	607	mâche
+92	727	okra
+=======	=======	========
+
+
+Give the OID for each data value, assuming this table were encoded in SNMP. Assume the columns are assigned OID levels 1, 2, and 3 in order (including the index column), and the root of the subtree (the ``tableEntry`` OID) is represented by **T**. Note that rows are not numbered consecutively. 
+
+\ 2. Recall that ``GetBulk()`` acts like a repeated ``GetNext()``. Why is there no ``GetBulk()`` equivalent of ``Get()``? 
+
+\ 3. What happens if we have a three-row, three-column table and ask, using ``GetBulk()``, for the first two columns with a repetition count of four? What is retrieved? Assume entries are of the form **T**.col.row, for col and row each ranging from 1 to 3.
+
+\ 4. Consider the following multi-attribute ``GetNext()`` as presented in :ref:`multi-col get`:
+
+ | GetNext(**T**.1.4, **T**.2.4, **T**.3.4, **T**.4.4, **T**.10.4, **T**.11.4)
+
+The answer given in the text explicitly assumed that the only columns existing were those shown: 1, 2, 3, 4, 10 and 11. What would be the result if all columns of ``ifTable`` were present? Assume, as before, that row 4 is the final row.
+
+\ 5. Suppose you want an SNMP table ``identTable`` to hold ⟨idNum,userName⟩ pairs, where idnum is to be an INTEGER and username an OCTET STRING. The INDEX is idnum. Give ASN.1 definitions for the following:
+
++ ``identTable``
++ ``identEntry``
++ ``IdentEntry``
++ ``idNum``
++ ``userName``
+
+Follow the SNMPv2 convention of *not* including the index column in the actual table data, :ref:`SNMPv2 indexes`.
+
+\ 6. (a) What can an SNMP agent do to detect that a manager has created a row in state ``underCreation`` and then crashed, leaving the row abandoned?
+
+(b). What can an SNMP agent do to detect that a manager has created a ``valid`` row, and has later crashed?
+
+\ 7. In the RMON ``hostTopN`` table (:ref:`host top N`), the agent does all the report-building work. Would it be possible for the manager to do this? If not, why not? If so, why do you think RMON provides this table?
+
+\ 8. In the RMON ``matrixSDTable`` (:ref:`matrix`), the table constructed collects data from only a single interface on the agent (that interface specified by ``DataSource``). Could we get additional Matrix information by considering other interfaces? Why or why not?
+
+\ |RMON matrix|. The RMON matrix group (:ref:`matrix`) provides two tables with the same information, ``matrixSDTable`` and ``matrixDSTable``. 
+
+(a). Suppose we want all the table data about a given destination D, and have only the ``matrixSDTable``. Explain why every row of ``matrixSDTable`` would need to be examined.
+
+(b). Now suppose we repeat the investigation of (a), but this time the manager has previously downloaded the complete list of all hosts on the LAN by using the RMON hosts tables. If N is the number of hosts on the LAN, explain how to find all hosts that communicated with D using only N retrieval requests.
+
+(c). Explain how to find all hosts S that sent packets to D even more quickly using the ``matrixDSTable``. If M≤N is the number of such S, your answer should involve N+1 retrieval requests.
+
+.. |RMON matrix| replace:: 9
+
+\ 10. In the keychange operation of :ref:`key change`, suppose the manager simply transmitted ``delta2`` = ``oldkey`` XOR ``newkey`` to the agent. 
+
+(a). Suppose an eavesdropper discovers ``delta2`` and also knows a few bits of ``oldkey``. What can the eavesdropper learn about ``newkey``? Would the same vulnerability apply to the mechanism of :ref:`key change`?
+
+(b). Suppose an eavesdropper later discovers ``newkey``. Explain how to recover ``oldkey``, and why this does not work when the mechanism of :ref:`key change` is used.
+
+
+.. |keychange| replace:: 10
+
+\ 11. List the OID prefixes for which a manager would need to be granted write permission if the manager were to be able to modify all settings in .1.3.6.1.2.1 and .1.3.6.1.4.1, and change their own local key, but *not* have access to columns in ``usmUserTable`` that would allow modification of other manager accounts. (The VACM table has an "exception" option to make this easier). 
+
+\ 12. Suppose a manager has write permission only for the ``usmUserOwnAuthKeyChange`` column in ``usmUserTable``, which allows change of only that manager's password. However, the manager has full write access to the VACM tables. Explain how the manager can modify the local keys of other managers.
+
+\ 13. Use Wireshark to monitor localhost traffic while you use the Net-SNMP ``snmpusm`` command to change a manager's own local key. Does the command use the ``usmUserAuthKeyChange`` column or the ``usmUserOwnAuthKeyChange`` column? 
+

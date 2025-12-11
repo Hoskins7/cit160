@@ -1,0 +1,1451 @@
+ 
+.. sectnum::
+   :start: 26
+
+.. index::
+	single: security
+
+.. _security hash:
+
+Security
+****************************
+
+How do we keep intruders out of our computers? How do we keep them from impersonating us, or from listening in to our conversations or downloading our data? Computer security problems are in the news on almost a daily basis. In this chapter and the next we take a look at just a few of the issues involved in building secure networks. This chapter focuses on general principles and on *secure hashing* (:ref:`secure hashes`) and "secret-key" encryption; the next addresses public-key encryption.
+
+For our limited overview here, we will divide attacks into three categories:
+
+#. Attacks that execute the intruder's code on the target computer
+#. Attacks that extract data from the target, without code injection
+#. Eavesdropping on or interfering with computer-to-computer communications
+
+The first category is arguably the most serious; this usually amounts to a complete takeover, though occasionally the attacker's code is limited by operating-system privileges. A computer taken over this way is sometimes said to have been "owned". We discuss these attacks below in :ref:`code execution`. Perhaps the simplest form of such an attack is through stolen or guessed passwords to a system that offers remote login to command-shell accounts. More technical forms of attack may involve a virus, a buffer overflow (:ref:`stack buffer overflow` and :ref:`heap buffer overflow`), a protocol flaw (:ref:`xmas`), or some other software flaw (:ref:`morris worm`).
+
+In the second category are intrusions that do not involve remote code execution; a server application may be manipulated to give up data in ways that its designers did not foresee. 
+
+For example, in 2008 David Kernell gained access to the `Yahoo <http://yahoo.com>`_ email account of then-vice-presidential candidate Sarah Palin, by guessing or looking up the answers to the forgotten-password security questions for the account. One question was Palin's birthdate. Another was "where did you meet your spouse?", which, after some research and trial-and-error, Kernell was able to guess was "Wasilla High"; Palin grew up in and was at one point mayor of Wasilla, Alaska. Much has been made since of the idea that the answers to many security questions can be found on social-networking sites.
+
+As a second example in this category, in 2010 Andrew "weev" Auernheimer and Daniel Spitler were charged in the "AT&T iPad hack". IPad owners who signed up for network service with AT&T had their iPad's `ICC-ID <http://en.wikipedia.org/wiki/Subscriber_identity_module#ICCID>`_ recorded along with their other information. If one of these owners later revisited the AT&T website, the site would automatically request the iPad's ICC-ID and then populate the web form with the user's information. If a randomly selected ICC-ID were presented to the AT&T site that happened to match a real account, that user's name, phone number and email address would be returned. ICC-ID strings contain 20 decimal digits, but the individual-device portion of the identifier is much smaller and this brute-force attack yielded 114,000 accounts. 
+
+This attack is somewhat like a password intrusion, except that there was no support for running commands via the "compromised" accounts.
+
+Auernheimer was convicted for this "intrusion" in November 2012, but his sentence was set aside on appeal in April 2014. Auernheimer's conviction remains controversial as the AT&T site never requested a password in the usual sense, though the site certainly released information not intended by its designers.
+
+Finally, the third category here includes any form of eavesdropping. If the password for a login-shell account is obtained this way, a first-category attack may follow. The usual approach to prevention is the use of **encryption**. Encryption is closely related to **secure authentication**; encryption and authentication are addressed below in :ref:`secure hashes` through :ref:`ssh and tls`. 
+
+.. index::
+	single: TJX attack
+	single: WEP encryption failure
+
+Encryption does not always work as desired. In 2006 intruders made off with 40 million credit-card records from **TJX Corp** by breaking the WEP Wi-Fi encryption (:ref:`WEP failure`) used by the company, and thus gaining access to account credentials and to file servers. Albert Gonzalez pleaded guilty to this intrusion in 2009. This was the largest retail credit-card breach until the Target hack of late 2013.
+
+.. _code execution:
+
+Code-Execution Intrusion
+=========================
+
+The most serious intrusions are usually those in which a vulnerability allows the attacker to run executable code on the target system. 
+
+The classic **computer virus** is broadly of this form, though usually without a network vulnerability: the user is tricked -- often involving some form of social engineering -- into running the attacker's program on the target computer; the program then makes itself at home more or less permanently. In one form of this attack, the user receives a file ``interesting_picture.jpg.exe`` or ``IRS_deficiency_notice.pdf.exe``. The attack is made slightly easier by the default setting in Windows of not displaying the final file extension ``.exe``. 
+
+Early viruses had to be completely self-contained, but, for networked targets, once an attacker is able to run some small initial executable then that program can in turn download additional malware. The target can also be further controlled via the network.
+
+The reach of an executable-code intrusion may be limited by privileges on the target operating system; if I am operating a browser on my computer as user "pld" and an intruder takes advantage of a flaw in that browser, then the intruder's code will also run as "pld" and not as "root" or "Administrator". This may prevent the intruder from rewriting my kernel, though that is small comfort to me if my files are encrypted and held for ransom. 
+
+On servers, it is standard practice to run network services with the minimum privileges practical, though see :ref:`stack defenses`.
+
+Exactly what is "executable code" is surprisingly hard to state. Scripting languages usually qualify. In 2000, the ILOVEYOU virus began spreading on Windows systems; users received a file ``LOVE-LETTER.TXT.vbs`` (often with an enticing Subject: line such as "love letter for you"). The ``.vbs`` extension, again not displayed by default, meant that when the file was opened it was automatically run as a **v**\ isual **b**\ asic **s**\ cript. The ILOVEYOU virus was later attributed to Reonel Ramones and Onel de Guzman of the Philippines, though they were never prosecuted. The year before, the Melissa virus spread as an emailed Microsoft Word attachment; the executable component was a Word macro.
+
+Under Windows, a number of configuration-file formats are effectively executable; among these are the program-information-file format `.PIF <http://en.wikipedia.org/wiki/Program_information_file>`_ and the screen-saver format `.SCR <http://en.wikipedia.org/wiki/Screensaver#Microsoft_Windows_2>`_. 
+
+
+.. _morris worm:
+
+The Morris Worm
+-------------------
+
+The classic Morris Worm was launched on the infant Internet in 1988 by `Robert Tappan Morris <http://en.wikipedia.org/wiki/Robert_Tappan_Morris>`_. Once one machine was infected, it would launch attacks against other machines, either on the same LAN or far away. The worm used a number of techniques, including taking advantage of **implementation flaws** via stack buffer overflows (:ref:`stack buffer overflow`). Two of the worm's techniques, however, had nothing to do with code injection. One worm module contained a dictionary of popular passwords that were used to try against various likely system accounts. Another module relied on a different kind of implementation vulnerability: a (broken) diagnostic feature of the ``sendmail`` email server. Someone could connect to the ``sendmail`` TCP port 25 and send the command ``WIZ <password>``; that person would then get a shell and be able to execute arbitrary commands. It was the intent to require a legitimate ``sendmail``-specific password, but an error in ``sendmail``'s frozen-configuration-file processing meant that an empty password often worked. 
+
+.. _xmas:
+
+Christmas Day Attack
+------------------------
+
+The 1994 "Christmas day attack" (:ref:`ISN spoofing`) used a TCP **protocol weakness** combined with a common computer-trust arrangement to gain privileged login access to several computers at UCSD. Implementations can be fixed immediately, once the problem is understood, but protocol changes require considerable negotiation and review.
+
+The so-called "rlogin" trust arrangement meant that computer A might be configured to trust requests for remote-command execution from computer B, often on the same subnet. But the ISN-spoofing attack meant that an attacker M could send a command request to A that would *appear* to come from the trusted peer B, at least until it was too late. The command might be as simple as "open up a shell connection to M". At some point the spoofed connection would fail, but by then the harmful command would have been executed. The only fix is to stop using rlogin. (Ironically, the ISN spoofing attack was discovered by Morris but was not used in the Morris worm above; see [RTM85]_.)
+
+Note that, as with the sendmail WIZ attack of the Morris worm, this attack did not involve network delivery of an executable fragment (a "shellcode").
+
+.. _stack buffer overflow:
+
+Stack Buffer Overflow
+======================
+
+The stack buffer overflow is perhaps the classic way for an attacker to execute a short piece of machine code on a remote machine, thus compromising it. Such attacks are always due to an implementation flaw. A server application reads attacker-supplied data into a buffer, ``buf``, of length ``buflen``. Due to the flaw, however, the server reads more than ``buflen`` bytes of data, and the additional data is written into memory past the end of ``buf``, corrupting memory. In the C language, there is no bounds checking with native arrays, and so such an overflow is not detected at the time it occurs. See [AO96]_ for early examples.
+
+In most memory layouts, the stack grows downwards; that is, a function call creates a new stack frame with a numerically lower address. Array indexing, however, grows upwards: ``buf[i+1]`` is at a higher address than ``buf[i]``. As a consequence, overwriting the buffer allows rewriting the most recent return address on the stack. A common goal for the attacker is to supply an overflowing buffer that does two things:
+
+1. it includes a **shellcode** - a small snippet of machine code that, when executed, does something bad (traditionally but not necessarily by starting a shell with which the attacker can invoke arbitrary commands).
+
+2. it overwrites the stack return address so that, when the current function exits, control is returned not to the caller but to the supplied shellcode.
+
+In the diagram below, the left side shows the normal layout: the current stack frame has a buffer into which the attacker's message is read. When the current function exits, control is returned to the address stored in ``return_address``.
+
+.. image::	images/security/basic_stack_overflow.svg
+
+The right side shows the result after the attacker has written shellcode to the buffer, and, by overflow, has also overwritten the ``return_address`` field on the stack so that it now points to the shellcode. When the function exits, control will be passed to the code at ``return_address``, that is, to the shellcode rather than to the original caller. The shellcode is here shown below ``return_address`` in memory, but it can also be above it.
+
+.. index::
+	single: return-to-libc attack
+
+.. _return-to-libc:
+
+Return to libc
+-----------------
+
+A variant attack is for the attacker to skip the shellcode, but instead to overwrite the stack return address with the address of a known library procedure. The libc library is popular here, making this known as the **return-to-libc** approach. The goal of the attacker is to identify a library procedure that, in the current context of the server process being attacked, will do something that the attacker finds useful.
+
+One version of this attack is to overwrite the stack address with the address of the ``system()`` call, and to place on the stack just above this return address a pointer to the string "/bin/sh" (often present in the environment strings of the attacked process). When the current function exits, control branches to ``system()``, which now thinks it has been called with parameter ``/bin/sh``. A shell is launched.
+
+Return-to-libc attacks often involve no shellcode at all. The attack of :ref:`SP1` uses some return-to-libc elements but also does involve injected shellcode.
+
+A practical problem with any form of the stack-overflow attack is knowing enough about the memory layout of the target machine so that the attacker can determine exactly where the shellcode is loaded. This is made simpler by standardized versions of Windows in which many library routines are at fixed, well-known addresses.
+
+.. _stack-overflow example:
+
+An Actual Stack-Overflow Example
+-----------------------------------
+
+.. sidebar:: Why the code here?
+
+	In many accounts of computer vulnerabilities, there is an understandable reluctance to explain the actual mechanics, lest some attacker learn how to exploit the flaw. This secrecy, however, sometimes has the unfortunate side-effect of making vulnerabilities seem almost magical. The goal in presenting this twenty-year-old example in detail is simply to strip away the aura of mystery surrounding many exploits.
+
+To put together an actual example, we modify a version of TCP simplex-talk (:ref:`tcp simplex-talk`) written in the C language. On the server side, all we have to do is read the input with the infamous ``gets(char * buf)``, which reads in data up to a newline (or NUL) character into the array ``buf``, with no size restrictions. To be able to use ``gets()`` this way, we must arrange for the standard-input stream of the reading process to be the network connection. There is a version of ``gets()`` that reads from an arbitrary input stream, namely ``fgets(char * buf, int bufsize, FILE *stream)``, but ``fgets()`` is not as vulnerable as ``gets()`` as it will not read more than ``bufsize`` characters into ``buf``. (It is possible, of course, for a programmer to supply a value of ``bufsize`` much larger than the actual size of ``buf[]``.)
+
+One drawback of using ``gets()`` is that the shellcode string must not have any NULL (zero) bytes. Sometimes this takes some subterfuge; in the example below, the shellcode includes the string ``"/bin/shNAAAABBBB"``; the ``N`` and the ``BBBB`` will be replaced with zeroes by the injected code itself, after it is read.
+
+Alternatively, we can also have the server read its the data with the call 
+
+::
+
+	recv(int socket, char * buf, int bufsize, int flags)
+
+but supply an *incorrect* (and much too large) value for the parameter ``bufsize``. This approach has the practical advantage of allowing the attacker to supply a buffer with NUL characters (zero bytes) and with additional embedded newline characters.
+
+On the client side -- the attacker's side -- we need to come up with a suitable shellcode and create a too-large buffer containing, in the correct place, the address of the start of the shellcode. Guessing this address used to be easy, in the days when every process always started with the same virtual-memory address. It is now much harder precisely to make this kind of buffer-overflow attack more difficult; we will cheat and have our server print out an address on startup that we can then supply to the client.
+
+An attack like this depends on knowing the target operating system, the target cpu architecture (so as to provide an executable shellcode), the target memory layout, and something about the target server implementation (so the attacker knows what overflow to present, and when). Alas, all but the last of these are readily guessable. Once upon a time vulnerabilities in server implementations were discovered by reading source code, but it has long been possible to search for overflow opportunities making use only of the binary executable code.
+
+The shellcode presented here assumes that the server system is running 32-bit code. 64-bit Linux systems can be configured to run 32-bit code as well, though a simpler alternative is often to create a 32-bit virtual machine to run the server side. It would also be possible to migrate the shellcode to 64-bit format.
+
+
+.. _the exploited server:
+
+The server
+````````````
+
+The overflow-vulnerable server, |oserver-c|_, is more-or-less a C implementation of the tcp simplex-talk server of :ref:`tcp simplex-talk`. For the 32-bit shellcode below to work, the server must be run as a 32-bit program.
+
+The server contains an explicit call to ``bind()`` which was handled implicitly by the ``ServerSocket()`` constructor in the Java version. 
+
+For each new connection, a new process to handle it is created with ``fork()``; that new process then calls ``process_connection()``. The ``process_connection()`` function then reads a line at a time from the client into a buffer ``pcbuf`` of 80 bytes. Unfortunately for the server, it may read well more than 80 bytes into ``pcbuf``.
+
+For the stack overflow to work, it is essential that the function that reads too much data into the buffer -- thus corrupting the stack -- must return. Therefore the protocol has been modified so that ``process_connection()`` returns if the arriving string begins with "quit". 
+
+We must also be careful that the stack overflow does not so badly corrupt any local variables that the code fails afterwards to continue running, even before returning. All local variables in ``process_connection()`` are overwritten by the overflow, so we save the socket itself in the global variable ``gsock``. 
+
+We also call ``setstdinout(gsock)`` so that the standard input and standard output within ``process_connection()`` is the network connection. This allows the use of the notoriously vulnerable ``gets()``, which reads from the standard input (alternatively, ``recv()`` or ``fgets()`` with an incorrect value for ``bufsize`` may be used). The call to ``setstdinout()`` also means that the shell launched by the shellcode will have its standard input and output correctly set up. We could, of course, make the appropriate ``dup()``/\ ``fcntl()`` calls from the shellcode, but that would increase its complexity and size.
+
+Because the server's standard output is now the TCP connection, it prints incoming strings to the terminal via the standard-error stream.
+
+On startup, the server prints an address (that of ``mbuf[]``) within its stack frame; we will refer to this as **mbuf_addr**. The attacking client must know this value. No real server is so accommodating as to print its internal addresses, but in the days before address randomization, :ref:`ASLR`, the server's stack address was typically easy to guess. 
+
+Whenever a connection is made, the server here also prints out the distance, in bytes, between the start of ``mbuf[]`` in ``main()`` and the start of ``pcbuf`` -- the buffer that receives the overflow -- in ``process_connection()``. This latter number, which we will call **addr_diff**, is constant, and must be compiled into the exploit program (it does change if new variables are added to the server's ``main()`` or ``process_connection()``). The actual address of ``pcbuf[]`` is thus mbuf_addr − addr_diff. This will be the address where the shellcode is located, and so is the address with which we want to overwrite the stack. We return to this below in :ref:`the exploit`, where we introduce a "NOPslide" so that the attacker does not have to get the address of ``pcbuf[]`` exactly right.
+
+Linux provides some protection against overflow attacks (:ref:`stack defenses`), so the server must disable these. As mentioned above, one protection, address randomization, we defeat by having the server print a stack address. The server must also be compiled with the ``-fno-stack-protector`` option to disable the stack canary of :ref:`stack canary`, and the ``-z execstack`` option to disable making the stack (and other data areas) non-executable, :ref:`NX`.
+
+::
+
+	gcc -fno-stack-protector -z execstack -o oserver oserver.c
+
+Even then we are dutifully warned by both the compiler and the linker:
+
+::
+
+	warning: 'gets' is deprecated ....
+	warning: the 'gets' function is dangerous and should not be used.
+
+
+In other words, getting this vulnerability still to work in 2014 takes a bit of effort.
+
+The server here does work with the simplex-talk client of :ref:`tcp simplex-talk`, but with the ``#USE_GETS`` option enabled it does not handle a client exit gracefully, unless the client sends "quit".
+
+.. index::
+	single: shellcode
+
+.. _the shellcode:
+
+The shellcode
+``````````````
+
+The shellcode must be matched to the operating system and to the cpu architecture; we will assume Linux running on a 32-bit Intel x86. Our goal is to create a shellcode that launches ``/bin/sh``. The approach here is taken from [SH04]_.
+
+The shellcode must be a string of machine instructions that is completely self-contained; data references cannot depend on the linker for address resolution. Not only must the code be position-independent, but the code together with its data must be position-independent.
+
+So-called "Intel syntax" is used here, in which the destination operand comes first, |eg| ``mov eax,37``. The `nasm <http://www.nasm.us/>`_ assembler is one of many that supports this format.
+
+Direct system calls in Linux are made using interrupts, using the ``int 0x80`` opcode and parameter. The x86 architecture has four general-purpose registers ``eax``, ``ebx``, ``ecx`` and ``edx``; when invoking a system call via an interrupt, the first of these holds a code for the particular system routine to be invoked and the others hold up to three parameters. (Below, in :ref:`jpeg heap`, we will also make use of register ``edi``.) The system call we want to make is
+
+::
+
+ execve(char * filename, char *argv[], char *envp[])
+
+We need ``eax`` to contain the numeric value 11, the 32-bit-Linux syscall value corresponding to ``execve`` (perhaps defined in ``/usr/include/i386-linux-gnu/asm/unistd_32.h``). (64-bit Linux uses 59 as the syscall value for ``execve``.) We load this with ``mov al 11``; ``al`` is a shorthand for the low-order byte of register ``eax``. We first zero ``eax`` by subtracting it from itself. We can also, of course, use ``mov eax 11``, but then the 11 expands into four bytes 0x0b000000, and we want to avoid including NUL bytes in the code.
+
+We also need ``ebx`` to point to the NUL-terminated string ``/bin/sh``. The register ``ecx`` should point to an array of pointers ["/bin/sh", 0] in memory (the null-terminated ``argv[]``), and ``edx`` should point to a null word in memory (the null-terminated ``envp[]``). We include in the shellcode the string "/bin/shNAAAABBBB", and have the shellcode insert a NUL byte to replace the N and a zero word to replace the "BBBB", as the shellcode must contain no NUL bytes at the time it is read in by ``gets()``. The shellcode will also replace the "AAAA" with the address of "/bin/sh". We then load ``ecx`` with the address of "AAAA" (now containing the address of "/bin/sh" followed by a zero word) and ``edx`` with the address of "BBBB" (now just a zero word).
+
+Loading the address of a string is tricky in the x86 architecture. We want to calculate this address relative to the current instruction pointer IP, but no direct access is provided to IP. The workaround in the code below is to jump to ``shellstring`` near the end, but then invoke ``call start``, where ``start:`` is the label for our main code up at the top. The action of ``call start`` is to push the address of the byte following ``call start`` onto the stack; this happens to be the address of ``shellstring:``. Back up at ``start:``, the ``pop ebx`` pops this address off the stack and leaves it in ``ebx``, where we want it.
+
+Our complete shellcode is as follows (the actual code is in |shellcode-s|_):
+
+::
+
+        jmp short shellstring
+        start:
+        pop ebx                 ;get the address of the string in ebx
+        sub eax, eax            ;zero eax by subtracting it from itself
+        mov [ebx+7 ], al        ;put a NUL byte where the N is in the string
+        mov [ebx+8 ], ebx       ;put the address of the string where the AAAA is
+        mov [ebx+12], eax       ;put a zero (NULL) word into where the BBBB is
+        mov al, 11              ;execve is syscall 11
+        lea ecx, [ebx+8]        ;load the address of where the AAAA was
+        lea edx, [ebx+12]       ;load the address of where the BBBB was, now NULL
+        int 0x80                ;call the kernel. WE HAVE A SHELL!
+        shellstring:
+        call start		;pushes address of string below and jumps to start:
+        db '/bin/shNAAAABBBB'	;the string. AAAA and BBBB get filled in as above
+
+We run this through the commands
+
+::
+
+	nasm -f elf shellcode.s
+	ld -o shellcode shellcode.o
+	objdump -d shellcode
+
+and then, creating a string with the bytes produced, come up with the following:
+
+::
+
+ char shellcode[] = 
+	"\xeb\x16\x5b\x29\xc0\x88\x43\x07\x89\x5b\x08\x89"
+	"\x43\x0c\xb0\x0b\x8d\x4b\x08\x8d\x53\x0c\xcd\x80"
+	"\xe8\xe5\xff\xff\xff/bin/sh/NAAAABBBB";
+
+We can test this (on a 32-bit system) with a simple C program defining the above and including
+
+::
+
+	int main(int argc, char **argv) {
+	    void (*func)() = (void (*)()) shellcode;
+	    func();
+	}
+
+We can verify that the resulting shell has not inherited the parent environment with the ``env`` and ``set`` commands.
+
+Additional shellcode examples can be found in [AHLR07]_.
+
+.. _the exploit:
+
+The exploit
+```````````````````
+
+Now we can assemble the actual attack. We start with a C implementation of the simplex-talk client, and add a feature so that when the input string is "doit", the client
+
++ sends the oversized buffer containing the shellcode, terminated with a newline to make ``gets()`` happy
++ also sends "quit", terminated with a newline, to force the server's ``process_connection()`` to return, and thus to transfer control to the code pointed to by the now-overwritten ``return_address`` field of the stack
++ begins a loop -- ``copylines()`` -- to copy the local terminal's standard input to the network connection (hopefully now with a shell at the other end), and to copy the network connection to the local terminal's standard output
+
+On startup, the client accepts a command-line parameter representing the address (in hex) of a variable close to the start of the server's ``main()`` stack frame. When the server starts, it prints this address out; we simply copy that when starting the client. A second command-line parameter is the server hostname.
+
+The full client code is in |netsploit-c|_.
+
+All that remains is to describe the layout of the malicious oversized buffer, created by ``buildbadbuf()``. We first compute our guess for the address of the start of the vulnerable buffer ``pcbuf`` in the server's ``process_connection()`` function: we take the address passed in on the command line, which is actually the address of ``mbuf`` in the server's ``main()``, and add to it the known constant (``pcbuf`` - ``mbuf``). This latter value, 147 in the version tested by the author, is stored in netsploit.c's ``BUF_OFFSET``. 
+
+.. index::
+	single: NOPslide
+
+This calculation of the address of the server's ``pcbuf`` *should* be spot-on; if we now store our shellcode at the start of ``pcbuf`` and arrange for the server to jump to our calculated address, the shellcode should run. Real life, however, is not always so accommodating, so we introduce a **NOP slide**: we precede our shellcode with a run of NOP instructions. A jump anywhere into the NOPslide should lead right into the shellcode. In our example here, we make the NOPslide 20 bytes long, and add a fudge factor of between 0 and 20 to our calculated address (``FUDGE`` is 10 in the actual code). 
+
+We need the attack buffer to be large enough that it overwrites the stack return-address field, but small enough that the server does not incur a segmentation fault when overfilling its buffer. We settle on a ``BADBUFSIZE`` of 161 (160 plus 1 byte for a final newline character); it should be comparable to but perhaps slightly larger than the ``BUF_OFFSET`` value of, in our case, 147).
+
+The attack buffer is now
+
++ 25 bytes of NOPs
++ shellcode (46 bytes in the version above)
++ 90 bytes worth of the repeated calculated address (``baseaddr-BUF_OFFSET+FUDGE`` in the code
++ 1 byte newline, as the server's ``gets()`` expects a newline-terminated string
+
+Here is a diagram like the one above, but labeled for this particular attack. Not all memory regions are drawn to scale, and there are more addresses between the two stack frames than just ``return address``.
+
+.. image::	images/security/specific_stack_overflow.svg
+
+We double-check the bad buffer to make sure it contains no NUL bytes and no other newline characters.
+
+If we wanted a longer NOPslide, we would have to hope there was room *above* the stack's return-address field. In that case, the attack buffer would consist of a bunch of repeated address guesses, then the NOPslide, and finally the shellcode.
+
+After the command "doit", the netsploit client prompt changes to ``1>``. We can then type ``ls``, and, if the shellcode has successfully started, we get back a list of files on the server. As earlier, we can also type ``env`` and ``set`` to verify that the shell did not inherit its environment from any "normal" shell. Note that any shell commands that need to write to the stderr stream will fail, as this stream was not set up; this includes any mistyped commands. 
+
+.. |oserver-c|   replace:: oserver.c
+.. |shellcode-s| replace:: shellcode.s
+.. |netsploit-c| replace:: netsploit.c
+
+
+.. _stack defenses:
+
+Defenses Against Buffer Overflows
+---------------------------------------- 
+
+How to prevent this sort of attack? The most basic approach is to make sure that **array bounds** are never violated (and also that similar rules for the use of dynamically allocated memory, such as not using a block after it has been freed, are never violated). Some languages enforce this automatically through "memory-safe" semantics; while this is not a guarantee that programs are safe, it does eliminate an important class of vulnerabilities. In C, memory- and overflow-related bugs can be eliminated through careful programming, but the task is notoriously error-prone.
+
+Another basic approach, applicable to almost all remote-code-execution attacks, is to make sure that the server runs with the minimum **permissions** possible. The server may not have write permission to anything of substance, and may in fact be run in a so-called "chroot" environment in which any access to the bulk of the server's filesystem is disabled.
+
+One issue with this approach is that a server process on a unix-derived system that wants to listen on a port less than 1024 needs special privileges to open that port. Traditionally, the process would start with root privileges and, once the socket was opened, would downgrade its privileges with calls to ``setgid()`` and ``setuid()``. This is safe in principle, but requires careful attention to the ``man`` pages; use of ``seteuid()``, for example, allows the shellcode to recover the original privileges. Linux systems now support assigning to an unprivileged process any of several "capabilities" (see ``man capabilities``). The one most relevant here is ``CAP_NET_BIND_SERVICE``, which, if set, allows a process to open privileged ports. Still, to assign these capabilities still requires some privileged intervention when the process is started.
+
+.. index::
+	single: stack canary
+
+.. _stack canary:
+
+Stack canary
+`````````````
+
+The underlying system can also provide some defenses. One of these, typically implemented within the compiler, is the **stack canary**: an additional word on the stack near the return address that is set to a pseudorandom value. A copy of this word is saved elsewhere. When the function calls ``return`` (either explicitly or implicitly), this word is checked to make sure the stack copy still agrees with the saved-elsewhere copy; a discrepancy indicates that the stack was overwritten.
+
+In the ``gcc`` compiler, a stack canary can be enabled with the compiler option ``-fstack-protector``. To compile the stack exploit in :ref:`the exploit`, we needed to add ``-fno-stack-protector``.
+
+.. index::
+	single: ASLR
+	single: address randomization
+
+.. _address randomization:
+.. _ASLR:
+
+ASLR
+``````````
+
+Another operating-system-based defense is **Address-Space Layout Randomization**, or ASLR. In its simplest form, this means that each time the server process is restarted, the stack will have a different starting address. For example, restarting the oserver program above five times yields addresses (in hex) of bf8d22b7, bf84ed87, bf977d87, bfcc5cb7 and bfa302d7. There are at least four hex digits (16 bits) of entropy here; if the server did not print its stack address it might take 2\ :sup:`16` guesses for the attacker to succeed. 
+
+Still, 2\ :sup:`16` guesses might take an attacker well under an hour. Worse, the attacker might simply create a stack-buffer-overflow attack with a very long NOPslide; the longer the NOPslide the more room for error in guessing the shellcode address. With a NOPslide of length 2\ :sup:`10` = 1024 bits, guessing the correct stack address will take only 2\ :sup:`6` = 64 tries. (Some implementations squeeze out 19 bits of address-space entropy, meaning that guessing the correct address increases to 2\ :sup:`9` = 512 tries.)
+
+For 64-bit systems, however, ASLR is much more effective. Brute-force guessing of the stack address takes a prohibitively long time.
+
+ALSR also changes the heap layout and the location of libraries each time the server process is restarted. This is to prevent return-to-libc attacks, :ref:`return-to-libc`. For a concrete example of an attacker's use of non-randomized library addresses, see :ref:`SP1`.
+
+On Linux systems, ASLR can be disabled by writing a 0 to /proc/sys/kernel/randomize_va_space; values 1 and 2 correspond to partial and full randomization.
+
+Windows systems since Vista (2007) have had ASLR support, though earlier versions of the linker required the developer to request ASLR with the ``/DYNAMICBASE`` switch. 
+
+.. index::
+	single: non-executable stack
+	single: NX page bit
+	single: XD page bit
+.. _nx:
+
+Making the stack non-executable
+``````````````````````````````````````
+
+A more sophisticated idea, if the virtual-memory hardware supports it, is to mark those pages of memory allocated to the stack as *non-executable*, meaning that if the processor's instruction register is loaded with an address on those pages (due to branching to stack-based shellcode), a hardware-level exception will immediately occur. This immediately prevents attacks that place a shellcode on the stack, though return-to-libc attacks (:ref:`return-to-libc`) are still possible.
+
+In the x86 world, AMD introduced the per-page NX bit, for No eXecute, in their x86-64 architecture; CPUs with this architecture began appearing in 2003. Intel followed with its XD, for eXecute Disabled, bit. Essentially all x86-64 CPUs now provide hardware NX/XD support; support on 32-bit CPUs generally requires so-called Physical Address Extension mode. 
+
+The NX idea applies to all memory pages, not just stack pages. This sometimes causes problems with applications such as just-in-time compilation, where the code page is written and then immediately executed. As a result, it is common to support NX-bit disabling in software. On Linux systems, the compiler option ``-z execstack`` disables NX-bit protection; this was used above in :ref:`the exploited server`. Windows has a similar ``/NXCOMPAT`` option for requesting NX-bit protection.
+
+.. index::
+	single: write-or-execute
+	single: W^X
+	single: OpenBSD
+
+While a non-executable stack prevents the stack-overflow attack described above, injecting shellcode onto the heap is still potentially possible. The `OpenBSD <http://en.wikipedia.org/wiki/OpenBSD>`_ operating system introduced **write or execute** in 2003; this is abbreviated **W^X** after the use of "^" as the XOR operator in C. A memory page may be writable or executable, but not both. This is strong protection against virtually all shellcode-injection attacks, but may still be vulnerable to some return-to-libc attacks (:ref:`return-to-libc`). 
+
+See [AHLR07], chapter 14, for some potential attack strategies against systems with non-executable pages.
+
+.. index::
+	single: heap buffer overflow
+
+.. _heap buffer overflow:
+
+Heap Buffer Overflow
+=====================
+
+
+As with stack overflows, heap overflows all rely on some software flaw that allows data to be written beyond the confines of the designated buffer. A buffer on the heap is subject to the same software-failure overflow prospects as a buffer on the stack. An important difference, however, is that buffers on the heap are not in clear proximity to an obvious return address. Despite that difference, heap overflows can also be used to enable remote-code-execution attacks.
+
+Perhaps the simplest heap overflow is to take advantage of the fact that some heap pages contain executable code, representing application-loaded library pages. If the page with the overflowable buffer is pointed to by ``p``, and the following page in memory pointed to by ``q`` contains code, then all an attacker has to do is to have the overflow fill the ``q`` page with a long NOPslide and a shellcode. When at some point a call is made to the code pointed to by ``q``, the shellcode is executed instead. A drawback to this attack is that the layout of heap pages like this is seldom known. On the other hand, the fact that heap pages do sometimes legitimately contain executable code means that uniformly marking the heap as non-executable, as is commonly done with the stack, may not be an option.
+
+.. index::
+	single: heap vulnerability
+	single: glibc-2.2.4
+	single: buffer overflow, heap
+
+.. _heap vuln:
+
+A Linux heap vulnerability
+---------------------------
+
+We now describe an actual Linux heap vulnerability from 2003, following [AB03]_, based on version 2.2.4 of the glibc library. The vulnerable server code is simply the following:
+
+::
+
+	char *p = malloc(1024);
+	char *q = malloc(1024);
+	gets(p);		// read the attacker's input
+	free(q);		// block q is last allocated and first freed
+	free(p);
+
+As with the stack-overflow example, the ``gets(p)`` results in an overflow from block p into block q, overwriting not just the data in block q but also the block headers maintained by ``malloc()``. While there is no guarantee in general that block ``q`` will immediately follow block ``p`` in memory, in practice this usually happens unless there has been a great deal of previous allocate/free activity.
+
+The vulnerability here relies on some features of the 2003-era (glibc-2.2.4) ``malloc()``. All blocks are either allocated to the user or are free; free blocks are kept on a doubly linked list. We will assume the data portion of each block is always a power of 2; there is a separate free-block list for each block size. When two adjacent blocks are both free, ``malloc()`` coalesces them and moves the joined block to the free-block list of the next size up.
+
+All blocks are prefixed by a four-byte field containing the size, which we will assume here is the actual size 1032 including the header and alignment rather than the user-available size of 1024. As the three low-order bits of the size are always zero, one of these bits is used as a flag to indicate whether the block is allocated or free. Crucially, another bit is used to indicate whether the *previous* block is allocated or free. 
+
+In addition to the size-plus-flags field, the first two 32-bit words of a free block are the forward and backward pointers linking the block into the doubly linked free-block list; the size-plus-flag field is also replicated as the last word of the block:
+
+.. image::	images/security/allocated_and_free.svg
+
+The strategy of the attacker, in brief, is to overwrite the ``p`` block in such a way that, when block ``q`` is freed, ``malloc()`` thinks block ``p`` is also free, and so attempts to coalesce them, in the process unlinking block ``p``. But ``p`` was not in fact free, and the ``forward`` and ``backward`` pointers manipulated by ``malloc()`` as part of the unlinking process are in fact provided by the attacker. As we shall see, this allows writing two attacker-designated 32-bit words to two attacker-designated memory locations; if one of the locations holds a return address and is updated so as to point to attacker-supplied shellcode also in block ``p``, the system has been compromised.
+
+The normal operation of ``free(q)``, for an arbitrary block ``q``, includes the following:
+
++ Get the block size (``size``) and flags at address ``q-4``
++ Check the following block at address ``p+size`` to see if it is free; if so, merge (we are not interested in this case)
++ Check the flags to see if the *preceding* block is free; if so, load its size ``prev_size`` from address ``q-8``, the address of the ``copy of size`` field in the diagram above; from that calculate a pointer to the previous block as ``p = q - prev_size``; then unlink block ``p`` (as the coalesced block will go on a different free-block list).
+
+For our specific block ``q``, however, the attacker can overwrite the final ``size`` field of block ``p``, ``prev_size`` above, and can also overwrite the flag at address ``q-4`` indicating whether or not block ``p`` is free. The attacker can *not* overwrite the header of block ``p`` that would properly indicate that block ``p`` was still in use, but the ``free()`` code did not double-check that.
+
+We will suppose that the attacker has overwritten block ``p`` to include the following:
+
++ setting the previous-block-is-free flag in the header of block ``q`` to true
++ setting the final ``size`` field of block ``p`` to a desired value, ``badsize``
++ placing value ``ADDR_F`` at address ``q-badsize``; this is where ``free()`` will believe the previous block's forward pointer is located
++ placing the value ``ADDR_B`` at address ``q-badsize+4``; this is where ``free()`` will believe the previous block's backward pointer is located
+
+When the ``free(q)`` operation is now executed, the system will calculate the previous block as at address ``p1 = q-badsize`` and attempt to unlink the false "block" ``p1``. The normal unlink is
+
+::
+
+	(p->backward) -> forward  = p->forward;
+	(p->forward)  -> backward = p->backward;
+
+Alas, when unlinking ``p1`` the result is
+
+::
+
+	*ADDR_B       = ADDR_F
+	*(ADDR_F + 4) = ADDR_B
+	
+where, for the pointer increment in the second line, we take the type of ``ADDR_F`` to be ``char *`` or ``void *``.
+
+At this point the jig is pretty much up. If we take ``ADDR_B`` to be the location of a return address on the stack, and ``ADDR_F`` to be the location of our shellcode, then the shellcode will be executed when the current stack frame returns. Extending this to a working example still requires a fair bit of attention to details; see [AB03]_. 
+
+One important detail is that the data we use to overwrite block ``p`` generally cannot contain NUL bytes, and yet a small positive number for ``badsize`` will have several NUL bytes. One workaround is to have ``badsize`` be a small *negative* number, meaning that the false previous-block pointer ``p1`` will actually come after ``q`` in memory. 
+
+.. index::
+	single: JPEG heap vulnerability
+	single: Windows XP SP1 vulnerability
+
+.. _jpeg heap:
+.. _SP1:
+
+A JPEG heap vulnerability
+--------------------------
+
+In 2004 Microsoft released vulnerability notice `MS04-028 <http://support.microsoft.com/kb/833987>`_ (and patch), relating to a **heap buffer overflow** in **Windows XP SP1**. Microsoft had earlier provided a standard library for displaying `JPEG <http://en.wikipedia.org/wiki/JPEG>`_ images, known as GDI for Graphics Device Interface. If a specially formed JPEG image were opened via the GDI library, an overflow on the heap would occur that would launch a shellcode. While most browsers had their own, unaffected, JPEG-rendering subroutines, it was often not difficult to convince users to open a JPEG file supplied as an email attachment or via an html download link.
+
+The problem occurred in the processing of the JPEG "comment" section, normally invisible to the user. The section begins with the flag 0xFFFE, followed by a two-byte length field (in network byte order) that was to include its own two bytes in the total length. During the image-file loading, 2 was subtracted from the length to get the calculated length of the actual data. If the length field had contained 1, for example, the calculated length would be -1, which would be interpreted as the unsigned value 2\ :sup:`32` - 1. The library, thinking it had that amount of space, would then blithely attempt to write that many bytes of comment into the next heap page, overflowing it. These bytes in fact would come from the image portion of the JPEG file; the attacker would place here a NOPslide, some shellcode, and, as we shall see, a few other carefully constructed values.
+
+As with the Linux heap described above in :ref:`heap vuln`, blocks on the WinXP heap formed a doubly-linked list, with forward and backward pointers known as ``flink`` and ``blink``. As before, the allocator will attempt to unlink a block via 
+
+::
+
+  blink -> forward  = flink;
+  flink -> backward = blink;
+
+The first of these simplifies to ``*blink = flink``, as the offset to field ``forward`` is 0; this action allows the attacker to write any word of memory (at address ``blink``) with any desired value.
+
+The JPEG-comment-overflow operation eventually runs out of heap and results in a segmentation fault, at which point the heap manager attempts to allocate more blocks. However, the free list has already been overwritten, and so, as above, this block-allocation attempt instead executes ``*blink = flink``. 
+
+The attacker's conceptual goal is to have ``flink`` hold an instruction that branches to the shellcode, and ``blink`` hold the address of an instruction that will soon be executed, or, equivalently, to have ``flink`` hold the address of the shellcode and ``blink`` represent a location soon to be loaded and used as the target of a branch. The catch is that the attacker doesn't exactly know where the heap is, so a variant of the return-to-libc approach described in :ref:`return-to-libc` is necessary. The strategy described in the remainder of this section, described in [JA05]_, is one of several possible approaches.
+
+In Windows XP SP1, location ``0x77ed73b4`` holds a pointer to the entry point of the *Undefined Exception Filter* handler; if an otherwise-unhandled program exception occurs, Windows creates an ``EXCEPTION_POINTERS`` structure and branches to the address stored here. It is this address, which we will refer to as **UEF**, the attack will overwrite, by setting ``blink = UEF``. A call to the Undefined Exception Filter will be triggered by a suitable subsequent program crash.
+
+When the exception occurs (typically by the second operation above, ``flink -> backward = blink``), before the branch to the address loaded from UEF, the ``EXCEPTION_POINTERS`` structure is created on the heap, overwriting part of the JPEG comment buffer. The address of this structure is stored in register ``edi``. 
+
+It turns out that, scattered among some standard libraries, there are half a dozen instructions at known addresses of the form ``call DWORD [edi+0x74]``, that is, "call the subroutine at 32-bit address ``edi`` + 0x74" ([AHLR07]_, p 186). All these ``call`` instructions are intended for contexts in which register ``edi`` has been set up by immediately preceding instructions to point to something appropriate. In our attacker's context, however, ``edi`` points to the ``EXCEPTION_POINTERS`` structure; 0x74 bytes past ``edi`` is part of the attacker's overflowed JPEG buffer that is safely past this structure and will not have been overwritten by it. One such call instruction happens to be at address ``0x77d92a34``, in ``user32.dll``. This address is the value the attacker will put in ``flink``.
+
+So now, when the exception comes, control branches to the address stored in UEF. This address now points to the above ``call DWORD [edi+0x74]``, so control branches again, this time into the attacker-controlled buffer. At this point, the processor lands on the NOPslide and ends up executing the shellcode (sometimes one more short jump instruction is needed, depending on layout).
+
+This attack depends on the fact that a specific instruction, ``call DWORD [edi+0x74]``, can be found at a specific, fixed address, ``0x77d92a34``. Address-space layout randomization (:ref:`ASLR`) would have prevented this; it was introduced by Microsoft in Windows Vista in 2007. 
+
+.. index::
+	single: cross-site scripting
+	single: XSS
+
+.. _XSS:
+
+Cross-Site Scripting (XSS)
+----------------------------
+
+.. index::
+	single: javascript
+
+In its simplest form, cross-site scripting involves the attacker posting malicious `javascript <http://en.wikipedia.org/wiki/JavaScript>`_ on a third-party website that allows user-posted content; this javascript is then executed by the target computer when the victim visits that website. The attacker might leave a comment on the website of the following form:
+
+::
+
+	I agree with the previous poster completely
+	<script> do_something_bad() </script>
+
+Unless the website in question does careful html filtering of what users upload, any other site visitor who so much as *views* this comment will have the ``do_something_bad()`` script executed by his or her browser. The script might email information about the target user to the attacker, or might attempt to exploit a browser vulnerability on the target system in order to take it over completely. The script and its enclosing tags will not appear in what the victim actually sees on the screen.
+
+The ``do_something_bad()`` code block will usually include javascript function definitions as well as function calls.
+
+In general, the attacker can achieve the same effect if the victim visits the attacker's website. However, the popularity (and apparent safety) of the third-party website is usually important in practice; it is also common for the attack to involve obtaining private information from the victim's account on that website.
+
+.. index::
+	single: SQL injection
+
+.. _SQL injection:
+
+SQL Injection
+--------------
+
+SQL is the close-to-universal query language for databases; in a SQL-injection attack the attacker places a carefully chosen SQL fragment into a website form, in such a way that it gets executed. Websites typically construct SQL queries based on form data; the attacker's goal is to have his or her data treated as additional SQL. This is *supposed* to be prevented by careful quoting, but quoting often ends up not quite careful *enough*. A successful attacker has managed to run SQL code on the server that gives him or her unintended privileges or information.
+
+As an example, suppose that the form has two fields, ``username`` and ``password``. The system then runs the following sub-query that returns an empty set of records if the ⟨username,password⟩ pair is not found; otherwise the user is considered to be authenticated:
+
+
+ | select * from PASSWORDS p 
+ | where p.user = ``'``\ *username*\ ``'`` and p.password = ``'``\ *password*\ ``'``;
+
+The strings *username* and *password* are taken from the web form and spliced in; note that each is enclosed in single quotation marks *supplied by the server*. The attacker's goal is to supply username/password values so that a nonempty set of records will be returned, thus authenticating the attacker. The following values are successful here, where the quotation marks in *username* are supplied by the attacker:
+
+ | *username*: ``' OR 1=1 OR 'x'='y``
+ | *password*: ``foo``
+
+The spliced-together query built by the server is now
+
+ | select * from PASSWORDS p 
+ | ``where p.user = '' OR 1=1 OR 'x'='y' and p.password = 'foo';``
+
+Note that of the eight single-quote marks in the where-clause, four (the first, sixth, seventh and eighth) came from the server, and four (the second through fifth) came from the attacker.
+
+The where-clause here appears to SQL to be the disjunction of three OR clauses (the last of which is ``'x'='y' and p.password = 'foo'``). The middle OR clause is ``1=1`` which is always true. Therefore, the login succeeds.
+
+For this attack to work, the attacker must have a pretty good idea what query the server builds from the user input. There are two things working in the attacker's favor here: first, these queries are often relatively standard, and second, the attacker can often discover a great deal from the error messages returned for malformed entries. In many cases, these error messages even reveal the table names used.
+
+.. index::
+	single: xkcd
+
+See also `xkcd.com/327 <http://xkcd.com/327>`_.
+
+.. index::
+	single: intrusion detection
+
+.. _intrusion detection:
+
+Network Intrusion Detection
+============================
+
+The idea behind **network intrusion detection** is to monitor one's network for signs of attack. Many newer network intrusion-detection systems (NIDS) also attempt to halt the attack, but the importance of simple monitoring and reporting should not be underestimated. Many attacks (such as password guessing, or buffer overflows in the presence of ASLR) take multiple (thousands or millions) of tries to succeed, and a NIDS can give fair warning.
+
+There are also host-based intrusion-detection systems (HIDS) that run on and monitor a specific host; we will not consider these further.
+
+.. index::
+	single: traffic anomalies
+	single: signatures, intrusion
+
+Most NIDS detect intrusions based either on **traffic anomalies** or on pattern-based **signatures**. As an example of the former, a few pings (:ref:`ping`) might be acceptable but a large number, or a modest number addressed to nonexistent hosts, might be cause for concern.
+
+As for signatures, the attack in :ref:`jpeg heap` can be identified by the hex strings 0xFFFE0000 or 0xFFFE0001. What about the attack in :ref:`the exploit`? Using the shellcode itself as signature tends to be ineffective as shellcode is easy to vary. The NOPslide, too, can be replaced with a wide variety of other instructions that just happen to do nothing in the present context, such as ``sub eax,eax``. One of the most common signatures used by NIDSs for overflow attacks is simply the presence of overly long strings; the false-positive rate is relatively low. In general, however, coming up with sufficiently specific signatures can be nontrivial. An attack that keeps changing in relatively trivial ways to avoid signature-based detection is sometimes said to be **polymorphic**.
+
+.. index::
+	single: evasion, intrusion detection
+
+.. _evasion:
+
+Evasion
+---------
+
+The NIDS will have to reassemble TCP streams (and sometimes sequences of UDP packets) in order to match signatures. This raises the possibility of **evasion**: the attacker might arrange the packets so that the NIDS reassembles them one way and the target another way. The possibilities for evasion are explored in great detail in [PN98]_; see also [SP03]_.
+
+One simple way to do this is with overlapping TCP segments. What happens if one packet contains bytes 1-6 of a TCP connection as "help" and a second packet contains bytes 2-7 as "armful"? 
+
+::
+
+ h  e  l  p
+    a  r  m  f  u  l
+
+These can be reassembled as either "helpful" or "harmful"; the TCP specification does not say which is preferred and different operating systems routinely reassemble these in different ways. If the NIDS reassembles the packets one way, and the target the other, the attack goes undetected. If the attack is spread over multiple packets, there may be many more than two ways that reassembly can occur, increasing the probability that the NIDS and the target will differ.
+
+Another possibility is that one of the overlapping segments has a header irregularity (in either the IP or TCP header) that causes it to be rejected by the target but not by the NIDS, or vice-versa. If the packets are 
+
+::
+
+ h  e  l  p
+ h  a  r  m  f  u  l
+
+and both systems normally prefer data from the first segment received, then both would reassemble as "helpful". But if the first packet is rejected by the target due to a header flaw, then the target receives "harmful". If the flaw is not recognized by the NIDS, the NIDS does not detect the problem.
+
+A very similar problem occurs with IPv4 fragment reassembly, although IPv4 fragments are at this point intrinsically suspicious.
+
+One approach to preventing evasion is to configure the NIDS with information about how the actual target does its reassembly, so the NIDS can match it. An even safer approach is to have the NIDS reassemble any overlapping packets and then forward the result on to the potential target.
+
+.. _cryptographic goals:
+
+Cryptographic Goals
+====================
+
+For the remainder of this chapter we turn to the use of cryptographic techniques in networking, to protect packet contents. Different techniques address different issues; three classic goals are the following:
+
+1. Message **confidentiality**: eavesdroppers should not be able to read the contents.
+2. Message **integrity**: the recipient should be able to verify that the message was received correctly, even in the face of a determined adversary along the way.
+3. Sender **authentication**: the recipient should be able to verify the identity of the sender.
+
+Briefly, confidentiality is addressed through encryption (:ref:`encryption` and :ref:`public key`), integrity is addressed through secure hashes (:ref:`secure hashes`), and authentication is addressed through secure hashes and public-key signatures. 
+
+Encryption by itself does not ensure message integrity. In :ref:`stream ciphers` we give an example using the message "Transfer $ **02**\ 000 to Mallory". It is encrypted by XORing with the corresponding number of bytes of the keystream (:ref:`encryption`), and decrypted by XORing again. If the attacker XORs the two bytes in bold with the byte ('0' XOR '2'), the message becomes "Transfer $ **20**\ 000 to Mallory"; if the attacker XORs those bytes in the encrypted message with ('0' XOR '2') then the result will decrypt to the $20,000 transfer.
+
+Similarly, integrity does not automatically ensure authentication. Two parties can negotiate a temporary key to guarantee message integrity without ever establishing each other's identities as is necessary for authentication. For example, if Alice connects to a website using SSL/TLS, but the site never purchased an SSL certificate (:ref:`tls` and :ref:`CA`), or Alice does not trust the site's certificate authority (:ref:`CA`), then Alice has message integrity for her session, but not authentication.
+
+To the above list we might add resistance to message **replay**. Consider messages such as the following:
+
+1. "I, Alice, authorize the payment to Bob of $1000 from my account"
+2. My facebook.com authentication cookie is Zg8yPCDwbzJ-59Hc-DvHt67qrS
+
+Alice does not want the first message to be executed by her bank more than once, though doing so would violate none of the three rules above. The owner of the second message might be happy to replay it multiple times, but would not want someone *else* to be able to do so. One straightforward way to prevent replay attacks is to introduce a message timestamp or count.
+
+We might also desire resistance to **denial-of-service attacks**. Such attacks are generally related to implementation failures. Attacks in which SSL users end up negotiating a very early version of the protocol, and thus a much less secure encryption mechanism, are arguably of this type; see the POODLE sidebar at :ref:`ssh and tls`.
+
+.. index::
+	single: non-repudiation
+
+Finally, one sometimes sees *message non-repudiation* as a goal. However, in the technical -- as opposed to legal -- realm we can never hope to prove Alice herself signed a message; the best we can do is to prove that Alice's *key* was used to sign the message. At this point non-repudiation is, for our purposes here, quite similar to authentication. See, however, the final example of :ref:`HMAC`.
+
+
+.. index::
+	single: Alice
+	single: Bob
+	single: Aodh
+
+.. _Alice and Bob:
+
+Alice and Bob
+--------------
+
+Cryptographers usually use Alice and Bob, instead of A and B, as the names of the parties sending each other encrypted messages. This tradition dates back at least to [RSA78]_. Other parties sometimes include Eve the eavesdropper and Mallory the active attacker (and launcher of man-in-the-middle attacks). (In `this article <http://www.maa.org/external_archive/columns/colm/cardcolm200502.html>`_ the names Aodh and Bea are introduced, though not specifically for cryptography; the Irish name Aodh is pronounced, roughly, as "Eh".)
+
+.. index::
+	single: secure hash functions
+	single: collision problem, hash
+
+.. _secure hashes:
+
+Secure Hashes
+===============
+
+How can we tell if a file has been changed? One way is to create a record of the file's checksum, using, for the sake of argument, the Internet checksum of :ref:`Error Detection`. If the potential file corruption is random, this will fail to detect a modified file with probability only 1 in 2\ :sup:`16`.
+
+Alas, if the modification is *intentional*, it is trivial to modify the file so that it has the same checksum as the original. If the original file has checksum c\ :sub:`1`, and after the initial modification the checksum is now c\ :sub:`2`, then all we have to do to create a file with checksum c\ :sub:`1` is to append the 16-bit quantity c\ :sub:`2` − c\ :sub:`1` (where the subtraction is done using ones-complement; we need to modify this slightly if the number of bytes in the first-draft modified file is odd). The CRC family of checksums is almost as easily tricked.
+
+The goal of a **cryptographically secure hash** is to provide a hash function -- we will not call it a "checksum" as hashes based on simple sums all share the insecurity above -- for which this trick is well-nigh impossible. Specifically, we want a hash function such that:
+
++ Knowing the hash value should shed no practical light on the message
++ Given a hash value, there should be no feasible way to find a message yielding that hash
+
+A slightly simpler problem than the second one above is to find two messages that have the same hash; this is sometimes called the **collision problem**. When the collision problem for a hash function has been solved, it is (high) time to abandon it as potentially no longer secure.
+
+If a single bit of the input is changed, the secure-hash-function output is usually entirely different. 
+
+.. index::
+	single: collision attack, MD5
+	single: MD5
+	single: SHA-1
+
+Hashes popular in the 1990s were the 128-bit MD5 (:rfc:`1321`, based on MD4, [RR91]_) and the 160-bit SHA-1 (developed by the `NSA <https://www.nsa.gov/>`_); SNMPv3 (:ref:`SNMPv3 security`) originally supported both of these (:ref:`crypto fun`). MD5 collisions (two messages hashing to the same value) were reported in 2004, and collisions where both messages were meaningful were reported in 2005; such **collision attacks** mean it can no longer be trusted for security purposes.
+
+.. index::
+	single: SHA-2
+
+Hash functions currently (2014) believed secure include the SHA-2 family, which includes variants ranging from 224 bits to 512 bits (and known individually as SHA-224 through SHA-512).
+
+.. index::
+	single: Merkle-Dåmgard construction
+
+A common framework for constructing n-bit secure-hash functions is the Merkle-Dåmgard construction ([RM88]_, [ID89]_); it is used by MD5, SHA-1 and SHA-2. The initial n-bit state is specified. To this is then applied a set of transformations H\ :sub:`i`\ (x,y) that each take an n-bit block x and some additional bits y and return an updated n-bit block. These transformations are usually similar to the **rounds functions** of a block cipher; see :ref:`block cipher` for a typical example. In encryption, the parameter y would be used to hold the key, or a substring of the key; in secure-hash functions, the parameter y holds a substring of the input message. The set of transformations is applied repeatedly as the process iterates over the entire input message; the result of the hash is the final n-bit state.
+
+In the MD5 hash function, the input is processed in blocks of 64 bytes. Each block is divided into sixteen 32-bit words. One such block of input results in 64 iterations from a set of sixteen rounds-functions H\ :sub:`i`, each applied four times in all. Each 32-bit input word is used as the "key" parameter to one of the H\ :sub:`i` four times. If the total input length is not a multiple of 512 bits, it is padded; the padding includes a length attribute so two messages differing only by the amount of padding should not hash to the same value.
+
+.. index::
+	single: length-extension vulnerability
+
+While this framework in general is believed secure, and is also used by the SHA-2 family, it does suffer from what is sometimes called the **length-extension** vulnerability. If h = hash(m), then the value h is simply the final state after the above mechanism has processed message m. An attacker knowing only h can then initialize the above algorithm with h, and continue it to find the hash hʹ = hash(m⏜mʹ), for an arbitrary message mʹ concatenated to the end of m, *without knowing m*. If the original message m was padded to message m\ :sub:`p`, then the attacker will find hʹ = hash(m\ :sub:`p`\ ⏜mʹ), but that is often enough. This vulnerability must be considered when using secure-hash functions for message authentication, below.
+
+The SHA-3 family of hash functions does not use the Merkle-Dåmgard construction and is believed not vulnerable to length-extension attacks.
+
+.. index::
+	single: authentication with secure-hash functions
+
+.. _HMAC:
+
+Secure Hashes and Authentication
+---------------------------------
+
+Secure hash functions can be used to implement message authentication. Suppose the sender and receiver share a secret, pre-arranged "key", K, a random string of length comparable to the output of the hash. Then, in principle, the sender can append to the message m the value h = hash(K⏜m). The receiver, knowing K, can recalculate this value and verify that the h appended to the message is correct. In theory, only someone who knew K could calculate h.
+
+This *particular* hash(K⏜m) implementation is undermined by the length-extension vulnerability of the previous section. If the hash function exhibits this vulnerability and the sender transmits message m together with hash(K⏜m), then an attacker can modify this to message m⏜mʹ together with hash(K⏜m⏜mʹ), *without knowing K*. 
+
+This problem can be defeated by reversing the order and using hash(m⏜K), but this now introduces potential collision vulnerabilities: if the hash function has the length-extension vulnerability and two messages m\ :sub:`1` and m\ :sub:`2` hash to the same value, then so will m\ :sub:`1`\ ⏜K and m\ :sub:`2`\ ⏜K. 
+
+.. index::
+	single: HMAC
+	single: Hash Message Authentication Code
+
+Taking these vulnerabilities into account, :rfc:`2104` defines the **Hash Message Authentication Code**, or HMAC, as follows; it can be used with any secure-hash function whether or not it has the length-extension vulnerability. The 64-byte length here comes from the typical input-block length of many secure-hash functions; it may be increased as necessary. (SHA-512, of the SHA-2 family, has a 128-byte input-block length and would be a candidate for such an increase.)
+
++ The shared key K is extended to 64 bytes by padding with zeroes.
++ A constant string **ipad** is formed by repeating the octet 0x36 (0011 0110) 64 times.
++ A constant string **opad** is formed by repeating 0x5c (0101 1100) 64 times.
++ We set **K1** = K XOR **ipad**.
++ We set **K2** = K XOR **opad**. 
+
+Finally, the HMAC value is 
+
+| HMAC = hash(**K2** ⏜ hash(\ **K1**\ ⏜\ **mesg**))
+
+The values 0x36 (0011 0110) and 0x5c (0101 1100) are not critical, but the XOR of them has, by intent, a reasonable number of both 0-bits and 1-bits; see [BCK96]_.
+
+The HMAC algorithm is, somewhat surprisingly, believed to be secure even when the underlying hash function is vulnerable to some kinds of collision attacks; see [MB06]_ and :rfc:`6151`. That said, a hash function vulnerable to collision attacks may have other vulnerabilities as well, and so HMAC-MD5 should still be phased out.
+
+Negotiating the pre-arranged key K can be a significant obstacle, just as it can be for ciphers using pre-arranged keys (:ref:`encryption`). If Alice and Bob meet in person to negotiate the key K, then Alice can use HMAC for authentication of Bob, as long as K is not compromised: if Alice receives a message signed with K, she knows it must have come from Bob.
+
+Sometimes, however, K is negotiated on a per-session basis, without definitive "personal" authentication of the other party. This is akin to Alice and someone claiming to be "Bob" selecting an encryption key using the Diffie-Hellman-Merkle mechanism (:ref:`diffie-hellman`); such key selection is secure and does not require that Alice or Bob have any prior knowledge of one another. In the HMAC setting, Alice can be confident that any HMAC-signed message was sent by the same "Bob" that negotiated the key, and not by a third party (assuming neither side has leaked the key K). This is true even if Alice is not sure "Bob" is the real Bob, or has no idea who "Bob" might be. The signature guarantees the message *integrity*, but also serves as *authentication* that the sender is the same entity who sent the previous messages in the series.
+
+
+.. index::
+	single: non-repudiation
+
+Finally, if Alice receives a message from Bob signed with HMAC using a pre-arranged secret key K (:ref:`HMAC`), Alice may herself trust the signature, but she cannot prove to anyone else that K was used to sign the message without divulging K. She also cannot prove to anyone else that Bob is the only other party who knows K. Therefore this signature mechanism provides authentication but not non-repudiation.
+
+
+
+.. index::
+	single: password hash
+	single: hash, password
+
+.. _password hashes:
+
+Password Hashes
+------------------
+
+A site generally does not store user passwords directly; instead, a hash of the password, h(p), is stored. The cryptographic hash functions above, |eg| MD5 and SHA-n, work well as long as the password file itself is not compromised. However, these functions all execute very quickly -- by design -- and so an attacker who succeeds in obtaining the password file can usually extract passwords simply by calculating the hash of every possible password. There are about 2\ :sup:`14` six-letter English words, and so there are about 2\ :sup:`38` passwords consisting of two such words and three digits. Such passwords are usually considered rather strong, but brute-force calculation of h(p) for 2\ :sup:`38` possible values of p is quite feasible for the hashes considered so far. Checking 10\ :sup:`8` MD5-hashed passwords per second is quite feasible; this means 2\ :sup:`38` = 256 × 2\ :sup:`30` ≃ 256 × 10\ :sup:`9` passwords can be checked in under 45 minutes. Use of a `GPU <http://en.wikipedia.org/wiki/Graphics_processing_unit>`_ increases the speed at least 10-fold.
+
+.. index::
+	single: scrypt
+	single: bcrypt
+	single: PBKDF2
+	single: argon2
+
+Special hashes have been developed to address this. Two well-known ones are scrypt ([CP09]_ and this `Internet Draft <https://tools.ietf.org/html/draft-josefsson-scrypt-kdf-00>`_) and `bcrypt <http://en.wikipedia.org/wiki/Bcrypt>`_. A newer entrant is `Argon2 <https://en.wikipedia.org/wiki/Argon2>`_, while `PBKDF2 <https://en.wikipedia.org/wiki/PBKDF2>`_ is an old stalwart. The goal here is to develop a hash that takes -- ideally -- the better part of a second to calculate even once, and which cannot easily be sped up by large precomputed tables. Typically these are something like a thousand to a million times slower than conventional hash functions like MD5 and the SHA-2 family; a millionfold-slower hash function is the equivalent of making the passwords longer by 20 random bits (10\ :sup:`6` ≃ 2\ :sup:`20`). See [ACPRT16]_ for a theoretical analysis of the effectiveness of scrypt in this context. See also :rfc:`2898`, section 4.2, though the proposal there is only a thousandfold slower.
+
+.. index::
+	single: salt, password
+	single: nonce
+
+(Good password tables also incorporate a *salt*, or *nonce*: a random string s is chosen and appended to the password before hashing; the password record is stored as the pair ⟨s,h(p⏜s)⟩. This means that cracking the password for one user will not expose a second user who has chosen exactly the same password, so long as the second user has a different salt s. Salting, however, does not change the scenarios outlined above.)
+
+.. index::
+	single: challenge-handshake authentication
+	single: chap authentication
+
+.. _chap:
+
+CHAP
+---------------------------------------------
+
+Secure hashes can also be used to provide secure password-based login authentication in the presence of eavesdropping. Specific implementations include CHAP, the Challenge-Handshake Authentication Protocol (:rfc:`1994`) and Microsoft's MS-CHAP (version 1 in :rfc:`2433` and version 2 in :rfc:`2759`). The general idea is that the server sends a random string (the "challenge") and the client then creates a response consisting of a secure hash of the challenge string concatenated with the user's password (and possibly other information). Assuming the secure hash is actually secure, only someone in possession of the user password could have created this response. By the same token, an eavesdropper cannot figure out the password from the response. 
+
+While such protocols can be quite secure in terms of verifying to the server that the client knows the password, the CHAP strategy has a fundamental vulnerability: the server must store the plaintext password rather than a secure hash of it (as in the previous section). An attacker who makes off with the server's password file then has everything; no brute-force password cracking is needed. For this reason, newer authentication protocols often will create an encrypted channel first (|eg| using TLS, :ref:`tls`), and then use that secure channel to exchange credentials. This may involve transmission of the *plaintext* password, which clearly allows the server to store only hashed passwords. However, as the next example shows, it *is* possible to authenticate without having the server store plaintext passwords and without having the plaintext password transmitted at all.
+
+.. index::
+	single: SCRAM authentication
+	single: ClientKey
+	single: ClientSignature
+	single: StoredKey
+	single: nonce
+
+SCRAM
+-------------
+
+SCRAM (Salted Challenge-Response Authentication Mechanism), :rfc:`5802`, is an authentication protocol with the following features:
+
++ The client password is not transmitted in the clear
++ The server does not store the plaintext client password
++ If the server's hashed credentials are compromised, an attacker still cannot authenticate
+
+We outline a very stripped-down version of the protocol: password salting has been removed for clarity, and the exchange itself has been greatly simplified. The **ClientKey** is a hashed version of the password; what the server stores is a secure hash of the ClientKey called **StoredKey**:
+
+::
+
+ StoredKey = hash(ClientKey)
+
+The exchange begins with the server sending a random **nonce** string to the client. The client now calculates the **ClientSignature** as follows:
+
+::
+
+ ClientSignature = hash(StoredKey, nonce)
+
+Only an attacker who has eavesdropped on this exchange can replicate the ClientSignature, but the server can compute it. The client then sends the following to the server:
+
+::
+
+  ClientKey XOR ClientSignature
+
+Because the server can calculate ClientSignature, it can extract ClientKey, and verify that h(ClientKey) = StoredKey. An attacker who has obtained StoredKey from the server can generate ClientSignature, but cannot generate ClientKey.
+
+However, an attacker who has *both* exfiltrated StoredKey from the server *and* eavesdropped on a client-server exchange is able to generate the ClientSignature and thus extract the ClientKey. The attacker can then authenticate at a later time using ClientKey. For this reason, a secure tunnel is still needed for the authentication. Given the presence of such a tunnel, the SCRAM approach appears to offer a relatively modest security improvement over sending the password as plaintext. Note, though, that with SCRAM the server does not see the password at all, so if the client mistakenly connects to the wrong server, the password is not revealed.
+
+See below at :ref:`SAE` for another, mutual, form of password authentication.
+
+
+.. index::
+	single: encryption
+	single: shared-key ciphers
+	single: symmetric ciphers
+
+.. _encryption:
+
+Shared-Key Encryption
+======================
+
+Secure hashes can provide authentication, but to prevent eavesdropping we need encryption. While **public-key** encryption (:ref:`public key`) is perhaps more glamorous, the workhorse of the encryption world is the **shared-key cipher**, or **shared-secret** or **symmetric** cipher, in which each party has possession of a key K, used for both encryption and decryption. 
+
+Shared-key ciphers are often quite fast; public-key encryption is generally slower by several orders of magnitude. As a result, if two parties without a shared key wish to communicate, they will almost always used public-key encryption only to exchange a key for a shared-key cipher, which will then be used for the actual message encryption. 
+
+Typical key lengths for shared-key ciphers believed secure range from 128 bits to 256 bits. For most shared-key ciphers there are no known attacks that are much faster than brute force, and 2\ :sup:`256` ≃ 10\ :sup:`77` is quite a large number.
+
+Shared-key ciphers can be either **block ciphers**, encrypting data in units of blocks that might typically be 8 bytes long, or **stream** ciphers, which generate a pseudorandom **keystream**. Each byte (or even bit) of the message is then encrypted by (typically) XORing it with the corresponding byte of the keystream.
+
+.. index::
+	single: session key
+
+.. _session keys:
+
+Session Keys
+-------------
+
+The more messages a key is used to encrypt, the more information a potential eavesdropper may have with which to launch a codebreaking attack. If Alice and Bob have a pre-arranged shared secret key K, is therefore quite common for them to encrypt the bulk of their correspondence with temporary **session keys**, each one used for a time period that may range from minutes to days. The secret key K might then be used only to exchange new session keys and to forestall man-in-the-middle attacks (:ref:`man in the middle`) by signing important messages (:ref:`HMAC`). If Diffie-Hellman-Merkle key exchange (ref:`diffie-hellman`) is used, K might be reserved *only* for message signing. 
+
+Sometimes session keys are entirely different keys, chosen randomly; if such a key is discovered, the attacker learns nothing about the secret key K. Other times, the session key is a mash-up of K and some additional information (such as an initialization vector, :ref:`cipher modes`), that is transmitted in the clear. The session key might then be the concatenation of K and the initialization vector, or the XOR of the two. Either approach means that an eavesdropper who figures out the session key also has the secret key K, but the use of such session keys still may make any codebreaking attempt much more difficult. 
+
+In :ref:`forward secrecy` we consider the reverse problem of how Alice and Bob might keep a session key private even if the secret key is compromised. 
+
+.. _block cipher:
+
+Block Ciphers
+--------------
+
+As mentioned, a block cipher encrypts data one block at a time, typically with a key length rather longer than the block size. A typical block cipher proceeds by the iterated application of a sequence of **round functions**, each updating the block and using some round-dependent substring of the key as auxiliary input. If we start with a block of plaintext P and apply all the round functions in turn, the result is the ciphertext block C = E(P,K) = E\ :sub:`K`\ (P). The process can be reversed so that P = D(C,K) = D\ :sub:`K`\ (C).
+
+.. index::
+	single: Feistel network
+
+A common framework is that of the **Feistel network**. In such an arrangement, the block is divided into two or more words sized for the machine architecture; an 8-byte block is typically divided into two 32-bit words which we can call L and H for Low and High. A typical round function is now of the following form, where K is the key and F(x,K) takes a word x and the key K and returns a new word:
+
+ | ⟨L,H⟩ ⟶ ⟨H, L XOR F(H,K)⟩
+
+Visually, this is often diagrammed as
+
+.. image:: 	images/security/feistel.svg
+
+One round here scrambles only half the block, but the other half gets scrambled in the next round (sometimes the operation above is called a half-round for that reason). The total number of rounds is typically somewhere between 10 and 50. Much of the art of designing high-quality block ciphers is to come up with round functions that result in overall very fast execution, without introducing vulnerabilities. The more rounds, the slower.
+
+The internal function F, often different for each round, may look at only a designated subset of the bits of the key K. Note that the operation above is invertible -- that is, can be decrypted -- regardless of F; given the right-hand side the receiver can compute F(H,K) and thus, by XORing this with L XOR F(H,K), can recover L. This remains true if, as is sometimes the case, the XOR operation is replaced with ordinary addition.
+
+.. index::
+	single: Lisp
+
+.. sidebar:: Crypto Law
+
+	The Salsa20 cipher mentioned here is a member of Daniel Bernstein's "snuffle" family of ciphers based on secure-hash functions. In the previous century, the US government banned the export of ciphers but not secure-hash functions. They also at one point banned the export (and thus publication) of one of Bernstein's papers; he sued. In 1999, the US Court of Appeals for the Ninth Circuit found in his favor. The decision, `176 F.3d 1132 <http://epic.org/crypto/export_controls/bernstein_decision_9_cir.html>`_, is the only appellate decision of which the author is aware that contains (in the footnotes) not only samples of C code, but also of Lisp.
+
+.. index:: 
+	single: Salsa20
+
+A simple F might return the result of XORing H and a subset of the bits of K. This is usually a little *too* simple, however. Ordinary modulo-32 addition of H and a subset of K often works well; the interaction of addition and XORing introduces considerable bit-shuffling (or *diffusion* in the language of cryptography). Other operations used in F(H,K) include Boolean AND and OR operations. 32-bit multiplication introduces considerable bit-shuffling, but is often computationally more expensive. The **Salsa20** cipher of [DB08]_ uses only XOR and addition, for speed. 
+
+It is not uncommon for the round function also to incorporate "bit rotation" of one or both of L and H; the result of bit-rotation of 1000 **111**\ 0 two places to the left is 00\ **11** **1**\ 010.
+
+If a larger blocksize is desired, say 128 bits, but we still want to avail ourselves of the efficiency of 32-bit operations, the block can be divided into ⟨A,B,C,D⟩. The round function might then become
+
+ | ⟨A,B,C,D⟩ ⟶ ⟨B,C,D, (A XOR F(B,C,D,K)) ⟩
+
+As mentioned above, many secure-hash functions use block-cipher round functions that then use successive chunks of the message being hashed in place of the key. In the MD5 algorithm, block A above is transformed into the 32-bit sum of input-message fragment M, a constant K, and G(B,C,D) which can be any of several Boolean combinations of B, C and D.
+
+An alternative to the Feistel-network framework for block ciphers is the use of so-called `substitution-permutation networks <https://en.wikipedia.org/wiki/Substitution-permutation_network>`_.
+
+.. index::
+	single: DES
+
+The first block cipher in widespread use was the federally sanctioned Data Encryption Standard, or **DES** (commonly pronounced "dez"). It was developed at IBM by 1974 and then selected by the US National Bureau of Standards (NBS) as a US standard after some alterations recommended by the National Security Agency (`NSA <https://www.nsa.gov/>`_). One of the NSA's recommendations was that a key size of 56 bits was sufficient; this was in an era when the US government was very concerned about the spread of strong encryption. For years, many people assumed the NSA had intentionally introduced other weaknesses in DES to facilitate government eavesdropping, but after forty years no such vulnerability has been discovered and this no longer seems so likely. The suspicion that the NSA had in the 1970's the resources to launch brute-force attacks against DES, however, has greater credence. 
+
+In 1997 an academic team launched a successful brute-force attack on DES. The following year the Electronic Frontier Foundation (EFF) built a hardware DES cracker for about US$250,000 that could break DES in a few days.
+
+.. index::
+	single: triple DES
+	single: 3DES
+
+
+In an attempt to improve the security of DES, triple-DES or **3DES** was introduced. It did not become an official standard until the late 1990's, but a two-key form was proposed in 1978. 3DES involves three applications of DES with keys ⟨K1,K2,K3⟩; encrypting a plaintext P to ciphertext C is done by C = E\ :sub:`K3`\ (D\ :sub:`K2`\ (E\ :sub:`K1`\ (P))). The middle deciphering option D\ :sub:`K2` means the algorithm reduces to DES when K1 = K2 = K3; it also reduces exposure to a particular vulnerability known as "meet in the middle" (no relation to "man in the middle"). In [MH81]_ it is estimated that 3DES with three distinct keys has a strength roughly equivalent to 2×56 = 112 bits. That same paper also uses the meet-in-the-middle attack to show that straightforward "double-DES" encryption C = E\ :sub:`K2`\ (E\ :sub:`K1`\ (P)) has an effective keystrength of only 56 bits -- no better than single DES -- if sufficient quantities of plaintext and corresponding ciphertext are known.
+
+.. index::
+	single: AES
+	single: Rinjdael
+
+As concerns about the security of DES continued to mount, the US National Institute of Standards and Technology (NIST, the new name for the NBS) began a search for a replacement. The result was the Advanced Encryption Standard, **AES**, officially approved in 2001. AES works with key lengths of 128, 192 and 256 bits. The algorithm is described in [DR02]_, and is based on the Rijndael family of ciphers; the name Rijndael ("rain-dahl") is a combination of the authors' names.
+
+.. index::
+	single: IDEA
+	single: Blowfish
+
+Earlier non-DES ciphers include **IDEA**, the International Data Encryption Algorithm, described in [LM91]_, and **Blowfish**, described in [BS93]_. Both use 128-bit keys. The IDEA algorithm was patented; Blowfish was intentionally not patented. A successor to Blowfish is Twofish.
+
+.. |H1| replace:: H\ :sub:`1`
+.. |H2| replace:: H\ :sub:`2`
+
+.. index::
+	single: cipher modes
+	single: ECB mode
+
+.. _cipher modes:
+
+Cipher Modes
+--------------------
+
+The simplest encryption "mode" for a block cipher is to encrypt each input block independently. That is, if |Pi| is the ith plaintext block, then the ith ciphertext block |Ci| is E(|Pi|,K). This is known as electronic codebook or **ECB** mode.
+
+ECB is vulnerable to known-plaintext attacks. Suppose the attacker knows that the message is of the following form, where the vertical lines are the block boundaries:
+
+::
+
+ Bank Transfer  |  to MALLORY  |  Amount $1000
+
+If the attacker also knows the ciphertext for "Amount $100,000", and is in a position to rewrite the message (or to inject a new message), then the attacker can combine the first two blocks above with the third $100,000 block to create a rather different message, without knowing the key. At http://en.wikipedia.org/wiki/Block_cipher_mode_of_operation there is a remarkable example of the failure of ECB to fail to effectively conceal an encrypted image.
+
+.. index::
+	single: CBC mode
+
+As a result, ECB is seldom used. A common alternative is cipher block chaining or **CBC** mode. In this mode, each plaintext block is XORed with the previous ciphertext block before encrypting:
+
+ |  |Ci| = E(K,C\ :sub:`i-1` XOR |Pi|)
+
+To decrypt, we use
+
+ |  |Pi| = D(K,\ |Ci|) XOR C\ :sub:`i-1`
+
+.. index::
+	single: initialization vector
+	single: IV
+
+If we stop here, this means that if two messages begin with several identical plaintext blocks, the encrypted messages will also begin with identical blocks. To prevent this, the first ciphertext block C\ :sub:`0` is a random string, known as the **initialization vector**, or IV. The plaintext is then taken to start with block P\ :sub:`1`. The IV is sent in the clear, but contains no private information.
+
+CBC works well when encrypting reliable streams of data, such as are delivered by TCP. But CBC is more difficult if some packets might be lost, as may occur with UDP transport. If one cipher block is lost, say C\ :sub:`i-1`, then we cannot decrypt |Ci|, because we need to XOR the lost block into the final mix. We *can* decrypt C\ :sub:`i+1`, and subsequent cipher blocks, but if |Ci| starts a packet, then that packet is effectively lost, and so the nondelivery of one packet leads to the effective loss of two. 
+
+See exercise |CBCflip|.
+
+.. index::
+	single: stream ciphers
+	single: keystream
+	single: pseudorandom number generator
+	single: PRNG
+
+.. _stream ciphers:
+
+Stream Ciphers
+-----------------
+
+Conceptually, a stream cipher encodes one byte at a time. The cipher generates a pseudorandom **keystream**. If |Ki| is the ith byte of the keystream, then the ith plaintext byte |Pi| is encrypted as |Ci| = |Pi| XOR |Ki|. A stream cipher can be viewed as a special form of pseudorandom number generator or PRNG, though PRNGs used for numeric methods and simulations are seldom secure enough for cryptography.
+
+.. index::
+	single: one-time pad
+
+Simple XORing of the plaintext with the keystream may not seem secure, but if the keystream is in fact truly random then this cipher is unbreakable: to an attacker, all possible plaintexts are equally likely. A truly random keystream means that the entire keystream must be shared ahead of time, and no portion may ever be reused; this cipher is known as the **one-time pad**.
+
+Stream ciphers do not, by themselves, provide authenticity. An attacker can XOR something with the encrypted message to change it. For example, if the message is known to be
+
+::
+  
+ Transfer $ 02000 to Mallory
+            ^^
+
+then the attacker can XOR the two bytes over the "^" with '0' XOR '2', changing the character '0' to a '2' and the '2' to a '0'. The attacker does this to the encrypted stream, but the decrypted plaintext stream retains the change. Appending an authentication code such as HMAC, :ref:`HMAC`, prevents this.
+
+Stream ciphers are, in theory, well suited to the encryption of data sent a single byte at a time, such as data from a telnet session. The ssh protocol (:ref:`ssh`), however, generally uses block ciphers; when it has to send a single byte it pads the block with random data.
+
+.. index::
+	single: RC4
+	single: ARC4
+	single: ARCFOUR
+
+.. _RC4:
+
+RC4
+`````
+
+The RC4 stream cipher was quite widely used. It was developed by Ron Rivest at RSA Security in 1987, but never formally published. The code was leaked, however, and so the internal details are widely available. "Unofficial" implementations are sometimes called **ARC4** or ARCFOUR, the "A" for "Alleged". 
+
+RC4 was designed for very fast implementation in software; to this end, all operations are on whole bytes. RC4 generates a keystream of pseudorandom bytes, each of which is XORed with the corresponding plaintext byte. The keystream is completely independent of the plaintext.
+
+The key length can range from 5 up to 256 bytes. The unofficial protocol contains no explicit mechanism for incorporating an initialization vector, but an IV is well-nigh essential for stream ciphers; otherwise an identical keystream is generated each time. One simple approach is to create a session key by concatenating the IV and the secret RC4 key; alternatively (and perhaps more safely) the IV and the RC4 key can be XORed together.
+
+RC4 was the basis for the ill-fated WEP Wi-Fi encryption, :ref:`WEP failure`, due in part to WEP's requirement that the 3-byte IV precede the 5-byte RC4 key. The flaw there did not affect other applications of RC4, but newer attacks have suggested that RC4 be phased out.
+
+Internally, an RC4 implementation maintains the following state variables:
+
+ | An array S[] representing a permutation i→S[i] of all bytes
+ | two 8-bit integer indexes to S[], i and j
+
+S[] is guaranteed to represent a permutation (|ie| is guaranteed to be a 1-1 map) because it is initialized to the identity and then all updates are transpositions (involving swapping S[i] and S[j]).
+
+.. index::
+	single: key-scheduling algorithm, RC4
+
+Initially, we set S[i] = i for all i, and then introduce 256 transpositions. This is known as the **key-scheduling algorithm**. In the following, ``keylength`` is the length of the key ``key[]`` in bytes.
+
+::
+
+ J=0;	
+ for I=0 to 255:
+     J = J + S[I] + key[I mod keylength];
+     swap S[I] and S[J]
+
+As we will see in :ref:`WEP failure`, 256 transpositions is apparently not enough.
+
+After initialization, ``I`` and ``J`` are reset to 0. Then, for each keystream byte needed, the following is executed, where ``I`` and ``J`` retain their values between calls:
+
+::
+
+  I = (I+1) mod 256
+  J = J + S[I] mod 256
+  swap S[I] and S[J]
+  return S[ S[I] + S[J] mod 256 ]
+
+For ``I`` = 1, the first byte returned is ``S[ S[1] + S[S[1]] ]``.
+
+.. _block stream:
+
+Block-cipher-based stream ciphers
+------------------------------------
+
+.. index::
+	single: counter mode
+	single: CTR mode
+
+It is possible to create a stream cipher out of a block cipher. The first technique we will consider is **counter mode**, or **CTR** mode. The sender and receiver agree on an initial block, B, very similar to an initialization vector. The first block of the keystream, K\ :sub:`0`, is simply the encrypted block E(B,K). The ith keystream block, for i>0, is K\ :sub:`i` = E(B+i,K), where "B+i" is the result of treating B as a long number and performing ordinary arithmetic.
+
+Going from B+1 to B+(i+1) typically changes only one or two bits before encryption, but no significant vulnerability based on this has ever been found, and this form of counter mode is now widely believed to be as secure as the underlying block cipher.
+
+Note that the E(B+i), for different i, can also be computed in parallel; CBC encryption, by comparison, cannot be parallelized. Similarly, if cipher block j never arrives, then E(B+j) need never be computed.
+
+A related technique is to generate the keystream by starting with a secret key K and taking a secure hash of each of the successive concatenations K⏜1, K⏜2, |etc|. The drawback to this approach is that many secure-hash functions have not been developed with this use in mind, and unforeseen vulnerabilities may exist.
+
+Stream ciphers in general face an error-recovery problem, if the underlying transport is unreliable and so blocks may be lost. However, resynchronization after lost packets becomes trivial if each packet contains the block number i of the first cipher block of the packet; in some arrangements it is sufficient to include the packet number. The receiver can then easily compute E(B+i,K), |etc|, and decrypt the packet. 
+
+.. index::
+	single: WPA2 
+
+This technique is used in WPA2 encryption used by Wi-Fi. Individual Wi-Fi packets are, of course, frequently lost, but each packet contains a 6-byte packet number that enables decryption in the absence of previous packets. The packet numbers do not help eavesdroppers, as in the absence of losses they can be determined simply by keeping track of the packet count. 
+
+.. index::
+	single: cipher feedback mode
+	single: CFB mode
+
+The keystream calculated by counter mode is completely independent of the plaintext. This is not always the case. In **cipher feedback** mode, or CFB, we initialize C\ :sub:`0` to the initialization vector, and then define the keystream blocks |Ki| for i>0 as follows:
+
+ | |Ki| = E\ :sub:`K`\ (C\ :sub:`i-1`)
+
+As usual, |Ci| = |Pi| XOR |Ki| for i>0, so the right-hand side above is E\ :sub:`K`\ (P\ :sub:`i-1` XOR K\ :sub:`i-1`). The evolution of the keystream thus depends on earlier plaintext. However, if a cipher block is lost, the receiver now faces resynchronization problems.
+
+.. _encryption and authentication:
+
+Encryption and Authentication 
+------------------------------
+
+If the ciphertext is modified in transit, most decryption algorithms will happily "decrypt" it anyway, though perhaps to gibberish; encryption provides no implicit validity check. Worse, it is sometimes possible for an attacker to modify the ciphertext so as to produce a meaningful, intentional change in the resultant plaintext. Examples of this appear above in :ref:`stream ciphers` and :ref:`cipher modes`; for CBC block ciphers see exercise |CBCflip|. 
+
+It is therefore common practice to include HMAC authentication signatures (:ref:`HMAC`) with each encrypted message; the use of HMAC rather than a simple checksum ensures that an attacker cannot modify messages and have them still appear to be valid. HMAC may not identify the sender as positively as public-key digital signatures, :ref:`RSA signatures`, but it *does* positively identify the sender as the same entity with whom the receiver negotiated the key. This is all that is needed.
+
+Appending an HMAC signature does more than prevent garbled messages; there are attacks that, in the absence of such signatures, allow full decryption of messages (particularly if the attacker can create multiple ciphertexts and find out which ones the recipient was able to decrypt successfully). See [SV02]_ for an example.
+
+.. index::
+	single: MAC-then-encrypt
+	single: encrypt-and-MAC
+	single: encrypt-then-MAC
+
+There are three options for combining encryption with HMAC; for consistency with the literature we replace HMAC with the more general MAC (for Message Authentication Code):
+
+* MAC-then-encrypt: calculate the MAC signature on the plaintext, append it, and encrypt the whole
+* encrypt-and-MAC: calculate the MAC signature on the plaintext, encrypt the message, and append to that the MAC
+* encrypt-then-MAC: encrypt the plaintext and calculate the MAC of the ciphertext; append the MAC to the ciphertext
+
+These are analyzed in [BN00]_, in which it is proven that **encrypt-then-MAC** in general satisfies some stronger cryptographic properties than the others, although these properties may hold for the others in special cases. Encrypt-then-MAC means that no decryption is attempted of a forged or spoofed message.
+
+.. _WEP failure:
+
+Wi-Fi WEP Encryption Failure
+------------------------------
+
+The WEP (Wired-Equivalent Privacy) mechanism was the first Wi-Fi encryption option, introduced in 1999; see :ref:`wifi security`. It used RC4 encryption with either a 5-byte or 13-byte secret key; this was always appended to a 3-byte initialization vector that, of necessity, was sent in the clear. The RC4 session key was thus either 8 or 16 bytes; the shorter key was more common.
+
+There is nothing inherently wrong with that strategy, but the designers of WEP made some design choices that were, in retrospect, infelicitous:
+
++ the secret key was appended to the IV (rather than, say, XORed with it)
++ the IV was only three bytes long
++ a new RC4 keystream and new IV was used for each packet
+
+The third choice above was perhaps the more serious mistake. One justification for this choice, however, was that otherwise lost packets (which are common in Wi-Fi) would represent gaps in the received stream, and the receiver might have trouble figuring out the size of the gap and thus how to decrypt the later arrivals.
+
+A contributing issue is that the first byte of the plaintext -- a header byte from the Wi-Fi packet -- is essentially known. This first byte is generally from the Logical Link Control header, and contains the same value as the Ethernet Type field (see :ref:`wifi configurations`). All IP packets share the same value. Thus, by looking at the first byte of the encrypted packet, an attacker knows the first byte of the keystream.
+
+A theoretical WEP vulnerability was published in [FMS01] that proved all-too-practical in the real world. We will let K[] denote the 8-byte key, with K[0],K[1],K[2] representing the three-byte initialization vector and K[i] for 3≤i<8 representing the *secret* key. The attacker monitors the airwaves for IVs of a particular form; after about 60 of these are collected, the attacker can make an excellent guess at K[3]. Now a slightly different group of IVs is collected, allowing a guess at K[4] and so on. The bytes of the secret key thus fail sequentially. The attack requires about the same (modest) time for each key byte discovered, so a 16-byte total key length does not add much more security versus the 8-byte key.
+
+Because the IV is only three bytes, the time needed to collect packets containing the necessary special IV values is modest.
+
+We outline the attack on the first secret byte, K[3]. The IV's we are looking for have the form
+
+ | ⟨3,-1,X⟩
+
+where -1 = 255 for 8-bit bytes; these are sometimes called **weak IVs**. One IV in 2\ :sup:`16` is of this form, but a more careful analysis (which we omit) can increase the usable fraction of IVs substantially.
+
+To see why these IVs are useful, we need to go back to the RC4 key-scheduling algorithm, :ref:`RC4`. We start with an example in which the first six bytes of the key is 
+
+::
+
+  K[] = [3,-1,5,4,-14,3]
+
+The IV here is ⟨3,-1,5⟩. 
+
+Recall that the array S is initialized with S[i] = i; this represents S = S\ :sub:`0`. At this point, I and J are also 0. We now run the following loop, introducing one transposition to S per iteration:
+
+::
+
+ for I=0 to 255:
+     J = J + S[I] + K[I mod keylength];
+     swap S[I] and S[J]
+
+The first value of ``J``, when ``I`` = 0, is ``K[0]`` which is 3. After the first transposition, S is as follows, where the swapped values are in bold:
+
+.. image::	images/security/wep_crack_1.svg
+
+For the next iteration, ``I`` is 1 and ``J`` is 3+1+(-1) = 3 again. After the swap, S is
+
+.. image::	images/security/wep_crack_2.svg
+
+Next, ``I`` is 2 and ``J`` is 3+2+5 = 10. In general, if the IV were ⟨3,-1,X⟩, ``J`` would be 5+X.
+
+.. image::	images/security/wep_crack_3.svg
+
+At this point, we have processed the three-byte IV; the next iteration involves the first secret byte of ``K``. ``I`` is 3 and ``J`` becomes 10+1+\ ``K[3]`` = 15:
+
+.. image::	images/security/wep_crack_4.svg
+
+Recall that the first byte returned in the keystream is ``S[ S[1] + S[S[1]] ]``. At this point, that would be ``S[0+3]`` = 15. 
+
+From this value, 15, and the IV ⟨3,-1,5⟩, the attacker can calculate, by repeating the process above, that ``K[3]`` = 4. 
+
+If the IV were ⟨3,-1,X⟩, then, as noted above, in the ``I``\ =2 step we would have ``J`` = 5+X, and then in the ``I``\ =3 step we would have ``J`` = 6 + X + ``K[3]``. If Y is the value of the first byte of the keystream, using ``S[]`` as of this point, then ``K[3]`` = Y − X − 6 (assuming that X is not -5 or -4, so that ``S[0]`` and ``S[1]`` are not changed in step 3). 
+
+**If** none of ``S[0]``, ``S[1]`` and ``S[3]]`` are changed in the remaining 252 iterations, the value we predict here after three iterations -- |eg| 15 --  would be the first byte of the actual keystream. Treating future selections of the value ``J`` as random, the probability that one iteration does *not* select ``J`` in the set {0,1,3} -- and thus leaves these values alone -- is 253/256. The probability that the remaining iterations do not change these values in ``S[]`` is thus about (253/256)\ :sup:`252` ≃ 5%
+
+A 5% success rate is not terribly impressive, on the face of it. But 5% of the time we identify ``K[3]`` correctly, and the other 95% of the time the (incorrect) values we calculate for ``K[3]`` are uniformly, randomly distributed in the range 0 to 255. With 60 guesses, we expect about three correct guesses. The other 57 are spread about with, most likely, no more than two guesses for any one value. If we look for the value guessed most often, it is likely to be the true value of ``K[3]``; increasing the number of ⟨3,-1,X⟩ IVs will increase the certainty here. 
+
+For the sake of completeness, in the next two iterations, ``I`` is 4 and 5 respectively, and ``J`` is 15+4+(-14) = 5 and 5+4+3=12 respectively. The corresponding contents of ``S[]`` are
+
+.. image::	images/security/wep_crack_5.svg
+
+Now that we know ``K[3]``, the next step is to find ``K[4]``. Here, we search the traffic for IVs of the form ⟨4,-1,X⟩, but the general strategy above still works. 
+
+The [FMS01]_ attack, as originally described, requires on average about 60 weak IVs for each secret key byte, and a weak IV turns up about every 2\ :sup:`16` packets. Each key byte, however, requires a different IV, so any one IV has one chance per key byte to be a weak IV. To guess a key thus requires 60×65536 ≃ 4 million packets. 
+
+But we can do quite a bit better. In [TWP07]_, the number of packets needed is only about 40,000 on average. At that point the attack is entirely practical.
+
+This vulnerability was used in the attack on TJX Corp mentioned in the opening section.
+
+.. index::
+	single: Diffie-Hellman-Merkle key exchange
+	single: Hellman (Diffie-Hellman-Merkel)
+	single: Merkle (Diffie-Hellman-Merkel)
+
+.. _diffie-hellman:
+
+Diffie-Hellman-Merkle Exchange
+===============================
+
+How do two parties agree on a secret key K? They can meet face-to-face, but that can be expensive or even not possible. We would like to be able to encrypt, for example, online shopping transactions, which often occur at the spur of the moment.
+
+.. sidebar:: Diffie, Hellman and Merkle
+
+	Diffie and Hellman's paper [DH76]_ appeared in 1976, but they reference Merkle's later-published paper [RM78]_ as "submitted". In [MH04]_, Hellman suggested that the name of the key-exchange algorithm here should bear the names of all three contributors. The algorithm was apparently discovered in 1974 by `Malcolm Williamson <http://en.wikipedia.org/wiki/Malcolm_J._Williamson>`_ at `GCHQ <http://www.gchq.gov.uk>`_, but Williamson's work was classified.
+
+One approach is to use public-key encryption, below, but that came two years later. The Diffie-Hellman-Merkle approach, from [DH76]_ and [RM78]_, allows private key exchange without public keys.
+
+The goal here is for Alice and Bob to exchange information over a public network so that, at the end, Alice and Bob have determined a common key, and no eavesdropper can determine it without extraordinary computational effort. 
+
+As a warmup, we begin with a simple example. Alice and Bob each choose a number; say Alice chooses 7 and Bob chooses 9. Alice sends to Bob the value A = 3\ :sup:`7` = 2187, and Bob sends to Alice the value B = 3\ :sup:`9` = 19683. Alice then computes B\ :sup:`7` = 3\ :sup:`9×7`, and Bob computes A\ :sup:`7` = 3\ :sup:`7×9`. If they each use 32-bit arithmetic, they have each arrived at 2111105451 (the exact value is 1144561273430837494885949696427).
+
+The catch here is that any intruder with a calculator can recover 7 from A and 9 from B, by factoring. But if we make the arithmetic a little more complicated, this becomes extremely difficult.
+
+In the actual protocol, Alice and Bob agree, publicly, on a large prime p (typically several hundred digits) and a small value g, discussed below. Alice then chooses a<p, and sends to Bob the value A = g\ :sup:`a` mod p. Similarly, Bob chooses b<p and sends to Alice the value B = g\ :sup:`b` mod p. 
+
+As before, Alice and Bob now compute B\ :sup:`a` mod p and A\ :sup:`b` mod p, which both equal g\ :sup:`a×b` mod p. This becomes their shared secret, from which a key can be derived.
+
+.. index::
+	single: discrete logarithm problem
+	single: primitive root modulo p
+
+The question is whether an eavesdropper who knows A and B and g can compute a and b. This is the **discrete logarithm problem**, as in some mod-p sense a = log\ :sub:`g`\ (A). It is indeed believed to be computationally intractable, provided that the *order* of g -- the smallest k>0 such that g\ :sup:`k` = 1 modulo p, is large. In Diffie-Hellman-Merkle key exchange, g is a so-called **primitive root** modulo p, meaning that its order is p−1, the largest possible value. A naive attempt to compute a from A is to try each g\ :sup:`i` for i<p  until one finds a match; this is much too slow to be practical.
+
+.. index::
+	single: logjam attack
+
+There is some work involved in finding a suitable primitive root g given p, but that can be public, and is usually not *too* time-consuming; see the next section. Traditionally, reusing the same p and g was regarded as safe; in fact, popular (p,g) pairs for various lengths of p were published in :rfc:`2409` and :rfc:`3526`, and were (and still are) widely deployed. However, (p,g) reuse must be done with care; in particular, p must be large enough. Otherwise one may be vulnerable to the **logjam** attack described in [ABDGHSTVWZ15]_. For a fixed prime p, it turns out that relatively fast discrete-logarithm computation -- that is, finding a from g\ :sup:`a`, modulo p -- is possible if an attacker is able to pre-compute a very large table. For 512-bit primes, the average logarithm-calculation time in [ABDGHSTVWZ15]_, once the table was constructed, was 90 seconds. Time for calculation of the table itself took almost 10\ :sup:`5` core-hours, though that could be compressed into as little as one week with highly parallel hardware. By comparison, the authors were able to factor 512-bit RSA keys in about 5,000 core-hours; see :ref:`factoring times`.
+
+The authors of [ABDGHSTVWZ15]_ conjecture that the `NSA <https://www.nsa.gov/>`_ has built such a table for some well-known (and commonly used) 1024-bit primes. However, for those with fewer computational resources, the logjam attack also includes strategies for forcing common server implementations to downgrade to the use of 512-bit primes using TLS implementation vulnerabilities; |cf| the POODLE attack (first sidebar at :ref:`ssh and tls`).
+
+.. index::
+	single: man-in-the-middle attack
+
+The Diffie-Hellman-Merkle exchange is vulnerable to a **man-in-the-middle attack**, discussed in greater detail in :ref:`trust`. If Mallory intercepts Alice's g\ :sup:`a` and sends Bob his own g\ :sup:`a'`, and similarly intercepts Bob's g\ :sup:`b` and replaces it with his own g\ :sup:`b'`, then the Alice--Mallory link will negotiate key g\ :sup:`a×b'` and the Mallory-Bob link will negotiate g\ :sup:`a'×b`. Mallory then remains in the middle, intercepting, decryping, re-encrypting and forwarding each message between Alice and Bob. The usual fix is for Alice and Bob to *sign* their g\ :sup:`a` and g\ :sup:`b`; see :ref:`forward secrecy`.
+
+.. index::
+	single: fast arithmetic
+	single: arithmetic, fast
+
+.. _arithmetic:
+
+Fast Arithmetic
+---------------------------
+
+It is important to note that the basic arithmetic operations here -- |eg| calculating g\ :sup:`a` mod p -- can be done in **polynomial** time with respect to the number of binary digits in p, sometimes called the **bit-length** of p. This is not completely obvious, as the naive approach of multipying out g×g×...×g, a times, takes O(p) steps when a≃p, which is exponential with respect to the bit-length of p. The trick is to use repeated squaring: to compute g\ :sup:`41`, we note 41 = 101001 in binary, that is, 41 = 2\ :sup:`5` + 2\ :sup:`3` + 1, and so 
+
+ | g\ :sup:`41` = ((((g\ :sup:`2`)\ :sup:`2`)\ :sup:`2`)\ :sup:`2`)\ :sup:`2` × ((g\ :sup:`2`)\ :sup:`2`)\ :sup:`2` × g
+
+A simple python3 implementation of this appears at :ref:`an RSA key`.
+
+.. index::
+	single: fast primality testing
+	single: primality testing, fast
+	single: Prime Number Theorem
+
+It is also worth noting that even *finding* large primes is not obviously polynomial in the number of digits. We can, however, use fast `probabilistic primality testing <http://en.wikipedia.org/wiki/Fermat_primality_test>`_, and note that the `Prime Number Theorem <http://en.wikipedia.org/wiki/Prime_number_theorem>`_ guarantees that the number of candidates we must test to find a prime near a given number n is O(log n).
+
+Finally, there is in general no fast algorithm for finding a primitive root g modulo p -- a number such that g\ :sup:`k` = 1 mod p for k=p-1, but not for any smaller k. The straightforward approach involves factoring p-1, and in general factoring of large numbers is believed to be quite hard. However, finding primitive roots can be done for "special" primes, for example, primes p of the form p = 2q+1 for a second prime q. In this case, g<p is a generator if g\ :sup:`2` ≠ 1 mod p and g\ :sup:`q` = -1 mod p. Such special primes are straightforward to find, usually by searching first for the prime q and then checking if 2q+1 is also prime. However, this process is often considered too slow to be performed on demand, as part of an interactive exchange; instead, p and g are calculated in advance.
+
+
+.. index::
+	single: SAE
+	single: Dragonfly
+	single: WPA3
+	single: simultaneous authentication of equals
+
+.. _SAE:
+
+Simultaneous Authentication of Equals
+-----------------------------------------
+
+The Simultaneous Authentication of Equals protocol, or **SAE**, is an approach to *mutual* password authentication: each side has the password, and each side verifies to the other that it knows the password. Note that an exchange of passwords cannot achieve this. It can be compared to the WPA2 four-way handshake used in Wi-Fi, :ref:`wpa four-way handshake`; in fact, in the WPA3 standard SAE is partly replacing the four-way handshake. The SAE protocol was introduced in [DH08]_; a later variant, known as Dragonfly, is described in :rfc:`7664`. The version used in WPA3 is defined in the IEEE standard 802.11-2016. All are essentially the same protocol, with later versions including various technical cryptographic refinements.
+
+A secondary outcome of SAE, beyond mutual authentication, is that each side generates a shared secret that can be used as an encryption key. In this sense, SAE acts as a key-exchange protocol; |cf| :ref:`diffie-hellman`, and, in fact, parts of SAE strongly resemble Diffie-Hellman-Merkle key exchange.
+
+The SAE protocol will be presented here using arithmetic modulo a large prime number, although elliptic curves (sidebar at :ref:`RSA`) can also be used.
+
+Each side, Alice and Bob, initially knows a password, likely a string, and each side agrees on a large prime number p. Each side also agrees on a number g (known as the generator) such that the order of g modulo p -- the smallest k>0 such that g\ :sup:`k` = 1 modulo p -- is large. For most purposes a primitive root modulo p would be sufficient, though :rfc:`7664` (but not [DH08]_) requires that the order of g modulo p be a large prime divisor q of p-1. (If p=2q+1 for prime q, then g can be the square of a primitive root modulo p.) The requirement that q be prime is not used in the analysis here.
+
+Each side initially determines, from the string-format password, a numeric value PW < p. This starts with a hash of the password, modulo p, to create a seed value. PW is then calculated as seed\ :sup:`(p−1)/q` mod p. This ensures PW\ :sup:`q` mod p = 1. 
+
+The authentication starts with each side choosing random values ``rand`` and ``mask``, each less than the value of q. Alice's values are ``randA`` and ``maskA``, and likewise for Bob. Each side then computes the following:
+
+ | ``scal`` = (``rand`` + ``mask``) mod q
+ | ``elem`` = PW\ :sup:`−\ mask\ ` mod p
+
+The names here reflect the fact that ``scal`` is a scalar value, and ``elem`` is an element of the group generated by g, though for mod-p arithmetic this distinction is purely one of convention. The negative exponent in the second formula here refers to the multiplicative inverse mod p; PW\ :sup:`−\ mask` represents the (unique modulo p) number X such that X × PW\ :sup:`\ mask` mod p = 1.
+
+Let Alice's ``scal`` and ``elem`` be denoted ``scalA`` and ``elemA``, and Bob's ``scalB`` and ``elemB``. The first step of the protocol is for Alice and Bob to exchange their ``scal`` and ``elem`` values.
+
+One way to view this is that each side's value of ``rand`` represents that side's contribution to the key, and this value is hidden, or "masked", with ``mask``. 
+
+Each side now computes a secret K as follows. Alice computes
+
+ | K = (PW\ :sup:`scalB` × ``elemB``)\ :sup:`randA` mod p
+
+while Bob computes
+
+ | K = (PW\ :sup:`scalA` × ``elemA``)\ :sup:`randB` mod p
+
+We now show these two values of K are in fact equal. Since ``scal`` = ``rand+mask`` mod q, we can find N so ``scal`` = ``rand+mask+Nq`` in ordinary integer arithmetic. We now start with Alice's value of K:
+
+ | K = (PW\ :sup:`scalB` × elemB)\ :sup:`randA`
+ |   = (PW\ :sup:`(randB+maskB+Nq)` × PW\ :sup:`−maskB`)\ :sup:`randA`
+ |   = (PW\ :sup:`randB`)\ :sup:`randA`	         (because PW\ :sup:`q` mod p = 1)
+ |   = PW\ :sup:`randB × randA`
+
+This last value is the same for both Alice and Bob. For comparison with Diffie-Hellman-Merkle key exchange, note that there Alice and Bob both arrive at the same shared secret g\ :sup:`a×b`.
+
+The second, and final, step of the protocol involves an exchange of verification tokens. This is the password-verification step. Alice sends to Bob a value like the following, where Hash() is a suitable secure-hash function.
+
+ | Hash(K⏜elemA⏜scalA⏜elemB⏜scalB)
+
+Bob sends something similar. Alice and Bob have now each verified to the other that they knew the password. If Alice did not really know PW, and used an incorrect value instead, then she will get a different K, and Bob will know when the second-step tokens are exchanged. 
+
+Perhaps more importantly, an attacker who eavesdrops on the Alice-Bob exchange obtains nothing of use; there is no known offline dictionary attack. In this, SAE is much more resistant to eavesdropping than, say, the WPA2 handshake used by Wi-Fi. The second SAE step is protected by a secure-hash function, and, for the first step, knowing ``scal`` and ``elem`` convey nothing about PW, in large part due to the difficulty of solving the discrete logarithm problem. 
+
+The SAE protocol does require that Alice and Bob each keep a copy of the password cleartext, not a copy of the password hash. This seems unavoidable, given that Bob and Alice must each authenticate to one another.
+
+
+.. |sA| replace:: scal\ :sub:`A`
+.. |sB| replace:: scal\ :sub:`B`
+.. |eA| replace:: elem\ :sub:`A`
+.. |eB| replace:: elem\ :sub:`B`
+.. |rA| replace:: rand\ :sub:`A`
+.. |rB| replace:: rand\ :sub:`B`
+.. |mA| replace:: mask\ :sub:`A`
+.. |mB| replace:: mask\ :sub:`B`
+
+.. |Ci| replace:: C\ :sub:`i`
+.. |Pi| replace:: P\ :sub:`i`
+.. |Ki| replace:: K\ :sub:`i`
+
+
+
+
+                
+
+Exercises
+============
+
+*Exercises are given fractional (floating point) numbers, to allow for interpolation of new exercises.*
+
+\ 1.0 Modify the netsploit.c program of :ref:`the exploit` so that the NOPslide is about 1024 bytes long, and the NOPslide and shellcode are now *above* the overwritten return address in memory.
+
+\ 2.0 Disable ASLR on a Linux system by writing the appropriate value to /proc/sys/kernel/randomize_va_space. Now get the netsploit attack to work *without* having the attacked server print out a stack address. You *are* allowed beforehand to run a test copy of the server that prints its address.
+
+\ 3.0 Below are a set of four possible TCP-segment reassembly rules. These rules (and more) appear in [SP03]_. Recall that, once values for all positions j≤i are received, these values are acknowleged and released to the application; there must be some earlier "hole" for segments to be subject to reassembly at all.
+
+1. Always accept the first value received for each position.
+2. Always accept the last value received for each position, up until the value is released to the application.
+3. ["BSD"] For each new segment, discard each position from that segment if that position was supplied by an earlier packet with a left edge less than or equal to that of the new packet. Values in any remaining positions replace any previously received values.
+4. ["Linux"] Same as the previous rule, except that we only discard positions that were supplied by an earlier packet with a left edge *strictly smaller* than that of the new packet.
+
+For each of the following two sets of packet arrivals, give the reassembled packet. Values in the same column have the same position. Reassembled packets will all begin with "daa" and "ebb" respectively.
+
+(a).
+
+::
+
+ │ │a a a a a
+ │ │    b b b b b b b
+ │ │    c c c c
+ │d│
+
+(b).
+
+::
+
+ │ │    a a a a a
+ │ │b b b b b
+ │ │    c c c c c c
+ │ │      d d d
+ │e│
+
+\ 4.0 Suppose a network intrusion-detection system is 10 hops from the attacker, but the target is 11 hops, behind one more router R. Outline a strategy of tweaking the TTL field so that the NIDS receives TCP stream "helpful" and the target receives "harmful". Segments should either be disjoint or cover exactly the same range of bytes; you may assume that the target accepts the first segment for any given range of bytes.
+
+
+
+\ |CBCflip| Suppose Alice encrypts blocks P1, P2 and P3 using CBC mode (:ref:`cipher modes`). The initialization vector is C0. The encrypt and decrypt operations are E(P) = C and D(C) = P. We have
+
+* C1 = E(C0 XOR P1)
+* C2 = E(C1 XOR P2)
+* C3 = E(C2 XOR P3)
+
+Suppose Mallory intercepts C2 in transit, and replaces it with C2' = C2 XOR M; C1 and C3 are transmitted normally; that is, Bob receives [C1',C2',C3'] where C1' = C1 and C3' = C3. Bob now attempts to decrypt; C1' decrypts normally to P1 while C2' decrypts to gibberish. 
+
+Show that C3' decrypts to P3 XOR M. (This is sometimes used in attacks to flip a specific bit or byte, in cases where earlier gibberish does not matter.)
+
+.. |CBCflip| replace:: 5.0
+
+\ 6.0 Suppose Alice uses a block-based stream cipher (:ref:`block stream`); block i of the keystream is Ki and Ci = Ki XOR Pi. Alice sends C1, C2 and C3 as in the previous exercise, and Mallory again replaces C2 by C2 XOR M. What are the three plaintext blocks Bob deciphers?
+
+\ 7.0 Show that if p and q are primes with p = 2q + 1, then g is a primitive root mod p if g≠1, g\ :sup:`2`\ ≠1, and g\ :sup:`q`\ ≠1. (This exercise requires familiarity with modular arithmetic and primitive roots.)
+
+\ 8.0 Suppose we have a *short* message m, |eg| a bank PIN number. Alice wants to send message M to Bob that, without revealing m immediately, can be used later to verify that Alice knew m at the time M was sent. During this later verification, Alice may reveal m itself.
+
+(a). Suppose Alice simply sends M = hash(m). Explain how Bob can quickly recover m. 
+
+(b). How can Alice construct M using a secure-hash function, avoiding the problem of (a)? Hint: as part of the later verification, Alice can supply additional information to Bob.
+
+\ 9.0 In the example of :ref:`WEP failure`, suppose the IV is ⟨4,-1,5⟩ and the first two bytes of the key are ⟨10,20⟩. What is the first keystream byte ``S[ S[1] + S[S[1]] ]``?
+
+\ 10.0 Suppose Alice uses encryption exponent e=3 to three friends, Bob, Charlie and Deborah, with respective encryption moduli n\ :sub:`B`, n\ :sub:`C` and n\ :sub:`D`, all of which are relatively prime. Alice sends message m to each, encrypted as
+
++ C\ :sub:`B` = m\ :sup:`3` mod n\ :sub:`B`
++ C\ :sub:`C` = m\ :sup:`3` mod n\ :sub:`C`
++ C\ :sub:`D` = m\ :sup:`3` mod n\ :sub:`D`
+ 
+If Mallory intercepts all three encrypted messages, explain how he can efficiently decrypt m. Hint: the Chinese Remainder Theorem implies that Mallory can find C < n\ :sub:`B`\ n\ :sub:`C`\ n\ :sub:`D` such that
+
++ C = C\ :sub:`B`  mod n\ :sub:`B`
++ C = C\ :sub:`C`  mod n\ :sub:`C`
++ C = C\ :sub:`D`  mod n\ :sub:`D`
+
+(One simple way to avoid this risk is for Alice to include a timestamp and the recipient's name in each message, ensuring that she never sends exactly the same message twice.)
+
+\ 11.0 Repeat the key-creation of :ref:`an RSA key` using a 110-bit key. Extract the modulus from the key file, convert it to decimal, and attempt to factor it. Can you do the factoring in under a minute?
+
+\ 12.0 Below are a series of public RSA keys and encrypted messages; the encrypted message is c and the modulus is n=pq. In each case, find the original message, using the methods of :ref:`breaking the key`; you will have to factor n and then find d. For some keys, the Gnu/Linux ``factor`` command will be sufficient; for the larger keys consider `msieve <http://sourceforge.net/projects/msieve/>`_ or some other fast factorer. 
+
+Each number below is in decimal. The encryption exponent e is always 65537; the encryption is c = power(message,e,n). Each message is an ASCII string; that is, after the numeric message is converted to a string, the byte values are each in the range 32-127. The following Python function may be useful in converting numeric messages to strings:
+
+::
+
+	def int2ascii(n):
+	    if n==0: return ""
+	    return int2ascii(n // 256) + chr(n % 256)
+
+| (a) [64 bits] c=13467824835325843134
+|     n=15733922878520524621
+
+| (b) [96 bits] c=8007751471156136764029275727
+|     n=57644199986835279860947893727
+
+| (c) [104 bits] c=6642328489179330732282037747645
+|     n=17058317327334907783258193953123
+
+| (d) [127 bits] c=95651949760509273124353927897611145475
+|     n=122096824047754908887766043915630626757
+|     Limit for Gnu/Linux ``factor`` without the `GMP library <https://gmplib.org/>`_
+
+| (e) [185 bits] c=14898070767615435522751082309577192810119252877170446296
+|     n=36881105206579952723396854897336450502002018818436622611
+
+| (f) [210 bits] c=1030865591241775131254813948981782525587720826169501849049177362
+|     n=1089313781487492651628882855744766776820791642308868127824231021
+
+| (g) [280 bits]
+| c=961792929180423930042975913300802531765775361218349440433358416557620430721970697783
+| n=1265365011260907658483984328995361695181000868013851878620685943648084220336740539017
+
+| (h) [304 bits] 
+| c=17860252858059565448950681133486824440185752167054796213786228492658586864179401029486173539
+|      n=26294146550372428669569992924076340150116542153388301312743129088600749884420889043685502979
+
+

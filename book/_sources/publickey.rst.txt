@@ -1,0 +1,1534 @@
+ 
+.. sectnum::
+   :start: 29
+
+.. index::
+	single: cryptograpy
+	single: public-key encryption
+
+.. _security pkcrypto:
+.. _public key:
+
+Public-Key Encryption
+****************************
+
+Shared-key encryption is fast and efficient, and secure temporary keys can be negotiated via the Diffie-Hellman-Merkle algorithm (:ref:`diffie-hellman`). But how do you authenticate the other side? How can Alice be sure she has negotiated a key with Bob, rather than with the `NSA <https://www.nsa.gov/>`_ The signatures of :ref:`HMAC` depend on the pre-negotiated key; how does one authenticate new correspondents? 
+
+Alternatively, suppose Alice wants to send a secure messge to Bob, but circumstances prevent any back-and-forth negotiation of a key? This would apply if Alice wanted, for example, to send an encrypted email to Bob. How can Alice encrypt her message?
+
+The answer to both issues is *public*-key encryption, in which communicating entities can all publish the public part of their (public,private) keypair. We explore public-key encryption in this chapter.
+
+In public-key encryption, each party has a public encryption key |KE| and a private decryption key |KD|. Alice can publish her |KE| to the world, without making it feasible for an eavesdropper to determine |KD|. If Bob has Alice's |KE|, he can encrypt a message with it and send it to her; only someone in possession of Alice's |KD| can read it. The fundamental idea behind public-key encryption is that knowledge of |KE| should not offer any meaningful information about |KD|. 
+
+.. index::
+	single: RSA
+
+.. _RSA:
+
+RSA
+=================
+
+Public-key encryption was outlined in [DH76]_, but the best-known technique is arguably the RSA algorithm of [RSA78]_. (The RSA algorithm was discovered in 1973 by `Clifford Cocks <http://en.wikipedia.org/wiki/Clifford_Cocks>`_ at `GCHQ <http://www.gchq.gov.uk>`_, but was classified.) RSA is based on the idea that most arithmetic operations on a large number N take time that is polynomial in the number of bits in N, but *factoring* a large number N requires time that is exponential in the number of bits in N.
+
+To construct RSA keys, one first finds two very large primes p and q, perhaps 1024 binary digits each. These primes should be chosen at random, by choosing random N's in the right range and then testing them for primality until success. Let n = p×q.
+
+It now follows from `Fermat's little theorem <http://en.wikipedia.org/wiki/Fermat%27s_little_theorem>`_ that, for any integer m, m\ :sup:`(p-1)(q-1)` = 1 mod n (it suffices to show m\ :sup:`(p-1)(q-1)` = 1 mod p and m\ :sup:`(p-1)(q-1)` = 1 mod q).
+
+.. index::
+	single: Euclidean algorithm
+
+One then finds positive integers e and d so that e×d = 1 mod (p-1)(q-1); given any e relatively prime to both p-1 and q-1 it is possible to find d using the `Extended Euclidean Algorithm <http://en.wikipedia.org/wiki/Extended_Euclidean_algorithm>`_ (a simple Python implementation appears below in :ref:`an RSA key`). From the claim in the previous paragraph, we now know m\ :sup:`e×d` = (m\ :sup:`e`)\ :sup:`d` = m mod p. 
+
+If we take m as a message (that is, as a bit-string of length less than the bit-length of n, rather than as an integer), we encrypt it as c = m\ :sup:`e` mod n. We can decrypt c and recover m by calculating c\ :sup:`d` mod n = m\ :sup:`e×d` mod n = m.
+
+The public key is the pair ⟨n,e⟩; the private key is d. 
+
+.. index::
+	single: elliptic-curve cryptography
+
+.. sidebar:: Elliptic-curve cryptography
+
+	One of the concerns with RSA is that a faster factoring algorithm will someday make the encryption useless. A newer alternative is the use of *elliptic curves*; for example, the set of solutions modulo a large prime p of the equation y\ :sup:`2` = x\ :sup:`3` + ax + b. This set has a natural (but nonobvious) product operation completely unrelated to modulo-p multiplication, and, as with modulo-p arithmetic, finding n given B = A\ :sup:`n`, using this product operation, appears to be quite difficult. Several cryptographic protocols based on elliptic curves have been proposed; see `Wikipedia <http://en.wikipedia.org/wiki/Elliptic_curve_cryptography>`_.
+
+As with Diffie-Hellman-Merkle (:ref:`arithmetic`), the operations above can all be done in polynomial time with respect to the bit-lengths of p and q.
+
+The theory behind the security of RSA is that, if one knows the public key, the only way to find d in practice is to factor n. And factoring is a hard problem, with a long history. There are much faster ways to factor than to try every candidate less than √n, but it is still believed to require, in general, close-to-exponential time with respect to the bit-length of n. See :ref:`factoring times` below.
+
+RSA encryption is usually thousands of times slower than comparably secure shared-key ciphers. However, RSA needs only to be used to encrypt a secret key for a shared-key cipher; it is this latter key that actually protects the document. 
+
+For this reason, if a message is encrypted for multiple recipients, it is usually not much larger than if it were encrypted for only one: the additional space needed for each additional recipient is just the encrypted key for the shared-key cipher.
+
+Similarly, for digital-signature purposes Alice doesn't have to encrypt the entire message with her private key; it is sufficient (and much faster) to encrypt a secure hash of the message.
+
+If Alice and Bob want to negotiate a session key using public-key encryption, it is sufficient for Alice to know Bob's public key; Alice does not even need a public key. Alice can choose a session key, encrypt it with Bob's public key, and send it to Bob.
+
+
+We will look at an actual calculation of an RSA key and then an encrypted message in :ref:`an RSA key`.
+
+.. index::
+	single: signatures, RSA
+	single: digital signatures, RSA
+
+.. _RSA signatures:
+
+RSA and Digital Signatures
+------------------------------
+
+RSA can also be used for strong digital signatures (as can any public-key system in which the roles of the encryption and decryption keys are symmetric, and can be reversed). Suppose, as above, Alice's public key is the pair ⟨n,e⟩ and her private key is the exponent d. If Alice wants to sign a message m to Bob, she simply encrypts it using the exponent d from her *private* key; that is, she computes c = m\ :sup:`d` mod n. Bob, along with everyone else in the world, can then decrypt the resulting ciphertext c with Alice's *public* exponent e (that is, c\ :sup:`e`). If this yields a valid message, then Alice (or someone in possession of her key) must have been the sender.
+
+Generally, for signature purposes Alice will encrypt not her entire message but simply a secure hash of it, and then send both the message and the RSA-encrypted hash. Bob decrypts the encrypted hash, and the signature checks out if the result matches the hash of the corresponding message.
+
+The advantage of a public-key signature over an HMAC signature is that the former uses a key with long-term persistence, and can be used to identify the *individual* who sent the message. The drawback is that HMAC signatures are much faster.
+
+It is common for Alice to sign her message to Bob and then encrypt the message plus signature -- perhaps with Bob's public key -- before sending it all to Bob.
+
+Just as Alice probably prefers not to sign undated documents with her handwritten signature, she will likely prefer to apply her digital signature only to documents containing a timestamp. This helps deter replay attacks.
+
+.. index::
+	single: factoring RSA keys
+	single: number-field sieve
+	single: RSA factoring challenge
+
+.. _factoring times:
+
+Factoring RSA Keys
+----------------------------
+
+The security of RSA depends largely on the difficulty in factoring the key modulus n = pq (though it is theoretically possible that an RSA vulnerability exists that does not entail factoring). As of 2015, the factoring algorithm that appears to be the fastest for larger keys is the so-called `number-field sieve <http://en.wikipedia.org/wiki/General_number_field_sieve>`_; an early version of this technique was introduced in [JP88]_. A heuristic estimate of the time needed to factor a number n via this algorithm is exp(1.923×log(n)\ :sup:`1/3`\ ×log(log(n))\ :sup:`2/3`), where exp(x) = e\ :sup:`x` and log(x) is the natural logarithm. To a first approximation this is exp(k×L\ :sup:`1/3`), where L is the bit-length of N. This is sub-exponential (because of the exponent 1/3) but still extremely slow.
+
+.. sidebar:: Side Channels
+
+	Those placing serious reliance on the relative security levels outlined here should also be aware of the existence of so-called `side-channel attacks <https://en.wikipedia.org/wiki/Side-channel_attack>`_, |eg| making use of electromagnetic leakage from a computer to infer a key.
+
+The first factorization of an RSA modulus with 512 bits occurred in 1999 and was published in [CDLMR00]_;  this was part of the `RSA factoring challenge <http://en.wikipedia.org/wiki/RSA_Factoring_Challenge>`_. It took seven calendar months, using up to 300 processors in parallel. Fifteen years later, [ABDGHSTVWZ15]_ reported being able to do such a factorization in eight days on a 24-core machine (~5,000 core-hours), or in seven hours using 1800 cores. Some of the speedup is due to software implementation improvements, but most is due to faster hardware.
+
+If we normalize the number-field-sieve factoring time of a 512-bit n to 1, we get the following table of estimated relative costs for factoring larger n:
+
+==================	========================
+key length in bits	relative factoring time
+==================	========================
+512			1
+1024			8,000,000
+1536			8×10\ :sup:`11`
+2048			8×10\ :sup:`15`
+3072			3×10\ :sup:`22`
+4096			8×10\ :sup:`27`
+==================	========================
+
+From this we might conclude that 1024-bit keys are potentially breakable by a *very* determined and well-funded adversary, while the 2048-bit key length appears to be much safer. In 2011 `NIST <http://www.nist.gov/>`_\ 's recommended key length for RSA encryption increased to 2048 bits (publication `800-131A <http://csrc.nist.gov/publications/nistpubs/800-131A/sp800-131A.pdf>`_, Table 6). This is quite a bit larger than the 128-to-256-bit recommendation for shared-key ciphers, but RSA factoring attacks are *much* faster than trying all keys by brute force.
+
+Note that some parts of the factoring algorithm are highly parallelizable while other parts are less so; relative factoring times when using highly parallel hardware may therefore differ quite a bit.  See also :ref:`breaking the key`.
+
+.. index::
+	single: forward secrecy
+	single: perfect forward secrecy
+
+.. _forward secrecy:
+
+Forward Secrecy
+=====================
+
+Suppose Alice and Bob exchange a shared-key-cipher session key K\ :sub:`S` using their RSA keys. Later, their RSA keys are compromised. If the attacker has retained Alice and Bob's prior communications, the attacker can go back and decrypt K\ :sub:`S`, and then use K\ :sub:`S` to decrypt the entire session protected by K\ :sub:`S`.
+
+This is not true, however, if Alice and Bob had used Diffie-Hellman-Merkle key exchange. In that case, there is no encryption used in the process of negotiating K\ :sub:`S`, so no later encryption compromise can reveal K\ :sub:`S`. 
+
+This property is called **forward secrecy**, or, sometimes, *perfect* forward secrecy (other times, perfect forward secrecy adds the further requirement that the compromise of any other session key negotiated by Alice and Bob does not reveal information about K\ :sub:`S`).
+
+The advantage using public-key encryption along with Diffie-Hellman-Merkle key exchange, then, is that Alice can sign the key K\ :sub:`S` she sends to Bob. Assuming Bob is confident he has Alice's real public key, a man-in-the-middle attack (:ref:`trust`) becomes impossible.
+
+It is now common for public-key encryption to be used to sign all the transactions that are part of the Diffie-Hellman-Merkle exchange. When this is done, Alice and Bob gain both forward secrecy *and* protection from man-in-the-middle attacks.
+
+One drawback of forward secrecy, as described here, is that the Diffie-Hellman-Merkle key exchange nominally requires synchronous exchanges. If Alice is encrypting an email message to Bob, synchronous exchanges are probably not an option, as Bob may be offline at the time. 
+
+.. index::
+	single: prekey, and forward secrecy
+	single: X3DH encryption
+
+One approach to forward secrecy in asynchronous communication, used by the `X3DH <https://signal.org/docs/specifications/x3dh/>`_ protocol, is for Alice and Bob to generate **prekeys**. In the key exchange described above in :ref:`diffie-hellman`, Alice and Bob agree on a prime p and a generator g, and choose random values a and b respectively. They then exchange g\ :sup:`a` mod p and g\ :sup:`b` mod p. A prekey for Bob is simply a precomputed g\ :sup:`b`, shared with a server and signed by Bob. To avoid reuse, Bob will typically generate (and share) many prekeys. When Alice wants to send her asynchronous message, she simply asks the server for one of Bob's prekeys. With that and her own g\ :sup:`a`, she can then calculate the session key K\ :sub:`S` and encrypt the message. Alice's  g\ :sup:`a` must then be sent along with her encrypted message, so Bob can also calculate K\ :sub:`S` and decrypt the message. This prekey approach appears to be quite secure, though it does either commit everyone to using the same key-exchange prime p and generator g (the usual approach), or else requires the generation of a set of prekeys for every potential correspondent.
+
+Finally, we note that forward secrecy works best with ephemeral data streams, like browser sessions or voice calls, where the data no longer exists anywhere except in the captured, encrypted packets. But when the data consists of messages that have been archived, a compromise of the device on which they are archived is likely to yield them all; even if they are encrypted, a keylogger on the device may yield the necessary local passwords. While brute-force cracking of Alice's keys is a possibility, the most common way of obtaining those keys is probably through compromise of her computer. If an attacker succeeds at this, then that attacker will likely also have access to any messages Alice has archived on that computer, forward secrecy notwithstanding.
+
+.. index::
+	single: trust and public keys
+	single: man-in-the-middle attack
+
+.. _trust:
+.. _man in the middle:
+
+Trust and the Man in the Middle
+=====================================
+
+Suppose Alice wants to send Bob a message. Where does she find Bob's public key E\ :sub:`B`?
+
+If Alice goes to a public directory that is not completely secure and trustworthy, she may find a key that in fact belongs to Mallory instead. Alice may now fall victim to a **man-in-the-middle** attack, like that at the end of :ref:`diffie-hellman`:
+
++ Alice encrypts Bob's message using Mallory's public key E\ :sub:`Mal`, thinking it is Bob's
++ Mallory intercepts and decrypts the message, using his own decryption key D\ :sub:`Mal`
++ Mallory re-encrypts the message with Bob's real public key E\ :sub:`Bob`
++ Bob decrypts the message with D\ :sub:`Bob`
+
+Despite Mallory's inability to break RSA directly, he has read (and may even modify) Alice's message.
+
+Alice can, of course, get Bob's key directly from Bob. Of course, if Alice met Bob, the two could also exchange a key for a shared-key cipher.
+
+.. sidebar:: Wi-Fi in the Middle
+
+	One of the easiest settings at which to launch a man-in-the-middle attack is a public Wi-Fi hotspot, either as the hotspot owner or by setting up a rogue access point to which some customers mistakenly connect.
+
+We now come to the mysterious world of trust. Alice might trust Charlie for Bob's key, but not Dave. Alice doesn't have to meet Charlie to get Bob's key; all she needs is
+
++ a trusted copy of Charlie's public key
++ a copy of Bob's public key, together with Bob's name, *signed by* Charlie
+
+At the same time, Alice might trust Dave but not Charlie for Evan's key. And Bob might not trust Charlie *or* Dave for Alice's key. Mathematically, the trust relationship is neither symmetric nor transitive. To handle the possibility that trust might erode with time, signed keys often have an expiration date.
+
+.. index::
+	single: key-signing parties
+	single: certificate authorities
+	single: web of trust
+	single: PKI
+	single: public-key infrastructure
+
+At the small scale, **key-signing parties** are sometimes held in which participants exchange some keys directly and others indirectly through signing. This approach is sometimes known as the **web of trust**. At the large scale, **certificate authorities** (:ref:`CA`) are entities built into the TLS framework (:ref:`TLS`) that verify that a website's public key is as claimed; you are implicitly trusting these certificate authorities if your browser vendor trusts them. Both the web of trust and certificate authorities are examples of "public-key infrastructure" or **PKI**, which is, broadly, any mechanism for reliably tying public keys to their owners. For applications of public-key encryption that manage to avoid the need for PKI, by use of **cryptographically generated addresses**, see :ref:`ND security` and the discussion of .onion addresses at the end of :ref:`DNS`.
+
+.. index::
+	single: end-to-end encryption
+
+.. _end-to-end encryption:
+
+End-to-End Encryption
+===============================
+
+Many communications applications are based on the model of encryption from each end-user to the central server. For example, Alice and Bob might both use https (based on TLS, :ref:`TLS`) to encrypt their interactions with their email provider. This means Alice and Bob are now trusting that provider, who decrypts messages from Alice, stores them, and re-encrypts them when delivering them to Bob. 
+
+This model does protect Alice and Bob from Internet eavesdroppers who have not breached the security of the email provider. However, it also allows government authorities to order the email provider to turn over Alice and Bob's correspondence.
+
+If Alice and Bob do not wish to trust an intermediary, or their (or someone else's) government, they need to implement **end-to-end** encryption. That is, Alice and Bob must negotiate a key, use that key to encrypt messages between them, and not divulge the key to anyone else. This is quite a bit more work for Alice and Bob, and even more complicated if Alice wishes to use end-to-end encryption with a large number of correspondents.
+
+.. index::
+	single: subpoena
+	single: search warrant
+
+Of course, even with end-to-end encryption Alice may still be compelled by subpoena to turn over her correspondence with Bob, but that is a different matter. Alice's private key may also be seized under a search warrant. It is common (though not universal) to protect private keys with a password; this is good practice, but protecting a key having an effective length of 256 bits with a password having an effective length of 32 bits leaves something to be desired. The mechanisms of :ref:`password hashes` provide only limited relief. The mechanism of :ref:`forward secrecy` may be more useful here, assuming Alice can communicate to Bob that her previous key is now compromised; see also :ref:`revocation`.
+
+.. index::
+	single: ssh
+	single: tls
+	single: ssl
+
+.. _ssh and tls:
+
+SSH and TLS
+==============
+
+We now look at two encryption mechanisms in popular use on the Internet. The first is the Secure Shell, **SSH**, used to allow login to remote systems, remote command execution, file transfer and even some forms of VPN tunneling. Public-key-encryption is optional; if it is used, the public keys are generally transported manually.
+
+.. index::
+	single: POODLE vulnerability 
+
+.. sidebar::	POODLE
+
+	The 2014 `POODLE attack <https://www.openssl.org/~bodo/ssl-poodle.pdf>`_ was based in part on a long-known flaw in SSL 3.0. But SSL 3.0 is fifteen years obsolete (though it was not officially deprecated until 2015); the other flaw was a broken version-negotiation implementation in which the disruption of a few packets by an attacker could force both client and server to settle on SSL 3.0 even when both supported the latest TLS version. See :ref:`TLS negotiation`.
+
+.. index::
+	single: https
+
+The second example is the Transport Layer Security protocol, **TLS**, which is a successor of the Secure Sockets Layer, or **SSL**. Many people still refer to TLS by the SSL name even though TLS replaced SSL in 1999, though, to be fair, TLS is effectively an update of SSL, and TLS v1.0 could easily have been named SSL v4.0. TLS is used to encrypt web traffic for the HTTP Secure protocol, **https**; it is also used to encrypt traffic for several other applications and *can* be used, with appropriate programming, for any application. 
+
+If Alice wants to contact a server S using either SSH or TLS, at some point she will have to trust a public key claimed to be from S. A common approach with SSH is for Alice to accept the key on faith the first time it is presented, but then to save it for all future verifications. Under TLS, the key from S that Alice receives will have been signed by a certificate authority (:ref:`CA`); Alice presumably trusts this certificate authority. (SSH does now support certificate authorities too, but their use with SSH seems not yet to be common.)
+
+Both SSH and TLS eventually end up negotiating a shared-secret session key, which is then used for most of the actual data encryption.
+
+.. index::
+	single: ssh
+	single: secure shell
+
+.. _ssh:
+
+SSH
+-----
+
+The SSH protocol establishes an encrypted communications channel between two hosts, after establishing the identities of each endpoint. Its primary use is to enable secure remote-command execution with input and output via the secure channel; this includes the remote execution of an interactive shell, which is in effect a telnet-style terminal login with encryption. The companion program ``scp`` uses the SSH protocol to implement secure file transfer. Finally, ssh supports secure port forwarding from one machine (and port) to another; unrelated applications can then connect to one machine and find themselves securely talking to another. The current version of the SSH protocol is 2.0, and is defined in :rfc:`4251`. The authentication and transport sub-protocols are defined in :rfc:`4252` and :rfc:`4253` respectively.
+
+One of the first steps in an SSH connection is for the endpoints to negotiate which secret-key cipher (and mode) to use. Support of the following ciphers is "recommended" and there is a much longer list of "optional" ciphers (which include RC4 and Blowfish); the table below includes those added by :rfc:`4344`:
+
+==============	===========	====================
+cipher		modes		nominal keylength
+==============	===========	====================
+3DES		CBC, CTR	168 bits
+AES		CBC, CTR	192 bits
+AES		CTR		128 bits
+AES		CTR		256 bits
+==============	===========	====================
+
+SSH supports a special name format for including new ciphers for local use.
+
+The SSH protocol also allows the endpoints to negotiate a public-key-encryption mechanism, a secure-hash function, and even a key-exchange algorithm although only minor variants of Diffie-Hellman-Merkle key exchange are implemented. 
+
+If Alice wishes to connect to a server S, the server clearly wants to verify Alice's identity, either through a password or some other means. But it is just as important for Alice to verify the identity of S, to prevent man-in-the-middle attacks and the possibility that an attacker masquerading as S is simply collecting Alice's password for later use.
+
+The SSH protocol is not designed to minimize the number of round-trip packet exchanges, making SSH connection setup quite a bit slower than TLS connection setup (:ref:`TLS negotiation`). A connection may involve quite a few round trips to get started: the TCP three-way handshake, the protocol version exchange, the "Key Exchange Init" exchange, the actual Diffie-Hellman-Merkle key exchange, the "NewKeys" exchange, and the "Service Request" exchange (all but the first are documented in :rfc:`4253`). Still, multi-second delays can usually be reduced through performance tuning; enabling diagnostic output (|eg| with the ``-v`` option) is often helpful. A common delay culprit is a server-side DNS lookup of the client, fixable with a server-side configuration setting of ``UseDNS no`` or the equivalent.
+
+
+In the following subsections we focus on the "common" SSH configuration and ignore some advanced options.
+
+.. _ssh server authentication:
+
+Server Authentication
+```````````````````````````````
+
+.. index::
+	single: ssh host key
+	single: host key, ssh
+	single: known_hosts, ssh
+
+To this end, one of the first steps in SSH connection negotiation is for the server to send the public half of its **host key** to Alice. Alice verifies this key, which is typically in her ``known_hosts`` file. Alice also asks S to sign something with its host key. If Alice can then decrypt this with the public host key of S, she is confident that she is talking to the real S.
+
+If this is Alice's first attempt to connect to S, however, she should get a message like the one below:
+
+ | The authenticity of host 'S (10.2.5.1)' can't be established.
+ | RSA key fingerprint is da:2e:e3:94:84:6b:bf:6d:2f:e4:c3:76:68:72:a5:a0.
+ | Are you sure you want to continue connecting (yes/no)?
+
+.. index::
+	single: trust on first use, SSH
+
+If Alice is cautious, she may contact the administrator of S and verify the key fingerprint. More likely, she will simply choose "yes", in which case the host key of S will be added to her own ``known_hosts`` file; this latter strategy is sometimes referred to as **trust on first use**.
+
+If she later re-connects to S after the host key of S has been changed, she will get a rather more dire message, and, under the default configuration, she will not be allowed to continue until she manually removes the old, now-incorrect, host key for S from her ``known_hosts`` file.
+
+See also the ARP-spoofing scenario at :ref:`ARP security`, and the comment there about how this applies to SSH.
+
+SSH v2.0 now also supports a certificate-authority mechanism for verifying server host keys, replacing the ``known_hosts`` file. 
+
+
+Key Exchange
+```````````````````````
+
+The next step is for Alice's computer and S to negotiate a session key. After the cipher and key-exchange algorithms are negotiated, Alice's computer and S use the chosen key-exchange algorithm to agree on a session key for the chosen cipher. 
+
+The two directions of the connection generally get different session keys. They can even use different encryption algorithms.
+
+At this point the channel is encrypted. 
+
+Client Authentication
+```````````````````````````
+
+The server now asks Alice to authenticate herself. If password authentication is used, Alice types in her password and it and her username are sent to the server, over the now-encrypted connection. This does expose the server to brute-force password-guessing attacks, and is not infrequently disabled.
+
+Alice may also have set up **RSA authentication** (other types of public-key authentication are also possible). For this, Alice must create a public/private key pair (often in files ``id_rsa.pub`` and ``id_rsa``), and the public key must have been previously installed on S. On Unix-based systems it is often installed on S in the ``authorized_keys`` file in the ``.ssh`` subdirectory of Alice's home directory. If Alice now sends a message to S signed by her private key, S is in a position to verify the signature. If this succeeds, Alice can log in without supplying a password to S. 
+
+It is common though not universal practice for Alice's private-key file (on her own computer) to be protected by a password. If this is the case, Alice will need to supply that password, but it is used only on Alice's end of the connection. (The default password hash is MD5, which may not be a good choice; see :ref:`password hashes`.)
+
+Public-key authentication is tried before password authentication. If Alice has created a public key, it is likely to be tried even if she has not copied it to S.
+
+If S is set up to *require* public-key authentication, Alice may not have any direct way to install her public key on S herself, and may need the cooperation of the administrators of S. It is possible that the latter will send Alice a public/private keypair chosen by them specifically for S, rather than allowing Alice to choose her own keypair. The standard SSH user configuration does support different private keys for different servers.
+
+In several command-line implementations of ssh, the various stages of authentication can be observed from the client side by using the ``ssh`` or ``slogin`` command with the ``-v`` option.
+
+The Session
+`````````````````````
+
+Once an SSH connection has started, a new session key is periodically negotiated. :rfc:`4253` recommends this after one hour or after 1 GB of data is exchanged.
+
+Data is then sent in packets generally with size a multiple of the block size of the cipher. If not enough data is available, |eg| because only a single keystroke (byte) is being sent, the packet is padded with random data as needed. *Every* packet is required to be padded with at least four bytes of random data to thwart attacks based on known plaintext/ciphertext pairs. Included in the *encrypted* part of the packet is a byte indicating the length of the padding. 
+
+.. _tls:
+
+TLS
+------
+
+**Transport Layer Security**, or TLS, is an IETF extension of the Secure Socket Layer (SSL) protocol originally developed by `Netscape Communications <http://en.wikipedia.org/wiki/Netscape>`_. SSL went through published versions 2.0 and 3.0; the latter was introduced in 1996 and was officially deprecated by :rfc:`7568` in 2015 (see the POODLE sidebar above at :ref:`ssh and tls`). TLS 1.0 was introduced in 1999, as the IETF took ownership of the specification from Netscape. The current version of TLS is 1.2, specified in :rfc:`5246` (plus updates listed there). A draft of TLS 1.3 is in progress (2018); see `draft-ietf-tls-tls13 <https://tools.ietf.org/html/draft-ietf-tls-tls13>`_.
+
+The original and still primary role for TLS is encrypting web connections and verifying for the client the authenticity of the server. TLS can, however, be embedded in any network application. 
+
+Unlike SSH, *client* authentication, while possible, is not common; web servers often have no pre-existing relationship with the client. Also unlike SSH, the public-key mechanisms are all based on established **certificate authorities**, or CAs, whereas the most common way for an SSH server's host key to end up on a client is for it to have been accepted by the user during the first connection. Browsers (and other TLS applications as necessary) have embedded lists of certificate authorities, known as **trust stores**, trusted by the browser vendor. SSH requires no such centralized trust.
+
+If Bob wishes to use TLS on his web server |Sbob|, he must first arrange for a certificate authority, say |CA1|, to sign his **certificate**. A certificate contains the full DNS name of |Sbob|, say |boborg|, a public key |SK| used by |Sbob|, and also an expiration date.  TLS uses the ITU-T `X.509 <https://en.wikipedia.org/wiki/X.509>`_ certificate format.
+
+.. sidebar:: The ``.int`` domain
+
+	For Bob to actually have a domain name in the ``.int`` top-level domain, as in the example here, Bob's organization must be established by international treaty. 
+
+Now imagine that Alice connect to Bob's server |Sbob| using TLS. Early in the process |Sbob| will send her its signed certificate, claiming public key |SK|. Alice's browser will note that the certificate is signed by |CA1|, and will look up |CA1| on its list of trusted certificate authorities. If found, the next step is for the browser to use |CA1|'s public key, also on the list, to verify the signature on the certificate |Sbob| sent. 
+
+If everything checks out, Alice's browser now knows that |CA1| certifies |boborg| has public key |SK|. As |Sbob| has presented this key |SK|, and is able to verify that it possesses the matching private key, this is proof that |Sbob| is legitimately the server with domain name |boborg|.
+
+Assuming, of course, that |CA1| is correct.
+
+As with SSH, once Alice has accepted the public key |SK| of |Sbob|, a secret-key cipher is negotiated and the remainder of the exchange is encrypted.
+
+
+.. index::
+	single: certificate authority
+	single: CA
+
+.. _CA:
+
+Certificate Authorities
+``````````````````````````
+
+A **certificate authority**, or CA, is just an entity in the business of signing certificates: messages that include a name |Sbob| and a verified public key |SK|. The purpose of the certificate authority is to  prevent man-in-the-middle attacks (:ref:`trust`); Alice wants to be sure she is not really connected to |Sbad| instead of to |Sbob|. 
+
+What the CA is actually signing is that the particular public key |SK| belongs to domain |boborg|, just like Charlie might sign Bob's public key on an individual basis. The difference here is that the CA is likely to be a large organization, and the CA's public key is likely to be embedded in the network application software somewhere. (Real CA's usually have a two-layer key signing arrangement, in which Bob's public key would be signed by one of the CA's subsidiary keys, but the effect is the same.)
+
+A certificate specific for |boborg| will not work for **www**\ .\ |boborg|, even though both DNS names might direct to the same server |Sbob|. If |Sbob| presents a certificate for |boborg| to a browser that has arrived at |Sbob| via the url http://www.\ |boborg|, the user should see a warning. It is straightforward, however, for the server either to support two certificates, or (if the certificate authority supports this) a single certificate for www.\ |boborg| with a `Subject Alternative Name <https://en.wikipedia.org/wiki/Subject_Alternative_Name>`_ also entered on the certificate for |boborg| alone. It is also possible to obtain "wildcarded" certificates for \*.\ |boborg| (though this does not match |boborg|; it also does not match names with two additional levels such as www.foo.\ |boborg|). :rfc:`6125`, §7.2, recommends against wildcard certificates, though they remain widely used.
+
+
+.. sidebar:: Firefox Certificates
+
+	As of this writing, certificate authorities for the popular Firefox browser are found in Preferences → Advanced → View Certificates. It is an interesting list, if only because, for such highly trusted organizations, few people have heard of more than a handful of them. The policy for becoming a Firefox CA is `here <https://www.mozilla.org/en-US/about/governance/policies/security-group/certs/policy/>`_.
+
+
+Popular browsers all use preset lists of CAs provided by (and presumably trusted by) either the browser vendor or the host operating-system vendor. **If** Alice is also willing to trust these CAs, she can feel comfortable using the key she receives to send private messages to Bob. That "if", however, is sometimes controversial. Just because Alice trusts her browser and operating system (|eg| not to contain malware), that does *not* automatically imply that Alice should trust these vendors' judgment when it comes to CAs.
+
+On the face of it, Bob's certificate authority |CA1| is just signing that domain name |boborg| has public key |SK|. This isn't *quite* the same, however, as attesting that the certificate-signing request actually came from Bob. All depends on how thorough |CA1| is in checking the identity of its customer, and since those customers typically choose the least expensive CA, there is sometimes an incentive to cut corners. 
+
+
+A certificate authority's failure to verify the identity of the party making the  certificate-signing request can enable a man-in-the-middle attack (:ref:`trust`). Suppose, for example, that Mallory is able to obtain a signed certificate from another certificate authority |CA2| linking |boborg| to key |SK2| controlled by Mallory. If Mallory can now position his server |Sbad| in the middle between Alice and |Sbob|,
+
+ | Alice ──── |Sbad| ──── |Sbob|
+
+then Alice can be tricked into connecting to |Sbad| instead of |Sbob|. Alice will request a certificate, but from |Sbad| instead of |Sbob|, and get Mallory's from |CA2| instead of Bob's actual certificate from |CA1|. Mallory opens a second connection from |Sbad| to |Sbob| (this is easy, as Bob makes no attempt to verify Alice's identity), and forwards information from one connection to the other. As far as TLS is concerned everything checks out. From Alice's perspective, Mallory's false certificate vouches for the key |SK2| of |Sbad|, |CA2| has signed this certificate, and |CA2| is trusted by Alice's browser. There is no "search" at any point through the other CAs to see if any of them have any contrary information about |Sbob|. In fact, there is not necessarily even contact with |CA2|, though see :ref:`revocation` below. 
+
+.. index::
+	single: badssl.com
+
+.. sidebar:: Certificate Errors
+
+	Sometimes certificate signatures fail to verify, either because they are expired or were improperly signed or the certificate authority is not recognized. The browser then receives the appropriate TLS error message and communicates the problem to the user. Examples can be found at `badssl.com <https://badssl.com/>`__; click the buttons there to see different errors.
+
+If the certificate authority |CA1| were also the domain registrar with whom Bob registered the DNS name |boborg|, it would be especially well-positioned to verify that Bob is really the owner of the |boborg| domain. But this is not generally the case. Quite often, the CA's primary verification method is to send an email to, say, bob@\ |boborg| (or perhaps to the DNS administrative contact listed in the WHOIS database for domain |boborg|). If someone responds to this email, it is assumed they must be legitimately part of the |boborg| domain. Another authentication strategy is for |CA1| to send a special file to be placed at, say, |boborg|/foo/bar/special.html; again, the idea is that only the domain owner would be able to do this. Note, however, that in the man-in-the-middle attack above, it does not matter what |CA1| does; what matters is the verification policy used by |CA2|.
+
+If Alice is very careful, she may click on the "lock" icon in her browser and see that the certificate authority signing her connection to |Sbad| is |CA2| rather than |CA1|. But if Alice has a secure way of finding Bob's "real" certificate authority, she might as well use it to find Bob's key |SK|. As she often does not, this is of limited utility in practice.
+
+The second certificate authority |CA2| might be a legitimate certificate authority that has been tricked, coerced or bribed into signing Mallory's certificate. Alternatively, it might be Mallory's own creation, inserted by Mallory into Alice's browser through some other vulnerability.
+
+.. index::
+	single: superfish
+
+.. sidebar:: Superfish
+
+	The "Superfish" vulnerability of 2015 involved an operating-system module (based on `LSP <http://en.wikipedia.org/wiki/Layered_Service_Provider>`_, `WFP <http://en.wikipedia.org/wiki/Windows_Filtering_Platform>`_ or, in principle, `iptables <http://en.wikipedia.org/wiki/Iptables>`_) that could intercept all browser TLS connections (thus acting as the man in the middle), together with software that could act as a certificate authority, generating new certificates (like Mallory's from |CA2|) on the fly. The apparent goal was to inject advertising into TLS-secured connections.
+
+Mallory's machinations here do require both the man-in-the-middle attack and the bad certificate. If Alice is able to establish a direct connection with |Sbob|, then the latter will send its true key |SK| signed by |CA1|.
+
+As another attack, Mallory might obtain a certificate for |b0borg| and hope Alice doesn't notice the spelling difference between B0B and BOB. When this is done, Mallory often also sends Alice a disguised link to |b0borg| in the hope she will click on it. Unicode domain names make this even easier, as Unicode provides many character pairs that are different but which look identical.
+
+Certificates tend to come with a number of constraints. First among them is that most certificates issued by CAs to end users (either corporations or individuals) are marked as "not a certificate authority", meaning that the certificate cannot be used to sign additional certificates. That is, the certificate trust relationship is *not transitive*. If Bob gets a certificate for |boborg|, he cannot use it to sign a certificate for Alice or, for that matter, Google. The second major restriction is on names: a certificate is almost always tied to a specific DNS name. As described above, multiple names can be accepted via the "subject alternative name" attribute, or by using a "wildcard" name like ``*.foo.com``. Finally, certificates often contain restrictions on how they can be used, in the "extended key usage" attribute. A typical entry is "TLS web server authentication", expressed as an OID (:ref:`SNMP naming`). These restrictions are enforced by the TLS library; it is possible outside that library to use the keys inside certificates for whatever you want.
+
+.. index::
+	single: extended-validation certificates
+
+**Extended-Validation** certificates were introduced in 2007 as a way of providing greater assurances that the certificate issued to |boborg| was in fact generated by a request from Bob himself; Mallory should in theory have a much harder time obtaining an EV certificate for |boborg| from |CA2|. Desktop browsers that have secured a TLS connection using an EV certificate typically add the name of the domain owner, highlighted in green and/or with a green padlock icon, to the address bar. Financial institutions often use EV certificates. So does `mozila.org <https://www.mozilla.org/>`_. 
+
+Of course, if Alice does not know Bob is using an EV certificate, she can still be tricked by Mallory as above. Alternatively, perhaps Alice is using a mobile device; most mobile browsers give little if any visual indication of EV certificates. Because the majority of browsing today (2018) is done on mobile devices, this severely limits the usefulness of these certificates.
+
+.. index::
+	single: certificate pinning
+	single: pinning, TLS certificates
+	single: trust on first use, TLS
+
+
+.. _pinning:
+
+Certificate pinning
+`````````````````````
+
+Another strategy intended as a more direct prevention of man-in-the-middle attacks is **certificate pinning**. Conceptually, Alice (or her browser) makes a note the first time she connects to |Sbob| that the certificate authority is |CA1| or that Bob's public key is |SK|, or both. Future connections to |Sbob| must match at least one of these credentials. This form of pinning depends on Alice's having reached the real |Sbob| on the first connection, sometimes called "trust on first use". A similar trust-on-first-use strategy is often (though not always) used with SSH, :ref:`ssh server authentication`. 
+
+In the pinning protocol described in :rfc:`7469`, it is |Sbob| that initiates the pinning by including a "pin directive" in its initial HTTP connection. This requests Alice's browser to pin the desired certificates, though the pinned correspondence between a site and its keys is always maintained at the browser side. The pin directive also specifies which keys (|SK| or |CA1| or both) are pinned, and for how long.
+
+If |Sbob| sends a pin directive for |SK|, then Alice's browser remembers |SK|, and any new certificate at |Sbob| will be a mismatch. If |Sbob| pins |CA1|, then |Sbob| can have |CA1| issue a new key and it will still pass pin-validation. If |CA1| is later compromised, though, |Sbob| is not protected against any new rogue certificates it issues. (This is generally a minor concern, as |CA1| compromise will always mean that *new* visitors to |Sbob| will be vulnerable to man-in-the-middle attacks.)
+
+Bob can also obtain, along with |SK|, a backup certificate |SKback|, and have |Sbob|'s pin directives pin both of these. Then, if |SK| is compromised, |SKback| is ready to go. Hopefully, key compromise is a rare event, so there is a very small chance that both |SK| and |SKback| are compromised within the pin's lifetime. Key compromise pretty much follows from any server compromise, however, and if intruders break in, |SKback| cannot be put into production until Bob is sure the site is secure. That may take some time.
+
+If |SK| and |SKback| *are* both compromised, and |CA1| wasn't pinned, |Sbob| may simply become inaccessible to returning visitors. Automatic unpinning of revoked certificates would help, but certificate revocation (see following section) has its own difficulties. The user may have an option to disable pin validation for this particular site, but it's not supposed to be as simple as clicking "ok", and in any event if the site is your bank you may be loath to do this.
+
+.. index::
+	single: certificate revocation
+
+.. _revocation:
+
+Certificate revocation
+``````````````````````````
+
+Suppose the key r underlying the certificate for |boborg| has been compromised, and Mallory has the private key. Then, if Mallory can trick Alice into connecting to |Sbad| instead of |Sbob|, the original |CA1| will validate the connection. |Sbad| can prove to Alice that it has the secret key corresponding to |SK|, and all the certificate does is to attest that |boborg| has key |SK|. Mallory's deception works even if Bob noticed the compromise and updated |Sbob|'s key to |S2K|; the point is that Mallory still has the original key, and |CA1|'s certificate attesting to that original key is still valid.
+
+.. index::
+	single: expiration date, certificate
+
+There is a mechanism by which a certificate can be revoked. Revocation information, however, must be kept at some central directory; a server can continue to serve up a revoked certificate and unless the clients actively check, they will be none the wiser. This is the reason certificates have **expiration dates**.
+
+.. index::
+	single: certificate revocation list
+	single: OCSP
+
+The original revocation mechanism was the global **certificate revocation list**. A newer alternative is the Online Certificate Status Protocol, **OCSP**, described in :rfc:`6960`. If Alice receives a certificate signed by |CA1|, she can send the serial number of the certificate to a designated "OCSP responder" run by or on behalf of |CA1|. If the certificate is still valid, the responder site will return a signed confirmation of that. 
+
+Of course, an eavesdropper watching Alice's traffic arriving at the OCSP responder -- and the OCSP responder itself -- now knows that Alice is visiting |boborg|. An eavedropper closer to Alice, however, knows that anyway.
+
+.. index::
+	single: soft fail, OCSP
+	single: hard fail, OCSP
+
+More seriously, someone running a man-in-the-middle attack close to Alice can probably intercept and block Alice's OCSP request. If Alice receives no response, what should she do? Maybe there is a problem, but maybe the responder site is simply down or the Internet is simply slow. Most browsers that actually do revocation checks assume the latter -- known as **soft fail** -- making revocation checks of dubious value. The alternative of refusing to allow access to the original site -- **hard fail** -- leads to many false positives. 
+
+.. index::
+	single: OCSP stapling
+
+As of 2016, there is no generally accepted solution. One minimal approach, in the event of OCSP soft fail, is to use hard fail with EV certificates, or at least to downgrade EV certificates to ordinary ones upon OCSP non-response. Another approach is **OCSP stapling**, in which the server site periodically (perhaps daily) requests a signed and dated update from its CA's OCSP server indicating that the site's certificate is still valid. This OCSP report is then "stapled" to the ``ServerHello`` message (below), if requested by the client. This allows the client to verify that the certificate was still valid quite recently. 
+
+Of course, if the client *is* the victim of a man-in-the-middle attack then the (fake) server will not staple an OCSP validity report, and the client must fall back to the regular OCSP lookup process. But this case can be expected to be infrequent, making a hard fail after OCSP non-response a reasonable option.
+
+Google's Chrome browser implements **CRLSets** in lieu of checking OCSP servers, `described here <https://dev.chromium.org/Home/chromium-security/crlsets>`_. This is a list of revoked certificates downloaded regularly to the browser. Unfortunately, the full list is much too large, so CRLSets are limited to emergency revocations and certificate revocations due to key compromise; even then the list is not complete. 
+
+.. |KD| replace:: K\ :sub:`D`
+.. |KE| replace:: K\ :sub:`E`
+
+
+.. |boborg| replace:: bob.int
+.. |b0borg| replace:: b0b.int
+.. |CA1| replace:: CA\ :sub:`1`
+.. |CA2| replace:: CA\ :sub:`2`
+.. |Sbob|  replace:: S\ :sub:`Bob`
+.. |Sbad|  replace:: S\ :sub:`Bad`
+.. |SK|  replace:: K\ :sub:`S`
+.. |SKback|  replace:: K\ :sub:`S-backup`
+.. |S2K|  replace:: K\ :sub:`2`
+.. |SK2| replace:: K\ :sub:`bad`
+
+.. index::
+	single: TLS handshake protocol
+	single: TLS connection setup
+	single: handshake protocol, TLS
+
+.. _TLS negotiation:
+
+TLS Connection Setup
+``````````````````````
+
+The typical TLS client-side user is interested in viewing a web page as quickly as possible, placing a premium on rapid negotiation of the TLS connection. If sites were to load noticeably more slowly when encryption was used, encryption might not be used routinely. As a result, the connection-setup process, known as the TLS **handshake protocol**, is designed to complete in two RTTs. The goals of the handshake protocol are to agree on the encryption and authentication mechanisms to be used, to provide authentication as necessary, and to negotiate the encryption keys. Here is an outline of a typical exchange, with some options omitted:
+
++-----------------------------------------------+-----------------------------------------------+
+|client (Alice)                                 |server (Bob)                                   |
++-----------------------------------------------+-----------------------------------------------+
+|``ClientHello``                                |                                               |
+|  + preferred TLS version                      |                                               |
+|  + session ID	(empty for new connections)	|                                               |
+|  + list of ciphers acceptable to client       |                                               |
+|  + ServerName (optional extension)            |                                               |
+|  + start of key exchange (optional)           |                                               |
++-----------------------------------------------+-----------------------------------------------+
+| 						|``ServerHello``				|
+|						| + chosen version				|
+| 						| + chosen cipher				|
+| 						| + server key exchange (optional)		|
+| 						| + server certificate (separate message)	|
++-----------------------------------------------+-----------------------------------------------+
+|(client now knows the key)			|                                               |
+| | optional client certificate			|						|
+| | optional other data (may be encrypted)	|						|
+| | ``Finished`` message			|						|
++-----------------------------------------------+-----------------------------------------------+
+| 						| ``Finished`` message (encrypted)		|
++-----------------------------------------------+-----------------------------------------------+
+
+.. index::
+	single: ClientHello, TLS
+	single: nonce, cryptographic
+
+The client initiates the connection by sending its ``ClientHello`` message, which contains its preferred TLS/SSL-protocol version number, a session identifier, some random bytes (a cryptographic nonce), and a list of cipher *suites*: tuples consisting of a key-exchange algorithm, a shared-key encryption algorithm and a secure-hash algorithm. The list of cipher suites is ranked by the client according to preference.
+
+.. index::
+	single: SNI, TLS
+	single: ServerName extension, TLS
+
+Many large servers host multiple websites through "virtual hosting". Each website will have its own certificate, and the server needs to be able to know which one to send in its reply. In settings like this, the client includes the server's DNS name in a ServerName extension; the Server Name Indication (**SNI**) is defined in :rfc:`6066`.
+
+.. sidebar:: Choosing your cipher
+
+	In theory, any TLS client can choose which cipher suites it will accept. In practice, for most software applications this is non-trivial. In the Firefox browser, see ``about:config``, under security.ssl3 (yes, ssl3 is in theory not the same as tls).
+
+.. index::
+	single: ServerHello, TLS
+
+The server then responds with its ``ServerHello``. This contains the final protocol-version number, generally the maximum of the version proposed by the client and the highest version supported by the server. The ``ServerHello`` also contains the server's choice of a cipher suite from the client's list, and some more random bytes (the server's nonce). The server also sends its certificate, if requested (which it almost always is). Exactly which certificate is sent may depend on the server name sent by the client in the optional ServerName extension. The certificate is considered to be a separate "message" at the TLS protocol level, not part of the ``ServerHello``, but everything is sent together.
+
+Having received the server's certificate, the client application's next step is to validate this certificate, by checking its signature against the client's list of trusted certificate authorities, the client's "trust store". This step does not involve any network communication. While most operating systems maintain a list of generally trusted certificates, the client application can trust all, some or none of this list; the client can also load application-specific certificates. If the certificate does *not* check out, the client is free to continue the connection, perhaps pausing to add the server certificate to its trust store (hopefully after user interaction confirming this).
+
+The client then responds with its key-exchange response, and its own certificate if applicable (which it seldom is). It immediately follows that with its ``Finished`` message, the first message that is encrypted with the just-negotiated cipher suite. The server then replies with *its* encrypted ``Finished`` message, and encrypted application-layer communication can then begin.
+
+Most browsers allow the user to click on the padlock icon for the TLS-secured connection to find out what cipher suite was actually agreed upon.
+
+A client starting a brand-new connection leaves the Session ID field empty in the ``ClientHello`` message. However, if a client wishes to resume a previous session, it includes here the Session ID from that previous session. The server must, of course, also recognize that session. 
+
+Once upon a time, some broken TLS servers failed to respond properly if a client proposed a version number greater than what the server supported; the server would close the connection instead of returning a lower version number. As a result, many clients were programmed to try again with the next-lower version in the event of *any* connection-setup failure. This meant that an attacker could force a client to propose an obsolete version (|eg| SSL 3.0) simply by interrupting earlier connection-setup attempts, perhaps with a TCP RST packet. A consequence was the POODLE vulnerability mentioned in the sidebar in :ref:`ssh and tls`.
+
+.. index::
+	single: STARTTLS
+	single: SMTP
+
+An application's choice of TLS (versus unencrypted communication) is often signaled by the use of a special port number; for example, the standard http port is 80 while the standard https port is 443. Alternatively, there may be some initial negotiation; for example, in the SMTP email protocol (:rfc:`5321`) it is common for the client to connect to the server on the standard port 25 without encryption, but then to negotiate the use of TLS using the STARTTLS extension to SMTP (:rfc:`3207`). This adds multiple extra RTTs, but for non-interactive protocols this is usually of only minor concern.
+
+Occasionally applications do sometimes get confused about whether TLS is in use. Web browsers connecting to port 80 (HTTP) or port 443 (HTTPS) can usually figure things out correctly, even if the "ht\ tp://" or "http\ **s**\ ://" part of the URL is missing. However, browsers connecting to nonstandard webservers running on nonstandard ports may receive a very cryptic binary response if TLS was required but the "ht\ tps://" URL prefix was missing.
+
+.. index::
+	single: domain fronting
+	single: censorship
+
+.. _domain fronting:
+
+Domain Fronting
+^^^^^^^^^^^^^^^^
+
+Government censorship of websites and other Internet services -- such as encrypted messaging -- is rampant in many parts of the world. We saw above that the ServerName extension is included in many ``ClientHello`` messages in order to request the correct certificate. This is sent in the clear, and can be used by censors to block selected traffic. 
+
+One censorship workaround, known as domain fronting, is to ask for one hostname, say ``alice.org``, in the ``ClientHello`` ServerName extension, but then request a second, different hostname, ``badbob.net``, within the application-layer protocol, after encryption is in place. For example, an HTTP GET request (:ref:`netcat_tcp`) almost always contains a ``HOST:`` header; this is where ``badbob.net`` would be specified. Of course, this only works if ``alice.org`` and ``badbob.net`` are hosted at the same IP address, but large HTTP servers often do handle multiple websites on a single server using a mechanism known as `virtual hosting <https://en.wikipedia.org/wiki/Virtual_hosting>`_ (:ref:`nslookup1`).  To block ``badbob.net``, a censor must now also block ``alice.org``. The hope is that censors will be unwilling to do that.
+
+Domain fronting is even easier when CDNs (:ref:`CDNs`) are involved; virtual hosting is not necessary. A CDN accepts connections to the websites of a large number of customers (often a much larger number than a single server can support using virtual hosting) a each *edge server* of their network. The edge servers have certificates for each of the customers, and so appear legitimate to users. After the connection, the edge server might then answer some requests with cached data, but will forward other requests on to the actual web server. To enable domain fronting in this environment, ``badbob.net`` might only need to become a customer of the same CDN as ``alice.org``.
+
+
+CDNs and large hosting providers sometimes do not think highly of domain fronting, particularly as some censors have shown willingness to block critical domains like ``google.com`` just to block an unwanted application. Google and Amazon Web Services disabled domain fronting for their CDN customers in 2018. 
+
+Before the initial connection to the server, the client will usually make a DNS request to obtain the server's IP address. These too can be blocked, or monitored, although there are workarounds.
+
+.. index::
+	single: key exchange, TLS
+	single: master secret, TLS
+
+
+.. _TLS key exchange:
+
+TLS key exchange
+^^^^^^^^^^^^^^^^^^^
+
+Perhaps the most important part of the TLS handshake is to negotiate the encyption keys. The keys themselves are all derived from the TLS **master secret**. The key derivations are done in deterministic ways (|eg| using secure hashes, or a stream-cipher algorithm), and can be done by either side once the master secret is known.
+
+In all cases, the client should know the master secret after receiving the ``ServerHello`` and related packets. At this point -- after one RTT -- the client can begin sending encrypted messages to the server. At this point, the client can even begin sending encrypted data, although it is possible that the client is not yet fully authenticated to the server. 
+
+.. index::
+	single: pre-master secret, TLS
+
+Negotiation of the master secret depends on the cipher suite chosen. In the **RSA key-exchange** method, the client chooses a random **pre-master secret**. This is sent to the server in the third leg of the exchange, after the client has received the server's certificate in the ``ServerHello`` stage. The pre-master secret is encrypted with the public RSA key from the server's certificate, thus conveying it securely to the server. Both sides calculate the master secret from the pre-master secret and both sides' cryptographic nonces, using a secure hash or the pseudorandom keystream of a stream cipher (:ref:`stream ciphers`). The inclusion of the server nonce means tha the client does not unilaterally specify the key.
+
+If **Diffie-Hellman-Merkle** key-exchange is used (:ref:`diffie-hellman`), then the server proposes the prime p and primitive root g during the ``ServerHello`` phase, as part of its selection of one of the cipher suites listed in the ``ClientHello``. The server (Bob) also includes g\ :sup:`b` mod p. The client chooses its exponent a, and sends g\ :sup:`a` mod p to the server. The pre-master secret is g\ :sup:`a×b` mod p, which the client, as in the RSA case, knows at the end of the first RTT. The client's g\ :sup:`a` mod p cannot be encrypted using the master key, but everything else sent by the client at that point can be. There is also a version of Diffie-Hellman-Merkle exchange that uses elliptic-curve cryptography.
+
+.. index::
+	single: TLS version 1.3
+
+.. _TLS v1.3:
+
+TLS version 1.3
+^^^^^^^^^^^^^^^^^^^^
+
+Version 1.3 of TLS, :rfc:`8446`, makes numerous improvements to the protocol. Among other things, it prunes the list of acceptable cipher suites of all algorithms no longer considered secure, and also of all key-exchange algorithms that do not support forward secrecy, :ref:`forward secrecy`. The version-negotiation process has also been improved, to prevent version-downgrade attacks, and the 0-RTT mode (below) enables faster connection startup.
+
+Of the two key-exchange methods in the previous section, Diffie-Hellman-Merkle does support forward secrecy while RSA may not, depending on the latter's choice of the pre-master secret. The proposal to drop RSA key exchange has caused concern in some enterprise settings, particularly the banking industry, where widespread use is often made of middleboxes that are able to decrypt and monitor internal TLS connections (that is, connections where both endpoints are under control of the same enterprise). This monitoring is done for a variety of reasons, including regulatory compliance and malware detection.
+
+To enable such monitoring using TLS v1.2, all TLS connections between the enterprise and the outside Internet terminate at the site's border, at a special TLS-proxy appliance. From there, connections to interior systems are re-encrypted, but using a static RSA pre-master secret that is shared with the monitoring equipment. The same applies to any TLS connections that are entirely internal to the enterprise. 
+
+To enable this kind of monitoring under TLS v1.3, one approach is to have the monitoring occur at the TLS-proxy appliance, though this means that device will have to be considerably bigger, more complicated and more expensive; additionally, it will not help with entirely internal TLS connections. Another approach is to have the TLS proxy, and at least one endpoint of internal TLS connections, turn over all session keys to the monitors. This raises other security concerns. For two proposed amendments to the original TLS v1.3 proposal, see the Internet Drafts `draft-rhrd-tls-tls13-visibility <https://tools.ietf.org/html/draft-rhrd-tls-tls13-visibility>`_ and `draft-green-tls-static-dh-in-tls13 <https://tools.ietf.org/html/draft-green-tls-static-dh-in-tls13>`_. 
+
+TLS v1.3 requires that all messages after the ``ServerHello`` be encrypted (except possibly one last client-to-server key-exchange message that should be intrinsically secure). The client knows the master secret at this point, and the server will know it as soon as it hears from the client.
+
+.. index::
+	single: 0-RTT protection, TLS v1.3
+	single: 1-RTT protection, TLS v1.3
+	single: idempotency and 0-RTT
+
+.. _0-RTT mode:
+
+TLS v1.3 0-RTT mode
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Finally, TLS v1.3 adds a so-called **O-RTT** mode, in which the client can send encrypted messages from the very beginning, assuming an appropriate master secret has been negotiated during a *previous* connection. For HTTPS interactions, this is a common case. The 0-RTT mode, in particular, allows the client to send secure *data* along with its ``ClientHello``. The server can respond with 0-RTT-protected data along with its ``ServerHello``, if it chooses to. After that, everything should be protected with the new session's master secret; this is known as **1-RTT** protection.
+
+To send 0-RTT data, the client must resume the earlier session by including the previous Session ID in its ``ClientHello`` message. The server *can* refuse 0-RTT data, and demand 1-RTT protection, but usually will not.
+
+The advantage of 0-RTT data is that, if the server accepts it, an answer can return to the client in a single RTT. This is particularly significant in QUIC (:ref:`quic` and :ref:`quic2`), in which the TLS handshake is carried out in parallel with the QUIC connection handshake (a replacement for the TCP three-way handshake). This means that the response comes just one RTT after the very first message from the client. QUIC requires TLS v1.3 (or later).
+
+0-RTT protection is not quite as strong ast 1-RTT protection. For one, forward secrecy does not apply. More seriously, a participant receiving 0-RTT data is vulnerable to replay attacks. An attacker cannot modify a previously intercepted 0-RTT message (without breaking the cipher), but can resend it.
+
+At a minimum, the recipient of a 0-RTT request should accept it only if it is **idempotent**: yielding the same results and side-effects whether executed once or twice (:ref:`Sun RPC`). This is generally automatic for simple HTTP GET requests. Idempotency is not itself a security guarantee -- after all, the request "delete all files" is idempotent. The point, however, is that the particular request must, if part of a replay attack, have been executed before, and if it was safe once, it *should* be safe twice. A TLS server can also suppport other anti-replay mechanisms, such as a database of past requests.
+
+Another consequence of mixing 0-RTT and 1-RTT data is that the recipient needs to be able to tell which requests received 0-RTT protection and which received full 1-RTT protection.
+
+.. index::
+	single: TLS programming
+	single: SSL programming
+	single: openSSL programming
+
+.. _TLS programming:
+
+A TLS Programming Example
+----------------------------
+
+In this section we introduce a simple pair of programs, |tlsserver-c|_ and |tlsclient-c|_, that communicate via TLS. They somewhat resemble the simplex-talk program in :ref:`tcp simplex-talk`, except that neither reads from the command line. Instead, the client sends a message to the server (which may ignore it), and then the server sends a message back. This structure will allow us later to point the client at a "real" TLS-using (that is, HTTPS-using) web server, instead of ``tlsserver``, have the client send an HTTP GET request (:ref:`netcat_tcp`), and obtain the web server's response. 
+
+Both programs are written in C, in order to use the `OpenSSL <https://www.openssl.org/>`_ library, a descendant of the original Netscape SSL implementation. The openssl package also includes some important command-line utilities for certificate creation. While OpenSSL library documentation remains notoriously spare, parts of the library have now been `audited <https://www.openssl.org/docs/fips.html>`_, and OpenSSL remains the most widely used implementation of TLS.
+
+The code shown here is intended simply as a demonstration; **it should not be considered a model of how to implement secure connections**. 
+
+Making a certificate
+````````````````````````````
+The first step is to create the appropriate application certificate, and create our own certificate authority to sign it. For each step we will use the ``openssl`` command, also used below at :ref:`an RSA key` with additional explanation. We start with the certificate authority. The first step is to create the key our certificate authority will use; this is what the ``genrsa`` option below achieves. We choose a key length of 4096 bits.
+
+
+::
+
+  openssl genrsa -out CAkey.pem 4096
+
+The resultant file says it is a "private key", but it is in fact a public/private key pair.
+
+The next step is to create a **self-signed certificate**. The ``req`` option asks for a signing "request", the ``-new`` option indicates this is a new request, and the ``-x509`` option tells openssl to forget making a "request" and instead make a self-signed certificate. `X.509 <https://en.wikipedia.org/wiki/X.509>`_ is actually a format standard.
+
+::
+
+  openssl req -new -x509 -key CAkey.pem -out CAcert.pem -days 10000
+
+The certificate here is set to expire in 10,000 days; real *published* certificates are not supposed to be valid for more than about three years. The signing process (self- or not) triggers a series of questions that will form the "Distinguished Name" of the certificate:
+
+::
+
+	Country Name (2 letter code): US
+	State or Province Name (full name): Illinois
+	Locality Name (eg, city):Shabbona
+	Organization Name (eg, company): An Introduction to Computer Networks
+	Organizational Unit Name (eg, section): Security
+	Common Name (e.g. server FQDN or YOUR name): Peter L Dordal
+	Email Address []:
+
+If we were requesting a certificate for a web server, we would use the hostname as Common Name, but we are not. The output here, CAcert.pem, represents the concatenation of the above information with the public key from CAkey.pem, and then signed by the private key from CAkey.pem. The private key itself, however, is *not* present in CAcert.pem; this is the file that the TLS client will receive as its certificate authority. We can read the information from the file as follows:
+
+::
+
+  openssl x509 -in CAcert.pem -text
+
+This produces the following, somewhat edited for space. We can see that the certificate is self-signed because the ``Issuer:`` is the same as the ``Subject:``
+
+::
+
+	Certificate:
+	    Data:
+		Version: 3 (0x2)
+		Serial Number: 14576542390929842281 (0xca4a481320cbe069)
+	    Signature Algorithm: sha256WithRSAEncryption
+		Issuer: C=US, ST=Illinois, L=Shabbona, O=An Introduction to Computer Networks, OU=Security, CN=Peter L Dordal
+		Validity
+		    Not Before: Jan 10 20:17:55 2017 GMT
+		    Not After : May 28 20:17:55 2044 GMT
+		Subject: C=US, ST=Illinois, L=Shabbona, O=An Introduction to Computer Networks, OU=Security, CN=Peter L Dordal
+		Subject Public Key Info:
+		    Public Key Algorithm: rsaEncryption
+		        Public-Key: (4096 bit)
+		        Modulus:
+		            00:b0:70:06:7e:38:1d:29:35:a7:ca:40:bf:fd:6e:
+		            e5:26:7b:ee:0d:e7:d7:c2:61:8e:42:5f:b9:85:8c:
+		            ...
+		            d4:12:cf
+		        Exponent: 65537 (0x10001)
+		X509v3 extensions:
+		    X509v3 Subject Key Identifier: 
+		        D1:74:15:F5:31:CB:DD:FA:D6:AE:81:7A:40:AA:64:7A:55:96:2E:08
+		    X509v3 Authority Key Identifier: 
+		        keyid:D1:74:15:F5:31:CB:DD:FA:D6:AE:81:7A:40:AA:64:7A:55:96:2E:08
+
+		    X509v3 Basic Constraints: 
+		        CA:TRUE
+	    Signature Algorithm: sha256WithRSAEncryption
+		 2a:d2:35:43:c2:5d:1c:5d:e2:88:ed:4e:aa:d2:b5:d6:e9:26:
+		 60:f0:37:ea:29:56:14:62:58:01:78:b0:6f:ee:ab:40:17:36:
+		 ...
+		 eb:3d:da:79:5c:90:4d:c9
+	-----BEGIN CERTIFICATE-----
+	MIIF8TCCA9mgAwIBAgIJAMpKSBMgy+BpMA0GCSqGSIb3DQEBCwUAMIGOMQswCQYD
+	VQQGEwJVUzERMA8GA1UECAwISWxsaW5vaXMxETAPBgNVBAcMCFNoYWJib25hMS0w
+	...
+	ywhRBNEO1XXB7bFrkkv93q4G3Re2zyw2/5BDEn7rPdp5XJBNyQ==
+	-----END CERTIFICATE-----
+ 
+We now create the application key and then the application **signature request**. This request we will then sign with the above certificate CAfile.pem to generate the application certificate. 
+
+::
+
+	openssl genrsa -out appkey.pem 2048
+	openssl req -new -key appkey.pem -out appreq.pem -days 10000
+
+The certificate request here again requires entering a Distinguished Name. This time we enter as follows; the Organization Name must match the CAcert.pem above:
+
+::
+
+	Country Name (2 letter code): US
+	State or Province Name (full name): Illinois
+	Locality Name (eg, city): no fixed abode
+	Organization Name (eg, company): An Introduction to Computer Networks
+	Organizational Unit Name (eg, section): TLS server
+	Common Name (e.g. server FQDN or YOUR name): Odradek
+	Email Address []:
+
+We are also asked for a "challenge password", but we leave this blank.
+
+Now we come to the final step: the actual signing. Unlike any of the previous openssl commands, this requires root privileges. It also makes use of the global openssl configuration file (/etc/ssl/openssl.cnf), which, among other things, references a file "serial" to assign the certificate a serial number. (We did not have to do any of this to create the *self*\ -signed certificate.)
+
+::
+
+   openssl ca -in appreq.pem -out appcert.pem -days 10000 -cert CAcert.pem -keyfile CAkey.pem
+
+We now have our application certificate in appcert.pem, which we deliver to the application section, below. If we read it with ``openssl x509 -in appcert.pem -text``, we find that the Issuer is that of CAfile.pem, but the Subject is as above, with Common Name = Odradek.
+
+.. index::
+	single: TLS server example
+
+.. _tlsserver:
+
+TLSserver
+```````````
+
+The complete server is at |tlsserver-c|_, along with the certificate and key files |appcert-pem|_ and |appkey-pem|_ (both stored with an additional ``.text`` suffix to prevent an accidental click from loading them directly into a browser). To compiler the server under Linux, with the OpenSSL library installed in the usual place, we use
+
+::
+
+   gcc -o tlsserver tlsserver.c -lssl -lcrypto
+
+The server should be run in the same directory with its certificate and key files.
+
+In the following we go through the important lines of the full program stripped of any error checking. Most OpenSSL library methods return 1 on success and 0 on failure. Different kinds of failure may require different error-message libraries.
+
+::
+
+    SSL_library_init();   
+
+This does what it sounds like: initializes the SSL subsystem. Loading error strings may also be useful. The next steps commit us to the versions of SSL we agree to accept. 
+
+::
+
+    method = SSLv23_server_method();
+    ctx = SSL_CTX_new(method);
+    SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_NO_TLSv1 | SSL_OP_NO_TLSv1_1);
+
+Somewhat paradoxically, ``SSLv23_server_method()`` accepts *all* SSL and TLS versions. In the third line above, we then disable everything earlier than TLS version 1.1. In openssl version 1.1.0 (the numbering is unrelated to the TLS versioning), ``SSLv23_server_method()`` can be replaced with the more appropriately named ``TLS_server_method()``. 
+
+The variable ``ctx`` represents a TLS *context*, which is a set of TLS state information. Our server will use the same context for all incoming connections.
+
+Next we load the server certificate and key files into our newly created TLS context. Recall that the server side gets our application certificate ``appcert.pem``; the client side will get our certificate-authority certificate ``CAcert.pem``.
+
+::
+
+    int cfile_result = SSL_CTX_use_certificate_file(ctx, "./appcert.pem", SSL_FILETYPE_PEM);
+    int kfile_result = SSL_CTX_use_PrivateKey_file (ctx, "./appkey.pem",  SSL_FILETYPE_PEM);
+
+The server needs the key file to sign messages. Next we create an ordinary TCP socket listening on port 4433; ``createSocket()`` is defined at the end of the tlsserver.c file.
+
+::
+
+    sock = createSocket(4433);
+
+Finally we get to the main loop. We accept a TCP connection, create a new connection-specific SSL object from our context, and tie the new SSL object to the socket. 
+
+::
+
+    while(1) {
+        int childsock = accept(sock, (struct sockaddr*)&addr, &len);
+        SSL* ssl = SSL_new(ctx);
+        SSL_set_fd(ssl, childsock);
+        SSL_accept(ssl);
+        SSL_write(ssl, reply, strlen(reply));
+    }
+
+``SSL_accept()`` is where the handshaking described in :ref:`TLS negotiation` takes place. At this point, the server writes its ``reply`` message over the now-encrypted channel, and is done.
+
+We argued in :ref:`IETF and OSI` that TLS can in some ways be regarded as a true Presentation layer. Note, however, that the Application layer here (that is, tlsserver.c) is responsible for accepting ``childsock``, and passing it to TLS through ``SSL_set_fd()``; the Application layer, in other words, does interact directly with TCP.
+
+.. index::
+	single: TLS client example
+
+.. _tlsclient:
+
+TLSclient
+``````````````
+
+The complete client is at |tlsclient-c|_; its certificate is |CAcert-pem|_ (again with a ``.text`` suffix). Again we go through the sequence of SSL library calls with error-checking removed. As with the server, we start with initialization; this time, we also load error strings:
+
+::
+
+    SSL_library_init();   // "SSL_library_init() always returns '1'
+    ERR_load_crypto_strings();
+    SSL_load_error_strings();
+
+Next we again choose what TLS versions we will allow, this time starting with 
+``SSLv23_``\ **client**\ ``_method()``:
+
+::
+
+    method = SSLv23_client_method();
+    ctx = SSL_CTX_new(method);
+    SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3|SSL_OP_NO_TLSv1|SSL_OP_NO_TLSv1_1);
+
+If we instead use ``method = TLSv1_1_client_method()``, the connection should fail, this call allows *only* TLS version 1.1, and the server requires TLS version 1.2 or better.
+
+The next step is to load the **trust store**, that is, the certificates from the certificate authorities we have elected to trust. If we do nothing, the trust store will be empty. We first load a standard certificate directory (directories are supplied to ``SSL_CTX_load_verify_locations()`` as the third parameter and individual files as the second). Certificates in a directory must be named (possibly using symbolic links) by their hash values; see the `c_rehash <https://www.openssl.org/docs/man1.1.0/apps/c_rehash.html>`_ utility. If all we wanted was to be able to trust our own server's ``appcert.pem``, we could just load our own certificate-authority certificate ``CAcert.pem``, but we will need the standard certificate directory if we want to point ``tlsclient`` at a real HTTPS server rather than at ``tlsserver``.
+
+::
+
+    SSL_CTX_load_verify_locations(ctx, NULL, "/etc/ssl/certs")
+    
+Next we load our own certificate ``CAcert.pem``, which is then *added* to the trust store, in addition to the standard certificates. We can add multiple individual certificates by making multiple calls, or by concatenating all the certificates into a single file. The certificates must be separated by their ``BEGIN CERTIFICATE`` and ``END CERTIFICATE`` lines.
+
+::
+
+    SSL_CTX_load_verify_locations(ctx, "CAcert.pem", NULL);
+
+Now we're ready to connect to the server. The last line below initiates the TLS handshake, starting with ``ClientHello``. 
+
+::
+
+    sock = openConnection(hostname, port);
+    ssl = SSL_new(ctx);
+    SSL_set_fd(ssl, sock);
+    SSL_connect(ssl);
+
+Next the client retrieves (and, in our case prints) the certificate supplied by the server. If the server is ``tlsserver``, this will normally be ``appcert.pem``, with ``CN=Odradek``.
+
+::
+
+    cert = SSL_get_peer_certificate(ssl);
+    certname = X509_get_subject_name(cert);
+    // print certname
+
+The printed certname does indeed show ``CN=Odradek``, from ``appcert.pem``. If we were writing a web browser, this is the point where we would verify that the site hostname matches the ``CN`` field of the certificate.
+
+After the client receives the application certificate, it must **verify** its signature, with the call below. This is where the client uses its trust store.
+
+::
+
+    ret = SSL_get_verify_result(ssl);
+
+If one of the certificate authorities in the trust store vouches for the signature on the application certificate, the return value above is ``X509_V_OK``, and all is well. If we comment out the loading of ``CAcert.pem``, however, we get "unable to get local issuer certificate". If, with tlsclient still not loading ``CAcert.pem``, we have the *server* send ``CAcert.pem`` (and ``CAkey.pem``), instead of its proper certificate, we get an error "self-signed certificate". A full list of certificate-verification errors is listed with the `verify <https://www.openssl.org/docs/man1.1.0/apps/verify.html>`_ command.
+
+
+If validation fails, the connection is still encrypted, but is vulnerable to a man-in-the-middle attack. Regardless of what happened during validation, our particular ``tlsclient`` goes on to write an HTTP GET request to the server, and then read the server's response (the companion ``tlsserver`` program does not in fact read the GET request). Generally speaking, however, **continuing the TLS session after a certificate validation failure is a very bad idea**.
+
+::
+
+    SSL_write(ssl, request, req_len);     // ignored by tlsserver program
+    do {
+        bytesread = SSL_read(ssl, buf, sizeof(buf));
+        fwrite(buf, bytesread, 1, stdout);
+    } while(bytesread > 0);
+
+The written request here is ignored by ``tlsserver``; it is an HTTP GET request of the form ``GET / HTTP/1.1\r\nHost:``  *hostname*\ ``\r\n\r\n``. If we point ``tlsclient`` at a real webserver, say
+
+::
+
+	tlsclient google.com 443
+
+then we should again get an ``X509_V_OK`` verification result because we loaded the default certificate-authority library. 
+
+We can also point the built-in openssl client at ``tlsserver``; by default it connects to ``localhost`` at port 4433:
+
+::
+
+   openssl s_client 
+
+Of course, verification fails. This is because ``s_client`` doesn't know about our certificate authority. We can add it, however, on the command line:
+
+::
+
+   openssl s_client -CAfile CAcert.pem
+
+Now the verification is successful.
+
+.. |tlsserver-c| replace:: tlsserver.c
+.. |tlsclient-c| replace:: tlsclient.c
+.. |appcert-pem| replace:: appcert.pem
+.. |appkey-pem|  replace:: appkey.pem
+.. |CAcert-pem|  replace:: CAcert.pem
+
+.. index::
+	single: IPsec
+	
+.. _ipsec:
+
+IPsec
+==========
+
+The SSH software package was built from the ground up to implement the SSH protocol. All modern web browsers incorporate TLS libraries to enable secure web connections. What can you do if you want to add encryption (or authentication) to a network application that doesn't have it built in? Or, alternatively, how can you as a system administrator ensure that everyone's traffic is protected, regardless of what software they are using?
+
+**IPsec**, for "IP security", is one answer. It is a general-purpose security protocol which typically behaves as if it were a network sublayer *below* the IP layer (or, in transport mode, below the Transport layer). In this it is akin to Wi-Fi (:ref:`wifi security`), which implements encryption within the LAN layer; in both Wi-Fi and IPsec the encryption is transparent to the communicating applications. In terms of actual implementation it is most often incorporated within the IP layer, but can be implemented as an external network appliance.
+
+.. index::
+	single: authentication header, IPsec
+	single: AH, IPsec
+	single: encapsulated security payload, IPsec
+	single: ESP, IPsec
+
+IPsec can be used to protect anything from individual TCP (or UDP) connections to all traffic between a pair of routers. It is often used to implement VPN-like access from "outside" hosts to  private subnets behind NAT routers. It is easily adapted to support any encryption or authentication mechanism. IPsec supports two packet formats: the **authentication header**, AH, for authentication only, and the **encapsulating security payload**, ESP, below, for either authentication or encryption or both. The ESP format is much more common and is the only one we will consider here. The AH format dates from the days when most export of encryption software from the United States was banned (see the sidebar 'Crypto Law' at :ref:`block cipher`), and, in any event, the ESP format can be used for authentication only. The ESP packet format is as follows:
+
+.. image::	images/security/esp.svg
+
+The SPI identifies the security association, below. The sequence number is there to prevent replay attacks. Senders must increment it on every transmission, but receivers care only if the received numbers are not strictly increasing; gaps due to lost packets do not matter. The cryptographic algorithm applied to the payload and the integrity-check algorithm are negotiated at connection set-up. The Padding field is used first to bring the Payload length up to a multiple of the applicable encryption blocksize, and then to round up the total to a multiple of four bytes. The Next Header field describes the data that is *inside* the Payload, |eg| TCP or UDP for Transport mode or IP for Tunnel mode. It corresponds to the Protocol field of :ref:`IPv4 header` or the Next Header field of :ref:`IPv6 header`.
+
+.. index::
+	single: transport mode, IPsec
+	single: tunnel mode, IPsec
+
+IPsec has two primary modes: **transport** and **tunnel**. In transport mode, the IPsec endpoints are also typically the traffic endpoints, and only the transport-layer header (|eg| TCP header) and data are encrypted or protected. In the more-common tunnel mode one of the IPsec endpoints is often a router (or "security gateway"); encryption or protection includes the original IP headers, so that an eavesdropper cannot necessarily identify the actual traffic endpoints.
+
+IPsec is documented in a wide range of RFCs. A good overview of the architectural principles is found in :rfc:`4301`. The ESP packet format is described in :rfc:`4303`.
+
+.. index::
+	single: bugs
+
+A word of warning: while IPsec does support modern encryption, it also continues to support outdated algorithms as well; users must take care to ensure that the encryption negotiated is sufficient. IPsec has also attracted, in recent years, rather less attention from the security community than SSH or TLS, and "many eyes make all bugs shallow". Or at least some bugs.
+
+.. index::
+	single: security association, IPsec
+	single: selector, IPsec
+
+.. _security associations:
+
+Security Associations
+-----------------------
+
+In order for a given connection or node-to-node path to receive IPsec protection, it is first necessary to set up a pair of **security associations**. A security association consists of all necessary encryption/authentication attributes -- algorithms, keys, rekeying rules, |etc| -- together with a set of **selectors** to identify the covered traffic. A given security association covers traffic in one direction only; bidirectional traffic requires a separate security association for each direction. For outbound traffic -- that is, traffic going from unprotected (internal) to IPsec-protected status -- the selector consists of the destination IP address (or set of addresses) and possibly also the source IP address (or set of source addresses) and port or protocol values. Inbound ESP packets carry a 32-bit Security Parameters Index, or SPI, that for unicast traffic identifies the security association. However, that security association must still be checked against the packet for an actual match. 
+
+The destination and source IP addresses need not be the same as the IP addresses of the IPsec endpoints. As an example, consider the following tunnel-mode arrangement, in which traveling host A wants to connect to private subnet 10.1.2.0/24 through security gateway B. IPv4 addresses are shown, but the same arrangement can be created with IPv6.
+
+.. image::	images/security/host_to_router.svg
+
+The A-to-B IPsec security association's selector will include the entire subnet 10.1.2.0/24 in its set of destination addresses. A packet from A to 10.1.2.3 arriving at A's IPsec interface will match this selector, and will be encapsulated and sent (via normal Internet routing) to B at 100.7.8.9. B will de-encapsulate the packet, and then forward it on to 10.1.2.3 using its normal IP forwarding table. B might actually *be* the NAT router at its site, with external address 10.7.8.9 and internal subnet 10.1.2.0/24, or B might simply be a publicly visible host at its site that happens to have a route to the private 10.1.2.0/24 subnet.
+
+The action of forwarding the encapsulated packet from A to B closely resembles IP forwarding, but isn't quite. It is unlikely A will have a true forwarding-table entry for 10.1.2.0/24 at all; it will very likely have only a single default route to its local ISP connection. Delivery of the packet cannot be understood simply by examining A's IP forwarding table. A might even have a forwarding-table entry for 10.1.2.0/24 to somewhere else, but the IPsec "pseudo-route" to B's 10.1.2.0/24 is still the one taken. This can easily lead to confusion; for complex arrangements with multiple overlapping security associations, this can lead to nontrivial difficulties in figuring out just how a packet is forwarded. 
+
+A second routing issue exists at B's end. Host 10.1.2.3 will see the packet from A arrive with address 200.4.5.6. Its reply back to A will be delivered to A using the tunnel only if the B-site routing infrastructure routes the packet back to B. If B is the NAT router, this will happen as a matter of course, but otherwise some deliberate action may need to be taken to avoid having 10.1.2.3-to-A traffic take an unsecured route. Additionally, the B-to-A security association needs to list 10.1.2.0/24 in its list of *source* addresses. The IPsec "pseudo-route" now resembles the policy-based routing of :ref:`lartc_use`, with routing based on both destination and source addresses. A packet for A arriving at B with source address 10.\ **2.4**\ .3 should *not* take the IPsec tunnel. (To add confusion, Linux IPsec pseudo-routes do not actually show up in the Linux policy-based routing tables.)
+
+Security associations are created through a software **management interface**, |eg| via the Linux `ipsec <https://wiki.strongswan.org/projects/strongswan/wiki/IpsecCommand>`__ command and the associated configuration file `ipsec.conf <https://wiki.strongswan.org/projects/strongswan/wiki/IpsecConf>`__. It is possible for an application to request creation of the necessary security associations, but it is more common for these to be set up *before* the IPsec-protected application starts up.
+
+.. index::
+	single: Internet Key Exchange
+	single: IKEv2
+
+A request for the creation of a security association typically triggers the invocation of the **Internet Key Exchange**, IKE, protocol; the current version 2 is often abbreviated IKEv2. IKEv2 is described in :rfc:`7296`. IKEv2 typically uses public keys to negotiate a session key (:ref:`session keys`); IKEv2 may then renegotiate the session key at intervals. In the simplest (and not very secure) case, both sides have been manually configured with a session key, and IKEv2 has little to do beyond verifying that the two sides have the same key.
+
+.. index::
+	single: NAT and IPsec
+
+NAT traversal of IPsec packets is particularly tricky. For AH packets it is impossible, because the cryptographic authentication code in the packet covers the original IP addresses, as well as the packet transport data. That is not an issue for ESP packets, but even there the incoming packet must match the receivers's security-association selector, which it will not if that was negotiated using the sender's original IP address. An additional problem is that many NAT routers fail to forward (or fail to forward properly) packets outside of protocols ICMP, UDP and TCP.
+
+As a result, IPsec has its very own NAT-traversal mechanism, outlined in :rfc:`3715`, :rfc:`3947` and :rfc:`3948`. IPsec packets are encapsulated in UDP packets, with their original headers. After de-encapsulation at the IPsec receiving end, it is these original headers that are used in the security-association check. Additionally, a keepalive mechanism is defined in which the IPsec nodes send regular small packets to make sure the NAT mapping for the connection does not time out.
+  
+.. index::
+	single: DNSSEC
+	single: secure DNS
+
+.. _dnssec:
+
+DNSSEC
+==============
+
+The DNS Security Extensions, DNSSEC, make it possible for authoritative nameservers to provide authenticated responses to DNS queries, by using **digital signatures**, below. The primary goal of DNSSEC is to prevent cache poisoning (:ref:`cache poisoning`) by allowing resolvers to verify any DNS records received. 
+
+.. index::
+	single: DNSSEC OK flag
+
+DNSSEC is documented in :rfc:`4033`, :rfc:`4034`, :rfc:`4035` and updates. :rfc:`6891` outlines a general framework for extensions to DNS, known as EDNS; these extensions include new record types. EDNS in particular defines the DNSSEC OK, or DO, flag; this is used to signal that the receiving nameserver should return a DNSSEC-aware response.
+
+The basic idea behind DNSSEC is for each zone, including the root zone, to digitally sign all of its RRsets -- sets of DNS resource records matching a given name (|eg| ``cs.luc.edu``) and type (|eg| A records, AAAA records, or MX records) -- with a public-key signature. Each zone *except* the root zone then has its parent zone sign its public key. The root-zone public key must be pre-loaded into the resolver or end-system, much as the root-zone IP addresses must be pre-loaded. This sort of linked sequence of digital-signature verifications is often called a **chain of trust**. The root keys are known as the **trust anchors**; these can be compared to **certificate authorities**, :ref:`CA`. 
+
+.. index::
+	single: chain of trust
+	single: trust anchor
+
+
+The root zone implemented support for DNSSEC in 2010, after .gov and with the .org zone not far behind; other top-level domains including .com, .net and .edu became DNSSEC-aware by the following year.
+
+.. index::
+	single: RRSIG, DNS
+	single: DNSKEY, DNS
+	single: DS, DNS
+	single: NSEC, DNS
+	single: NSEC3, DNS
+
+In order to support all these signed records and keys, DNSSEC introduced several additional DNS record types:
+
+* ``RRSIG``: a signature for an RRset.
+* ``DNSKEY``: the public half of the keypair used to sign zone records.
+* ``DS``: a "delegation signer" record in a parent zone containing a signature for a child zone's zone-signing key.
+* ``NSEC`` and ``NSEC3``: the next DNS name in sequence, used to affirm securely that a given hostname does *not* exist.
+ 
+.. index::
+	single: ZSK, DNS
+
+In slightly more detail, each DNSSEC authoritative nameserver creates, for each zone, a Zone Signing Key, or ZSK. For each possible RRset the nameserver creates an ``RRSIG`` signature record, signed by the ZSK. The public half of the zone's ZSK is available in a record of type ``DNSKEY``, and with DNS name equal to the zone name. Finally, a hash of the public ZSK is signed by the *parent*'s ZSK and made available in the parent zone as a record of type ``DS``, again with name equal to the child zone's name.
+
+If a DNSSEC-aware query arrives for ⟨\ *name*,\ *type*\ ⟩, the nameserver will return both that RRset and also the RRSIG record for that name and type. For example, if we use the `dig <https://en.wikipedia.org/wiki/Dig_(command)>`__ tool to query for the ``A`` record for ``isc.org``, and include the ``+dnssec`` flag for DNSSEC-aware results, ``dig isc.org A +dnssec``, we receive (in part, and with formatting applied)
+
+::
+
+	isc.org.	52	IN	A	149.20.64.69
+	isc.org.	52	IN	RRSIG	A 5 2 60 20190328000617	20190226000617 19923 isc.org.
+	                                        KrBysOlbe4L6sJJOJNbJhfAuNt11q+6A2cQTnr3CXeFwxYJTXdqAkSwg
+	                                        QzGHpIrVfOw2dn6GdqXQ6umqU1cnFNtXumdvUp45+XSCoZC6YciR4xNs
+	                                        f8YMR5F66LIcMZewP11ofWOV6/m9rSfR38FRnDkPf3Jg+O2+qvSKQ+Mq 
+	                                        lV8=
+
+Note that RRSIG records must always be piggybacked onto the original query, as there is no independent way to request "RRSIG records matching type *type*". DNS queries may contain only one type. The RRSIG records are part of the DNS ANSWER section, not the ADDITIONAL section; these records are an essential part of the response.
+
+We can obtain the ``isc.org`` zone's public ZSK by requesting the record with name ``isc.org`` and type DNSKEY. We can verify this key by asking for the record with name ``isc.org`` and type DS from the ``.org`` nameserver.
+
+To fetch the A record for ``www.example.com``, a DNSSEC resolver (often called a *validating* resolver) would (if nothing has been cached) start by asking the root zone for the appropriate NS record, just as with plain DNS (:ref:`nslookup1`). The root zone replies with the NS record (and A record) pointing to the ``.com`` authoritative nameserver, and, because the DNSSEC OK bit in the request has been set, also includes the corresponding RRSIG record. The resolver can validate the RRSIG signature because it knows by prearrangement the root-zone KSK. 
+
+The resolver also asks the root nameserver for the DS record for ``.com``. This is a signature for the KSK that the ``.com`` nameserver uses, signed by the root key. It will be used in the next step.
+
+The resolver now switches to sending its requests to the authoritative nameserver for the ``.com`` zone. It asks for the NS record for ``example.com``, and receives the appropriate NS and A records. Because DNSSEC is involved, it also receives the corresponding RRSIG records. The latter are signed with the KSK for ``.com``. The resolver obtains this KSK by requesting the DNSKEY record from the ``.com`` nameserver. This KSK can then be validated by using the signed DS record previously obtained from the root zone, and the validated KSK can then in turn be used to validate the RRSIG records.
+
+Note that the DNSKEY and DS records for the ``.com`` DNS name form a pair, with the latter signing the former (or a hash of the former). The DNSKEY record, though, is obtained from the ``.com`` nameserver, while the corresponding DS record is obtained from the parent (root, in this case) nameserver.
+
+The resolver also asks the ``.com`` nameserver for the DS record for ``example.com``; this will be used in the next step.
+
+In the final stage, the resolver sends its requests to the ``example.com`` namserver. This time it asks for the A record for ``www.example.com``. This address is returned, along with the corresponding RRSIG. The resolver gets the ``example.com`` ZSK by requesting the DNSKEY record. The resolver obtained a signature for this ZSK in the previous DS record (obtained from the ``.com`` nameserver), and so can validate this ``example.com`` ZSK, and so in turn can validate the RRSIG for the address record for ``www.example.com``.
+
+The DNS queries involved are summarized in the following diagram. Each request shows the ⟨\ *name*,\ *type*\ ⟩ pair. Responses are indicated only for queries that traditional, non-DNSSEC DNS would make, to emphasize RRSIG records are included. These queries are shown with black paths. The DS/DNSKEY requests for the ``.com`` zone are shown with blue paths; the DS/DNSKEY requests for the ``example.com`` zone are shown in green. 
+
+.. image::	images/security/dnssec.svg
+
+The chain of key validations can be summarized as follows:
+
+* The known root ZSK validates the ``.com`` ZSK, through the DNSKEY/DS pair for the DNS name ``.com``
+* The ``.com`` ZSK validates the ``example.com`` ZSK, and is itself validated via the DNSKEY/DS pair for the DNS name ``.com``
+* The ``example.com`` ZSK validates the A record for ``www.example.com``, and is itself validated via the DNSKEY/DS pair for the DNS name ``example.com``
+
+
+It is possible that the resolver knows, likely through caching, the IP address of the ``example.com`` nameserver. In this case, if the RRSIG and DS credentials were not also cached, the resolver might go through the above process from the bottom up (``example.com`` to ``.com`` to root) to validate the information.
+
+If ``example.com`` had not yet implemented DNSSEC support, but a subdomain ``cs.example.com`` did, then the chain of trust between the subdomain and the root zone would be broken. In this case, a resolver could only use DNSSEC to validate records for ``cs.example.com`` if it already had the ZSK for this domain, known, as with the root zones, as the trust anchor. Trust anchors for such isolated zones, or "islands of security", are often made available through manual configuration.
+
+Any and all of the records above might be cached by the validating resolver, following a previous query. Caching works for DNSSEC just as it works for ordinary DNS. The key-related records, like all DNS records, each have a time-to-live (TTL) value; the resolver must abide by these. 
+
+The diagram above shows two separate requests to the root nameserver, three to the ``.com`` nameserver, and two to the ``example.com`` nameserver. That is inefficient. Fortunately, it is not mandatory: clients can request everything at once. It is also likely that many of these records will be cached (particularly requests to the root and ``.com`` nameservers).
+
+
+For improved security, some authoritative nameservers may be configured with two keys: a shorter zone-signing key, used to sign the RRSIGs, and then a longer **key-signing key**, or KSK; the latter is the one signed in the parent-zone DS record. The DNSKEY records return *both* ZSK and KSK; this is sufficient to maintain the chain of trust. 
+
+As an example of a ZSK/KSK pair, let us send the following DNSKEY request to the ``.com`` domain (having previously looked up the NS record to get the ``.com`` nameserver IP address, 192.12.94.30)
+
+::
+
+  dig @192.12.94.30 com DNSKEY +dnssec
+
+We get back two keys. The shorter one, as is explained below, is the ZSK and the longer is the KSK (this output has been formatted so the key data lines up neatly).
+
+::
+
+	com.	86400	IN	DNSKEY	256 3 8 AQO+kWUV3rtj/Vi6FLBfxMRcFoz69Go6xVwa99AWzENDi98y9CIJfx6w 
+	                                        n9aR0SWsCk/oY+hreX6egC7nyyxQ5bxq52aovlZI34Cn+hpy/YGGO2HS 
+	                                        b44AWONsjuZTAfGYLBdaJi2Wg+Z0IVqPw/Lp0Ysu9I8orc2KyNIPQGA/ 
+	                                        rTgXOw==
+	com.	86400	IN	DNSKEY	257 3 8 AQPDzldNmMvZFX4NcNJ0uEnKDg7tmv/F3MyQR0lpBmVcNcsIszxNFxsB 
+	                                        fKNW9JYCYqpik8366LE7VbIcNRzfp2h9OO8HRl+H+E08zauK8k7evWEm
+	                                        u/6od+2boggPoiEfGNyvNPaSI7FOIroDsnw/taggzHRX1Z7SOiOiPWPN
+	                                        IwSUyWOZ79VmcQ1GLkC6NlYvG3HwYmynQv6oFwGv/KELSw7ZSdrbTQ0H
+	                                        XvZbqMUI7BaMskmvgm1G7oKZ1YiF7O9ioVNc0+7ASbqmZN7Z98EGU/Qh 
+	                                        2K/BgUe8Hs0XVcdPKrtyYnoQHd2ynKPcMMlTEih2/2HDHjRPJ2aywIpK
+	                                        Nnv4oPo/
+
+The numbers 256 and 257 immediately following the DNSKEY type label represent a 16-bit flag field. Both have the bit set in the 256 position, indicating the keys are there for zone-signing generally. The longer key also has the bit set in the 1 position; this is the "Secure Entry Point" flag and, rather loosely, indicates that this key is the KSK. More specifically, the SEP flag is used to mark a key for which a DS record will be created in the parent zone.  See :rfc:`3757` for further details.
+
+After the 256/257 is a 3, and then an 8. The 8 means that the keys and signatures use RSA and SHA-256, as specified in :rfc:`5702`.
+
+The keys are encoded in base64 (:rfc:`4648`). The first key has 176 encoded bytes (3 lines of 56, plus 8). Decoding it with the Python ``b64decode`` function in the ``base64`` library, we get a byte string of length 130. The first byte is 0x01, with seven leading zero bits; the number of bits from the first nonzero bit to the end is 1033. The second has 344 bytes, or 2057 bits after stripping the leading 0-bits. In common parlance, these are 1024-bit and 2048-bit keys respectively. A 1024-bit RSA keylength is not terribly secure, but is meant for relatively short-term use (~30 days). The 2048-bit KSK provides excellent security.
+
+Each RRSIG record contains a ``Key Tag`` field, consisting of a 16-bit hash of information about the key. This makes it much easier, when there are multiple DNSKEY records, to help figure out which one was used to create the RRSIG signature. The fallback, if necessary, is to re-calculate the signature with each available key, and see which one matches the RRSIG. Multiple DNSKEY records occur when separate ZSK and KSK keys have been created, as above. They also occur anytime a key is in the process of being updated, as in the next paragraph.
+
+To change the KSK for the ``example.com`` nameserver, the first step is to create the new key, and then to create new RRSIGs for each RRset. A new DNSKEY record is also created. The new KSK public key must then be communicated to the parent zone, in order for the latter to create the corresponding DS record. For a while, the RRSIG and DNSKEY (and DS, at the parent nameserver, if the KSK is being changed) record sets returned will contain records for *both* KSKs; the receiving resolver can use the ``Key Tag`` field (above) to figure out which key goes with which RRSIG. Eventually the old KSK will expire, |eg| when its TTL is reached, and the older records can be removed.
+
+Signing failure responses for non-existent DNS names is also important, but is a little trickier. First, the RRset in question is empty. An empty set can be signed, but the signed response can now be replayed, perhaps to convince someone later that an existing DNS name is not valid. It would be possible to prevent this by including the non-existent DNS name in the signed response, but that would require that the signing private key be available whenever necessary. One of the goals of the RRset/RRSIG strategy above, however, is to make possible the pre-signing of all record sets, so the actual private key can then be secured offline. 
+
+.. index::
+	single: NSEC
+
+To get around this, the original strategy for authenticating non-existence was to return a record containing the previous legitimate DNS name, and then an **NSEC** record listing the subsequent legitimate DNS name, according to alphabetical order. The NSEC record corresponding to a valid DNS host name is the next valid DNS name in sequence. For example, if a query asked for information about nonexistent host ``foo.example.com``, the results returned might be the DNS name ``erl.example.com`` and then the NSEC record for ``erl`` indicating that the next record following was ``gateway.example.com``. The nameserver can prepare signatures for such records ahead of time for each consecutive pair of DNS names. The NSEC record corresponding to the last valid hostname wraps around to the first, usually the zone name itself. 
+
+The drawback to this strategy is that it makes it easy for someone to enumerate all the valid DNS names in a zone, by sequential querying. To prevent this, the NSEC approach was updated to **NSEC3**, which does much the same thing, except that cryptographic hashes of each hostname are returned instead, and the ordering used is that of the hashed values. An attacker can now enumerate the *hashed* values of each DNS name, but this doesn't help discover the actual hostnames without considerable effort. The necessary signatures can, as with the NSEC approach, all be prepared in advance.
+
+Using DNSSEC
+----------------
+
+If you are managing an authoritative nameserver, |eg| for your own website, enabling DNSSEC takes some deliberate effort. To enable DNSSEC requires configuring the nameserver software to be DNSSEC-aware, creating the keys, and forwarding the appropriate DS record to the parent zone.
+
+For sites that have done this, however, there is no guarantee that the DNSSEC validation benefits will actually be available to a given user workstation; that depends on the resolver the workstation uses. If it supports DNSSEC, then DNS results from DNSSEC-aware authoritative nameservers will be validated according to the DNSSEC process.
+
+Most user workstations are configured to use the site resolver provided by the local ISP. Some of these support DNSSEC; many do not. It is possible to switch to a DNSSEC-validating resolver manually, |eg| a public DNS server, but most users do not do this. Typical workstation "stub resolvers" do not perform DNSSEC validation by default; the popular Linux `dnsmasq <https://en.wikipedia.org/wiki/Dnsmasq>`__ resolver can be configured to use DNSSEC by adding the ``--dnssec`` command-line flag in the appropriate startup file.
+
+.. index::
+	single: dnssec-failed.org
+
+.. sidebar:: Does dnssec-failed.org exist?
+
+	If your site DNS resolver performs DNSSEC validation, clicking on the link here to `www.dnssec-failed.org <http://dnssec-failed.org>`__ will simply fail. To verify the site actually exists without changing resolvers, first get the NS record for ``dnssec-failed.org`` from the ``.org`` nameserver; as of 2019 this was dns101.comcast.net at 69.252.250.103. Then ``dig @69.252.250.103 www.dnssec-failed.org`` should give you the desired A records (two in 2022: 68.87.109.242 and 69.252.193.191). 
+
+The simplest way to tell if a resolver supports DNSSEC, *and* validates the DNSSEC responses received is to look up one of several DNS names that have intentionally been misconfigured. One of these is `www.dnssec-failed.org <http://dnssec-failed.org>`_, managed (2019) by Comcast. A validating resolver will return the NXDOMAIN (Non-eXistent DOMAIN) error message (or, in other words, zero records in the ANSWER section); clicking on the link should yield a browser error message like "Hmm. We’re having trouble finding that site." A non-DNSSEC-validating resolver will return an A record, and the link should work normally. Some partially DNSSEC-aware (but non-validating) resolvers still manage to return an address (see below). 
+
+Another way to gauge the degree of resolver support for DNSSEC is to use the `dig <https://en.wikipedia.org/wiki/Dig_(command)>`__ command(:ref:`dig1`). In the example below, the *dns_server* should be the IP address of the resolver; if omitted (along with the ``@`` sign) then the default resolver is used. The ``+dnssec`` argument sets the ``DNSSEC OK`` flag in the query.
+
+
+ | ``dig @``\ *dns_server*  ``isc.org A +dnssec``
+
+This command returns something like the following if the resolver does not support DNSSEC at all (this is from the OpenDNS resolver at 208.67.222.222, as of 2019). 
+
+::
+
+	;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 15612
+	;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+	;; OPT PSEUDOSECTION:
+	; EDNS: version: 0, flags:; udp: 4096
+	;; QUESTION SECTION:
+	;isc.org.			IN	A
+	;; ANSWER SECTION:
+	isc.org.		60	IN	A	149.20.64.69
+
+There is no RRSIG record, the ``flags`` on the second line do *not* include the ``ad`` flag (for "authenticated data"), and the EDNS line does not include the ``do`` flag (for "DNSSEC OK"). 
+
+For resolvers understanding DNSSEC, the following might appear (this is from the Google resolver at 8.8.8.8):
+
+:: 
+
+	;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 60302
+	;; flags: qr rd ra ad; QUERY: 1, ANSWER: 2, AUTHORITY: 0, ADDITIONAL: 1
+	;; OPT PSEUDOSECTION:
+	; EDNS: version: 0, flags: do; udp: 512
+	;; QUESTION SECTION:
+	;isc.org.			IN	A
+	;; ANSWER SECTION:
+	isc.org.		59	IN	A	149.20.64.69
+	isc.org.		59	IN	RRSIG	A 5 2 60 20190403233441 20190304233441 28347 isc.org. KlUPLww/FO3rOV3rDiuEH2ttUDSA/PtpCaHTGTSyHMaIGlOU3YoHn8hP FJtCkhoopF/ Z6dFXPxAq1LpwtEP9KqU+PxQYGSsZESg1KkEWIaoiE2MB hHsGqDnJG2GJhyBfCESIt21QY9Q28+nraTG0OUHiKwE8H2c0/PM2VTXP clQ=
+
+Note the RRSIG record, the ``ad`` flag in the second line, and the ``do`` flag in the fourth.
+
+Without the ``+dnssec`` argument, we should get an ordinary DNS response, without RRSIG, ``ad`` or ``do``. 
+
+Occasional intermediate results may also sometimes appear, |eg| having the RRSIG record and the ``do`` flag but missing the ``ad`` flag. 
+
+If we try the same lookup with the domain name ``www.dnssec-failed.org``, some resolvers return no answer (that is, NXDOMAIN) while others return A and RRSIG records. However, we should not see any resolver return with the ``ad`` flag, as due to an artificially induced key error the data cannot in this case be authenticated. 
+
+.. index::
+	single: DANE
+	single: DNS authentication
+
+DNS-based Authentication of Named Entities
+---------------------------------------------
+
+The idea behind DNS-based Authentication of Named Entities, or **DANE**, is to have DNSSEC sign not just the usual DNS records, but also TLS certificates. By doing so, DANE replaces the need for TLS certificate authorities (:ref:`CA`). See :rfc:`6698` and updates.
+
+The basic idea behind DANE is that a domain owner can make their public TLS keys available on their authoritative DNS nameserver. The same chain of trust that authenticates A records from this nameserver will also authenticate the certificates. That is, certificates are signed by local KSKs, and those in turn are signed by parent KSKs, until the root zone is reached. The long list of certificate-authority keys stored in browsers would be reduced to the much shorter list of root-zone DNSSEC keys.
+
+certificates are stored as DNS objects of type TLSA. Certificates are specific to applications, so the domain name (|eg| ``www.example.com``) is prefixed with the port and transport protocol, each with a leading underscore "_" (443 is the port number for https traffic):
+
+::
+
+  _443._tcp.www.example.com
+
+DANE solves a number of problems. First, it makes (or potentially makes) expensive certificate authorities unnecessary. Second, certificate authorities have to verify that someone asking for a certificate for a given domain is actually the owner of that domain; under DANE, this is solved by having the domain's authoritative nameserver be responsible for both the domain and the keys. 
+
+Finally, DANE simplifies the process of adding new certificates, and makes this pretty much a do-it-yourself operation. Once the owners of a domain have created a zone-signing key and had it signed in the parent-zone DS record, they can create as many additional certificates as they want. The validation library used by clients (whether incorporated into the TLS library or not) would be able to ensure that certificates so issued are for the domain in question, or a subdomain, and also verify the port and protocol constraints above.  Each such DANE certificate would be verifiable through the DNSSEC chain of trust. More-flexible certificate creation would eliminate the need for the "private" (self-signed) certificates often used to validate access to VPNs and email servers. Under DANE, certificates could become lightweight objects created on a moment's notice. (Of course, no browser currently supports any of this.)
+
+While DANE is intended for the creation of TLS (X.509) certificates, other forms of verifiable public keys would also be possible. See :rfc:`6394` for further examples.
+
+While compromise of an authoritative nameserver using DANE could lead to false TLS certificates, this can also happen with conventional certificate authorites, who generally use control of the domain as evidence that the entity requesting the certificate actually owns that domain. 
+
+Compromise of the ``.com`` nameserver would allow the distribution of false DANE-based TLS certificates for any ``.com`` domain. But if that happens we are all in trouble, regardless of DANE.
+
+.. index::
+	single: trust, DANE
+	single: governments, DANE
+
+There is one subtle difference, which is that of trust. Under the conventional certificate-authority regime, uses can *in principle* decide which CAs they trust. While this is rarely exercised by browser users, it is available as a potential option. Under DANE, to trust the certificate for ``example.com`` is to trust the ``.com`` and root nameservers; there is no choice. 
+
+For some, the fact that the ``.com`` and root nameservers are under control of the United States government (through IANA and agreements with IANA) is of concern. It is easy enough for other governments to create their own hierarchy, starting with the two-letter country-code domain and an associated trust-anchor key, but it is still a government in charge. However, while certificate authorities are private entities, it is not clear to what extent they can or would resist government demands to issue misleading certificates.
+
+
+.. _dnssec popular:
+
+Why Isn't DNSSEC More Popular?
+-----------------------------------
+
+SSH and TLS have been adopted eagerly by system and website administrators. Even SNMPv3 (:ref:`SNMPv3 security`) has seen widespread adoption, following early concerns about deployment difficulties. But while many governments (such as the United States) have mandated DNSSEC for their own websites, and while organizations with ties to Internet governance have been early adopters (especially `ICANN <http://icann.org>`__; see `this statement <https://www.icann.org/news/announcement-2019-02-22-en>`_), DNSSEC adoption by major Internet corporations has been vanishingly small. Using the dig tool, it is straightforward to verify that none of the domains in the table below support DNSSEC (none return RRSIG records when A records are requested with the ``+dnssec`` flag, as of 2019): 
+
+==============	==============	==============	==============	==============
+==============	==============	==============	==============	==============
+apple.com	alibaba.com	amazon.com	ebay.com	expedia.com
+facebook.com	google.com	microsoft.com	netflix.com	salesforce.com
+tencent.com 	twitter.com	uber.com 	yahoo.com 	youtube.com. 
+==============	==============	==============	==============	==============
+
+Google has supported DNSSEC at their public resolver, 8.8.8.8, since 2013, but not at their authoritative nameservers. Paypal.com is one of the few large sites that *has* adopted DNSSEC.
+
+These companies are seriously interested in Internet security. Why do they turn their backs on DNSSEC?
+
+.. index::
+	single: dark website
+	single: void, cast into
+
+The primary answer is that if a site enables DNSSEC, and *some third party* makes the wrong DNSSEC-configuration mistake, then the site becomes unreachable, for at least some users. It goes dark. It is cast into the void. 
+
+And there is no error message for those users.
+
+If a TLS certificate is faulty, at least the end user gets a message in their browser; see the sidebar "Certificate Errors" at :ref:`CA`. The browser directly manages the TLS connection, and, if something goes wrong, the browser learns what, and can inform the user. The majority of certificate errors have to do with misspellings and expirations and updates and other things under control of the domain owner; pretty much the only other major source of TLS errors is the certificate authority, and the domain owner can keep an eye on them.
+
+But with DNS, most browsers farm out lookups to a system resolver library; that library likely does not return anything to the browser that might distinguish DNSSEC validation errors from NXDOMAIN errors. The site or public resolver that the local system sends its DNS queries to likely also does not return different results for validation errors versus NXDOMAIN. And while an error in DNSSEC validation can occur at the root, it can also occur at any lower level in the DNS hierarchy. It is impossible for domain owners to track potential problems at every possible resolver.
+
+A second reason sites choose not to make use of DNSSEC is that it is often perceived as unnecessary. If a user receives a corrupted address through DNS, the problem should be detected through TLS certificate-signing failure. There have been remarkably few DNS-based attacks for which DNSSEC would have made the difference in terms of detection.
+
+.. index::
+	single: DNS attack, 2018
+
+A large-scale series of DNS attacks in 2018 involved changing the IP addresses retrieved via DNS for selected hostnames to those of servers under the attackers' control, just as with cache-poisoning attacks (:ref:`cache poisoning`).  These attacks, however, entailed the compromise of the  **authoritative nameservers** involved; the attacks were achieved through stolen DNS-administrator credentials (and possibly through misfeatures in the DNS-configuration software within some domain registrars). See this `FireEye blog <https://www.fireeye.com/blog/threat-research/2019/01/global-dns-hijacking-campaign-dns-record-manipulation-at-scale.html>`_ for more details. DNSSEC does *not* protect against an attacker who is able to compromise a zone's authoritative nameserver. Nameserver credentials (all login credentials, really) must be guarded carefully.
+
+.. index::
+	single: defense in depth, security
+
+The counter argument is that DNSSEC certainly has the potential to block *some* attacks, and that more security is always better than less. This latter concept is called the `defense in depth principle <https://en.wikipedia.org/wiki/Defense_in_depth_(computing)>`_. It is, in the abstract, hard to argue with. In the concrete, on the other hand, it depends. DNSSEC is complex, and introduces its own risks. The defense-in-depth principle has been used to argue for regular password changes, but that policy seems to have the paradoxical effect of encouraging users to choose shorter, easier-to-remember passwords. The real question is whether DNSSEC adds *enough* to Internet security to be worth the change.
+
+Eventually, as most public DNS servers and ISP-based site resolvers gain experience with DNSSEC, switching over to it at the server side will become safer and safer. It is likely that, eventually, the going-dark risk will be seen as negligible; at that point, DNSSEC starts to make a lot of sense even if the added benefit is modest.
+
+Another concern is that DNSSEC is old, and the world of DNSSEC still contains a great many legacy 1024-bit RSA keys. By today's standards, those are not considered long enough for long-term use. But DNSSEC does not mandate such short keys. As we saw in an example above, the ``.com`` key-signing key was 2048 bits; root keys and other top-level KSKs are similar.
+
+There is still the issue that the domain hierarchy is more tightly controlled by governments, but while some individual users may be concerned about this, it is not clear that large Internet companies are.
+
+.. index::
+	single:	DoH
+	single: DNS over HTTPS
+
+.. _DoH:
+
+DNS over HTTPS
+-------------------
+
+An entirely different approach to securing DNS -- or at least to reducing DNS problems -- has been taken by `Mozilla <https://www.mozilla.org>`_ in their Firefox browser. The idea behind DNS over HTTPS -- **DoH** -- is to abandon the use of site resolvers, and have Firefox send DNS queries to one central DNS resolver, secured by TLS. The specifics are in :rfc:`8484`.
+
+.. index::
+	single: trusted recursive resolver
+	single: TRR, DNS
+
+One stated goal is to eliminate DNS cache-poisoning attacks by, in essence, switching Firefox users to one large, highly secure resolver (a "trusted recursive resolver" or **TRR**) that gets all its data directly from authoritative nameservers. Another goal is to prevent ISP eavesdropping on (and even interference with) DNS requests sent to local ISP-provided resolvers. Of course, the ISP-eavesdropping concern is simply replaced by the concern that the central DNS resolver is collecting DNS queries. 
+
+The TRR partner selected by Mozilla is `Cloudflare <https://www.cloudflare.com/>`_, manager of a large CDN. There is an agreement negotiated between Mozilla and Cloudflare that personally identifiable data in DNS requests is to be discarded after 24 hours, and never shared with outside parties. 
+
+Use of DoH by Firefox is controlled by the ``about:config`` setting ``network.trr.mode``; a value of 0 prefers the normal system resolver and a value of 5 completely disables DoH. One can also set the resolver itself, |eg| to a non-Cloudflare one, though it must be one that understands DNS-over-HTTP queries.
+
+The DoH specification spells out how DNS queries are to be mapped onto HTTP GET requests; traditional DNS queries and responses look nothing like HTTP. 
+ 
+There is a separate approach, DNS over TLS; it is outlined in :rfc:`7858`. The goal is simply to prevent eavesdropping on DNS traffic from hosts to their individually chosen resolvers.
+
+
+.. _an RSA key:
+
+RSA Key Examples
+====================
+
+In this section we create a short RSA key, using the ``openssl`` package, available for Windows, Macs and Linux. We then break it, via factoring.
+
+The first step is to create an RSA key with length 96 bits; this length was chosen for easy factorability.
+
+::
+
+  openssl genrsa -out key96.pem 96
+
+The resultant file is as follows:
+
+::
+
+ -----BEGIN RSA PRIVATE KEY-----
+ MFICAQACDQCo1hzP6/gTzbNAEHcCAwEAAQINAJzcEHi8aYSO0iizgQIHANkzC28P
+ jwIHAMb/VQH8mQIHALc+9ZqRyQIHAKkfQ43msQIGJxhmMMOs
+ -----END RSA PRIVATE KEY-----
+
+This is in the so-called PEM format, which means that the two lines in the middle are the base64 encoding of the ASN.1 encoding (:ref:`ASN.1 encoding`) of the actual data. Despite the ``PRIVATE KEY`` label, the file in fact contains both private and public keys. SSH private keys, typically generated with the ``ssh-keygen`` command, are also in PEM format.
+
+We can extract the PEM-file data with the next command:
+
+::
+
+ openssl rsa -in key96.pem -text
+
+The output is the following:
+
+::
+
+	Private-Key: (96 bit)
+	modulus:
+	    00:a8:d6:1c:cf:eb:f8:13:cd:b3:40:10:77
+	publicExponent: 65537 (0x10001)
+	privateExponent:
+	    00:9c:dc:10:78:bc:69:84:8e:d2:28:b3:81
+	prime1:
+	    00:d9:33:0b:6f:0f:8f
+	prime2:
+	    00:c6:ff:55:01:fc:99
+	exponent1:
+	    00:b7:3e:f5:9a:91:c9
+	exponent2:
+	    00:a9:1f:43:8d:e6:b1
+	coefficient:
+	    27:18:66:30:c3:ac
+
+The default OpenSSL encryption exponent, denoted e in :ref:`RSA`, is 65537 = 2\ :sup:`16`\ +1. (The default exponent used to be 3, but see exercise 10.0)
+
+We next convert all these hex numbers to decimal; the corresponding notation of :ref:`RSA` is in parentheses.
+
+====================	====================================================
+====================	====================================================
+modulus	(n)		52252327837124407964427358327
+privateExponent (d)	48545702997494592199601992577
+prime1 (p)		238813258387343
+prime2 (q)		218799945153689
+exponent1		201481036403145
+exponent2		185951742453425
+coefficient		42985747170220
+====================	====================================================
+
+We now verify some arithmetic, using any tool that supports large integers (|eg| python3, used here, or the unix ``bc`` command). First we check n = pq:
+
+::
+
+ >>> 238813258387343 * 218799945153689
+ 52252327837124407964427358327
+
+Next we check that ed = 1 mod (p-1)(q-1):
+
+::
+
+	>>> e=65537
+	>>> d=48545702997494592199601992577
+	>>> p=238813258387343
+	>>> q=218799945153689
+	>>> (p-1)*(q-1)
+	52252327837123950351223817296
+	>>> e*d % 52252327837123950351223817296
+	1
+
+To encrypt a message m, we *must* use efficient mod-n calculations; here is an implementation of the repeated-squaring algorithm (mentioned above in :ref:`arithmetic`) in python3. (This function is built into python as ``pow(x,e,n)``.)
+
+::
+
+ def power(x,e,n):  # computes x^e mod n
+     pow = 1
+     while e>0:
+        if e%2 == 1: pow = pow*x % n
+        x = x*x % n
+        e = e//2    # // denotes integer division
+     return pow
+
+Let m be the string "Rivest". In hex this is 0x526976657374; in decimal, 90612911403892.
+
+::
+
+	>>> m=0x526976657374
+	>>> c=power(m,e,n)
+	>>> c
+	38571433489059199500953769621
+	>>> power(c,d,n)
+	90612911403892
+
+What about the last three numbers in the PEM file, ``exponent1``, ``exponent2`` and ``coefficient``? These are pre-computed values to speed up decryption. Their values are
+
++ ``exponent1`` = d mod (p-1)
++ ``exponent2`` = d mod (q-1)
++ ``coefficient`` is the solution of coefficient × q = 1 mod p
+
+.. _breaking the key:
+
+Breaking the key
+-----------------
+
+Finally, let us break this 96-bit key and decrypt the message with ciphertext c above. The hard part is factoring n; we use the Gnu/Linux ``factor`` command:
+
+:: 
+
+  > factor 52252327837124407964427358327 
+  52252327837124407964427358327: 218799945153689 238813258387343
+
+The factors are indeed the values of p and q, above. Factoring took 2.584 seconds on the author's laptop. Of course, 96-bit RSA keys were never secure; recall that the current recommendation is to use 2048-bit keys. 
+
+.. index::
+	single: Pollard's rho algorithm
+	single: msieve
+
+
+The Gnu/Linux ``factor`` command uses `Pollard's rho algorithm <http://en.wikipedia.org/wiki/Pollard's_rho_algorithm>`_, and, while serviceable, is not especially well suited to factoring the product of two large primes. The author was able to factor a 200-bit modulus in just over 5 seconds using the `msieve <http://sourceforge.net/projects/msieve/>`_ program, one of several large-number-factoring programs available on the Internet. Msieve implements a version of the number-field-sieve algorithm mentioned in :ref:`factoring times`.
+
+We are almost done; we now need to find the decryption key d, knowing e, p-1 and q-1. For this we need an implementation of the extended Euclidean algorithm; the following Python implementation is taken from `WikiBooks <https://en.wikibooks.org/wiki/Algorithm_Implementation/Mathematics/Extended_Euclidean_algorithm>`_:
+
+::
+
+	def egcd(a, b):
+	    if a == 0:
+	        return (b, 0, 1)
+	    else:
+	        g, y, x = egcd(b % a, a)
+	        return (g, x - (b // a) * y, y)
+
+A call to ``egcd(a,b)`` returns a triple (g,x,y) where g is the greatest common divisor of a and b, and x and y are solutions to g = ax + by. From :ref:`RSA`, we need d to be positive and to satisfy 1 = de + (p-1)(q-1)y. The x value (the second value) returned by ``egcd(e, (p-1)*(q-1))`` satisfies the second part, but it may be negative in which case we need to add (p-1)(q-1) to get a positive value which is congruent mod (p-1)(q-1). This x value is -3706624839629358151621824719; after adding (p-1)(q-1) we get d=48545702997494592199601992577. 
+
+This is the value of d we started with. If c is the ciphertext, we now calculate m = pow(c,d,n) as before, yielding m=90612911403892, or, in hex, 52:69:76:65:73:74, "Rivest".
+
+Exercises
+============
+
+*Exercises may be given fractional (floating point) numbers, to allow for interpolation of new exercises.*
+
+\ 1.0 Suppose Alice uses RSA to send messages to three friends, Bob, Charlie and Deborah, who have respective public keys (n\ :sub:`B`,3),  (n\ :sub:`C`,3) and (n\ :sub:`D`,3); note that all three friends use the same encryption exponent e=3. Assume n\ :sub:`B`, n\ :sub:`C` and n\ :sub:`D` are relatively prime (if they are not, Alice's friends have a much bigger problem!). Alice sends message m to each, encrypted as
+
++ C\ :sub:`B` = m\ :sup:`3` mod n\ :sub:`B`
++ C\ :sub:`C` = m\ :sup:`3` mod n\ :sub:`C`
++ C\ :sub:`D` = m\ :sup:`3` mod n\ :sub:`D`
+ 
+If Mallory intercepts all three encrypted messages, explain how he can efficiently decrypt m. Hint: the Chinese Remainder Theorem implies that Mallory can find C < n\ :sub:`B`\ n\ :sub:`C`\ n\ :sub:`D` such that
+
++ C = C\ :sub:`B`  mod n\ :sub:`B`
++ C = C\ :sub:`C`  mod n\ :sub:`C`
++ C = C\ :sub:`D`  mod n\ :sub:`D`
+
+(One simple way to avoid this risk is for Alice to include a timestamp and the recipient's name in each message, ensuring that she never sends exactly the same message twice. Another way is to choose a larger exponent e.)
+
+\ 2.0 Repeat the key-creation of :ref:`an RSA key` using a 110-bit key. Extract the modulus from the key file, convert it to decimal, and attempt to factor it. Can you do the factoring in under a minute?
+
+\ 3.0 Below are a series of public RSA keys and encrypted messages; the encrypted message is c and the modulus is n=pq. In each case, find the original message, using the methods of :ref:`breaking the key`; you will have to factor n and then find d. For some keys, the Gnu/Linux ``factor`` command will be sufficient; for the larger keys consider `msieve <http://sourceforge.net/projects/msieve/>`_ or some other fast factorer. 
+
+Each number below is in decimal. The encryption exponent e is always 65537; the encryption is c = power(message,e,n). Each message is an ASCII string; that is, after the numeric message is converted to a string, the byte values are each in the range 32-127 (in real use, RSA is never applied directly to messages, but rather to session keys). The following Python function may be useful in converting numeric messages to strings:
+
+::
+
+	def int2ascii(n):
+	    if n==0: return ""
+	    return int2ascii(n // 256) + chr(n % 256)
+
+| (a) [64 bits] c=13467824835325843134
+|     n=15733922878520524621
+
+| (b) [96 bits] c=8007751471156136764029275727
+|     n=57644199986835279860947893727
+
+| (c) [104 bits] c=6642328489179330732282037747645
+|     n=17058317327334907783258193953123
+
+| (d) [127 bits] c=95651949760509273124353927897611145475
+|     n=122096824047754908887766043915630626757
+|     Limit for Gnu/Linux ``factor`` without the `GMP library <https://gmplib.org/>`_
+
+| (e) [185 bits] c=14898070767615435522751082309577192810119252877170446296
+|     n=36881105206579952723396854897336450502002018818436622611
+
+| (f) [210 bits] c=1030865591241775131254813948981782525587720826169501849049177362
+|     n=1089313781487492651628882855744766776820791642308868127824231021
+
+| (g) [280 bits]
+| c=961792929180423930042975913300802531765775361218349440433358416557620430721970697783
+| n=1265365011260907658483984328995361695181000868013851878620685943648084220336740539017
+
+| (h) [304 bits] 
+| c=17860252858059565448950681133486824440185752167054796213786228492658586864179401029486173539
+|      n=26294146550372428669569992924076340150116542153388301312743129088600749884420889043685502979
+
+

@@ -1,0 +1,572 @@
+.. sectnum::
+   :start: 33
+
+Bibliography
+*************
+
+Note that RFCs are not included here.
+
+.. [AKSLYZ21] Anubhavnidhi Abhashkumar, Kausik Subramanian, Alexey Andreyev, Hyojeong Kim,
+   Nanda Kishore Salem, Jingyi Yang, Petr Lapukhov, Aditya Akella and Hongyi Zeng,
+   "Running BGP in Data Centers at Scale",
+   18th USENIX Symposium on Networked Systems Design and IMplementation (NSDI 21),
+   April 2021.
+
+.. [ABDGHSTVWZ15] David Adrian, Karthikeyan Bhargavan, Zakir Durumeric, 
+   Pierrick Gaudry, Matthew Green, J. Alex Halderman, Nadia Heninger,
+   Drew Springall, Emmanuel Thomé, Luke Valenta, Benjamin VanderSloot,
+   Eric Wustrow, Santiago Zanella-Béguelin, Paul Zimmermann, 
+   "Imperfect Forward Secrecy: How Diffie-Hellman Fails in Practice",
+   preprint at `weakdh.org <https://weakdh.org/>`_, May 2015.
+
+.. [AEH75] Eralp Akkoyunlu, Kattamuri Ekanadham and R V Huber,
+   "Some constraints and tradeoffs in the design of network communications",
+   SOSP '75: Proceedings of the fifth ACM symposium on Operating systems and principles, November 1975. 
+
+.. [AO96] Aleph One (Elias Levy),
+   "Smashing The Stack For Fun And Profit",
+   Phrack volume 7 number 49, 1996, available at http://insecure.org/stf/smashstack.html.
+
+.. [AGMPS10] Mohammad Alizadeh, Albert Greenberg, David Maltz, Jitendra Padhye, Parveen Patel, Balaji Prabhakar, Sudipta Sengupta and Murari Sridharan,
+   "Data Center TCP (DCTCP)",
+   Proceedings of ACM SIGCOMM 2010, September 2010.
+   
+.. [AYSKMP13] Mohammed Alizadeh, Shuang Yang, Milad Sharif, Sachin Katti, Nick McKeown, Balaji Prabhakar, and Scott Shenker", 
+   "pFabric: Minimal near-optimal datacenter transport",
+   SIGCOMM, August 2013.
+
+.. [AP99] Mark Allman and Vern Paxson, 
+   "On Estimating End-to-End Network Path Properties",
+   Proceedings of ACM SIGCOMM 1999, August 1999.
+
+.. [ACPRT16] Joël Alwen, Binyi Chen, Krzysztof Pietrzak, Leonid Reyzin and Stefano Tessaro,
+   "Scrypt is Maximally Memory-Hard",
+   Cryptology ePrint Archive, Report 2016/989, 2016, available at https://eprint.iacr.org/2016/989.
+
+.. [AHLR07] Chris Anley, John Heasman, Felix "FX" Linder and Gerardo Richarte,
+   "The Shellcoder's Handbook", second edition,
+   Wiley, 2007.
+
+.. [AKM04] Guido Appenzeller, Isaac Keslassy and Nick McKeown,
+   "Sizing Router Buffers", 
+   ACM SIGCOMM Computer Communication Review, October 2004
+
+.. [JA05] John Assalone,
+   "Exploiting the GDI+ JPEG COM Marker Integer Underflow Vulnerability",
+   Global Information Assurance Certification technical note, January 2005,   
+   available at `www.giac.org/paper/gcih/679/exploiting-gdi-plus-jpeg-marker-integer-underflow-vulnerability/106878 <http://www.giac.org/paper/gcih/679/exploiting-gdi-plus-jpeg-marker-integer-underflow-vulnerability/106878>`_.
+
+.. [PB62] Paul Baran, 
+   "On Distributed Computing Networks", 
+   Rand Corporation Technical Report P-2626, 1962.
+
+.. [BCL09] Steven Bauer, David Clark and William Lehr,
+   "The Evolution of Internet Congestion",
+   Telecommunications Policy Research Conference (TPRC) 2009, August 2009, available at `ssrn.com/abstract=1999830 <http://ssrn.com/abstract=1999830>`_.
+
+.. [MB06] Mihir Bellare,
+   "New Proofs for NMAC and HMAC: Security without Collision-Resistance",
+   Advances in Cryptology - CRYPTO '06 Proceedings, Lecture Notes in Computer Science volume 4117, Springer-Verlag, 2006.
+
+.. [BCK96] Mihir Bellare, Ran Canetti and Hugo Krawczyk,
+   "Keying Hash Functions for Message Authentication",
+   Advances in Cryptology - CRYPTO '96 Proceedings, Lecture Notes in Computer Science volume 1109, Springer-Verlag, 1996.
+
+.. [BN00] Mihir Bellare and Chanathip Namprempre,
+   "Authenticated Encryption: Relations among notions and analysis of the generic composition paradigm",
+   Advances in Cryptology — ASIACRYPT 2000 / Lecture Notes in Computer Science volume 1976, Springer-Verlag, 2000; updated version July 2007.
+
+.. [BZ97] Jon Bennett and Hui Zhang,
+   "Hierarchical Packet Fair Queueing Algorithms",
+   IEEE/ACM Transactions on Networking, volume 5, October 1997.
+
+.. [DB08] Daniel Bernstein,
+   "The Salsa20 family of stream ciphers",
+   Chapter, New Stream Cipher Designs, Matthew Robshaw and Olivier Billet, editors, Springer-Verlag, 2008.
+
+.. [JB05] John Bickett, 
+   "Bit-rate Selection in Wireless Networks",
+   MS Thesis, Massachusetts Institute of Technology, 2005.
+
+.. [BCTCU16] Timm Böttger, Felix Cuadrado, Gareth Tyson, Ignacio Castro and Steve Uhlig,
+   "Open Connect Everywhere: A Glimpse at the Internet Ecosystem through the Lens of the Netflix CDN", 
+   ARXIV, arXiv e-print (`arXiv:1606.05519 <http://arxiv.org/abs/1606.05519>`_), June 2016.
+
+.. [BP95] Lawrence Brakmo and Larry Peterson,
+   "TCP Vegas: End to End Congestion Avoidance on a Global Internet",
+   IEEE Journal on Selected Areas in Communications, volume 13 number 8, 1995.
+
+.. [BBGO08] Vladimir Brik, Suman Banerjee, Marco Gruteser and Sangho Oh,
+   "Wireless Device Identification with Radiometric Signatures",
+   Proceedings of the 14th ACM International Conference on Mobile Computing and Networking (MobiCom '08), September 2008.
+
+.. [AB03] Andreis Brouwer,
+   "Hackers Hut",
+   http://www.win.tue.nl/~aeb/linux/hh/hh.html, April 1, 2003
+
+.. [CF04] Carlo Caini and Rosario Firrincieli,
+   "TCP Hybla: a TCP enhancement for heterogeneous networks",
+   International Journal of Satellite Communications and Networking, 
+   volume 22, pp 547-566, 2004.
+
+.. [CGYJ16] Neal Cardwell, Yuchung Cheng, C. Stephen Gunn, Soheil Hassas Yeganeh and Van Jacobson,
+   "BBR Congestion-Based Congestion Control",
+   ACM Queue, volume 14 number 5, September-October 2016.
+
+.. [CM03] Zehra Cataltepe and Prat Moghe,
+   "Characterizing Nature and Location of Congestion on the Public Internet",
+   Proceedings of the Eighth IEEE International Symposium on Computers and Communication,
+   2003.
+
+.. [CDLMR00] Stefania Cavallar, Bruce Dodson, Arjen K Lenstra, Walter Lioen, Peter  Montgomery, Brian Murphy, Herman te Riele, Karen Aardal, Jeff Gilchrist, Gerard Guillerm, Paul Leyland, Joel Marchand, François Morain, Alec Muffett, Craig Putnam, Chris Putnam and Paul Zimmermann,
+   "Factorization of a 512-bit RSA Modulus",
+   Advances in Cryptology — EUROCRYPT 2000, Lecture Notes in Computer Science volume 1807, Springer-Verlag, 2000.
+
+.. [CK74] Vinton G Cerf and Robert E Kahn,
+   "A Protocol for Packet Network Intercommunication",
+   IEEE Transactions on Communications, volume 22 number 5, May 1974.
+
+.. [CJ89] Dah-Ming Chiu and Raj Jain,
+   "Analysis of the Increase/Decrease Algorithms for Congestion Avoidance in Computer  Networks", 
+   Journal of Computer Networks volume 17, pp. 1-14, 1989.
+
+.. [CJ91] David Clark and Van Jacobson,
+   "Flexible and efficient resource management for datagram networks",
+   Presentation, September 1991
+
+.. [CSZ92] David Clark, Scott Shenker and Lixia Zhang,
+   "Supporting Real-Time Applications in an Integrated Services Packet Network: Architecture and Mechanism",
+   Proceedings of ACM SIGCOMM 1992, August 1992.
+
+.. [CBcDHL14] David Clark, Steven Bauer, kc claffy, Amogh Dhamdhere, BBradley Huffaker, William Lehr, and Matthew Luckie, 
+   "Measurement and Analysis of Internet Interconnection and Congestion", 
+   Telecommunications Policy Research Conference (TPRC) 2014, September 2014.
+
+.. [DR02] Joan Daemen and Vincent Rijmen,
+   "The Design of Rijndael: AES – The Advanced Encryption Standard.",
+   Springer-Verlag, 2002.
+
+.. [DS78] Yogen Dalal and Carl Sunshine,
+   "Connection Management in Transport Protocols",
+   Computer Networks 2, 1978.
+
+.. [ID89]  Ivan Dåmgard,
+   "A Design Principle for Hash Functions", 
+   Advances in Cryptology - CRYPTO '89 Proceedings, Lecture Notes in Computer Science volume 435, Springer-Verlag, 1989.   
+
+.. [DBCP97] Mikael Degermark, Andrej Brodnik, Svante Carlsson, and Stephen Pink,
+   "Small forwarding tables for fast routing lookups", 
+   Proceedings of the ACM SIGCOMM '97 conference on Applications, Technologies, Architectures, and Protocols for Computer Communication, September 1997.
+
+.. [DKS89] Alan Demers, Srinivasan Keshav and Scott Shenker,
+   "Analysis and Simulation of a Fair Queueing Algorithm",
+   ACM SIGCOMM Proceedings on Communications Architectures and Protocols, 1989.
+
+.. [DH76] Whitfield Diffie and Martin Hellman,
+   "New Directions in Cryptography",
+   IEEE Transactions on Information Theory, volume IT-22, November 1976.
+
+.. [EGMR05] Mihaela Enachescu, Ashish Goel, Yashar Ganjali, Nick McKeown and Tim Roughgarden.
+   "Part III: Routers with Very Small Buffers",
+   ACM SIGCOMM Computer Communication Review, volume 35 number 2, July 2005.
+
+.. [FF96] Kevin Fall and Sally Floyd,
+   "Simulation-based Comparisons of Tahoe, Reno and SACK TCP",
+   ACM SIGCOMM Computer Communication Review, July 1996.
+
+.. [FRZ13] Nick Feamster, Jennifer Rexford and Ellen Zegura,
+   "The Road to SDN: An Intellectual History of Programmable Networks",
+   ACM Queue, December 2013.
+
+.. [FGMPC02] Roberto Ferorelli, Luigi Grieco, Saverio Mascolo, G Piscitelli, P Camarda,
+   "Live Internet Measurements Using Westwood+ TCP Congestion Control",
+   IEEE Global Telecommunications Conference, 2002.
+
+.. [F91] Sally Floyd,
+   "Connections with Multiple Congested Gateways in Packet-Switched Networks, Part 1",
+   ACM SIGCOMM Computer Communication Review, October 1991.
+
+.. [FJ92] Sally Floyd and Van Jacobson,
+   "On Traffic Phase Effects in Packet-Switched Gateways",
+   Internetworking: Research and Experience, volume 3, pp 115-156, 1992.
+
+.. [FJ93] Sally Floyd and Van Jacobson,
+   "Random Early Detection Gateways for Congestion Avoidance",
+   IEEE/ACM Transactions on Networking, volume 1, August 1993.
+
+.. [FJ95] Sally Floyd and Van Jacobson,
+   "Link-sharing and Resource Management Models for Packet Networks",
+   IEEE/ACM Transactions on Networking, volume 3, June 1995.
+
+.. [FP01] Sally Floyd and Vern Paxson,
+   "Difficulties in Simulating the Internet",
+   IEEE/ACM Transactions on Networking, volume 9, August 2001.
+
+.. [FMS01] Scott Fluhrer, Itsik Mantin and Adi Shamir,
+   "Weaknesses in the Key Scheduling Algorithm of RC4",
+   SAC '01 Revised Papers from the 8th Annual International Workshop on Selected Areas in Cryptography, Springer-Verlag, 2001.
+
+.. [FL03] Cheng Fu and Soung Liew,
+   "TCP Veno: TCP Enhancement for Transmission over Wireless Access Networks",
+   IEEE Journal on Selected Areas in Communications, volume 21 number 2, February 2003.
+
+.. [LG01] Lixin Gao, 
+   "On Inferring Autonomous System Relationships in the Internet",
+   IEEE/ACM Transactions on Networking, volume 9, December 2001.
+
+.. [GR01] Lixin Gao and Jennifer Rexford, 
+   "Stable Internet Routing without Global Coordination",
+   IEEE/ACM Transactions on Networking, volume 9, December 2001.
+
+.. [GNKARS15] Peter Gao, Akshay Narayan, Gauram Kumar, Rachit Agarwal, Sylvia Ratnasamy and Scott Schenker,
+   "pHost: Distributed Near-Optimal Datacenter Transport Over Commodity Network Fabric",
+   CoNEXT '15, December 2015.
+   
+.. [JG93] Jose J Garcia-Lunes-Aceves,
+   "Loop-Free Routing Using Diffusing Computations",
+   IEEE/ACM Transactions on Networking, volume 1, February 1993.
+
+.. [GP11] L Gharai and C Perkins,
+   "RTP with TCP Friendly Rate Control",
+   Internet Draft, http://tools.ietf.org/html/draft-gharai-avtcore-rtp-tfrc-00.
+
+.. [GV02] Sergey Gorinsky and Harrick Vin,
+   "Extended Analysis of Binary Adjustment Algorithms",
+   Technical Report TR2002-39, Department of Computer Sciences, 
+   University of Texas at Austin, 2002.
+
+.. [GM03] Luigi Grieco and Saverio Mascolo,
+   "End-to-End Bandwidth Estimation for Congestion Control in Packet Networks",
+   Proceedings of the Second International Workshop on Quality of Service in Multiservice IP Networks,
+   2003.
+
+.. [GM04] Luigi Grieco and Saverio Mascolo,
+   Performance Evaluation and Comparison of Westwood+, New Reno, and Vegas TCP Congestion Control,
+   ACM SIGCOMM Computer Communication Review, volume 34 number 2, April 2004.
+
+.. [GG03] Marco Gruteser and Dirk Grunwald,
+   "Enhancing Location Privacy in Wireless LAN Through Disposable Interface Identifiers:A Quantitative Analysis", Proceedings of the 1st ACM International Workshop on Wireless Mobile Applications and Services on WLAN Hotspots (WMASH '03), September, 2003.
+
+.. [HRX08] Sangtae Ha, Injong Rhee and Lisong Xu,
+   "CUBIC: A New TCP-Friendly High-Speed TCP Variant",
+   ACM SIGOPS Operating Systems Review - Research and developments in the Linux kernel,
+   volume 42 number 5, July 2008.
+
+.. [SH04] Steve Hanna,
+   "Shellcoding for Linux and Windows Tutorial",
+   http://www.vividmachines.com/shellcode/shellcode.html, July 2004
+
+.. [DH08] Dan Harkins,
+   "Simultaneous Authentication of Equals: A Secure, Password-Based Key Exchange for Mesh Networks",
+   2008 Second International Conference on Sensor Technologies and Applications (Sensorcomm 2008), August 2008.
+
+.. [MH04] Martin Hellman,
+   "Oral history interview with Martin Hellman",
+   Charles Babbage Institute, 2004. Retrieved from the University of Minnesota Digital Conservancy, http://purl.umn.edu/107353.
+
+.. [JH96] Janey Hoe,
+   "Improving the Start-up Behavior of a Congestion Control Scheme for TCP",
+   ACM SIGCOMM Symposium on Communications Architectures and Protocols, August 1996.
+
+.. [HVB01] Gavin Holland, Nitin Vaidya and Paramvir Bahl,
+   "A rate-adaptive MAC protocol for multi-Hop wireless networks",
+   MobiCon '01: Proceedings of the 7th annual International Conference on Mobile Computing and Networking, 2001.
+
+.. [HSBS15] Xueheng Hu, Lixing Song, Dirk Van Bruggen and Aaron Striegel,
+   "Is There WiFi Yet? How Aggressive WiFi Probe Requests Deteriorate Energy and Throughput",
+   Proceedings of the 2015 Internet Measurement Conference, October 2015.
+
+.. [CH99] Christian Huitema,
+   *Routing in the Internet*, second edition,
+   Prentice Hall, 1999.
+
+.. [HBT99] Paul Hurley, Jean-Yves Le Boudec and Patrick Thiran,
+   "A Note on the Fairness of Additive Increase and Multiplicative Decrease",
+   Proceedings of ITC-16, 1999.
+
+.. [JK88] Van Jacobson and Michael Karels,
+   "Congestion Avoidance and Control",
+   Proceedings of the Sigcomm '88 Symposium, volume 18(4), 1988.
+
+.. [JKMOPSVWZ13] Sushant Jain, Alok Kumar, Subhasree Mandal, Joon Ong, Leon Poutievski, Arjun Singh, Subbaiah Venkata, Jim Wanderer, Junlan Zhou, Min Zhu, Jonathan Zolla, Urs Hölzle, Stephen Stuart and Amin Vahdat,
+   "B4: Experience with a Globally-Deployed Software Defined WAN",
+   Proceedings of the ACM SIGCOMM 2013 conference on SIGCOMM, August 12-16, 2013.
+
+.. [JWL04] Cheng Jin, David Wei and Steven Low,
+   "FAST TCP: Motivation, Architecture, Algorithms, Performance",
+   IEEE INFOCOM 2004 Proceedings, March 2004.
+
+.. [KM97] Ad Kamerman and Leo Monteban,
+   "WaveLAN-II: A high-performance wireless LAN for the unlicensed band",
+   AT&T Bell Laboratories Technical Journal, volume 2 number 3, 1997.
+
+.. [SK88] Srinivasan Keshav,
+   "REAL: A Network Simulator" (Technical Report),
+   University of California at Berkeley, 1988.
+
+.. [KKCQ06]  Jongseok Kim, Seongkwan Kim, Sunghyun Choi and Daji Qiao,
+   "CARA: Collision-Aware Rate Adaptation for IEEE 802.11 WLANs",
+   IEEE INFOCOM 2006 Proceedings, April 2006.
+
+.. [LK78] Leonard Kleinrock,
+   "On Flow Control in Computer Networks",
+   Proceedings of the International Conference on Communications, June 1978.
+   
+.. [KK22] Moshe Kol and Amit Klein,
+   "Device Tracking via Linux's New TCP Source Port Selection Algorithm",
+   arXiv:2209.12993v2, September 2022 [to appear in 32nd USENIX Security Conference, 2023].
+
+.. [LH06] Mathieu Lacage and Thomas Henderson,
+   "Yet Another Network Simulator",
+   Proceedings of WNS2 '06: Workshop on ns-2: the IP network simulator, 2006.
+
+.. [LM91] Xuejia Lai and James L. Massey, 
+   "A Proposal for a New Block Encryption Standard",
+   EUROCRYPT '90 Proceedings of the workshop on the theory and application of cryptographic techniques on Advances in cryptology, Springer-Verlag, 1991.
+
+.. [LKCT96] Eliot Lear, Jennifer Katinsky, Jeff Coffin and Diane Tharp,
+   "Renumbering: Threat or Menace?",
+   Tenth USENIX System Administration Conference, Chicago, 1996.
+  
+.. [LS18] Carl Lebsack and Rob Shakir, "SNMP is dead",
+   presentation at NANOG (North American Network Operators Group), 2018, available at https://research.google/pubs/pub47773.
+
+.. [LSL05] DJ Leith, RN Shorten and Y Lee,
+   "H-TCP: A framework for congestion control in high-speed and long-distance networks",
+   Hamilton Institute Technical Report, August 2005.
+
+.. [LSM07] DJ Leith, RN Shorten and G McCullagh,
+   "Experimental evaluation of Cubic-TCP",
+   Extended version of paper presented at Proc. Protocols for Fast Long Distance Networks, 2007.
+
+.. [LBS06] Shao Liu, Tamer Basar and R Srikant,
+   "TCP-Illinois: A Loss and Delay-Based Congestion Control Algorithm for High-Speed Networks",
+   Proceedings of the 1st international conference on performance evaluation methodologies and tools, 2006.
+
+.. [AM90] Allison Mankin,
+   "Random Drop Congestion Control",
+   ACM SIGCOMM Symposium on Communications Architectures and Protocols, 1990.
+
+.. [MCGSW01] Saverio Mascolo, Claudio Casetti, Mario Gerla, MY Sanadidi, Ren Wang,
+   "TCP westwood: Bandwidth estimation for enhanced transport over wireless links",
+   MobiCon '01: Proceedings of the 7th annual International Conference on Mobile Computing and Networking, 2001.
+
+.. [McK90] Paul McKenney,
+   "Stochastic Fairness Queuing",
+   IEEE INFOCOM '90 Proceedings, June 1990.
+
+.. [MABPPRST08] Nick McKeown, Tom Anderson, Hari Balakrishnan, Guru Parulkar, Larry Peterson, Jennifer Rexford, Scott Shenker and Jonathan Turner,
+   "OpenFlow: Enabling innovation in campus networks",
+   ACM SIGCOMM Computer Communications Review, April 2008.
+
+.. [RM78] Ralph Merkle,
+   "Secure Communications over Insecure Channels",
+   Communications of the ACM, volume 21, April 1978.
+
+.. [RM88] Ralph Merkle, 
+   "A Digital Signature Based on a Conventional Encryption Function",
+   Advances in Cryptology — CRYPTO '87, Lecture Notes in Computer Science volume 293, Springer-Verlag, 1988.
+
+.. [MH81] Ralph Merkle and Martin Hellman,
+   "On the Security of Multiple Encryption",
+   Communications of the ACM, volume 24, July 1981.
+
+.. [MB76] Robert Metcalfe and David Boggs, 
+   "Ethernet: Distributed Packet Switching for Local Computer Networks",
+   Communications of the ACM, volume 19 number 7, 1976.
+
+.. [MW00] Jeonghoon Mo and Jean Walrand,
+   "Fair End-to-End Window-Based Congestion Control",
+   IEEE/ACM Transactions on Networking, volume 8 number 5, October 2000.   
+
+.. [JM92] Jeffrey Mogul,
+   "Observing TCP Dynamics in Real Networks",
+   ACM SIGCOMM Symposium on Communications Architectures and Protocols, 1992.
+
+.. [MM01] Jeffrey Mogul and Greg Minshall,
+   "Rethinking the TCP Nagle Algorithm",
+   ACM SIGCOMM Computer Communication Review, January 2001.
+
+.. [MM94] Mart Molle,
+   "A New Binary Logarithmic Arbitration Method for Ethernet",
+   Technical Report CSRI-298, Computer Systems Research Institute, University of Toronto, 1994.
+   
+.. [MLAO18] Behnam Montazeri, Yilong Li, Mohammad Alizadeh and John Ousterhout
+   "Homa: A Receiver-Driven Low-Latency Transport Protocol Using Network Priorities",
+   ACM SIGCOMM conference on Applications, technologies, architectures, and protocols for computer communication, August 2018.
+   
+.. [RTM85] Robert T Morris,
+   "A Weakness in the 4.2BSD Unix TCP/IP Software",
+   AT&T Bell Laboratories Technical Report, February 1985.
+
+.. [MEGK10] Andreas Müller, Nathan Evans, Christian Grothof and Samy Kamkar,
+   "Autonomous NAT Traversal",
+   IEEE Tenth International Conference on Peer-to-Peer Computing, August 2010.
+
+.. [NJ12] Kathleen Nichols and Van Jacobson,
+   "Controlling Queue Delay",
+   ACM Queue, May 2012.
+
+.. [OKM96] Teunis Ott, JHB Kemperman and Matt Mathis,
+   "The stationary behavior of ideal TCP congestion avoidance",
+   Technical Report, 1996.
+
+.. [PFTK98] Jitendra Padhye, Victor Firoiu, Don Towsley and Jim Kurose,
+   "Modeling TCP Throughput: A Simple Model and its Empirical Validation",
+   ACM SIGCOMM conference on Applications, technologies, architectures, and protocols for computer communication, 1998.
+
+.. [PG93] Abhay Parekh and Robert Gallager,
+   "A Generalized Processor Sharing Approach to Flow Control in Integrated Services Networks - The Single-Node Case",
+   IEEE/ACM Transactions on Networking, volume 1 number 3, June 1993.
+
+.. [PG94] Abhay Parekh and Robert Gallager,
+   "A Generalized Processor Sharing Approach to Flow Control in Integrated Services Networks - The Multiple Node Case",
+   IEEE/ACM Transactions on Networking, volume 2 number 2, April 1994.
+  
+.. [VP97] Vern Paxson, "End-to-End Internet Packet Dynamics",
+   ACM SIGCOMM conference on Applications, technologies, architectures, and protocols for computer communication, 1997.
+
+.. [PWZMTQ17] Changhua Pei, Zhi Wang, Youjian Zhao, Zihan Wang, Yuan Meng, Dan Pei, Yuanquan Peng, Wenliang Tang and Xiaodong Qu,
+   "Why It Takes So Long to Connect to a WiFi Access Point",
+   IEEE International Conference on Computer Communications, May 2017.
+
+.. [CP09] Colin Percival, "Stronger Key Derivation Via Sequential Memory-Hard Functions",
+   BSDCan - The Technical BSD Conference, May 2009.
+
+.. [PB94] Charles Perkins and Pravin Bhagwat,
+   "Highly Dynamic Destination-Sequenced Distance-Vector Routing (DSDV) for Mobile Computers",
+   ACM SIGCOMM Computer Communications Review, volume 24 number 4, October 1994.
+
+.. [PR99] Charles Perkins and Elizabeth Royer,
+   "Ad-hoc On-Demand Distance Vector Routing",
+   Proceedings of the Second IEEE Workshop on Mobile Computing Systems and Applications, February 1999.
+
+.. [RP85] Radia Perlman,
+   "An Algorithm for Distributed Computation of a Spanning Tree in an Extended LAN",
+   ACM SIGCOMM Computer Communication Review 15(4), 1985.
+
+.. [RP04] Radia Perlman,
+   "Rbridges: Transparent Routing",
+   IEEE INFOCOM 2004 Proceedings, March 2004.
+   
+.. [POBSF14] Jonathan Perry, Amy Ousterhout, Hari Balakrishnan, Devavrat Shah and Hans Fugal,
+   "Fastpass: A Centralized “Zero-Queue” Datacenter Network",
+   SIGCOMM '14, August 2014.
+
+.. [JP88] John M Pollard,
+   "Factoring with Cubic Integers",
+   unpublished manuscript circulated 1988; included in "The Development of the Number Field Sieve", Lecture Notes in Mathematics volume 1554, Springer-Verlag, 1993.
+
+.. [PDG12] Balaji Prabhakar, Katherine N Dektar and Deborah M Gordon,
+   "The Regulation of Ant Colony Foraging Activity without Spatial Information",
+   PLoS Computational Biology 8(8), http://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002670
+
+.. [PN98] Thomas Ptacek and Timothy Newsham,
+   "Insertion, Evasion, and Denial of Service: Eluding Network Intrusion Detection",
+   Technical report, Secure Networks Inc, January 1998.
+
+.. [RJ90] Kadangode Ramakrishnan and Raj Jain,
+   "A Binary Feedback Scheme for Congestion Avoidance in Computer Networks",
+   ACM Transactions on Computer Systems, volume 8 number 2, May 1990.
+
+.. [RX05] Injong Rhee and Lisong Xu, 
+   "Cubic: A new TCP-friendly high-speed TCP variant,"
+   3rd International Workshop on Protocols for Fast Long-Distance Networks, February 2005.
+
+.. [RR91] Ronald Rivest,
+   "The MD4 message digest algorithm",
+   Advances in Cryptology - CRYPTO '90 Proceedings, Springer-Verlag, 1991.
+
+.. [RSA78] Ronald Rivest, Adi Shamir and Leonard Adleman,
+   "A Method for Obtaining Digital Signatures and Public-Key Cryptosystems",
+   Communications of the ACM, volume 21, February 1978.
+   
+.. [RB22] Eric Rye and Robert Beverly,
+   "IPvSeeYou: Exploiting Leaked Identifiers in IPv6 for Street-Level Geolocation",
+   arXiv:2208.06767, August 2022.
+
+.. [SRC84] Jerome Saltzer, David Reed and David Clark,
+   "End-to-End Arguments in System Design", 
+   ACM Transactions on Computer Systems, volume 2 number 4, November 1984.
+
+.. [BS93] Bruce Schneier,
+   "Description of a New Variable-Length Key, 64-Bit Block Cipher (Blowfish)",
+   Fast Software Encryption, Cambridge Security Workshop Proceedings (December 1993), Springer-Verlag, 1994.
+
+.. [SM90] Nachum Shacham and Paul McKenney,
+   "Packet recovery in high-speed networks using coding and buffer management",
+   IEEE INFOCOM '90 Proceedings, June 1990.
+
+.. [SP03] Umesh Shankar and Vern Paxson,
+   "Active Mapping: Resisting NIDS Evasion without Altering Traffic",
+   Proceedings of the 2003 IEEE Symposium on Security and Privacy, 2003.
+
+.. [SV96] M Shreedhar and George Varghese,
+   "Efficient Fair Queuing Using Deficit Round Robin",
+   IEEE/ACM Transactions on Networking, volume 4 number 3, June 1996.
+
+.. [JS05] John Ivan Simon,
+   "John Simon on Music: Criticism, 1979-2005", Applause Books, 2005.
+
+.. [SKS06] Rade Stanojević, Christopher Kellett and Robert Shorten,
+   "Adaptive Tuning of Drop-Tail Buffers for Reducing Queuing Delays",
+   IEEE Communications Letters, volume 10 number 7, August 2006.
+
+.. [TSZS06] Kun Tan, Jingmin Song, Qian Zhang and Murari Sidharan,
+   "Compound TCP: A Scalable and TCP-friendly Congestion Control for High-speed Networks",
+   4th International Workshop on Protocols for Fast Long-Distance Networks (PFLDNet), 2006.
+
+.. [TR88] Andrew S. Tanenbaum and Robbert van Renesse,
+   "A Critique of the Remote Procedure Call Paradigm", 
+   Proceedings of the European Teleinformatics Conference (EUTECO 88), North-Hollnd, Amsterdam, 1988, pp. 775-783.
+
+.. [TWHL05] Ao Tang, Jintao Wang, Sanjay Hegde and Steven Low,
+   "Equilibrium and Fairness of Networks Shared by TCP Reno and Vegas/FAST",
+   Telecommunications Systems special issue on High Speed Transport Protocols, 2005.
+
+.. [TWP07] Erik Tews, Ralf-Philipp Weinmann and Andrei Pyshkin,
+   "Breaking 104-bit WEP in less than 60 seconds",
+   WISA'07 Proceedings of the 8th International Conference on Information Security Applications, Springer-Verlag, 2007. 
+
+.. [VMCCP16] Mathy Vanhoef, Célestin Matte, Mathieu Cunche, Leonardo Cardoso and Frank Piessens,
+   "Why MAC Address Randomization is not Enough: An Analysis of Wi-Fi Network Discovery Mechanisms",
+   ACM Asia Conference on Computer and Communications Security, May 2016.
+
+.. [VP17] Mathy Vanhoef and Frank Piessens,
+   "Key Reinstallation Attacks: Forcing Nonce Reuse in WPA2",
+   Proceedings of the 2017 ACM SIGSAC Conference on Computer and Communications Security, October 2017.
+
+.. [VGE00] Kannan Varadhan, Ramesh Govindan and Deborah Estrin, 
+   "Persistent Route Oscillations in Inter-domain Routing",
+   Computer Networks, volume 32, January, 2000.
+
+.. [SV02] Serge Vaudenay,
+   "Security Flaws Induced by CBC Padding -- Applications to SSL, IPSEC, WTLS...",
+   EUROCRYPT '02 Proceedings, 2002.
+
+.. [WJLH06] David Wei, Cheng Jin, Steven Low and Sanjay Hegde,
+   "FAST TCP: Motivation, Architecture, Algorithms, Performance",
+   ACM Transactions on Networking, December 2006.
+
+.. [WM05] Damon Wischik and Nick McKeown,
+   "Part I: Buffer Sizes for Core Routers",
+   ACM SIGCOMM Computer Communication Review, volume 35 number 2, July 2005.
+
+.. [YW19] Christopher S Yoo and David Wishnick, 
+   "Lowering Legal Barriers to RPKI Adoption",
+   U of Penn Law School, Public Law Research Paper No. 19-02, January 8, 2019.
+   Available at SSRN: https://ssrn.com/abstract=3308619.
+
+.. [LZ89] Lixia Zhang,
+   "A New Architecture for Packet Switching Network Protocols",
+   PhD Thesis, Massachusetts Institute of Technology, 1989.
+
+.. [LZ91] Lixia Zhang,
+   "VirtualClock: A New Traffic Control Algorithm for Packet-Switched Networks",
+   ACM Transactions on Computer Systems, volume 9 number 2, May 1991.
+
+.. [ZSC91] Lixia Zhang, Scott Shenker and David Clark,
+   "Observations on the Dynamics of a Congestion Control Algorithm: The Effects of Two-Way Traffic",
+   ACM SIGCOMM Symposium on Communications Architectures and Protocols, 1991.
+
+

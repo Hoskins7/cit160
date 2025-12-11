@@ -1,0 +1,925 @@
+
+.. sectnum::
+   :start: 10
+
+.. _ipv4-companions:
+
+IPv4 Companion Protocols
+********************************
+
+IP is the keystone of the Internet, but it occupies that position with a little help from its friends. DNS translates human-readable host names, such as ``intronetworks.cs.luc.edu`` to IP addresses. ARP translates IPv4 addresses to Ethernet addresses, for destinations on the same LAN. DHCP assigns IPv4 addresses. And ICMP enables the transmission of IPv4-related error and status messages. These four are the subject of this chapter. 
+
+The original DNS can be used with IPv6, with modest extensions, but for the other three, IPv6 has its own versions; see :ref:`Neighbor Discovery` (replacing ARP), :ref:`IPv6 address assignment` and :ref:`ICMPv6`.
+
+
+.. index::
+	single: DNS
+	single: Domain Name System
+
+.. _DNS:
+
+DNS
+=====
+
+The **Domain Name System**, DNS, is an essential companion protocol to IPv4 (and IPv6); an overview can be found in :rfc:`1034`. It is DNS that permits users the luxury of not needing to remember numeric IP addresses. Instead of 162.216.18.28, a user can simply enter `intronetworks.cs.luc.edu <http://intronetworks.cs.luc.edu>`_, and DNS will take care of looking up the name and retrieving the corresponding address. DNS also makes it easy to move services from one server to another with a different IP address; as users will locate the service by **DNS name** and not by IP address, they do not need to be notified.
+
+While DNS supports a wide variety of queries, for the moment we will focus on queries for IPv4 addresses, or so-called ``A`` records. The ``AAAA`` record type is used for IPv6 addresses,  and, internally, the ``NS`` record type is used to identify the "name servers" that answer DNS queries.
+
+
+While a workstation can use TCP/IP without DNS, users would have an almost impossible time finding anything, and so the core startup configuration of an Internet-connected workstation almost always includes the IP address of its DNS server (see :ref:`dhcp` below for how startup configurations are often assigned).
+
+.. sidebar:: It's Always DNS
+
+	That is a common, though exaggerated, sentiment among system administrators dealing with network problems. While DNS is on the whole remarkably reliable, its failures can be tricky to diagnose. 
+
+
+Most DNS traffic today is over UDP, although a TCP option exists. Due to the much larger response sizes, TCP is often necessary for DNSSEC (:ref:`DNSSEC`).
+
+DNS is **distributed**, meaning that each domain is responsible for maintaining its own **DNS servers** to translate names to addresses. DNS, in fact, is a classic example of a highly distributed database where each node maintains a relatively small amount of data. That said, in days gone by it was common practice for each domain to maintain its own DNS server; today, domain registrars often provide DNS services for many of their domain customers.
+
+DNS is **hierarchical** as well; for the DNS name ``intronetworks.cs.luc.edu`` the levels of the hierarchy are
+
++ **edu**: the **top-level domain** (TLD) for educational institutions in the US
++ **luc**: Loyola University Chicago
++ **cs**: The Loyola Computer Science Department
++ **intronetworks**: a hostname associated to a specific IP address
+
+
+The hierarchy of DNS names (that is, the set of all names and suffixes of names) forms a tree, but it is not only leaf nodes that represent individual hosts. In the example above, domain names `luc.edu <http://luc.edu>`_ and `cs.luc.edu <http://cs.luc.edu>`_ happen to be valid hostnames as well.
+
+The DNS hierarchy is in a great many cases not very deep, particularly for DNS names assigned to commercial websites. Such domain names are often simply the company name (or a variant of it) followed by the top-level domain (often ``.com``). Still, internally most organizations have many individually named behind-the-scenes servers with three-level (or more) domain names; sometimes some of these can be identified by viewing the source of the web page and searching it for domain names.
+
+.. index::
+	single: ICANN
+	single: aero
+	single:	biz
+	single:	info	
+	single: wtf
+
+Top-level domains are assigned by `ICANN <https://www.icann.org/>`_. The original top-level domains were seven three-letter domains --  ``.com``, ``.net``, ``.org``, ``.int``, ``.edu``, ``.mil`` and ``.gov`` --  and the two-letter country-code domains (|eg| .us, .ca, .mx). Now there are hundreds of non-country top-level domains, such as ``.aero``, ``.biz``, ``.info``, and, apparently, `.wtf <https://en.wikipedia.org/wiki/.wtf>`_. Domain names (and subdomain names) can also contain unicode characters, so as to support national alphabets. Some top-level domains are *generic*, meaning anyone can apply for a subdomain although there may be qualifying criteria. Other top-level domains are *sponsored*, meaning the sponsoring organization determines who can be assigned a subdomain, and so the qualifying criteria can be a little more arbitrary. 
+
+.. index::
+	single: domain registrar, DNS
+
+ICANN still must approve all new top-level domains. Applications are accepted only during specific intervals; the application fee for the 2012 interval was US$185,000. The actual leasing of domain names to companies and individuals is done by organizations known as **domain registrars** who work under contract with ICANN. 
+
+.. index::
+	single: zones, DNS
+
+The full tree of all DNS names and prefixes is divided administratively into **zones**: a zone is an independently managed subtree, minus any sub-subtrees that have been placed -- by delegation -- into their own zone. Each zone has its own root DNS name that is a suffix of every DNS name in the zone. For example, the ``luc.edu`` zone contains most of Loyola's DNS names, but ``cs.luc.edu`` has been spun off into its own zone. A zone cannot be the disjoint union of two subtrees; that is, ``cs.luc.edu`` and ``math.luc.edu`` must be two distinct zones, unless both remain part of their parent zone. 
+
+A zone can define DNS names more than one level deep. For example, the ``luc.edu`` zone can define records for the ``luc.edu`` name itself, for names with one additional level such as ``www.luc.edu``, and for names with two additional levels such as ``www.cs.luc.edu``. That said, it is common for each zone to handle only one additional level, and to create subzones for deeper levels.
+
+.. index::
+	single: authoritative nameserver
+	single: nameserver
+	single: A record, DNS
+	single: NS record, DNS
+	single: RR, DNS
+	single: resource record, DNS
+	single: domain registrar
+
+Each zone has its own **authoritative nameservers** for the zone, which are charged with maintaining the records -- known as **resource records**, or RRs -- for that zone. Each zone must have at least two nameservers, for redundancy. IPv4 addresses are stored as so-called **A records**, for Address. Information about how to find sub-zones is stored as **NS records**, for Name Server. Additional resource-record types are discussed at :ref:`other dns records`. Each DNS record type also includes a **time-to-live** field for caching (below). 
+
+An authoritative nameserver need not be part of the organization that manages the zone, and a single server can be the authoritative nameserver for multiple unrelated zones. For example, many domain registrars maintain single nameservers that handle DNS queries for all their domain customers who do not wish to set up their own nameservers.
+
+.. index::
+	single: root nameserver
+
+The **root nameservers** handle the zone that is the root of the DNS tree; that is, that is represented by the DNS name that is the empty string. As of 2019, there are thirteen of them. The root nameservers contain only NS records, identifying the nameservers for all the immediate subzones. Each top-level domain is its own such subzone. The IP addresses of the root nameservers are widely distributed. Their DNS names (which are only of use if some DNS lookup mechanism is already present) are ``a.root.servers.net`` through ``m.root-servers.net``. These names today correspond not to individual machines but to clusters of up to hundreds of servers.
+
+
+.. index::
+	single: resolver, DNS
+	single: DNS resolver
+	single: cache, DNS
+
+.. _resolvers:
+
+DNS Resolvers
+----------------
+
+We can now put together a first draft of a DNS lookup algorithm. To find the IP address of `intronetworks.cs.luc.edu <http://intronetworks.cs.luc.edu>`_, a host first contacts a root nameserver (at a known address) to find the nameserver for the ``edu`` zone; this involves the retrieval of an NS record. The ``edu`` nameserver is then queried to find the nameserver for the ``luc.edu`` zone, which in turn supplies the NS record giving the address of the ``cs.luc.edu`` zone. This last has an A record for the actual host. (This example is carried out in detail below.) The system (or application) that executes these DNS lookups is known as a **DNS resolver**. Confusingly, resolvers are also sometimes known as "nameservers" or, more precisely, **non**\ -authoritative nameservers. 
+
+To reduce overall DNS traffic, in particular to the root nameservers, it makes sense to cache intermediate (and final) results, so that in a later query for, say, `uchicago.edu <http://uchicago.edu>`_, the host can reuse the previously learned address of the ``edu`` nameserver.
+
+For still greater DNS efficiency, we can provide one DNS resolver to handle requests for a large pool of users. The idea is that, if one user has looked up youtube.com, or facebook.com, those addresses are in hand locally for the next user. The benefit of this consolidation approach depends on the distribution of lookup requests, their lifetimes, and how likely it is that two users visit the same site. In recent years this caching benefit has been getting smaller, at least for "full" DNS names, as the Internet becomes more diverse, and as cache lifetimes have been shrinking. (The caching benefit for DNS "partial" names, such as ``.edu`` and ``.com``, remains significant.)
+
+.. index::
+	single: site resolver, DNS
+
+Regardless of caching benefits, such pooled-use DNS resolvers are almost universally used. Almost all ISPs and most companies, for example, provide a resolver to handle the DNS needs of their customers and employees. We will refer to these as **site resolvers**. The IP addresses of these site resolvers are generally supplied via DHCP options (:ref:`dhcp`); such resolvers are thus the default choice for DNS services.
+
+
+.. index::
+	single: thepiratebay
+	single: GNS
+	single: Gnu DNS
+	single: Gnu Name System
+
+.. sidebar:: DNS Policing
+
+	It is sometimes suggested that if a site is engaged in illegal activity or copyright infringement, such as `thepiratebay.se <https://thepiratebay.se/>`_, its domain name should be seized. The problem with this strategy is that it is straightforward for users to set up "nonstandard" nameservers (for example the Gnu Name System, `GNS <https://gnunet.org/gns>`_) that continue to list the banned site. 
+
+
+
+.. index::
+	single: public DNS server
+	single: DNS server, public
+
+Sometimes, however, users elect to use a DNS resolver not provided by their ISP or company; there are a number of **public DNS servers** (that is, resolvers) available. Such resolvers generally serve much larger areas. Common choices include `OpenDNS <https://en.wikipedia.org/wiki/OpenDNS>`_, `Google DNS <https://en.wikipedia.org/wiki/Google_Public_DNS>`_ (primary address 8.8.8.8), `Cloudflare <https://blog.cloudflare.com/dns-resolver-1-1-1-1/>`_ (primary address 1.1.1.1) and the Gnu Name System mentioned in the sidebar above, though there are many others. Searching for "public DNS server" turns up lists of them.
+
+In theory, one advantage of using a public DNS server is that your local ISP can no longer track your DNS queries. However, some ISPs still do *record* customer DNS queries, and may even intercept and modify them. If this is a concern, DNS encryption is necessary. There are two primary proposals:
+
++ DNS over TLS (DoT): :rfc:`7858`
++ DNS over HTTPS (DoH): :rfc:`8484`
+
+TLS is an encryption protocol (:ref:`tls`). HTTPS -- secure HTTP -- uses TLS encryption, but the two are not the same. For one thing, eavesdroppers can still identify DoT traffic as DNS traffic (because it is sent to a special port), but DoH traffic is indistinguishable from HTTPS web traffic. 
+
+Use of any DNS server, whether via plain DNS or DoT or DoH, does mean that the DNS server now has access to all your DNS queries. Ultimately, the choice depends on how much you trust your site resolver versus your selected public resolver. 
+
+Both DoT and DoH often take some deliberate configuration to enable as the standard system resolver. However, as of 2020 Mozilla has started enabling DoH by default in their `Firefox <https://www.mozilla.org/en-US/firefox/>`_ browser, that is, without operating-system support, though disabling DoH and reverting back to the system DNS resolver is straightforward.
+
+.. sidebar:: IPv6
+
+	Google and Cloudflare provide public DNS for IPv6 users too, though the addresses are much less easy to remember. Google's is 2001:4860:4860::\ **8888**; Cloudflare's is 2606:4700:4700::\ **1111**.
+
+In setting up DoH for Firefox, the `Mozilla foundation <https://mozilla.org>`__ created what it calls its `Trusted Recursive Resolver <https://wiki.mozilla.org/Security/DOH-resolver-policy>`_ program. Participating providers -- initially `Cloudflare <https://www.cloudflare.com/>`__, and eventually others -- had to agree to contractual requirements. Among these requirements are that personal browsing history not be collected, and that Query Name Minimization (:ref:`qname minimization`) be supported. Ultimately, however, the choice of what DNS to trust belongs to the user.
+
+Some public DNS servers provide additional services, such as automatically filtering out domain names associated with security risks, or content inappropriate for young users. Sometimes there is a fee for this service. A common drawback to filtering content at the DNS level is that, unless the DNS server provides an alternative address pointing to an explanation page, users who attempt to access blocked content may have absolutely no idea what went wrong. Because of this, filtering content at the browser level rather than the DNS level is sometimes preferred, though filtering at the browser level has its own drawbacks. In October 2021, Cloudflare (with public DNS 1.1.1.1, above) began offering two additional (and free) public DNS servers:
+
++ 1.1.1.2, blocking known malware
++ 1.1.1.3, blocking malware and adult content
+
+See `blog.cloudflare.com/introducing-1-1-1-1-for-families <https://blog.cloudflare.com/introducing-1-1-1-1-for-families>`_ for further details.
+
+.. index::
+	single: cache, DNS
+	single: time-to-live, DNS
+	single: DNS time-to-live
+
+As mentioned earlier, each DNS record comes with a **time-to-live** (TTL) value, used by resolvers as an indication of how long they are supposed to keep that record in their caches. DNS TTL lifetimes can be up to several days; :rfc:`1035` recommends a minimum TTL of "at least a day". However, in recent years TTL values have been getting quite a bit smaller. Below, in :ref:`dig1`, we retrieve the TTL values for ``facebook.com`` and ``google.com`` from their respective authoritative nameservers; in each case it is 300 seconds (5 minutes).
+
+Authoritative nameservers also provide a TTL value for lookup *failures*. According to :rfc:`2308`, this is the TTL value specified in the SOA record. (Originally, the SOA TTL represented the default TTL for *successful* lookups.) Lookup-failure TTLs should usually be kept quite short; otherwise there is potential for large numbers of users to be locked out of a site. Consider, for example, the following scenario for updating a DNS record for host ``foo.com``. Let us suppose that the lookup-failure TTL is one week:
+
+======================================	================================
+Site foo.com	                               Site B (perhaps a large ISP)
+====================================== 	================================
+Delete foo.com A record
+Immediately reinstall foo.com A record
+====================================== 	================================
+
+At this point, Site B may be telling its users for a week that foo.com is unavailable, and site ``foo.com`` will be unable to fix it.
+
+If I send a query to Loyola's site resolver for ``google.com``, it is almost certainly in the cache. If I send a query for the misspelling `googel.com <http://googel.com>`_, this may not be in the cache, but the ``.com`` top-level nameserver almost certainly *is* in the cache. From that nameserver my local resolver finds the nameserver for the ``googel.com`` zone, and from that finds the IP address of the ``googel.com`` host.
+
+There are, as of 2019, around 1500 top-level domains. If, while still using Loyola's site resolver, I send a query for a site in one of the more obscure top-level domains, there is a reasonable chance that the top-level domain will *not* be in the cache. A consequence of this aspect of caching is that popular top-level domains are likelier to result in faster lookups.
+
+Applications almost always invoke DNS through library calls, such as Java's ``InetAddress.getByName()``. The library forwards the query to the system-designated resolver (though browsers sometimes offer other DNS options; see :ref:`DoH`). We will return to DNS library calls in :ref:`udp stalk client` and :ref:`TCP client`.
+
+.. index::
+	single: /etc/resolv.conf
+
+On unix-based systems, traditionally the IPv4 addresses of the local DNS resolvers were kept in a file ``/etc/resolv.conf``. Typically this file was updated with the addresses of the current resolvers by DHCP (:ref:`dhcp`), at the time the system received its IPv4 address. It is possible, though not common, to create special entries in ``/etc/resolv.conf`` so that queries about different domains are sent to different resolvers, or so that single-level hostnames have a domain name appended to them before lookup. On Windows, similar functionality can be achieved through settings on the DNS tab within the ``Network Connections`` applet. 
+
+.. index::
+	single: 127.0.1.1
+	single: stub resolver
+
+Recent systems often run a small "stub" resolver locally (|eg| Linux's `dnsmasq <https://en.wikipedia.org/wiki/Dnsmasq>`__); such resolvers are sometimes also called DNS *forwarders*. The entry in ``/etc/resolv.conf`` is then an IPv4 address of ``localhost`` (sometimes 127.0.\ **1**.1 rather than 127.0.\ **0**.1). Such a stub resolver would, of course, still need access to the addresses of site or public resolvers; sometimes these addresses are provided by static configuration and sometimes by DHCP (:ref:`dhcp`). 
+
+If a system running a stub resolver then runs internal virtual machines, it is usually possible to configure everything so that the virtual machines can be given an IP address of the host system as their DNS resolver. For example, often virtual machines are assigned IPv4 addresses on a private subnet and connect to the outside world using NAT (:ref:`NAT`). In such a setting, the virtual machines are given the IPv4 address of the host system interface that connects to the private subnet. It is then necessary to ensure that, on the host system, the local resolver accepts queries sent not only to the designated loopback address but also to the host system's private-subnet address. (Generally, local resolvers do *not* accept requests arriving from externally visible addresses.)
+
+
+.. index::
+	single: NXDOMAIN, DNS
+
+When someone submits a query for a nonexistent DNS name, the resolver is supposed to return an error message, technically known as **NXDOMAIN** (Non eXistent Domain). Some resolvers, however, have been configured to return the IP address of a designated web server; this is particularly common for ISP-provided site resolvers. Sometimes the associated web page is meant to be helpful, and sometimes it presents an offer to buy the domain name from a registrar. Either way, additional advertising may be displayed. Of course, this is completely useless to users who are trying to contact the domain name in question via a protocol (ssh, smtp) other than http.
+
+.. index::
+	single: recursive DNS lookup
+	single: non-recursive DNS lookup
+
+At the DNS protocol layer, a DNS lookup query can be either **recursive** or **non-recursive**. If A sends to B a recursive query to resolve a given DNS name, then B takes over the job until it is finally able to return an answer to A. If The query is non-recursive, on the other hand, then if B is not an authoritative nameserver for the DNS name in question it returns either a failure notice or an NS record for the sub-zone that is the next step on the path. Almost all DNS requests from hosts to their site or public resolvers are recursive.
+
+
+.. index::
+	single: round-robin DNS
+	single: DNS, round-robin
+	single: ANSWER, DNS
+	single: AUTHORITY, DNS
+	single: ADDITIONAL, DNS
+	
+A basic DNS response consists of an ANSWER section, an AUTHORITY section and, optionally, an ADDITIONAL section. Generally a response to a lookup of a hostname contains an ANSWER section consisting of a single A record, representing a single IPv4 address. If a site has multiple servers that are entirely equivalent, however, it is possible to give them all the same hostname by configuring the authoritative nameserver to return, for the hostname in question, multiple A records listing, in turn, each of the server IPv4 addresses. This is sometimes known as **round-robin DNS**. It is a simple form of **load balancing**; see also :ref:`loadbalance`. Consecutive queries to the nameserver should return the list of A records in different orders; ideally the same should also happen with consecutive queries to a local resolver that has the hostname in its cache. It is also common for a single server, with a single IPv4 address, to be identified by multiple DNS names; see the next section.
+
+The response AUTHORITY section contains the DNS names of the authoritative nameservers responsible for the original DNS name in question. These records are often NS records, which point to the zone from its parent, though SOA records -- declaring a zone from within -- are also seen. The ADDITIONAL section contains information the sender thinks is related; for example, this section often contains A records for the authoritative nameservers.
+
+.. index::
+	single: Tor project
+	single: onion addresses
+	single: .onion addresses
+	single: DuckDuckGo
+	single: cryptographically generated address
+	single: facebookcorewwwi
+	single: fortune
+	
+The `Tor Project <https://en.wikipedia.org/wiki/Tor_(anonymity_network)>`_ uses DNS-like names that end in ".onion". While these are not true DNS names in that they are not managed by the DNS hierarchy, they do work as such for Tor users; see :rfc:`7686`. These names follow an unusual pattern: the next level of name is an 80-bit hash of the site's RSA public key (:ref:`RSA`), converted to sixteen ASCII bytes. For example, 3g2upl4pq6kufc4m.onion is apparently the Tor address for the search engine `duckduckgo.com <https://duckduckgo.com/>`_. Unlike DuckDuckGo, many sites try different RSA keys until they find one where at least some initial prefix of the hash looks more or less meaningful; for example, ``nytimes2tsqtnxek.onion``. Facebook got very `lucky <https://lists.torproject.org/pipermail/tor-talk/2014-October/035413.html>`_ in finding an RSA key whose corresponding Tor address is ``facebookcorewwwi.onion`` (though it is sometimes said that *fortune is infatuated with the wealthy*). This naming strategy is a form of **cryptographically generated addresses**; for another example see :ref:`ND security`. The advantage of this naming strategy is that you don't need a certificate authority (:ref:`CA`) to verify a site's RSA key; the site name does it for you.
+
+
+.. index::
+	single: nslookup
+	single: dig
+
+.. _nslookup1:
+.. _dig1:
+
+nslookup and dig
+---------------------
+
+Let us trace a non-recursive lookup of ``intronetworks.cs.luc.edu``, using the `nslookup <http://en.wikipedia.org/wiki/Nslookup>`_ tool. The nslookup tool is time-honored, but also not completely up-to-date, so we also include examples using the `dig <https://en.wikipedia.org/wiki/Dig_(command)>`__ utility (supposedly an acronym for "domain Internet groper"). Lines we type in ``nslookup``\ 's interactive mode begin below with the prompt ">"; the shell prompt is "#". All ``dig`` commands are typed directly at the shell prompt.
+
+The first step is to look up the IP address of the root nameserver ``a.name-servers.net``. We can do this with a regular call to ``nslookup`` or ``dig``, we can look this up in our nameserver's configuration files, or we can search for it on the Internet. The address is 198.41.0.4.
+
+We now send our nonrecursive query to this address. The presence of the single hyphen in the ``nslookup`` command line below means that we want to use 198.41.0.4 as the nameserver rather than as the thing to be looked up; ``dig`` has places on the command line for both the nameserver (following the ``@``) and the DNS name. For both commands, we use the ``norecurse`` option to send a nonrecursive query.
+
+::
+
+ # nslookup -norecurse - 198.41.0.4
+ > intronetworks.cs.luc.edu
+ *** Can't find intronetworks.cs.luc.edu: No answer
+
+ # dig @198.41.0.4 intronetworks.cs.luc.edu +norecurse
+
+These fail because by default ``nslookup`` and ``dig`` ask for an A record. What we want is an NS record: the name of the next zone down to ask. (We can tell the ``dig`` query failed to find an A record because there are zero records in the ANSWER section)
+
+::
+
+ > set query=ns
+ > intronetworks.cs.luc.edu
+ edu   nameserver = a.edu-servers.net
+ ...
+ a.edu-servers.net	internet address = 192.5.6.30
+
+ # dig @198.41.0.4 intronetworks.cs.luc.edu NS +norecurse 
+ ;; AUTHORITY SECTION:
+ edu.			172800	IN	NS	b.edu-servers.net.
+ ;; ADDITIONAL SECTION:
+ b.edu-servers.net.	172800	IN	A	192.33.14.30
+ 
+
+The full responses in each case are a list of all nameservers for the .edu zone; we list only the first response above. The ``IN`` in the two response records shown above indicates these are InterNet records.
+
+Note that the full DNS name ``intronetworks.cs.luc.edu`` in the query here is *not* an exact match for the DNS name ``.edu`` in the resource record returned; the latter is a suffix of the former. This has privacy implications; the root nameserver didn't need to know we were searching for ``intronetworks.cs.luc.edu``. We could have just asked for ``edu``. We return to this in :ref:`qname minimization`.
+
+
+We send the next NS query to a.edu-servers.net (which does appear in the full ``dig`` answer)
+
+::
+
+ # nslookup -query=ns -norecurse - 192.5.6.30
+ > intronetworks.cs.luc.edu
+ ...
+ Authoritative answers can be found from:
+ luc.edu nameserver = bcdnswt1.it.luc.edu.
+ bcdnswt1.it.luc.edu	internet address = 147.126.64.64
+
+ # dig @192.5.6.30 intronetworks.cs.luc.edu NS +norecurse
+ ;; AUTHORITY SECTION:
+ luc.edu.		172800	IN	NS	bcdnsls1.it.luc.edu.
+ ;; ADDITIONAL SECTION:
+ bcdnsls1.it.luc.edu.	172800	IN	A	147.126.1.217
+
+(Again, we show only one of several ``luc.edu`` nameservers returned). 
+
+The next step is to ask the ``luc.edu`` nameserver for the ``cs.luc.edu`` nameserver. 
+
+::
+
+ # nslookup -query=ns - -norecurse 147.126.1.217
+ > cs.luc.edu
+ ...
+ cs.luc.edu	nameserver = bcdnsls1.it.luc.edu.
+
+ # dig @147.126.1.217 intronetworks.cs.luc.edu NS +norecurse
+ ;; AUTHORITY SECTION:
+ cs.luc.edu.		300	IN	SOA	bcdnsls1.it.luc.edu. postmaster.luc.edu. 589544360 1200 180 1209600 300
+ 
+.. index::
+	single: ChaosNet
+	single: India
+	single: Switzerland
+
+.. sidebar::
+	Desperately seeking Switzerland
+	
+	To look up the .edu nameservers with the default resolver, we might use ``dig edu NS``. This works for any top-level domain (|eg| ``us``, ``de``, ``uk``, ``aero``), *except India (.in) and Switzerland (.ch)*. The command ``dig in NS`` returns the root servers; that is, ``in`` is interpreted as the DNS abbreviation for InterNet. A working query is ``dig in. IN NS`` (note the period). For Switzerland the problem is that ``ch`` collides with the DNS abbreviation for the now-obsolete `ChaosNet <https://en.wikipedia.org/wiki/Chaosnet>`_; a working query is ``dig ch IN NS``. For more, see `here <https://shkspr.mobi/blog/2022/07/dns-esoterica-why-you-cant-dig-switzerland/>`_.
+
+The ``nslookup`` command returns the same nameserver as before; the ``dig`` command does also, but at least indicates it is returning an SOA rather than an NS record. The first data field of the SOA result -- ``bcdnsls1.it.luc.edu.`` -- is the primary nameserver for ``cs.luc.edu``. All this is a somewhat roundabout way of saying that the same nameserver handles ``cs.luc.edu`` as handles ``luc.edu``; that is, they are two zones that just happen to be handled by the same nameserver. Prior to 2019, ``cs.luc.edu`` was handled by a separate nameserver, but after a significant outage it was folded back to the ``luc.edu`` nameserver. If we drop the ``intronetworks`` label in the last query above, that is, we run ``dig @147.126.1.217 cs.luc.edu NS +norecurse``, we now get an ANSWER section (instead of AUTHORITY), which declares that ``bcdnsls1.it.luc.edu`` is indeed the authoritative nameserver for ``cs.luc.edu``.
+
+
+In any event, we can now ask for the A record directly:
+
+
+::
+
+ # nslookup -query=A - -norecurse 147.126.1.217
+ > intronetworks.cs.luc.edu
+ ...
+ Name:	intronetworks.cs.luc.edu
+ Address: 162.216.18.28
+
+ # dig @147.126.1.217 intronetworks.cs.luc.edu A +norecurse
+ ;; ANSWER SECTION:
+ intronetworks.cs.luc.edu. 600	IN	A	162.216.18.28
+
+This is the first time we get an ANSWER section (versus the AUTHORITY section)
+
+.. index::
+	single: canonical name, DNS
+	single: CNAME, DNS
+	single: virtual hosting
+
+Prior to 2019, the final result from ``nslookup`` was in fact this:
+
+::
+
+	 intronetworks.cs.luc.edu	canonical name = linode1.cs.luc.edu.
+	 Name:	linode1.cs.luc.edu
+	 Address: 162.216.18.28
+
+Here we received a **canonical name**, or CNAME, record. The server that hosts ``intronetworks.cs.luc.edu`` also hosts several other websites, with different names; for example, `introcs.cs.luc.edu <http://introcs.cs.luc.edu/>`_. This is known as **virtual hosting**. Rather than provide separate A records for each website name, DNS was set up to provide a CNAME record for each website name pointing to a single physical server name ``linode1.cs.luc.edu``. Only one A record is then needed, for this server. Post-2019, this CNAME strategy is no longer used. Note that both the CNAME and the corresponding A record was returned, for convenience. The pre-2019 answer returned by ``dig`` (above) made no mention of CNAMEs, because they are often of little user interest; ``dig`` will return CNAMEs however if asked explicitly.
+
+
+Note that the IPv4 address here, 162.216.18.28, is unrelated to Loyola's own IPv4 address block 147.126.0.0/16. The server hosting ``intronetworks.cs.luc.edu`` is managed by an external provider; there is no connection between the DNS name hierarchy and the IP address hierarchy.
+
+As another example of the use of ``dig``, we can find the time-to-live values advertised by ``facebook.com`` and ``google.com``:
+
+::
+
+ dig facebook.com
+ ;; ANSWER SECTION:
+ facebook.com.		78	IN	A	157.240.18.35
+ ;; AUTHORITY SECTION:
+ facebook.com.		147771	IN	NS	b.ns.facebook.com.
+
+ dig google.com
+ ;; ANSWER SECTION:
+ google.com.		103	IN	A	172.217.9.78
+ ;; AUTHORITY SECTION:
+ google.com.		141861	IN	NS	ns3.google.com.
+
+The TTLs are 78 and 103 seconds, respectively. But these are the TTLs coming from the local site resolver. To get the TTL values from ``facebook.com`` and ``google.com`` directly, we can do this:
+
+::
+
+ dig @b.ns.facebook.com facebook.com
+ ;; ANSWER SECTION:
+ facebook.com.		300	IN	A	157.240.18.35
+
+ dig @ns3.google.com google.com
+ ;; ANSWER SECTION:
+ google.com.		300	IN	A	172.217.1.14
+
+That is, both sites' authoritative nameservers advertise a TTL of 300 seconds (5 minutes). The TTL value of 78 received above means that our local resolver itself last asked about facebook.com 300−78 = 222 seconds ago.
+
+.. index::
+	single: QNAME minimization, DNS
+	single: query name minimization, DNS
+	single: zone breaks, DNS
+
+.. _qname minimization:
+
+Query Name Minimization
+````````````````````````````````
+
+In the example above in which we traced the lookup of DNS name ``intronetworks.cs.luc.edu`` starting from the root, we commented that the entire DNS name was sent to the root server. This was unnecessary, as the root nameservers only know how to reach the ``.edu`` nameservers; we could have sent an NS request just for ``.edu``. There is a privacy issue here; the root nameservers don't need to know everyone's full queries.
+
+:rfc:`7816` proposes **query name minimization**, or QNAME minimization, as an alternative. The idea is to send the root server just a query for ``.edu``, then the ``.edu`` nameserver just a query for ``luc.edu``, and so on. After each NS query, one more DNS label is attached to the query name before proceeding to the next query to the next nameserver. This way, no nameserver learns more of the query than the absolute minimum.
+
+There is a potential catch, though, as not every level of the DNS name corresponds to a different nameserver; to put it another way, not every '.' in a DNS name corresponds to a ``zone break``. For example, it is now (2020) the case that the ``luc.edu`` nameserver is responsible for the formerly independent ``cs.luc.edu`` name hierarchy, and so there is no longer a need for a ``cs.luc.edu`` NS record. There happens still to be one, for legacy reasons, but if that were not the case, then an NS query sent to the ``luc.edu`` nameserver ``cs.luc.edu`` might return with the literally correct ``NODATA``, or, worse, ``NXDOMAIN`` (the latter is not supposed to happen, but sometimes does). 
+
+The :rfc:`7816` solution to this, when a negative answer is received, is to include one more DNS-name level and repeat the query. That is, if a lookup for ``cs.luc.edu`` failed, try the full name. That said, this and other issues mean that query name minimization has not quite seen widespread adoption; see this `APNIC blog post <https://blog.apnic.net/2020/09/11/dns-query-privacy-revisited/>`_ for some actual measurements.
+
+It is worth noting that the only privacy protection achieved here is from non-leaf DNS nameservers. Also, ones local DNS resolver still has full information about each query it is sent. In the presence of active caching, a local resolver would generally not need to query the root or the ``.edu`` nameservers at all.
+
+.. index::
+	single: naked domain, DNS
+
+.. _naked domains:
+
+Naked Domains
+````````````````````
+
+If we look up both ``www.cs.luc.edu`` and ``cs.luc.edu``, we see they resolve to the same address. The use of ``www`` as a hostname for a domain's webserver is sometimes considered unnecessary and old-fashioned; many users and website administrators prefer the shorter, "naked" domain name, |eg| ``cs.luc.edu``. 
+
+It might be tempting to create a CNAME record for the naked domain, ``cs.luc.edu``, pointing to the full hostname ``www.cs.luc.edu``. However, :rfc:`1034` does not allow this:
+
+ | If a CNAME RR is present at a node, no other data should be present; this ensures that the data for a canonical name and its aliases cannot be different.  
+
+There are, however, several other DNS data records for ``cs.luc.edu``: an NS record (above), a SOA, or Start of Authority, record containing various administrative data such as the expiration time, and an MX record, discussed in the following section. All this makes ``www.cs.luc.edu`` and ``cs.luc.edu`` ineluctably quite different. :rfc:`1034` adds, "this rule also insures that a cached CNAME can be used without checking with an authoritative server for other RR types."
+
+A better way to create a naked-domain record, at least from the perspective of DNS, is to give it its own A record. This does mean that, if the webserver address changes, there are now *two* DNS records that need to be updated, but this is manageable. 
+
+Recently ANAME records have been proposed to handle this issue; an ANAME is like a *limited* CNAME not subject to the :rfc:`1034` restriction above. An ANAME record for a naked domain, pointing to another hostname rather than to address, is legal. See the Internet draft `draft-hunt-dnsop-aname <https://tools.ietf.org/html/draft-hunt-dnsop-aname>`_. Some large CDNs (:ref:`CDNs`) already implement similar DNS tweaks internally. This does not require end-user awareness; the user requests an A record and the ANAME is resolved at the CDN side.
+
+Finally, there is also an argument, at least when HTTP (web) traffic is involved, that the www *not* be deprecated, and that the naked domain should instead be *redirected*, at the HTTP layer, to the full hostname. This simplifies some issues; for example, you now have only one website, rather than two (though it does add an extra RTT). You no longer have to be concerned with the fact that HTTP cookies with and without the "www" are different. And some CDNs may not be able to handle website failover to another server if the naked domain is reached via an A record. But none of these are DNS issues.
+
+.. _other dns records:
+
+Other DNS Records
+------------------
+
+.. index::
+	single: reverse DNS
+
+Besides address lookups, DNS also supports a few other kinds of searches. The best known is probably **reverse DNS**, which takes an IP address and returns a name. This is slightly complicated by the fact that one IP address may be associated with multiple DNS names. What DNS does in this case is to return the canonical name, or CNAME; a given address can have only one CNAME.
+
+Given an IPv4 address, say 147.126.1.230, the idea is to reverse it and append to it the suffix ``in-addr.arpa``. 
+
+::
+
+	230.1.126.147.in-addr.arpa
+
+There is a DNS name hierarchy for names of this form, with zones and authoritative servers. If all this has been configured -- which it often is not, especially for user workstations -- a request for the ``PTR`` record corresponding to the above should return a DNS hostname. In the case above, the name `luc.edu <http://luc.edu>`_ is returned (at least as of 2018).
+
+.. index::
+	single: MX records, DNS
+
+``PTR`` records are the only DNS records to have an entirely separate hierarchy; other DNS types fit into the "standard" hierarchy. For example, DNS also supports MX, or Mail eXchange, records, meant to map a domain name (which might not correspond to any hostname, and, if it does, is more likely to correspond to the name of a web server) to the hostname of a server that accepts email on behalf of the domain. In effect this allows an organization's domain name, |eg| ``luc.edu``, to represent both a web server and, at a different IP address, an email server. MX records can even represent a *set* of IP addresses that accept email.
+
+DNS has from the beginning supported TXT records, for arbitrary text strings. The email Sender Policy Framework (:rfc:`7208`) was developed to make it harder for email senders to pretend to be a domain they are not; this involves inserting so-called SPF records as DNS TXT records. 
+
+For example, a DNS query for TXT records of ``google.com`` (not gmail.com!) might yield (2018)
+
+::
+
+ google.com	text = "docusign=05958488-4752-4ef2-95eb-aa7ba8a3bd0e"
+ google.com	text = "v=spf1 include:_spf.google.com ~all"
+
+The SPF system is interested in only the second record; the "v=spf1" specifies the SPF version. This second record tells us to look up ``_spf.google.com``. That lookup returns
+
+::
+
+ text = "v=spf1 include:_netblocks.google.com include:_netblocks2.google.com include:_netblocks3.google.com ~all"
+
+Lookup of ``_netblocks.google.com`` then returns
+
+::
+
+ text = "v=spf1 ip4:64.233.160.0/19 ip4:66.102.0.0/20 ip4:66.249.80.0/20 ip4:72.14.192.0/18 ip4:74.125.0.0/16 ip4:108.177.8.0/21 ip4:173.194.0.0/16 ip4:209.85.128.0/17 ip4:216.58.192.0/19 ip4:216.239.32.0/19 ~all"
+
+If a host connects to an email server, and declares that it is delivering mail from someone at google.com, then the host's email list should occur in the list above, or in one of the other included lists. If it does not, there is a good chance the email represents spam.
+
+.. index::
+	single: RRset, DNS
+
+Each DNS record (or "resource record") has a name (|eg| ``cs.luc.edu``) and a type (|eg| ``A`` or ``AAAA`` or ``NS`` or ``MX``). Given a name and type, the set of matching resource records is known as the **RRset** for that name and type (technically there is also a "class", but the class of all the DNS records we are interested in is ``IN``, for Internet). When a nameserver responds to a DNS query, what is returned (in the ANSWER section) is always an entire RRset: the RRset of all resource records matching the name and type contained in the original query. 
+
+In many cases, RRsets have a single member, because many hosts have a single IPv4 address. However, this is not universal. We saw above the example of a single DNS name having multiple A records when round-robin DNS is used. A single DNS name might also have separate A records for the host's public and private IPv4 addresses. TXT records, too, often contain multiple entries in a single RRset. In the TXT example above we saw that SPF data was stored in DNS TXT records, but there are other protocols besides SPF that also use TXT records; examples include `DMARC <https://en.wikipedia.org/wiki/DMARC>`_ and `google-site-verification <https://support.google.com/webmasters/answer/9008080?hl=en&visit_id=637364154322486031-1726883571&rd=1>_`. Finally, perhaps most MX-record (Mail eXchange) RRsets have multiple entries, as organizations often prefer, for redundancy, to have more than one server that can receive email.
+
+.. index::
+	single: cache poisoning, DNS
+	
+.. _cache poisoning:
+
+DNS Cache Poisoning
+--------------------------
+
+The classic DNS security failure, known as cache poisoning, occurs when an attacker has been able to convince a DNS resolver that the address of, say, www.example.com is something other than what it really is. A successful attack means the attacker can direct traffic meant for ``www.example.com`` to the attacker's own, malicious site. 
+
+The most basic cache-poisoning strategy is to send a stream of DNS reply packets to the resolver which declare that the IP address of www.example.com is the attacker's chosen IP address. The source IP address of these packets should be spoofed to be that of the example.com authoritative nameserver; such spoofing is relatively easy using UDP. Most of these reply packets will be ignored, but the hope is that one will arrive shortly after the resolver has sent a DNS request to the ``example.com`` authoritative nameserver, and interprets the spoofed reply packet as a legitimate reply. 
+
+To prevent this, DNS requests contain a 16-bit ID field; the DNS response must echo this back. The response must also come from the correct port. This leaves the attacker to guess 32 bits in all, but often the ID field (and even more often the port) can be guessed based on past history. 
+
+Another approach requires the attacker to wait for the target resolver to issue a legitimate request to the attacker's site, ``attacker.com``. The attacker then piggybacks in the ADDITIONAL section of the reply message an A record for ``example.com`` pointing to the attacker's chosen bad IP address for this site. The hope is that the receiving resolver will place these A records from the ADDITIONAL section into its cache without verifying them further and without noticing they are completely unrelated. Once upon a time, such DNS resolver behavior was common. 
+
+Most newer DNS resolvers carefully validate the replies: the ID field must match, the source port must match, and any received DNS records in the ADDITIONAL section must match, at a minimum, the DNS zone of the request. Additionally, the request ID field and source port should be chosen pseudorandomly in a secure fashion. For additional vulnerabilities, see :rfc:`3833`.
+
+The central risk in cache poisoning is that a resolver can be tricked into supplying users with invalid DNS records. A closely related risk is that an attacker can achieve the same result by spoofing an authoritative nameserver. Both of these risks can be mitigated through the use of the DNS security extensions, known as **DNSSEC**. Because DNSSEC makes use of public-key signatures, we defer coverage to :ref:`dnssec`. 
+
+.. index::
+	single: DNS and CDNs
+	single: CDN closest edge server
+	single: edge server, closest
+	single: closest CDN edge server
+	single: geoDNS
+
+.. _DNS and CDNs:
+
+DNS and CDNs
+----------------
+
+DNS is often pressed into service by CDNs (:ref:`CDNs`) to identify their closest "edge" server to a given user. Typically this involves the use of **geoDNS**, a slightly nonstandard variation of DNS. When a DNS query comes in to one of the CDN's authoritative nameservers, that server
+
+1. looks up the approximate location of the client (:ref:`IP geolocation`)
+2. determines the closest edge server to that location
+3. replies with the IP address of that closest edge server
+
+This works reasonably well most of the time. However, the requesting client is essentially never the end user; rather, it is the DNS resolver being used by the user. Typically such resolvers are the site resolvers provided by the user's ISP or organization, and are physically quite close to the user; in this case, the edge server identified above will be close to the user as well. However, when a user has chosen a (likely remote) public DNS resolver, as above, the IP address returned for the CDN edge server will be close to the DNS resolver but likely far from optimal for the end user.
+
+One solution to this last problem is addressed by :rfc:`7871`, which allows DNS resolvers to include the IP address of the client in the request sent to the authoritative nameserver. For privacy reasons, usually only a prefix of the user's IP address is included, perhaps /24. Even so, user's privacy is at least partly compromised. For this reason, :rfc:`7871` recommends that the feature be disabled by default, and only enabled after careful analysis of the tradeoffs.
+
+A user who is concerned about the privacy issue can -- in theory -- configure their own DNS software to include this :rfc:`7871` option with a zero-length prefix of the user's IP address, which conveys no address information. The user's resolver will then not change this to a longer prefix.
+
+Use of this option also means that the DNS resolver receiving a user query about a given hostname can no longer simply return a cached answer from a previous lookup of the hostname. Instead, the resolver needs to cache separately each ⟨hostname,prefix⟩ pair it handles, where the prefix is the prefix of the user's IP address forwarded to the authoritative nameserver. This has the potential to increase the cache size by several orders of magnitude, which may thereby enable some cache-overflow attacks.
+
+
+.. index::
+	single: Address Resolution Protocol
+	single: ARP
+
+.. _ARP:
+.. _Address Resolution Protocol:
+
+Address Resolution Protocol: ARP
+================================
+
+If a host or router A finds that the destination IP address D = D\ :sub:`IP` matches the network address of one of its interfaces, it is to deliver the packet via the LAN (probably Ethernet). This means looking up the LAN address (MAC address) D\ :sub:`LAN` corresponding to D\ :sub:`IP`. How does it do this?
+
+One approach would be via a special server, but the spirit of early IPv4 development was to avoid such servers, for both cost and reliability issues. Instead, the **Address Resolution Protocol** (ARP) is used. This is our first protocol that takes advantage of the existence of LAN-level broadcast; on LANs without physical broadcast (such as ATM), some other mechanism (usually involving a server) must be used.
+
+The basic idea of ARP is that the host A sends out a broadcast ARP query or "who-has D\ :sub:`IP`\ ?" request, which includes A's own IPv4 and LAN addresses. All hosts on the LAN receive this message. The host for whom the message is intended, D, will recognize that it should reply, and will return an ARP reply or "is-at" message containing D\ :sub:`LAN`. Because the original request contained A\ :sub:`LAN`, D's response can be sent directly to A, that is, unicast.
+
+.. image::	images/ipv4/ARPcast.svg
+
+.. index::
+	single: ARP cache
+
+Additionally, all hosts maintain an **ARP cache**, consisting of ⟨IPv4,LAN⟩ address pairs for other hosts on the network. After the exchange above, A has ⟨D\ :sub:`IP`\ ,D\ :sub:`LAN`\ ⟩ in its table; anticipating that A will soon send it a packet to which it needs to respond, D also puts ⟨A\ :sub:`IP`\ ,A\ :sub:`LAN`\ ⟩ into its cache. 
+
+.. index::
+	single: Linux
+
+ARP-cache entries eventually expire. The timeout interval used to be on the order of 10 minutes, but Linux systems now use a much smaller timeout (~30 seconds observed in 2012).
+Somewhere along the line, and probably related to this shortened timeout interval, repeat ARP queries about a *timed-out* entry are first sent **unicast**, not broadcast, to the previous Ethernet address on record. This cuts down on the total amount of broadcast traffic; LAN broadcasts are, of course, still needed for new hosts. The ARP cache on a Linux system can be examined with the command ``ip -s neigh``; the corresponding windows command is ``arp -a``. 
+
+The above protocol is sufficient, but there is one further point. When A sends its broadcast "who-has D?" ARP query, all other hosts C check their own cache for an entry for **A**. If there *is* such an entry (that is, if A\ :sub:`IP` is found there), then the value for A\ :sub:`LAN` is updated with the value taken from the ARP message; if there is no pre-existing entry then no action is taken. This update process serves to avoid stale ARP-cache entries, which can arise is if a host has had its Ethernet interface replaced. (USB Ethernet interfaces, in particular, can be replaced very quickly.)
+
+ARP is quite an efficient mechanism for bridging the gap between IPv4 and LAN addresses. Nodes generally find out neighboring IPv4 addresses through higher-level protocols, and ARP then quickly fills in the missing LAN address. However, in some Software-Defined Networking (:ref:`SDN`) environments, the LAN switches and/or the LAN controller may have knowledge about IPv4/LAN address correspondences, potentially making ARP superfluous. The LAN (Ethernet) switching network might in principle even know exactly how to route *via the LAN* to a given IPv4 address, potentially even making LAN addresses unnecessary. At such a point, ARP may become an inconvenience. For an example of a situation in which it is necessary to work around ARP, see :ref:`loadbalance`.
+
+.. index::
+	single: self-ARP
+	single: gratuitous ARP
+
+.. _ARP finer points:
+
+ARP Finer Points
+-----------------
+
+Most hosts today implement **self-ARP**, or **gratuitous ARP**, on startup (or wakeup): when station A starts up it sends out an ARP query *for itself*: "who-has A?". Two things are gained from this: first, all stations that had A in their cache are now updated with A's most current A\ :sub:`LAN` address, in case there was a change, and second, if an answer is received, then presumably some other host on the network has the same IPv4 address as A. 
+
+.. index::
+	single: duplicate address detection, IPv4
+	single: ACD, IPv4
+
+Self-ARP is thus the traditional IPv4 mechanism for **duplicate address detection**. Unfortunately, it does not always work as well as might be hoped; often only a single self-ARP query is sent, and if a reply is received then frequently the only response is to log an error message; the host may even continue using the duplicate address! If the duplicate address was received via DHCP, below, then the host is supposed to notify its DHCP server of the error and request a different IPv4 address. 
+
+:rfc:`5227` has defined an improved mechanism known as **Address Conflict Detection**, or ACD. A host using ACD sends out three ARP queries for its new IPv4 address, spaced over a few seconds and leaving the ARP field for the sender's IPv4 address filled with zeroes. This last step means that any other host with that IPv4 address in its cache will ignore the packet, rather than update its cache. If the original host receives no replies, it then sends out two more ARP queries for its new address, this time with the ARP field for the sender's IPv4 address filled in with the new address; this is the stage at which other hosts on the network will make any necessary cache updates. Finally, ACD requires that hosts that do detect a duplicate address must discontinue using it.
+
+.. index::
+	single: proxy ARP
+
+It is also possible for other stations to answer an ARP query on behalf of the actual destination D; this is called **proxy ARP**. An early common scenario for this was when host C on a LAN had a modem connected to a serial port. In theory a host D dialing in to this modem should be on a different subnet, but that requires allocation of a new subnet. Instead, many sites chose a simpler arrangement. A host that dialed in to C's serial port might be assigned IP address D\ :sub:`IP`, from the same subnet as C. C would be configured to route packets to D; that is, packets arriving from the serial line would be forwarded to the LAN interface, and packets sent to C\ :sub:`LAN` addressed to D\ :sub:`IP` would be forwarded to D. But we also have to handle ARP, and as D is not actually on the LAN it will not receive broadcast ARP queries. Instead, C would be configured to answer on behalf of D, replying with ⟨D\ :sub:`IP`,\ **C**\ :sub:`LAN`\ ⟩. This generally worked quite well.
+
+Proxy ARP is also used in Mobile IP, for the so-called "home agent" to intercept traffic addressed to the "home address" of a mobile device and then forward it (|eg| via tunneling) to that device. See :ref:`Mobile IP`.
+
+One delicate aspect of the ARP protocol is that stations are required to respond to a **broadcast** query. In the absence of proxies this theoretically should not create problems: there should be only one respondent. However, there were anecdotes from the Elder Days of networking when a broadcast ARP query would trigger an avalanche of responses. The protocol-design moral here is that determining who is to respond to a broadcast message should be done with great care. (\ :RFC:`1122` section 3.2.2 addresses this same point in the context of responding to broadcast ICMP messages.)
+
+ARP-query implementations also need to include a timeout and some queues, so that queries can be resent if lost and so that a burst of packets does not lead to a burst of queries. A naive ARP algorithm without these might be: 
+
+	To send a packet to destination  D\ :sub:`IP`, see if  D\ :sub:`IP` is in the ARP cache. If it is, address the packet to D\ :sub:`LAN`\ ; if not, send an ARP query for D
+
+To see the problem with this approach, imagine that a 32 kB packet arrives at the IP layer, to be sent over Ethernet. It will be fragmented into 22 fragments (assuming an Ethernet MTU of 1500 bytes), all sent at once. The naive algorithm above will likely send an ARP query for *each* of these. What we need instead is something like the following:
+
+ |   To send a packet to destination D\ :sub:`IP`\ :
+ |   If D\ :sub:`IP` is in the ARP cache, send to D\ :sub:`LAN` and return
+ |   If not, see if an ARP query for D\ :sub:`IP` is pending. 
+ |	If it is, put the current packet in a queue for D.
+ |      If there is no pending ARP query for D\ :sub:`IP`, start one, 
+ |	    again putting the current packet in the (new) queue for D
+
+We also need:
+
+ |   If an ARP query for some C\ :sub:`IP` times out, resend it (up to a point)
+ |   If an ARP query for C\ :sub:`IP` is answered, send off any packets in C's queue
+
+.. index::
+	single: ARP spoofing
+
+.. _ARP security:
+
+ARP Security
+------------
+
+Suppose A wants to log in to secure server S, using a password. How can B (for Bad) impersonate S?
+
+Here is an ARP-based strategy, sometimes known as **ARP Spoofing**. First, B makes sure the real S is down, either by waiting until scheduled downtime or by launching a denial-of-service attack against S.
+
+When A tries to connect, it will begin with an ARP "who-has S?". All B has to do is answer, "S is-at B". There is a trivial way to do this: B simply needs to set its own IP address to that of S.
+
+A will connect, and may be convinced to give its password to B. B now simply responds with something plausible like "backup in progress; try later", and meanwhile use A's credentials against the real S.
+
+.. index::
+	single: SSH
+
+This works even if the communications channel A uses is encrypted! If A is using the SSH protocol (:ref:`ssh`), then A will get a message that the other side's key has changed (B will present its own SSH key, not S's). Unfortunately, many users (and even some IT departments) do not recognize this as a serious problem. Some organizations -- especially schools and universities -- use personal workstations with "frozen" configuration, so that the filesystem is reset to its original state on every reboot. Such systems may be resistant to viruses, but in these environments the user at A will always get a message to the effect that S's credentials are not known.
+
+.. index::
+	single: ARP failover
+
+ARP Failover
+------------
+
+Suppose you have two front-line servers, A and B (B for Backup), and you want B to be able to step in if A freezes. There are a number of ways of achieving this, but one of the simplest is known as **ARP Failover**. First, we set A\ :sub:`IP` = B\ :sub:`IP`, but for the time being B does not use the network so this duplication is not a problem. Then, once B gets the message that A is down, it sends out an ARP query for A\ :sub:`IP`, including B\ :sub:`LAN` as the source LAN address. The gateway router, which previously would have had ⟨A\ :sub:`IP`,A\ :sub:`LAN`\ ⟩ in its ARP cache, updates this to ⟨A\ :sub:`IP`,\ **B**\ :sub:`LAN`\ ⟩, and packets that had formerly been sent to A will now go to B. As long as B is trafficking in stateless operations (|eg| html), B can pick up right where A left off.
+
+
+.. index::
+	single: password sniffing
+
+Detecting Sniffers
+------------------
+
+Finally, there is an interesting use of ARP to detect Ethernet password sniffers (generally not quite the issue it once was, due to encryption and switching). To find out if a particular host A is in promiscuous mode, send an ARP "who-has A?" query. Address it not to the broadcast Ethernet address, though, but to some nonexistent Ethernet address.
+
+If promiscuous mode is off, A's network interface will ignore the packet.
+But if promiscuous mode is on, A's network interface will pass the ARP request to A itself, which is likely then to answer it.
+
+.. index::
+	single: Linux
+
+Alas, Linux kernels reject at the ARP-software level ARP queries to physical Ethernet addresses other than their own. However, they do respond to faked Ethernet multicast addresses, such as ff:ff:ff:00:00:00 or ff:ff:ff:ff:ff:fe.
+
+.. index::
+	single: multihoming and ARP
+
+.. _ARP flux:
+
+ARP and multihomed hosts
+-------------------------
+
+If host A has two interfaces ``iface1`` and ``iface2`` *on the same LAN*, with respective IP addresses A\ :sub:`1` and A\ :sub:`2`, then it is common for the two to be used interchangeably. Traffic addressed to A\ :sub:`1` may be received via ``iface2`` and vice-versa, and traffic *from* A\ :sub:`1` may be sent via ``iface2``. In :ref:`multihomed` this is described as the **weak end-system** model; the idea is that we should think of the IP addresses A\ :sub:`1` and A\ :sub:`2` as bound to A rather than to their respective interfaces.
+
+In support of this model, ARP can usually be configured (in fact this is often the default) so that ARP requests for either IP address and received by either interface may be answered with either physical address. Usually all requests are answered with the physical address of the preferred (|ie| faster) interface. 
+
+As an example, suppose A has an Ethernet interface ``eth0`` with IP address 10.0.0.2 and a faster Wi-Fi interface ``wlan0`` with IP address 10.0.0.3 (although Wi-Fi interfaces are *not* always faster). In this setting, an ARP request "who-has 10.0.0.2" would be answered with ``wlan0``'s physical address, and so all traffic to A, to either IP address, would arrive via ``wlan0``. The ``eth0`` interface would go essentially unused. Similarly, though not due to ARP, traffic sent by A with source address 10.0.0.2 might depart via ``wlan0``.
+
+This situation is on Linux systems adjusted by changing ``arp_ignore`` and ``arp_announce`` in ``/proc/sys/net/ipv4/conf/all``.
+
+.. index::
+	single: DHCP
+
+
+.. _DHCP:
+
+Dynamic Host Configuration Protocol (DHCP)
+===========================================
+
+DHCP is the most common mechanism by which hosts are assigned their IPv4 addresses. DHCP started as a protocol known as Reverse ARP (RARP), which evolved into BOOTP and then into its present form. It is documented in :rfc:`2131`. Recall that ARP is based on the idea of someone broadcasting an ARP query for a host, containing the host's IPv4 address, and the host answering it with its LAN address. DHCP involves a host, at startup, broadcasting a query containing its *own* LAN address, and having a server reply telling the host what IPv4 address is assigned to it, hence the "Reverse ARP" name. 
+
+The DHCP response message is also likely to carry, piggybacked onto it, several other essential startup options. Unlike the IPv4 address, these additional network parameters usually do not depend on the specific host that has sent the DHCP query; they are likely constant for the subnet or even the site. In all, a typical DHCP message includes the following:
+
+.. index::
+	single: minimal network configuration
+	single: DNS
+
++ IPv4 address
++ subnet mask
++ default router
++ DNS Server
+
+These four items are a standard **minimal network configuration**; in practical terms, hosts cannot function properly without them. Most DHCP implementations support the piggybacking of the latter three above, and a wide variety of other configuration values, onto the server responses. 
+
+.. sidebar:: Default Routers and DHCP
+
+	If you lose your default router, you cannot communicate. Here is something that used to happen to me, courtesy of DHCP:
+
+	#. I am connected to the Internet via Ethernet, and my default router is via my Ethernet interface
+	#. I connect to my institution's wireless network.
+	#. Their DHCP server sends me a new default router on the wireless network. However, this default router will only allow access to a tiny private network, because I have neglected to complete the "Wi-Fi network registration" process.
+	#. I therefore disconnect from the wireless network, and my wireless-interface default router goes away. However, my system does not automatically revert to my Ethernet default-router entry; DHCP does not work that way. As a result, I will have no router at all until the next scheduled DHCP lease renegotiation, and must fix things manually.
+
+The DHCP server has a range of IPv4 addresses to hand out, and maintains a database of which IPv4 address has been assigned to which LAN address. Reservations can either be permanent or dynamic; if the latter, hosts typically renew their DHCP reservation periodically (typically one to several times a day). 
+
+
+.. index::
+	single: autoconfiguration, IPv4
+
+.. _small dhcp:
+
+NAT, DHCP and the Small Office
+---------------------------------
+
+If you have a large network, with multiple subnets, a certain amount of manual configuration is inevitable. What about, however, a home or small office, with a single line from an ISP? A combination of NAT (:ref:`nat`) and DHCP has made **autoconfiguration** close to a reality.
+
+The typical home/small-office "router" is in fact a NAT router (:ref:`nat`) coupled with an Ethernet switch, and usually also coupled with a Wi-Fi access point and a DHCP server. In this section, we will use the term "NAT router" to refer to this whole package. One specially designated port, the **external** port, connects to the ISP's line, and uses DHCP as a client to obtain an IPv4 address for that port. The other, **internal**, ports are connected together by an Ethernet switch; these ports as a group are connected to the external port using NAT translation. If wireless is supported, the wireless side is connected directly to the internal ports.
+
+Isolated from the Internet, the internal ports can thus be assigned an arbitrary non-public IPv4 address block, |eg| 192.168.0.0/24. The NAT router typically contains a DCHP server, usually enabled by default, that will hand out IPv4 addresses to everything connecting from the internal side. 
+
+Generally this works seamlessly. However, if a second NAT router is also connected to the network (sometimes attempted to extend Wi-Fi range, in lieu of a commercial Wi-Fi repeater), one then has two operating DHCP servers on the same subnet. This often results in chaos, though is easily fixed by disabling one of the DHCP servers.
+
+While omnipresent DHCP servers have made IPv4 autoconfiguration work "out of the box" in many cases, in the era in which IPv4 was designed the need for such servers would have been seen as a significant drawback in terms of expense and reliability. IPv6 has an autoconfiguration strategy (:ref:`SLAAC`) that does not require DHCP, though DHCPv6 may well end up displacing it.
+
+.. index::
+	single: DHCP Relay
+
+DHCP and Routers
+----------------
+
+It is often desired, for larger sites, to have only one or two DHCP servers, but to have them support multiple subnets. Classical DHCP relies on broadcast, which isn't forwarded by routers, and even
+if it were, the DHCP server would have no way of knowing on what subnet the host in question was actually located.
+
+This is generally addressed by **DHCP Relay** (sometimes still known by the
+older name BOOTP Relay). The router (or, sometimes, some other node on
+the subnet) receives the DHCP broadcast message from a host, and notes the subnet address of the arrival interface. The router then relays the DHCP request, together with this subnet address, to the designated DHCP Server; this relayed message is sent directly (unicast), not broadcast. Because the subnet address is included, the DHCP server can figure out the correct IPv4 address to assign.
+
+This feature has to be specially enabled on the router.
+
+
+.. index::
+	single: ICMP
+
+.. _ICMP:
+.. _ping:
+
+Internet Control Message Protocol
+=================================
+
+The Internet Control Message Protocol, or ICMP, is a protocol for sending IP-layer error and status messages; it is defined in :rfc:`792`. ICMP is, like IP, **host-to-host**, and so they are never delivered to a specific port, even if they are sent in response to an error related to something sent from that port. In other words, individual UDP and TCP connections do not receive ICMP messages, even when it would be helpful to get them. 
+
+ICMP messages are identified by an 8-bit **type** field, followed by an 8-bit subtype, or **code**. Here are the more common ICMP types, with subtypes listed in the description. 
+
++-----------------------------+----------------------------------------+
+|  Type                       |   Description                          |
++=============================+========================================+
+|   Echo Request              |   ``ping`` queries                     |
++-----------------------------+----------------------------------------+
+|   Echo Reply                |   ``ping`` responses                   |
++-----------------------------+----------------------------------------+
+|   Destination Unreachable   | Destination **network** unreachable    |
++                             +----------------------------------------+
+|                             | Destination **host** unreachable       |
++                             +----------------------------------------+
+|                             | Destination **port** unreachable       |
++                             +----------------------------------------+
+|                             | Fragmentation required but DF flag set |
++                             +----------------------------------------+
+|                             |  Network administratively prohibited   |
++-----------------------------+----------------------------------------+
+|   Source Quench             |  Congestion control                    |
++-----------------------------+----------------------------------------+
+|   Redirect Message          | Redirect datagram for the **network**  |
++                             +----------------------------------------+
+|                             | Redirect datagram for the **host**     |
++                             +----------------------------------------+
+|                             | Redirect for TOS and network           |
++                             +----------------------------------------+
+|                             | Redirect for TOS and host              |
++-----------------------------+----------------------------------------+
+|  Router Solicitation        | Router discovery/selection/solicitation|
++-----------------------------+----------------------------------------+
+|   Time Exceeded             | TTL expired in transit                 |
++                             +----------------------------------------+
+|                             | Fragment reassembly time exceeded      |
++-----------------------------+----------------------------------------+
+|  Bad IP Header              |  Pointer indicates the error           |
++  or Parameter               +----------------------------------------+
+|                             |  Missing a required option             |
++                             +----------------------------------------+
+|                             |  Bad length                            |
++-----------------------------+----------------------------------------+
+|  Timestamp                  |  Like ``ping``, but requesting         |
+|  Timestamp Reply            |  a timestamp from the destination      |
++-----------------------------+----------------------------------------+
+
+.. index::
+	single: Query Identifier, ICMP
+	single: query, ICMP
+	single: error message, ICMP
+
+The Echo and Timestamp formats are *queries*, sent by one host to another. Most of the others are all *error messages*, sent by a router to the sender of the offending packet. Error-message formats contain the IP header and next 8 bytes of the packet in question; the 8 bytes will contain the TCP or UDP port numbers. Redirect and Router Solicitation messages are informational, but follow the error-message format. Query formats contain a 16-bit *Query Identifier*, assigned by the query sender and echoed back by the query responder.
+
+.. sidebar:: ``ping`` Packet Size
+
+	The author once had to diagnose a problem where pings were *almost* 100% successful, and yet file transfers failed immediately; this could have been the result of either a network fault or a file-transfer application fault. The problem turned out to be a failed network device with a very high bit-error rate: 1500-byte file-transfer packets were frequently corrupted, but ping packets, with a default size of 32-64 bytes, were mostly unaffected. If the bit-error rate is such that 1500-byte packets have a 50% success rate, 50-byte packets can be expected to have a 98% (≃ 0.5\ :sup:`1/30`) success rate. Setting the ping packet size to a larger value made it immediately clear that the network, and not the file-transfer application, was at fault.
+
+.. index::
+	single: Echo Request/Reply
+	single: ping
+
+ICMP is perhaps best known for Echo Request/Reply, on which the ``ping`` tool (:ref:`utilities`) is based. Ping remains very useful for network troubleshooting: if you can ping a host, then the network is reachable, and any problems are higher up the protocol chain. Unfortunately, ping replies are often blocked by many firewalls, on the theory that revealing even the existence of computers is a security risk. While this may sometimes be an appropriate decision, it does significantly impair the utility of ping. 
+
+Ping can be asked to include IP timestamps (:ref:`IPv4 header`) on Linux systems with the ``-T`` option, and on Windows with ``-s``.
+
+.. index::
+	single: Source Quench
+
+Source Quench was used to signal that congestion has been encountered. A router that drops a packet due to congestion experience was encouraged to send ICMP Source Quench to the originating host. Generally the TCP layer would handle these appropriately (by reducing the overall sending rate), but UDP applications never receive them. ICMP Source Quench did not quite work out as intended, and was formally deprecated by :RFC:`6633`. (Routers can inform TCP connections of impending congestion by using the ECN bits.)
+
+.. index::
+	single: Destination Unreachable
+	single: Network Unreachable
+	single: Host Unreachable
+	single: Port Unreachable
+	single: Fragmentation Required
+	single: Administratively Prohibited
+	single: Path MTU Discovery
+
+The Destination Unreachable type has a large number of subtypes:
+
+
++ **Network unreachable**: some router had no entry for forwarding the packet, and no default route
++ **Host unreachable**: the packet reached a router that was on the same LAN as the host, but the host failed to respond to ARP queries
++ **Port unreachable**: the packet was sent to a UDP port on a given host, but that port was not open. TCP, on the other hand, deals with this situation by replying to the connecting endpoint with a ``reset`` packet. Unfortunately, the UDP Port Unreachable message is sent to the host, not to the application on that host that sent the undeliverable packet, and so is close to useless as a practical way for applications to be informed when packets cannot be delivered.
++ **Fragmentation required but DF flag set**: a packet arrived at a router and was too big to be forwarded without fragmentation. However, the Don't Fragment bit in the IPv4 header was set, forbidding fragmentation. 
++ **Administratively Prohibited**: this is sent by a router that knows it can reach the network in question, but has configureintro to drop the packet and send back Administratively Prohibited messages. A router can also be configured to **blackhole** messages: to drop the packet and send back nothing.
+
+In :ref:`Path MTU Discovery` we will see how TCP uses the ICMP message **Fragmentation required but DF flag set** as part of **Path MTU Discovery**, the process of finding the largest packet that can be sent *to a specific destination* without fragmentation. The basic idea is that we set the DF bit on some of the packets we send; if we get back this message, that packet was too big.
+
+Some sites and firewalls block ICMP packets in addition to Echo Request/Reply, and for some messages one can get away with this with relatively few consequences. However, blocking **Fragmentation required but DF flag set** has the potential to severely affect TCP connections, depending on how Path MTU Discovery is implemented, and thus is not recommended. If ICMP filtering is contemplated, it is best to base block/allow decisions on the ICMP type, or even on the type and code. For example, most firewalls support rule sets of the form "allow ICMP destination-unreachable; block all other ICMP".
+
+The **Timestamp** option works something like Echo Request/Reply, but the receiver includes its own local timestamp for the arrival time, with millisecond accuracy. See also the IP Timestamp option, :ref:`IPv4 header`, which appears to be more frequently used.
+
+The type/code message format makes it easy to add new ICMP types. Over the years, a significant number of additional such types have been defined; a `complete list <http://www.iana.org/assignments/icmp-parameters/icmp-parameters.xhtml>`_ is maintained by the IANA. Several of these later ICMP types were seldom used and eventually deprecated, many by :rfc:`6918`.
+
+.. index::
+	single: NAT and ICMP
+
+ICMP packets are usually forwarded correctly through NAT routers, though due to the absence of port numbers the router must do a little more work. :rfc:`3022` and :rfc:`5508` address this. For ICMP queries, like ping, the ICMP Query Identifier field can be used to recognize the returning response. ICMP error messages are a little trickier, because there is no direct connection between the inbound error message and any of the previous outbound non-ICMP packets that triggered the response. However, the headers of the packet that triggered the ICMP error message are embedded in the body of the ICMP message. The NAT router can look at those embedded headers to determine how to forward the ICMP message (the NAT router must also rewrite the addresses of those embedded headers).
+
+.. index::
+	single: traceroute
+
+.. _traceroute:
+
+Traceroute and Time Exceeded
+----------------------------
+
+The traceroute program uses ICMP Time Exceeded messages. A packet is sent to the destination (often UDP to an unused port), with the TTL set to 1. The first router the packet reaches decrements the TTL to 0, drops it, and returns an ICMP Time Exceeded message. The sender now knows the first router on the chain. The second packet is sent with TTL set to 2, and the second router on the path will be the one to return ICMP Time Exceeded. This continues until finally the remote host returns something, likely ICMP Port Unreachable.
+
+For an example of traceroute output, see :ref:`traceroute-intro`. In that example, the three traceroute probes for the Nth router are sometimes answered by two or even three different routers; this suggests routers configured to work in parallel rather than route changes.
+
+Many routers no longer respond with ICMP Time Exceeded messages when they drop packets. For the distance value corresponding to such a router, traceroute reports ``***``. 
+
+Traceroute assumes the path does not change. This is not always the case, although in practice it is seldom an issue.
+
+.. sidebar:: Route Efficiency
+
+	Once upon a time (~2001), traceroute showed that traffic from my home to the office, both in the Chicago area, went through the MAE-EAST Internet exchange point, outside of Washington DC. That inefficient route was later fixed. A situation like this is typically caused by two higher-level providers who did not negotiate sufficient Internet exchange points.
+
+Traceroute to a nonexistent site works up to the point when the packet reaches the Internet "backbone": the first router which does not have a default route. At that point the packet is not routed further (and an ICMP Destination Network Unreachable should be returned).
+
+Traceroute also interacts somewhat oddly with routers using MPLS (see :ref:`MPLS`). Such routers -- most likely large-ISP internal routers -- may continue to forward the ICMP Time Exceeded message on further towards its destination before returning it to the sender. As a result, the round-trip time measurements reported may be quite a bit larger than they should be.
+
+
+Redirects
+----------
+
+Most non-router hosts start up with an IPv4 forwarding table consisting of a single (default) router, discovered along with their IPv4 address through DHCP. ICMP Redirect messages help hosts learn of other useful routers. Here is a classic example:
+
+.. image::	images/ipv4/redirect.svg
+
+A is configured so that its default router is R1. It addresses a packet to B, and sends it to R1. R1 receives the packet, and forwards it to R2. However, R1 also notices that R2 and A are on the same network, and so A could have sent the packet to R2 directly. So R1 sends an appropriate ICMP redirect message to A ("Redirect Datagram for the Network"), and A adds a route to B via R2 to its own forwarding table.
+
+
+Router Solicitation
+-------------------
+These ICMP messages are used by some router protocols to identify immediate neighbors. When we look at routing-update algorithms, :ref:`routing update`, these are where the process starts.
+
+
+
+Epilog
+==========
+
+
+At this point we have concluded the basic mechanics of IPv4. Still to come is a discussion of how IP routers build their forwarding tables. This turns out to be a complex topic, divided into routing within single organizations and ISPs -- :ref:`routing update` -- and routing between organizations -- :ref:`large-scale IP routing`.  
+
+But before that, in the next chapter, we compare IPv4 with IPv6, now twenty years old but still seeing limited adoption. The biggest issue fixed by IPv6 is IPv4's lack of address space, but there are also several other less dramatic improvements.
+
+
+
+
+.. _ipv4companion_exercises:
+
+Exercises
+=========
+
+*Exercises may be given fractional (floating point) numbers, to allow for interpolation of new exercises.* 
+
+\ 1.0. In :ref:`Address Resolution Protocol` it was stated that, in newer implementations, "repeat ARP queries about a timed out entry are first sent unicast", in order to reduce broadcast traffic. Suppose host A uses ARP to retrieve B's LAN address (MAC address). A short time later, B *changes* its LAN address, either through a hardware swap or through software reconfiguration.
+
+| (a). What will happen if A now sends a *unicast* repeat ARP query for B?
+| (b). What will happen if A now sends a *broadcast* repeat ARP query for B? 
+
+\ 2.0. Suppose A broadcasts an ARP query "who-has B?", receives B's response, and proceeds to send B a regular IPv4 packet. If B now wishes to reply, why is it likely that A will already be present in B's ARP cache? Identify a circumstance under which this can fail.
+
+\ 3.0. Suppose A broadcasts an ARP request "who-has B", but inadvertently lists the physical address of another machine C instead of its own (that is, A's ARP query has IP\ :sub:`src` = A, but LAN\ :sub:`src` = C). What will happen? Will A receive a reply? Will any other hosts on the LAN be able to send to A? What entries will be made in the ARP caches on A, B and C?
+
+\ 4.0. Suppose host A connects to the Internet via Wi-Fi. The default router is R\ :sub:`W`. Host A now begins exchanging packets with a remote host B: A sends to B, B replies, |etc|. The exact form of the connection does not matter, except that TCP may not work. 
+
+| (a). You now plug in A's Ethernet cable. The Ethernet port is assumed to be on a different subnet from the Wi-Fi (so that the strong and weak end-system models of :ref:`ARP flux` do not play a role here). Assume A automatically selects the new Ethernet connection as its default route, with router R\ :sub:`E`. What happens to the original connection to A? Can packets still travel back and forth? Does the return address used for either direction change?
+
+| (b). You now *disconnect* A's Wi-Fi interface, leaving the Ethernet interface connected. What happens now to the connection to B? Hint: to what IP address are the packets from B being sent?
+
+See also :ref:`routing update` exercise |ethernet+wifi-routing|, and :ref:`TCPB` exercise |ethernet+wifi-TCP|.
+
+
