@@ -1,0 +1,230 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>SNMPv3 &mdash; An Introduction to Computer Networks</title>
+    
+    <link rel="stylesheet" href="_static/csbnetbook.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/rightsidebar.js"></script>
+    <link rel="top" title="An Introduction to Computer Networks" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="index.html">An Introduction to Computer Networks</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">SNMPv3</a><ul>
+<li><a class="reference internal" href="#what-could-possibly-go-wrong">What Could Possibly Go Wrong?</a></li>
+<li><a class="reference internal" href="#cryptographic-fundamentals">Cryptographic Fundamentals</a></li>
+<li><a class="reference internal" href="#snmpv3-engines">SNMPv3 Engines</a></li>
+<li><a class="reference internal" href="#message-authentication">Message Authentication</a></li>
+<li><a class="reference internal" href="#passwords-and-keys">Passwords and Keys</a><ul>
+<li><a class="reference internal" href="#message-signing">Message Signing</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#key-changes">Key Changes</a><ul>
+<li><a class="reference internal" href="#the-usmusertable">The <tt class="docutils literal"><span class="pre">usmUserTable</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#creating-agent-accounts">Creating Agent Accounts</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="snmpv3">
+<h1>SNMPv3<a class="headerlink" href="#snmpv3" title="Permalink to this headline">¶</a></h1>
+<p>SNMP version 3 added authentication and encryption to SNMPv2c, but made relatively few other changes except to nomenclature. The original definitions are in <span class="target" id="index-0"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc3410.html"><strong>RFC 3410</strong></a> through <span class="target" id="index-1"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc3415.html"><strong>RFC 3415</strong></a>; <span class="target" id="index-2"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc3410.html"><strong>RFC 3410</strong></a> first appeared as <span class="target" id="index-3"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2570.html"><strong>RFC 2570</strong></a>.  SNMPv3 introduced the User Security Model, or <strong>USM</strong>, in which agents allow manager access only if the manager has presented an appropriate <strong>key</strong>, derived ultimately from a passphrase. The agent&#8217;s response can be either digitally signed or encrypted, as desired.</p>
+<blockquote>
+<div>SNMPv3 did make several terminology changes. Any SNMP node &#8211; either manager or agent &#8211; is now known as an SNMP <strong>entity</strong>. An entity is divided into two parts; the first is the SNMP <strong>engine</strong> consisting of the message dispatcher, the message processor, and the security and access-control subsystems. The second part consists of the various SNMP <strong>applications</strong>, consisting, for agents, primarily of the command responder (responding to <tt class="docutils literal"><span class="pre">Get()</span></tt> and <tt class="docutils literal"><span class="pre">GetNext()</span></tt>, etc). One goal of this architectural division is to separate the applications from the authentication mechanisms. Another goal, however, is to provide a framework in which future new applications can easily be supported.</div></blockquote>
+<p>It is the SNMP engine that must implement all the new security provisions.</p>
+<div class="section" id="what-could-possibly-go-wrong">
+<h2>What Could Possibly Go Wrong?<a class="headerlink" href="#what-could-possibly-go-wrong" title="Permalink to this headline">¶</a></h2>
+<p><span class="target" id="index-4"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc3414.html"><strong>RFC 3414</strong></a> analyzes the the risks of inadequate SNMP security, and identifies two primary and two secondary threats. The primary threats are as follows:</p>
+<ul class="simple">
+<li>Unauthorized <strong>modification</strong> of information in transit: that is, <strong>man-in-the-middle</strong> attacks in which A&#8217;s message to B is intercepted and modified by an intermediate node M.</li>
+<li><strong>Masquerade</strong>: unauthorized operations by a manager (or agent) masquerading as an authorized entity. Use of guessed or cracked passwords would fall into this category.</li>
+</ul>
+<p>The secondary threats are these:</p>
+<ul class="simple">
+<li><strong>Message Stream Modification</strong>: This includes re-ordering messages, and, perhaps most importantly, <strong>replay attacks</strong>. For example, even if no keys are ever discovered, an attacker might learn that a certain message causes a certain server to reboot. Retransmitting that message could have serious consequences.</li>
+<li><strong>Disclosure</strong>: reading by an eavesdropper of the management information in transit.</li>
+</ul>
+<p>All but the last, disclosure, can be addressed by appropriate digital signatures and timestamps; encryption is only needed when disclosure is an active concern. Because disclosure is not always a significant concern, and perhaps because when <span class="target" id="index-5"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2574.html"><strong>RFC 2574</strong></a> was written in 1999 the unlicensed export of encryption technology from the United States was illegal, SNMPv3 defines two separate new levels of security:</p>
+<ul class="simple">
+<li>authentication-only, addressing modification, masquerade and replay</li>
+<li>encryption, addressing the above and disclosure</li>
+</ul>
+<p>These correspond to three values for the <tt class="docutils literal"><span class="pre">snmpSecurityLevel</span></tt> textual convention (in which &#8220;priv&#8221; abbreviates &#8220;privacy&#8221;):</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">noAuthNoPriv</span></tt>: no authentication</li>
+<li><tt class="docutils literal"><span class="pre">authNoPriv</span></tt>: authentication, but no</li>
+<li><tt class="docutils literal"><span class="pre">authPriv</span></tt>: encryption of all messages</li>
+</ul>
+<p>Encryption (privacy) implies authentication, as only an entity in possession of the secret key could have created the message.</p>
+</div>
+<div class="section" id="cryptographic-fundamentals">
+<span id="crypto-fun"></span><h2>Cryptographic Fundamentals<a class="headerlink" href="#cryptographic-fundamentals" title="Permalink to this headline">¶</a></h2>
+<p>SNMPv3 authentication is based on <strong>cryptographic hash functions</strong>: functions which take a data string of arbitrary length and return a fixed-length hash, in such a way that</p>
+<ul class="simple">
+<li>Knowing the hash value sheds no practical light on the original data</li>
+<li>Given a hash value, there is no feasible way to find a message yielding that hash</li>
+</ul>
+<p>The Internet checksum of <a class="reference internal" href="packets.html#error-detection"><em>5.4&nbsp;&nbsp;&nbsp;Error Detection</em></a> fails as a cryptographic hash, for example, because given a message m and a hash value hʹ, one can calculate hash(m) = h and then append to m a two-byte string based on hʹ−h, yielding a message mʹ for which hash(mʹ) = hʹ.</p>
+<p>The two cryptographic hash functions originally supported by SNMPv3 in <span class="target" id="index-6"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc3414.html"><strong>RFC 3414</strong></a> are <a class="reference external" href="http://en.wikipedia.org/wiki/MD5">MD5</a>, which produces a 128-bit hash, and <a class="reference external" href="http://en.wikipedia.org/wiki/SHA-1">SHA-1</a>, which produces a 160-bit hash. Since the publication of <span class="target" id="index-7"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc3414.html"><strong>RFC 3414</strong></a> in 2002, vulnerabilities in each of these hash functions have been discovered. The SNMP framework in principle allows easy substitution of new hash functions, but to date new hashes have not been standardized.</p>
+<p>If two parties share a secret key k, the basic hash-based way to sign a message m is to append to it the value hash(m⏜k), where m⏜k is the result of appending k to m. An eavesdropper will see m and hash(m⏜k) but this will provide no information about k, and, similarly, an attacker will, given a message m, not be able to generate the value hash(m⏜k) without knowing k.</p>
+<p>The SNMP encryption mechanism is also based on shared secret keys; that is, public-key encryption is not used. <span class="target" id="index-8"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc3414.html"><strong>RFC 3414</strong></a> describes the use of the <a class="reference external" href="http://en.wikipedia.org/wiki/Data_Encryption_Standard">Data Encryption Standard cipher</a>, or DES, which uses 56-bit keys. DES is, if anything, even more vulnerable than MD5 and SHA-1, due to the limited key length. Given a plaintext message p and a key k, we can encrypt it with e(p,k); given an encrypted ciphertext message c we can decrypt it with d(c,k), where e() and d() are established functions.</p>
+</div>
+<div class="section" id="snmpv3-engines">
+<span id="index-9"></span><span id="id1"></span><h2>SNMPv3 Engines<a class="headerlink" href="#snmpv3-engines" title="Permalink to this headline">¶</a></h2>
+<p>The SNMPv3 engine is the component of an SNMP entity charged with ensuring security. Each SNMPv3 engine &#8211; manager or agent &#8211; has an <strong>snmpEngineID</strong>. This is a string that, by default, incorporates the node&#8217;s IP or Ethernet address and additional standard information. While it is</p>
+<p>In any SNMPv3 exchange, one SNMPv3 engine is designated <strong>authoritative</strong>. For a <tt class="docutils literal"><span class="pre">Get()</span></tt> or <tt class="docutils literal"><span class="pre">Set()</span></tt> request, or any other request that requires a response, it is always the agent that is authoritative. It is the job of the authoritative engine to validate the message received from the other engine.</p>
+<p>For either authentication-only or encrypting security levels, the nonauthoritative engine must present a pair consisting of the following:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">userName</span></tt>: a human-readable string identifying a person or manager-computer</li>
+<li><tt class="docutils literal"><span class="pre">authParameters</span></tt>: a string holding data specific to the authentication/encryption mechanism in use that serves to authenticate the user. This might be thought of as a passphrase, except one goal is never to send passphrases in the clear.</li>
+</ul>
+<p>The authoritative engine must keep a table of all the <tt class="docutils literal"><span class="pre">userName</span></tt> values it recognizes, and, for each, the appropriate key with which to validate the user.</p>
+<p>Any SNMPv3 engine also keeps track of two 32-bit attributes</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">snmpEngineTime</span></tt>: the number of seconds since the engine last rebooted</li>
+<li><tt class="docutils literal"><span class="pre">snmpEngineBoots</span></tt>: the number of times the engine has rebooted</li>
+</ul>
+<p>The pair of these, which we will abbreviate as ⟨Time,Boots⟩, uniquely identifies a point in time for an entity (to the nearest second). They are used to prevent replay attacks; two messages sent more than one second apart will never have the same ⟨Time,Boots⟩ timestamp.</p>
+<p>Note that keeping track of <tt class="docutils literal"><span class="pre">snmpEngineBoots</span></tt> implies that the entity have some form of persistent storage.</p>
+<p>When a nonauthoritative engine (for our purposes, the manager) wants to send a request to an authoritative engine (the agent), the first step is to find out the agent&#8217;s <tt class="docutils literal"><span class="pre">snmpEngineID</span></tt> and then its current ⟨Time,Boots⟩ value. This is done through an initial two-step discovery process. The first request contains an empty <tt class="docutils literal"><span class="pre">varBindList</span></tt>, an empty engineID, a username of &#8220;&#8221; and a security_model of <tt class="docutils literal"><span class="pre">noAuthNoPriv</span></tt>. The authoritative side sends a response containing its engineID. The second step is to send a request, again with an empty <tt class="docutils literal"><span class="pre">varBindList</span></tt> but now containing a valid ⟨username,key⟩ pair. The value for ⟨Time,Boots⟩ is ⟨0,0⟩. The authoritative engine now responds with a message including its actual ⟨Time,Boots⟩.</p>
+</div>
+<div class="section" id="message-authentication">
+<h2>Message Authentication<a class="headerlink" href="#message-authentication" title="Permalink to this headline">¶</a></h2>
+<p>After discovering the authoritative engine&#8217;s ⟨Time,Boots⟩, the nonauthoritative engine stores the authoritative engine&#8217;s <tt class="docutils literal"><span class="pre">snmpEngineBoots</span></tt> and also the difference between the authoritative engine&#8217;s <tt class="docutils literal"><span class="pre">snmpEngineTime</span></tt> and its own clock time. It can now use this difference to approximate the authoritative engine&#8217;s <tt class="docutils literal"><span class="pre">snmpEngineTime</span></tt> at any point in the future. Every message from the nonauthoritative engine will include its estimate of the authoritative engine&#8217;s current ⟨Time,Boots⟩ value. Relative drift between the two engines&#8217; clocks will eventually mean this estimate fails, but, as we shall see, it can be expected to be close enough for quite a while.</p>
+<p>The authoritative engine accepts a non-empty request only if all three of the following hold, where Time and Boots are the values submitted by the nonauthoritative engine and <tt class="docutils literal"><span class="pre">snmpEngineTime</span></tt> and <tt class="docutils literal"><span class="pre">snmpEngineBoots</span></tt> are the authoritative engine&#8217;s own values:</p>
+<ul class="simple">
+<li>Boots = <tt class="docutils literal"><span class="pre">snmpEngineBoots</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">snmpEngineBoots</span></tt> &lt; 2<sup>31</sup> - 1</li>
+<li>Time and <tt class="docutils literal"><span class="pre">snmpEngineTime</span></tt> differ by less than 150 seconds</li>
+</ul>
+<p>The maximum allowable clock drift, in other words, is 150 seconds. If the two clocks drift by more than that, the nonauthoritative side must again go through the synchronization process outlined at the end of the previous section.</p>
+<p>The actual message signing is based on a shared secret key, <tt class="docutils literal"><span class="pre">authKey</span></tt>.</p>
+</div>
+<div class="section" id="passwords-and-keys">
+<h2>Passwords and Keys<a class="headerlink" href="#passwords-and-keys" title="Permalink to this headline">¶</a></h2>
+<p>Users are identified by <tt class="docutils literal"><span class="pre">userName</span></tt> values, and also have human-readable passwords. These passwords must be converted first into keys, in such a way that each ⟨user,agent⟩ pair has its own unique key. We will start with the authentication-only mechanism, which is the same for the MD5 and SHA-1 hashes. We will denote the hash function (either MD5 or SHA-1) by <tt class="docutils literal"><span class="pre">hash()</span></tt>.</p>
+<p>The first step is to create a <strong>digest</strong> based on the password. The password is repeated (logically, at least) to fill a buffer 2<sup>20</sup> bytes in length, and then the <tt class="docutils literal"><span class="pre">hash()</span></tt> function is applied to that megabyte string. The reason for the megabyte extension is to make the password→key conversion process relatively slow, so as to hamper brute-force attacks.</p>
+<p>The next step is to take the engineID of the agent for which the user is generating this particular key and take the hash of the concatenation of the digest, engineID and digest again:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><strong>k</strong> = hash(digest⏜engineID⏜digest)</div>
+</div>
+</div></blockquote>
+<p>This is now the ⟨user,agent⟩ shared key. It must be entered (or computed) on the agent, and stored there. For MD5 it is 16 bytes long; for SHA-1 it is 20 bytes long.</p>
+<div class="section" id="message-signing">
+<h3>Message Signing<a class="headerlink" href="#message-signing" title="Permalink to this headline">¶</a></h3>
+<p>An SNMP message <strong>mesg</strong> is now signed by this key as follows:</p>
+<ul class="simple">
+<li><strong>k</strong>, above, is extended to a 64-byte <strong>ek</strong> by padding with zeroes.</li>
+<li>A constant string <strong>ipad</strong> is formed by repeating the octet 0x36 64 times.</li>
+<li>A constant stiring <strong>opad</strong> is formed by repeating 0x5c 64 times.</li>
+<li>Set <strong>k1</strong> = <strong>ek</strong> XOR <strong>ipad</strong>.</li>
+<li>Set <strong>k2</strong> = <strong>ek</strong> XOR <strong>opad</strong>.</li>
+</ul>
+<p>The <tt class="docutils literal"><span class="pre">authParameter</span></tt> field &#8211; the actual digital signature &#8211; is now set to be the first 12 bytes of</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">hash(<strong>k2</strong>⏜hash(<strong>k1</strong>⏜<strong>mesg</strong>))</div>
+</div>
+</div></blockquote>
+<p>This is slightly more complicated than the hash(<strong>mesg</strong>⏜<strong>k</strong>) mechanism suggested in <a class="reference internal" href="#crypto-fun"><em>Cryptographic Fundamentals</em></a>, presumably to make it more resistant to potential vulnerabilities in the hash() function.</p>
+<p>The receiver can replicate this <tt class="docutils literal"><span class="pre">authParameter</span></tt> calculation and verify that it matches the value transmitted in the packet.</p>
+</div>
+</div>
+<div class="section" id="key-changes">
+<h2>Key Changes<a class="headerlink" href="#key-changes" title="Permalink to this headline">¶</a></h2>
+<p>Suppose a user wants to change his or her password, and thus the key <strong>k</strong>. The manager will need to communicate the new key to the agent in such a way that it is not exposed to eavesdroppers. Here is the mechanism, where, again, <tt class="docutils literal"><span class="pre">hash()</span></tt> is either MD5 or SHA-1 as appropriate; we will use N to denote the length in bytes of the result of <tt class="docutils literal"><span class="pre">hash()</span></tt> (either 16 or 20).</p>
+<p>The original key is here denoted <tt class="docutils literal"><span class="pre">oldkey</span></tt> and the new key is <tt class="docutils literal"><span class="pre">newkey</span></tt>.</p>
+<p>The manager first chooses a string <tt class="docutils literal"><span class="pre">random</span></tt> of N bytes chosen as randomly as possible. A second N-byte string <tt class="docutils literal"><span class="pre">delta</span></tt> is then calculated as follows:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> = <tt class="docutils literal"><span class="pre">hash(oldkey⏜random)</span></tt></div>
+<div class="line"><tt class="docutils literal"><span class="pre">delta</span></tt> = <tt class="docutils literal"><span class="pre">temp</span></tt> XOR <tt class="docutils literal"><span class="pre">newkey</span></tt></div>
+</div>
+</div></blockquote>
+<p>At this point, <tt class="docutils literal"><span class="pre">random</span></tt> and <tt class="docutils literal"><span class="pre">delta</span></tt> are sent &#8211; in the clear &#8211; from the manager to the agent. The agent can use <tt class="docutils literal"><span class="pre">random</span></tt> and <tt class="docutils literal"><span class="pre">oldkey</span></tt> to compute <tt class="docutils literal"><span class="pre">temp</span></tt>, and thus <tt class="docutils literal"><span class="pre">newkey</span></tt> = <tt class="docutils literal"><span class="pre">delta</span></tt> XOR <tt class="docutils literal"><span class="pre">temp</span></tt>. An eavesdropper cannot use <tt class="docutils literal"><span class="pre">random</span></tt> to find out anything about <tt class="docutils literal"><span class="pre">temp</span></tt> without knowing <tt class="docutils literal"><span class="pre">oldkey</span></tt>, and cannot get anything useful out of <tt class="docutils literal"><span class="pre">delta</span></tt> unless either <tt class="docutils literal"><span class="pre">newkey</span></tt> or <tt class="docutils literal"><span class="pre">temp</span></tt> is known.</p>
+<p>The actual process is to combine <tt class="docutils literal"><span class="pre">random</span></tt> and <tt class="docutils literal"><span class="pre">delta</span></tt> into a single 2N-byte <strong>keyChange</strong> string.</p>
+<div class="section" id="the-usmusertable">
+<h3>The <tt class="docutils literal"><span class="pre">usmUserTable</span></tt><a class="headerlink" href="#the-usmusertable" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="creating-agent-accounts">
+<h2>Creating Agent Accounts<a class="headerlink" href="#creating-agent-accounts" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="index.html">An Introduction to Computer Networks</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Peter L Dordal.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

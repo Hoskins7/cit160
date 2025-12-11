@@ -1,0 +1,1314 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>17   Queuing and Scheduling &mdash; An Introduction to Computer Networks</title>
+    
+    <link rel="stylesheet" href="_static/csbnetbook.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/rightsidebar.js"></script>
+    <link rel="top" title="An Introduction to Computer Networks" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="index.html">An Introduction to Computer Networks</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">17&nbsp;&nbsp;&nbsp;Queuing and Scheduling</a><ul>
+<li><a class="reference internal" href="#queuing-and-real-time-traffic">17.1&nbsp;&nbsp;&nbsp;Queuing and Real-Time Traffic</a></li>
+<li><a class="reference internal" href="#traffic-management">17.2&nbsp;&nbsp;&nbsp;Traffic Management</a></li>
+<li><a class="reference internal" href="#priority-queuing">17.3&nbsp;&nbsp;&nbsp;Priority Queuing</a></li>
+<li><a class="reference internal" href="#queuing-disciplines">17.4&nbsp;&nbsp;&nbsp;Queuing Disciplines</a></li>
+<li><a class="reference internal" href="#fair-queuing">17.5&nbsp;&nbsp;&nbsp;Fair Queuing</a><ul>
+<li><a class="reference internal" href="#weighted-fair-queuing">17.5.1&nbsp;&nbsp;&nbsp;Weighted Fair Queuing</a></li>
+<li><a class="reference internal" href="#different-packet-sizes">17.5.2&nbsp;&nbsp;&nbsp;Different Packet Sizes</a><ul>
+<li><a class="reference internal" href="#a-first-virtual-finish-example">17.5.2.1&nbsp;&nbsp;&nbsp;A first virtual-finish example</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#bit-by-bit-round-robin">17.5.3&nbsp;&nbsp;&nbsp;Bit-by-bit Round Robin</a><ul>
+<li><a class="reference internal" href="#bbrr-example">17.5.3.1&nbsp;&nbsp;&nbsp;BBRR example</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-gps-model">17.5.4&nbsp;&nbsp;&nbsp;The GPS Model</a><ul>
+<li><a class="reference internal" href="#the-wfq-scheduler">17.5.4.1&nbsp;&nbsp;&nbsp;The WFQ scheduler</a></li>
+<li><a class="reference internal" href="#finishing-order-under-gps-and-wfq">17.5.4.2&nbsp;&nbsp;&nbsp;Finishing Order under GPS and WFQ</a></li>
+<li><a class="reference internal" href="#gps-example-1">17.5.4.3&nbsp;&nbsp;&nbsp;GPS Example 1</a></li>
+<li><a class="reference internal" href="#gps-example-2">17.5.4.4&nbsp;&nbsp;&nbsp;GPS Example 2</a></li>
+<li><a class="reference internal" href="#gps-example-3">17.5.4.5&nbsp;&nbsp;&nbsp;GPS Example 3</a></li>
+<li><a class="reference internal" href="#gps-example-4">17.5.4.6&nbsp;&nbsp;&nbsp;GPS Example 4</a></li>
+<li><a class="reference internal" href="#finishing-order-bound">17.5.4.7&nbsp;&nbsp;&nbsp;Finishing-Order Bound</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-quantum-algorithm">17.5.5&nbsp;&nbsp;&nbsp;The Quantum Algorithm</a></li>
+<li><a class="reference internal" href="#stochastic-fair-queuing">17.5.6&nbsp;&nbsp;&nbsp;Stochastic Fair Queuing</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#applications-of-fair-queuing">17.6&nbsp;&nbsp;&nbsp;Applications of Fair Queuing</a></li>
+<li><a class="reference internal" href="#hierarchical-queuing">17.7&nbsp;&nbsp;&nbsp;Hierarchical Queuing</a><ul>
+<li><a class="reference internal" href="#generic-hierarchical-queuing">17.7.1&nbsp;&nbsp;&nbsp;Generic Hierarchical Queuing</a></li>
+<li><a class="reference internal" href="#hierarchical-examples">17.7.2&nbsp;&nbsp;&nbsp;Hierarchical Examples</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#hierarchical-weighted-fair-queuing">17.8&nbsp;&nbsp;&nbsp;Hierarchical Weighted Fair Queuing</a><ul>
+<li><a class="reference internal" href="#a-hierarchical-weighted-fair-queuing-algorithm">17.8.1&nbsp;&nbsp;&nbsp;A Hierarchical Weighted Fair Queuing Algorithm</a><ul>
+<li><a class="reference internal" href="#wfq-with-non-fifo-subqueues">17.8.1.1&nbsp;&nbsp;&nbsp;WFQ with non-FIFO subqueues</a></li>
+<li><a class="reference internal" href="#a-hierarchical-wfq-example">17.8.1.2&nbsp;&nbsp;&nbsp;A Hierarchical-WFQ Example</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#token-bucket-filters">17.9&nbsp;&nbsp;&nbsp;Token Bucket Filters</a><ul>
+<li><a class="reference internal" href="#token-bucket-definition">17.9.1&nbsp;&nbsp;&nbsp;Token Bucket Definition</a></li>
+<li><a class="reference internal" href="#token-bucket-examples">17.9.2&nbsp;&nbsp;&nbsp;Token-Bucket Examples</a></li>
+<li><a class="reference internal" href="#multiple-token-buckets">17.9.3&nbsp;&nbsp;&nbsp;Multiple Token Buckets</a></li>
+<li><a class="reference internal" href="#gcra">17.9.4&nbsp;&nbsp;&nbsp;GCRA</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#applications-of-token-bucket">17.10&nbsp;&nbsp;&nbsp;Applications of Token Bucket</a><ul>
+<li><a class="reference internal" href="#guaranteeing-voip-bandwidth">17.10.1&nbsp;&nbsp;&nbsp;Guaranteeing VoIP Bandwidth</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#token-bucket-queue-utilization">17.11&nbsp;&nbsp;&nbsp;Token Bucket Queue Utilization</a><ul>
+<li><a class="reference internal" href="#token-bucket-through-one-router">17.11.1&nbsp;&nbsp;&nbsp;Token Bucket Through One Router</a></li>
+<li><a class="reference internal" href="#token-bucket-through-multiple-routers">17.11.2&nbsp;&nbsp;&nbsp;Token Bucket Through Multiple Routers</a></li>
+<li><a class="reference internal" href="#delay-constraints">17.11.3&nbsp;&nbsp;&nbsp;Delay Constraints</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#hierarchical-token-bucket">17.12&nbsp;&nbsp;&nbsp;Hierarchical Token Bucket</a></li>
+<li><a class="reference internal" href="#fair-queuing-token-bucket-combinations">17.13&nbsp;&nbsp;&nbsp;Fair Queuing / Token Bucket combinations</a><ul>
+<li><a class="reference internal" href="#cbq">17.13.1&nbsp;&nbsp;&nbsp;CBQ</a></li>
+<li><a class="reference internal" href="#linux-htb">17.13.2&nbsp;&nbsp;&nbsp;Linux htb</a></li>
+<li><a class="reference internal" href="#parekh-gallager-theorem">17.13.3&nbsp;&nbsp;&nbsp;Parekh-Gallager Theorem</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#epilog">17.14&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li><a class="reference internal" href="#exercises">17.15&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="queuing-and-scheduling">
+<span id="queuing-alternatives"></span><h1>17&nbsp;&nbsp;&nbsp;Queuing and Scheduling<a class="headerlink" href="#queuing-and-scheduling" title="Permalink to this headline">¶</a></h1>
+<p>Is giving all control of congestion to the TCP layer really the only option? As the Internet has evolved, so have situations in which we may not want routers handling all traffic on a first-come, first-served basis. Traffic with delay bounds &#8211; so-called <strong>real-time</strong> traffic, often involving either voice or video &#8211; is likely to perform much better with preferential service, for example; we will turn to this in <a class="reference internal" href="realtime.html#quality-of-service"><em>18&nbsp;&nbsp;&nbsp;Quality of Service</em></a>. But even without real-time traffic, we might be interested in guaranteeing that each of several customers gets an agreed-upon fraction of bandwidth, regardless of what the other customers are receiving. If we trust only to TCP Reno&#8217;s bandwidth-allocation mechanisms, and if one customer has one connection and another has ten, then the bandwidth received may also be in the ratio of 1:10. This may make the first customer quite unhappy.</p>
+<p>The fundamental mechanism for achieving these kinds of traffic-management goals in a shared network is through <strong>queuing</strong>; that is, in deciding how the routers prioritize traffic. In this chapter we will take a look at what router-based strategies are available; in the following chapter we will study how some of these ideas have been applied to develop distributed quality-of-service options.</p>
+<p>Previously, in <a class="reference internal" href="dynamics.html#queuing1"><em>14.1&nbsp;&nbsp;&nbsp;A First Look At Queuing</em></a>, we looked at FIFO queuing &#8211; both tail-drop and random-drop variants &#8211; and (briefly) at priority queuing. These are examples of <strong>queuing disciplines</strong>, a catchall term for anything that supports a way to accept and release packets. The RED gateway strategy (<a class="reference internal" href="dynamics.html#red"><em>14.8.3&nbsp;&nbsp;&nbsp;RED gateways</em></a>) could qualify as a separate queuing discipline, too, although one closely tied to FIFO.</p>
+<p>Queuing disciplines provide tools for meeting administratively imposed constraints on traffic. Two senders, for example, might be required to share an outbound link equally, or in the proportion 60%-40%, even if one participant would prefer to use 100% of the bandwidth. Alternatively, a sender might be required not to send in bursts of more than 10 packets at a time.</p>
+<p>Closely allied to the idea of queuing is <strong>scheduling</strong>: deciding what packets get sent when. Scheduling may take the form of sending someone else&#8217;s packets right now, or it may take the form of delaying packets that are arriving too fast.</p>
+<p>While priority queuing is one practical alternative to FIFO queuing, we will also look at so-called <strong>fair queuing</strong>, in both flat and hierarchical forms. Fair queuing provides a straightforward strategy for dividing bandwidth among multiple senders according to preset percentages.</p>
+<p>Also introduced here is the <strong>token-bucket</strong> mechanism, which can be used for traffic scheduling but also for traffic <em>description</em>.</p>
+<p>Some of the material here &#8211; in particular that involving fair queuing and the Parekh-Gallager theorem &#8211; may give this chapter a more mathematical feel than earlier chapters. Mostly, however, this is confined to the proofs; the claims themselves are more straightforward.</p>
+<div class="section" id="queuing-and-real-time-traffic">
+<span id="id1"></span><h2>17.1&nbsp;&nbsp;&nbsp;Queuing and Real-Time Traffic<a class="headerlink" href="#queuing-and-real-time-traffic" title="Permalink to this headline">¶</a></h2>
+<p>One application for advanced queuing mechanisms is to support  <strong>real-time</strong> transport &#8211; that is, traffic with delay constraints on delivery.</p>
+<p>In its original conception, the Internet was arguably intended for non-time-critical transport. If you wanted to place a digital phone call where every (or almost every) byte was guaranteed to arrive within 50 ms, your best bet might be to use the (separate) telephone network instead.</p>
+<p>And, indeed, having an entirely separate network for real-time transport  is definitely a workable solution. It is, however, expensive; there are many economies of scale to having just a single network. There is, therefore, a great deal of interest in figuring out how to get the Internet to support real-time traffic directly.</p>
+<p>The central strategy for mixing real-time and bulk traffic is to use queuing disciplines to give the real-time traffic the service it requires. Priority queuing is the simplest mechanism, though the fair-queuing approach below offers perhaps greater flexibility.</p>
+<p>We round out the chapter with the Parekh-Gallager theorem, which provides a precise delay bound for real-time traffic that shares a network with bulk traffic. All that is needed is that the real-time traffic satisfies a token-bucket specification and is assigned bandwidth guarantees through fair queuing; the volume of bulk traffic does not matter. This is exactly what is needed for real-time support.</p>
+<p>While this chapter contains some rather elegant theory, it is not at all clear how much it is put into practice today, at least for real-time traffic at the ISP level. We will return to this issue in the following chapter, but for now we acknowledge that real-time traffic management using the queuing mechanisms described here has seen limited acceptance in the Internet marketplace.</p>
+</div>
+<div class="section" id="traffic-management">
+<span id="index-0"></span><h2>17.2&nbsp;&nbsp;&nbsp;Traffic Management<a class="headerlink" href="#traffic-management" title="Permalink to this headline">¶</a></h2>
+<p>Even if none of your traffic has real-time constraints, you still may wish to allocate bandwidth according to administratively determined percentages. For example, you may wish to give each of three departments an equal share of download (or upload) capacity, or you may wish to guarantee them shares of 55%, 35% and 10%. If you want any unused capacity to be divided among the non-idle users, fair queuing is the tool of choice, though in some contexts it may require cooperation from your ISP. If the users are more like customers receiving only the bandwidth they pay for, you might want to enforce flat caps even if some bandwidth thus goes unused; token-bucket filtering would then be the way to go. If bandwidth allocations are not only by department (or customer) but also by workgroup (or customer-specific subcategory), then hierarchical queuing offers the necessary control.</p>
+<p>In general, <strong>network management</strong> divides into managing the hardware and managing the traffic; the tools in this chapter address this latter component. These tools can be used internally by ISPs and at the customer/ISP interconnection, but traffic management often makes good economic sense even when entirely contained within a single organization.</p>
+</div>
+<div class="section" id="priority-queuing">
+<span id="index-1"></span><span id="id2"></span><h2>17.3&nbsp;&nbsp;&nbsp;Priority Queuing<a class="headerlink" href="#priority-queuing" title="Permalink to this headline">¶</a></h2>
+<p>To get started, let us fill in the details for <strong>priority queuing</strong>, which we looked at briefly in <a class="reference internal" href="dynamics.html#priority-queuing-1"><em>14.1.1&nbsp;&nbsp;&nbsp;Priority Queuing</em></a>.
+Here a given outbound interface can be thought of as having two (or more) physical queues representing different priority levels. Packets are placed into the appropriate subqueue based on some packet attribute, which might be an explicit priority tag, or which might be the packet&#8217;s destination socket. Whenever the outbound link becomes free and the router is able to send the next packet, it always looks first to the higher-priority queue; if it is nonempty then a packet is dequeued from there. Only if the higher-priority queue is empty is the lower-priority queue served.</p>
+<p>Note that priority queuing is nonpreemptive: if a high-priority packet arrives while a low-priority packet is being sent, the latter is not interrupted. Only when the low-priority packet has finished transmission does the router again check its high-priority subqueue(s).</p>
+<p>Priority queuing can lead to complete starvation of low-priority traffic, but only if the high-priority traffic consumes 100% of the outbound bandwidth. Often we are able to guarantee (for example, through admission control) that the high-priority traffic is limited to a designated fraction of the total outbound bandwidth.</p>
+</div>
+<div class="section" id="queuing-disciplines">
+<span id="index-2"></span><span id="id3"></span><h2>17.4&nbsp;&nbsp;&nbsp;Queuing Disciplines<a class="headerlink" href="#queuing-disciplines" title="Permalink to this headline">¶</a></h2>
+<p>As an abstract data type, a <strong>queuing discipline</strong> is simply a data structure that supports the following operations:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">enqueue()</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">dequeue()</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">is_empty()</span></tt></li>
+</ul>
+<p>Note that the <tt class="docutils literal"><span class="pre">enqueue()</span></tt> operation includes within it a way to handle dropping a packet in the event that the queue is full. For FIFO queuing, the <tt class="docutils literal"><span class="pre">enqueue()</span></tt> operation needs only to know the correct outbound interface; for priority queuing <tt class="docutils literal"><span class="pre">enqueue()</span></tt> also needs to be told &#8211; or be able to infer &#8211; the packet&#8217;s priority classification.</p>
+<p>We may also in some cases find it convenient to add a <tt class="docutils literal"><span class="pre">peek()</span></tt> operation to return the next packet that <em>would</em> be dequeued if we were actually to do that, or at least to return some important statistic (<em>eg</em> size or arrival time) about that packet.</p>
+<p>As with FIFO and priority queuing, any queuing discipline is always tied to a specific <em>outbound</em> interface. In that sense, any queuing discipline has a single output.</p>
+<p id="index-3">On the input side, the situation may be more complex. The FIFO queuing discipline has a single input stream, though it may be fed by multiple physical input interfaces: the <tt class="docutils literal"><span class="pre">enqueue()</span></tt> operation puts all packets in the same physical queue. A queuing discipline may, however, have multiple input streams; we will call these <strong>classes</strong>, or <strong>subqueues</strong>, and will refer to the queuing discipline itself as <strong>classful</strong>. Priority queues, for example, have an input class for each priority level.</p>
+<p id="index-4">When we want to enqueue a packet for a classful queuing discipline, we must first invoke a <strong>classifier</strong> &#8211; possibly external to the queuing discipline itself &#8211; to determine the input class. (In the linux documentation, what we have called classifiers are often called <em>filters</em>.) For example, if we wish to use a priority queue to give priority to VoIP packets, the classifier&#8217;s job is to determine which arriving packets are in fact VoIP packets (perhaps taking into account things like size or port number or source host), so as to be able to provide this information to the <tt class="docutils literal"><span class="pre">enqueue()</span></tt> operation. The classifier might also take into account pre-existing traffic <strong>reservations</strong>, so that packets that belong to flows with reservations get preferred service, or else packet <strong>tags</strong> that have been applied by some upstream router; we return to both of these in <a class="reference internal" href="realtime.html#quality-of-service"><em>18&nbsp;&nbsp;&nbsp;Quality of Service</em></a>.</p>
+<p>The number and configuration of classes is often fixed at the time of queuing-discipline creation; this is typically the case for priority queues. Abstractly, however, the classes can also be dynamic; an example of this might be fair queuing (below), which often supports a configuration in which a separate input class is created on the fly for each separate TCP connection.</p>
+<p id="index-5">FIFO and priority queuing are both <strong>work-conserving</strong>, meaning that the associated outbound interface is not idle unless the queue is empty. A non-work-conserving queuing discipline might, for example, artificially delay some packets in order to enforce an administratively imposed bandwidth cap. Non-work-conserving queuing disciplines are often called traffic <strong>shapers</strong> or <strong>policers</strong>; see <a class="reference internal" href="queuing.html#token-bucket"><em>17.9&nbsp;&nbsp;&nbsp;Token Bucket Filters</em></a> below for an example.</p>
+</div>
+<div class="section" id="fair-queuing">
+<span id="index-6"></span><span id="id4"></span><h2>17.5&nbsp;&nbsp;&nbsp;Fair Queuing<a class="headerlink" href="#fair-queuing" title="Permalink to this headline">¶</a></h2>
+<p>An important alternative to FIFO and priority is <strong>fair queuing</strong>. Where FIFO and its variants have a single input class and put all the incoming traffic into a single physical queue, fair queuing maintains a separate logical FIFO subqueue for each input class; we will refer to these as the per-class subqueues. Division into classes can be fine-grained &#8211; <em>eg</em> a separate class for each TCP connection &#8211; or coarse-grained &#8211; <em>eg</em> a separate class for each arrival interface, or a separate class for each designated internal subnet.</p>
+<p>Suppose for a moment that all packets are the same size; this makes fair queuing much easier to visualize. In this (special) case &#8211; sometimes called Nagle fair queuing, and proposed in <span class="target" id="index-7"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc970.html"><strong>RFC 970</strong></a> &#8211; the router simply services the per-class subqueues in round-robin fashion, sending one packet from each in turn. If a per-class subqueue is empty, it is simply skipped over. If all per-class subqueues are always nonempty this resembles time-division multiplexing (<a class="reference internal" href="links.html#tdm"><em>4.2&nbsp;&nbsp;&nbsp;Time-Division Multiplexing</em></a>). However, unlike time-division multiplexing if one of the per-class subqueues does become empty then it no longer consumes any outbound bandwidth. Recalling that all packets are the same size, the total bandwidth is then divided equally among the nonempty per-class subqueues; if there are K such queues, each will get 1/K of the output.</p>
+<p>Fair queuing was extended to streams of variable-sized packets in <a class="reference internal" href="bibliography.html#dks89" id="id5">[DKS89]</a> and <a class="reference internal" href="bibliography.html#lz89" id="id6">[LZ89]</a>. Since then there has been considerable work in trying to figure out how to implement fair queuing efficiently and to support appropriate variants.</p>
+<div class="section" id="weighted-fair-queuing">
+<span id="index-8"></span><span id="id7"></span><h3>17.5.1&nbsp;&nbsp;&nbsp;Weighted Fair Queuing<a class="headerlink" href="#weighted-fair-queuing" title="Permalink to this headline">¶</a></h3>
+<p>A straightforward extension of fair queuing is <strong>weighted fair queuing</strong> (WFQ), where instead of giving each class an equal share, we assign each class a different percentage. For example, we might assign bandwidth percentages of 10%, 30% and 60% to three different departments. If all three subqueues are active, each gets the listed percentage. If the 60% subqueue is idle, then the others get 25% and 75% respectively, preserving the 1:3 ratio of their allocations. If the 10% subqueue is idle, then the other two subqueues get 33.3% and 66.7%.</p>
+<p>Weighted fair queuing is, conceptually, a straightforward generalization of fair queuing, although the actual implementation details are sometimes nontrivial as the round-robin implementation above naturally yields equal shares. If all packets are still the same size, and we have two per-class subqueues that are to receive allocations of 40% and 60% (that is, in the ratio 2:3), then we could implement WFQ by having one per-class subqueue send two packets and the other three. Or we might intermingle the two: class 1 sends its first packet, class 2 sends its first packet, class 1 sends its second, class 2 sends its second and its third. If the allocation is to be in the ratio 1:√2, the first sender might always send 1 packet while the second might send in a pattern &#8211; an irregular one &#8211; that averages √2: 1, 2, 1, 2, 1, 1, 2, ....</p>
+<p>The fluid-based GPS model approach to fair queuing, <a class="reference internal" href="queuing.html#gps"><em>17.5.4&nbsp;&nbsp;&nbsp;The GPS Model</em></a>, does provide an algorithm that has direct, natural support for weighted fair queuing.</p>
+</div>
+<div class="section" id="different-packet-sizes">
+<span id="id8"></span><h3>17.5.2&nbsp;&nbsp;&nbsp;Different Packet Sizes<a class="headerlink" href="#different-packet-sizes" title="Permalink to this headline">¶</a></h3>
+<p>If not all the packets are the same size, fair queuing and weighted fair queuing are still possible but we have a little more work to do. This is an important practical case, as fair queuing is often used when one input class consists of small-packet real-time traffic.</p>
+<p>We present two mechanisms for handling different-sized packets; the two are ultimately equivalent. The first &#8211; <a class="reference internal" href="queuing.html#bbrr"><em>17.5.3&nbsp;&nbsp;&nbsp;Bit-by-bit Round Robin</em></a> &#8211; is a straightforward extension of the round-robin idea, and the second &#8211; <a class="reference internal" href="queuing.html#gps"><em>17.5.4&nbsp;&nbsp;&nbsp;The GPS Model</em></a> &#8211;  uses a &#8220;fluid&#8221; model of simultaneous packet transmission. Both mechanisms share the idea of a &#8220;virtual clock&#8221; that runs at a rate proportional to the number of active subqueues; as we shall see, the point of varying the clock rate in this way is so that the virtual-clock time at which a given packet would theoretically finish transmission does not depend on activity in any of the other subqueues.</p>
+<p>Finally, we present the quantum algorithm &#8211; <a class="reference internal" href="queuing.html#quantum-algorithm"><em>17.5.5&nbsp;&nbsp;&nbsp;The Quantum Algorithm</em></a> &#8211; which is a more-efficient approximation to either of the exact algorithms, but which &#8211; being an approximation &#8211; no longer satisfies a sometimes-important time constraint.</p>
+<p id="index-9">For a straightforward generalization of the round-robin idea to different packet sizes, we start with a simplification: let us assume that each per-class subqueue is always active, where a subqueue is <strong>active</strong> if it is nonempty whenever the router looks at it.</p>
+<p>If each subqueue is always active for the equal-sized-packets case, then packets are transmitted in order of increasing (or at least nondecreasing) cumulative data sent by each subqueue. In other words, every subqueue gets to send its first packet, and only then do we go on to begin transmitting second packets, and so on.</p>
+<p>Still assuming each subqueue is always active, we can handle different-sized packets by the same idea. For packet P, let C<sub>P</sub> be the cumulative number of bytes that will have been sent by P&#8217;s subqueue as of the <em>end</em> of P. Then we simply need to send packets in nondecreasing order of C<sub>P</sub>.</p>
+<img alt="_images/subqueues_busy_screen.png" src="_images/subqueues_busy_screen.png" />
+<p>In the diagram above, transmission in nondecreasing order of C<sub>P</sub> means transmission in left-to-right order of the vertical lines marking packet divisions, <em>eg</em> Q1, P1, R1, Q2, Q3, R2, .... This ensures that, in the long run, each subqueue gets an equal share of bandwidth.</p>
+<p>A completely equivalent strategy, better suited for generalization to the case where not all subqueues are always active, is to send each packet in nondecreasing order of <strong>virtual finishing times</strong>, calculated for each packet with the assumption that only that packet&#8217;s subqueue is active. The virtual finishing time F<sub>P</sub> of packet P is equal to C<sub>P</sub> divided by the output bandwidth. We use finishing times rather than starting times because if one packet is very large, shorter packets in other subqueues that would finish sooner should be sent first.</p>
+<div class="section" id="a-first-virtual-finish-example">
+<span id="first-virtual-finish-example"></span><h4>17.5.2.1&nbsp;&nbsp;&nbsp;A first virtual-finish example<a class="headerlink" href="#a-first-virtual-finish-example" title="Permalink to this headline">¶</a></h4>
+<p>As an example, suppose there are two subqueues, P and Q. Suppose further that a stream of 1001-byte packets P<sub>1</sub>, P<sub>2</sub>, P<sub>3</sub>, ... arrives at P, and a stream of 400-byte packets R<sub>1</sub>, R<sub>2</sub>, R<sub>3</sub>, ... arrives for Q; each stream is steady enough that each subqueue is always active. Finally, assume the output bandwidth is 1 byte per unit time, and let T=0 be the starting point.</p>
+<p>For the P subqueue, the virtual finishing times calculated as above would be P<sub>1</sub> at 1001, P<sub>2</sub> at 2002, P<sub>3</sub> at 3003, etc; for Q the finishing times would be R<sub>1</sub> at 400, R<sub>2</sub> at 800, R<sub>3</sub> at 1200, etc. So the order of transmission of all the packets together will be as follows:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="42%" />
+<col width="39%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Packet</th>
+<th class="head">virtual finish</th>
+<th class="head">actual finish</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>R<sub>1</sub></td>
+<td>400</td>
+<td>400</td>
+</tr>
+<tr class="row-odd"><td>R<sub>2</sub></td>
+<td>800</td>
+<td>800</td>
+</tr>
+<tr class="row-even"><td>P<sub>1</sub></td>
+<td>1001</td>
+<td>1801</td>
+</tr>
+<tr class="row-odd"><td>R<sub>3</sub></td>
+<td>1200</td>
+<td>2201</td>
+</tr>
+<tr class="row-even"><td>R<sub>4</sub></td>
+<td>1600</td>
+<td>2601</td>
+</tr>
+<tr class="row-odd"><td>R<sub>5</sub></td>
+<td>2000</td>
+<td>3001</td>
+</tr>
+<tr class="row-even"><td>P<sub>2</sub></td>
+<td>2002</td>
+<td>4002</td>
+</tr>
+</tbody>
+</table>
+<p>For each packet we have calculated in the table above its virtual finishing time, and then its actual wallclock finishing time assuming packets are transmitted in nondecreasing order of virtual finishing time (as shown).</p>
+<p>Because both subqueues are always active, and because the virtual finishing times assumed each subqueue received 100% of the output bandwidth, in the long run the actual finishing times will be about double the virtual times. This, however, is irrelevant; all that matters is the <em>relative</em> virtual finishing times.</p>
+<p>The next step is to extend this strategy to the case where subqueues can sometimes be inactive, using the model of bit-by-bit round robin.</p>
+</div>
+</div>
+<div class="section" id="bit-by-bit-round-robin">
+<span id="bbrr"></span><span id="index-10"></span><h3>17.5.3&nbsp;&nbsp;&nbsp;Bit-by-bit Round Robin<a class="headerlink" href="#bit-by-bit-round-robin" title="Permalink to this headline">¶</a></h3>
+<p>Imagine sending a single bit at a time from each active input subqueue, in round-robin fashion. While not directly implementable, this certainly meets the goal of giving each active subqueue equal service, even if packets are of different sizes. We will use bit-by-bit round robin, or <strong>BBRR</strong>, as a way of modeling packet-finishing times, and then, as in the previous example, send the packets the usual way &#8211; one full packet at a time &#8211; in order of increasing BBRR-calculated virtual finishing times.</p>
+<p>It will sometimes happen that a larger packet is being transmitted at the point a new, shorter packet arrives for which a smaller finishing time is computed. The current transmission is not interrupted, though; the algorithm is <strong>non-preemptive</strong>.</p>
+<p>The trick to making the BBRR approach workable is to find an &#8220;invariant&#8221; formulation of finishing time that does not change as later packets arrive, or as other subqueues become active or inactive. To this end, we define the &#8220;rounds counter&#8221; R(t), where t is the time measured in units of the transmission time for one bit. When there are any active (nonempty or currently transmitting) input subqueues, R(t) counts the number of round-robin cycles that have occurred since the last time all the subqueues were empty. If there are K active input subqueues, then R(t) increments by 1 as t increments by K; that is, R(t) grows at rate 1/K.</p>
+<p>An important attribute of R(t) is that, if a packet of size S bits starts transmission via BBRR at R<sub>0</sub> = R(t<sub>0</sub>), then it will finish when R(t) = R<sub>0</sub>+S, <em>regardless of whether any other input subqueues become active or become empty</em>. For any packet actively being sent via BBRR, R(t) increments by 1 for each bit of that packet sent. If for a given round-robin cycle there are K subqueues active, then K bits will be sent in all, and R(t) will increment by 1.</p>
+<p>To calculate the virtual BBRR finishing time of a packet P, we first record R<sub>P</sub> = R(t<sub>P</sub>) at the moment of arrival. We now compute the BBRR-finishing R-value F<sub>P</sub> as follows; we can think of this as a &#8220;time&#8221; measured via the rounds counter R(t). That is, R(t) represents a &#8220;virtual clock&#8221; that happens sometimes to run slow. Let S be the size of the packet P in bits. If P arrived on a previously empty input subqueue, then its BBRR transmission can begin immediately, and so its finishing R-value F<sub>P</sub> is simply R<sub>P</sub>+S. If the packet&#8217;s subqueue was nonempty, we look up the (future) finishing R-value of the packet immediately ahead of P in its subqueue, say F<sub>prev</sub>; the finishing R-value of P is then F<sub>P</sub> = F<sub>prev</sub> + S. This is sometimes described as:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">Start = max(R(now), F<sub>prev</sub>)</div>
+<div class="line">F<sub>P</sub> = Start + S &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;   (S = packet size, measured in bits)</div>
+</div>
+</div></blockquote>
+<p>As each new packet P arrives, we calculate its BBRR-finishing R-value F<sub>P</sub>, and then send packets the conventional one-packet-at-a-time way in increasing order of F<sub>P</sub>. As stated above, F<sub>P</sub> will not change if other subqueues empty or become active, thus changing the rate of the rounds-counter R(t).</p>
+<p>The router maintaining R(t) does not have to increment it on every bit; it suffices to update it whenever a packet arrives or a subqueue becomes empty. If the previous value of R(t) was R<sub>prev</sub>, and from then to now exactly K subqueues were nonempty, and M bit-times have elapsed according to the wall clock, then the current value of R(t) is R<sub>prev</sub> + M/K.</p>
+<div class="section" id="bbrr-example">
+<h4>17.5.3.1&nbsp;&nbsp;&nbsp;BBRR example<a class="headerlink" href="#bbrr-example" title="Permalink to this headline">¶</a></h4>
+<p>As an example, suppose the fair queuing router has three input subqueues P, Q and R, initially empty. The following packets arrive at the wall-clock times shown.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="17%" />
+<col width="17%" />
+<col width="17%" />
+<col width="49%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Packet</th>
+<th class="head">Queue</th>
+<th class="head">Size</th>
+<th class="head">Arrival time, t</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>P<sub>1</sub></td>
+<td>P</td>
+<td>1000</td>
+<td>0</td>
+</tr>
+<tr class="row-odd"><td>P<sub>2</sub></td>
+<td>P</td>
+<td>1000</td>
+<td>0</td>
+</tr>
+<tr class="row-even"><td>Q<sub>1</sub></td>
+<td>Q</td>
+<td>600</td>
+<td>800</td>
+</tr>
+<tr class="row-odd"><td>Q<sub>2</sub></td>
+<td>Q</td>
+<td>400</td>
+<td>800</td>
+</tr>
+<tr class="row-even"><td>Q<sub>3</sub></td>
+<td>Q</td>
+<td>400</td>
+<td>800</td>
+</tr>
+<tr class="row-odd"><td>R<sub>1</sub></td>
+<td>R</td>
+<td>200</td>
+<td>1200</td>
+</tr>
+<tr class="row-even"><td>R<sub>2</sub></td>
+<td>R</td>
+<td>200</td>
+<td>2100</td>
+</tr>
+</tbody>
+</table>
+<p>At t=0, we have R(t)=0 and we assign finishing R-values F(P<sub>1</sub>)=1000 to P<sub>1</sub> and F(P<sub>2</sub>) = F(P<sub>1</sub>)+1000 = 2000 to P<sub>2</sub>. Transmission of P<sub>1</sub> begins.</p>
+<p>When the three Q packets arrive at t=800, we have R(t)=800 as well, as only one subqueue has been active. We assign finishing R-values for the newly arriving Q<sub>1</sub>, Q<sub>2</sub> and Q<sub>3</sub> of F(Q<sub>1</sub>) = 800+600 = 1400, F(Q<sub>2</sub>) = 1400+400 = 1800, and F(Q<sub>3</sub>) = 1800+400 = 2200. At this point, BBRR begins serving two subqueues, so the R(t) rate is cut in half.</p>
+<p>At t=1000, transmission of packet P<sub>1</sub> is completed; R(t) is 800 + 200/2 = 900. The smallest finishing R-value on the books is F(Q<sub>1</sub>), at 1400, so Q<sub>1</sub> is the second packet transmitted. Q<sub>1</sub>&#8216;s real finishing time will be t = 1000+600 = 1600.</p>
+<p>At t=1200, R<sub>1</sub> arrives; transmission of Q<sub>1</sub> is still in progress. R(t) is 800 + 400/2 = 1000; we calculate F(R<sub>1</sub>) = 1000 + 200 = 1200. Note this is less than the finishing R-value for Q<sub>1</sub>, which is currently transmitting, but Q<sub>1</sub> is not preempted. At this point (t=1200, R(t)=1000), the R(t) rate falls to 1/3.</p>
+<p>At t=1600, Q<sub>1</sub> has finished transmission. We have R(t) = 1000 + 400/3 = 1133. The next smallest finishing R-value is F(R<sub>1</sub>) = 1200 so transmission of R<sub>1</sub> commences.</p>
+<p>At t=1800, R<sub>1</sub> finishes. We have R(1800) = R(1200) + 600/3 = 1000 + 200 = 1200 (3 subqueues have been busy since t=1200). R is now empty, so the R(t) rate rises from 1/3 to 1/2. The next smallest finishing R-value is F(Q<sub>2</sub>)=1800, so transmission of Q<sub>2</sub> begins. It will finish at t=2200.</p>
+<p>At t=2100, we have R(t) = R(1800) + 300/2 = 1200 + 150 = 1350. R<sub>2</sub> arrives on R; it is assigned a finishing time of F(R<sub>2</sub>) = 1350 + 200 = 1550. Again, transmission of Q<sub>2</sub> is not preempted even though F(R<sub>2</sub>) &lt; F(Q<sub>2</sub>). The R(t) rate again falls to 1/3.</p>
+<p>At t=2200, Q<sub>2</sub> finishes. R(t) = 1350 + 100/3 = 1383. The next smallest finishing R-value is F(R<sub>2</sub>)=1550, so transmission of R<sub>2</sub> begins.</p>
+<p>At t=2400, transmission of R<sub>2</sub> ends. R(t) is now 1350 + 300/3 = 1450. The next smallest finishing R-value is F(P<sub>2</sub>) = 2000, so transmission of P<sub>2</sub> begins. The R(t) rate rises to 1/2, as R is again empty.</p>
+<p>At t=3400, transmission of P<sub>2</sub> ends. R(t) is 1450 + 1000/2 = 1950. The only remaining unsent packet is Q<sub>3</sub>, with F(Q<sub>3</sub>)=2200. We send it.</p>
+<p>At t=3800, transmission of Q<sub>3</sub> ends. R(t) is 1950 + 400/1 = 2350.</p>
+<p>To summarize:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="9%" />
+<col width="18%" />
+<col width="28%" />
+<col width="27%" />
+<col width="18%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Packet</th>
+<th class="head">send-time,
+wall clock t</th>
+<th class="head">calculated
+finish R-value</th>
+<th class="head">R-value
+when sent</th>
+<th class="head">R-value
+at finish</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>P<sub>1</sub></td>
+<td>0</td>
+<td>1000</td>
+<td>0</td>
+<td>900</td>
+</tr>
+<tr class="row-odd"><td>Q<sub>1</sub></td>
+<td>1000</td>
+<td>1400</td>
+<td>900</td>
+<td>1133</td>
+</tr>
+<tr class="row-even"><td>R<sub>1</sub></td>
+<td>1600</td>
+<td>1200*</td>
+<td>1133</td>
+<td>1200</td>
+</tr>
+<tr class="row-odd"><td>Q<sub>2</sub></td>
+<td>1800</td>
+<td>1800</td>
+<td>1200</td>
+<td>1383</td>
+</tr>
+<tr class="row-even"><td>R<sub>2</sub></td>
+<td>2200</td>
+<td>1550*</td>
+<td>1383</td>
+<td>1450</td>
+</tr>
+<tr class="row-odd"><td>P<sub>2</sub></td>
+<td>2400</td>
+<td>2000</td>
+<td>1450</td>
+<td>1950</td>
+</tr>
+<tr class="row-even"><td>Q<sub>3</sub></td>
+<td>3400</td>
+<td>2200</td>
+<td>1950</td>
+<td>2350</td>
+</tr>
+</tbody>
+</table>
+<p>Packets arrive, begin transmission and finish in &#8220;real&#8221; time. However, the number of queues active in real time affects the rate of the rounds-counter R(t); this value is then attached to each packet as it arrives as its virtual finishing time, and determines the order of packet transmission.</p>
+<p>The change in R-value from start to finish exactly matches the packet size when the packet is &#8220;virtually sent&#8221; via BBRR. When the packet is sent as an indivisible unit, as in the table above, the change in R-value is usually much smaller, as the R-clock runs slower whenever at least two subqueues are in use.</p>
+<p>The calculated-finish R-values are not in fact increasing, as can be seen at the <strong>starred (*) values</strong>. This is because, for example, R<sub>1</sub> was not yet available when it was time to send Q<sub>1</sub>.</p>
+<p>Computationally, maintaining the R-value counter is inconsequential. The primary performance issue with BBRR simulation is the need to find the smallest R-value whenever a new packet is to be sent. If n is the number of packets waiting to be sent, then we can do this in time O(log(n)) by keeping the R-values sorted in an appropriate data structure.</p>
+<p>The BBRR approach assumes equal weights for each subqueue; this does not generalize completely straightforwardly to weighted fair queuing as the number of subqueues cannot be fractional. If there are two queues, one which is to have weight 40% and the other 60%, we <em>could</em> use BBRR with five subqueues, two of which (2/5) are assigned to the 40%-subqueue and the other three (3/5) to the 60% subqueue. But this becomes increasingly awkward as the fractions become less simple; the GPS model, next, is a better option.</p>
+</div>
+</div>
+<div class="section" id="the-gps-model">
+<span id="gps"></span><span id="index-11"></span><h3>17.5.4&nbsp;&nbsp;&nbsp;The GPS Model<a class="headerlink" href="#the-gps-model" title="Permalink to this headline">¶</a></h3>
+<p>An almost-equivalent model to BBRR is the <strong>generalized processor sharing</strong> model, or GPS; it was first developed as an application to CPU scheduling. In this approach we imagine the packets as liquid, and the outbound interface as a pipe that has a certain total capacity. The head packets from each subqueue are all squeezed  into the pipe <em>simultaneously</em>, each at its designated fractional rate. The GPS model is essentially an &#8220;infinitesimal&#8221; variant of BBRR. The GPS model has an advantage of generalizing straightforwardly to weighted fair queuing.</p>
+<p>Other fluid models have also been used in the analysis of networks, <em>eg</em> for the study of TCP, though we do not consider these here. See <a class="reference internal" href="bibliography.html#mw00" id="id9">[MW00]</a> for one example.</p>
+<p>For the GPS model, assume there are N input subqueues, and the ith subqueue, 0≤i&lt;N, is to receive fraction 𝛼<sub>i</sub>  &gt; 0, where 𝛼<sub>0</sub>+𝛼<sub>1</sub>+ ... + 𝛼<sub>N−1</sub>=1. If at some point a set A of input subqueues is active , say A = {0,2,4}, then subqueue 0 will receive fraction 𝛼<sub>0</sub>/(𝛼<sub>0</sub>+𝛼<sub>2</sub>+𝛼<sub>4</sub>), and subqueues 2 and 4 similarly. The router forwards packets from each active subqueue simultaneously, each at its designated rate.</p>
+<p>The GPS model (and the BBRR model) provides an ideal degree of <strong>isolation</strong> between input flows: each flow is insulated from any delay due to packets on competing flows. The ith flow receives bandwidth of at least 𝛼<sub>i</sub> and packets wait only for other packets belonging to the same flow. When a packet arrives for an inactive subqueue, forwarding begins immediately, interleaved with any other work the router is doing. Traffic on other flows can reduce the real rate of a flow, but not its virtual rate.</p>
+<p>While GPS is convenient as a model, it is even less implementable, literally, than BBRR. As with BBRR, though, we can use the GPS model to determine the order of one-packet-at-a-time transmission. As each real packet arrives, we calculate the time it <em>would</em> finish, if we were using GPS. Packets are then transmitted under WFQ one at a time, in order of increasing GPS finishing time.</p>
+<p>In lieu of the BBRR rounds counter R(t), a virtual clock VC(t) is used that runs at an <em>increased</em> rate 1/𝛼 ≥ 1 where 𝛼 is the sum of the 𝛼<sub>i</sub> for the active subqueues. That is, if subqueues 0, 2 and 4 are active, then the VC(t) clock runs at a rate of 1/(𝛼<sub>0</sub>+𝛼<sub>2</sub>+𝛼<sub>4</sub>). If all the 𝛼<sub>i</sub> are equal, each to 1/N, then VC(t) always runs N times faster than R(t), and so VC(t) = N×R(t); the VC clock runs at wallclock speed when all input subqueues are active and speeds up as subqueues become idle.</p>
+<p>For any one active subqueue i, the GPS rate of transmission <em>relative to the virtual clock</em> (that is, in units of bits per virtual-second) is always equal to fraction 𝛼<sub>i</sub> of the full output-interface rate. That is, if the output rate is 10 Mbps and an active flow has fraction 𝛼 = 0.4, then it will always transmit at 4 bits per virtual microsecond. When all the subqueues are active, and the VC clock runs at wallclock speed, the flow&#8217;s actual rate will be 4 bits/µsec. When the subqueue is active alone, its speed measured by a real clock will be 10 bit/µsec but the virtual clock will run 2.5 times faster so 10 bits/µsec is 10 bits per 2.5 virtual microseconds, or 4 bits per virtual microsecond.</p>
+<p>To make this claim more precise, let A be the set of active queues, and let 𝛼  again be the sum of the 𝛼<sub>j</sub> for j in A. Then VC(t) runs at rate 1/𝛼 and active subqueue i&#8217;s data is sent at rate 𝛼<sub>i</sub>/𝛼 relative to wallclock time. Subqueue i&#8217;s transmission rate relative to virtual time is thus (𝛼<sub>i</sub>/𝛼)/(1/𝛼) = 𝛼<sub>i</sub>.</p>
+<p>As other subqueues become inactive or become active, the VC(t) rate and the actual transmission rate move in lockstep. Therefore, as with BBRR, a packet P of size S on subqueue i that starts transmission at virtual time T will finish at T + S/(r×𝛼<sub>i</sub>) by the VC clock, where r is the actual output rate of the router, regardless of what is happening in the other subqueues. In other words, <em>VC-calculated finishing times are invariant</em>.</p>
+<dl class="docutils">
+<dt>To round out the calculation of finishing times, suppose packet P of size S arrives on an active GPS subqueue i.  The previous packet in that subqueue will have finishing time F<sub>prev</sub>, and that will become P&#8217;s start time. If P arrives on an inactive subqueue, GPS allows it to begin transmitting immediately. Either way, as with BBRR, P&#8217;s start time is P<sub>start</sub> = max(VC(now), F<sub>prev</sub>), and its finishing time on the VC clock is F<sub>P</sub> = P<sub>start</sub> + S/(r×𝛼<sub>i</sub>). In one expression, this finishing time is</dt>
+<dd><div class="first last line-block">
+<div class="line">F<sub>P</sub> = max(VC(now), F<sub>prev</sub>) + S/(r×𝛼<sub>i</sub>)</div>
+</div>
+</dd>
+</dl>
+<p>In <a class="reference internal" href="queuing.html#wfq-with-arbitrary-subqueues"><em>17.8.1.1&nbsp;&nbsp;&nbsp;WFQ with non-FIFO subqueues</em></a> below, we will consider WFQ routers that, as part of a hierarchy, are in effect only allowed to transmit intermittently. In such a case, the virtual clock should be suspended whenever output is blocked. This is perhaps easiest to see for the BBRR scheduler: the rounds-counter RR(t) is to increment by 1 for each bit sent by each active subqueue. When no bits may be sent, the clock should not increase.</p>
+<p>As an example of what happens if this is not done, suppose R has two subqueues A and B; the first is empty and the second has a long backlog. R normally processes one packet per second. At T=0/VC=0, R&#8217;s output is suspended. Packets in the second subqueue b<sub>1</sub>, b<sub>2</sub>, b<sub>3</sub>, ... have virtual finishing times 1, 2, 3, .... At T=10, R resumes transmission, and packet a<sub>1</sub> arrives on the A subqueue. If R&#8217;s virtual clock had been suspended for the interval 0≤T≤10, a<sub>1</sub> would be assigned finishing time T=1 and would have priority comparable to b<sub>1</sub>. If R&#8217;s virtual clock had continued to run, a<sub>1</sub> would be assigned finishing time T=11 and would not be sent until b<sub>11</sub> reached the head of the B queue.</p>
+<div class="section" id="the-wfq-scheduler">
+<span id="wfq-scheduler"></span><h4>17.5.4.1&nbsp;&nbsp;&nbsp;The WFQ scheduler<a class="headerlink" href="#the-wfq-scheduler" title="Permalink to this headline">¶</a></h4>
+<p>To schedule actual packet transmission under weighted fair queuing, we calculate upon arrival each packet&#8217;s virtual-clock finishing time assuming it were to be sent using GPS. Whenever the sender is ready to start transmission of a new packet, it selects from the available packets the one with the smallest GPS-finishing-time value. By the argument above, a packet&#8217;s GPS finishing time does not depend on any later arrivals or idle periods on other subqueues. As with BBRR, small but later-arriving packets might have smaller virtual finishing times, but a packet currently being transmitted will not be interrupted.</p>
+</div>
+<div class="section" id="finishing-order-under-gps-and-wfq">
+<span id="finishing-order"></span><span id="index-12"></span><h4>17.5.4.2&nbsp;&nbsp;&nbsp;Finishing Order under GPS and WFQ<a class="headerlink" href="#finishing-order-under-gps-and-wfq" title="Permalink to this headline">¶</a></h4>
+<p>We now look at the order in which packets finish transmission under GPS versus WFQ. The goal is to provide in <a class="reference internal" href="queuing.html#finishing-order-bound"><em>17.5.4.7&nbsp;&nbsp;&nbsp;Finishing-Order Bound</em></a> a tight bound on how long packets may have to wait under WFQ compared to GPS. We emphasize again:</p>
+<ul class="simple">
+<li>GPS finishing time: the theoretical finishing time based on parallel multi-packet transmissions under the GPS model</li>
+<li>WFQ finishing time: the real finishing time assuming packets are sent sequentially in increasing order of calculated GPS finishing time</li>
+</ul>
+<p>One way to view this is as a quantification of the informal idea that WFQ provides a natural priority for smaller packets, at least smaller packets sent on previously idle subqueues. This is quite separate from the bandwidth guarantee that a given small-packet input class might receive; it means that small packets are likely to leapfrog larger packets waiting in other subqueues. The quantum algorithm, below, provides long-term WFQ bandwidth guarantees but does <em>not</em> provide the same delay assurances.</p>
+<p>First, if all subqueues are always active (or if a fixed subset of subqueues is always active), then packets finish under WFQ in the same order as they do under GPS. This is because under WFQ packets are transmitted in the order of GPS finishing times according the virtual clock, and if all subqueues are always active the virtual clock runs at a rate identical to wallclock time (or, if a fixed subset of subqueues is always active, at a rate proportional to wallclock time).</p>
+<p>If all subqueues are always active, we can assume that all packets were in their subqueues as of time T=0; the finishing order is the same as long as each packet arrived before its subqueue went inactive.</p>
+<p>Finally, if all subqueues are always active then each packet finishes at least as early under WFQ as under GPS. To see this, let P<sub>j</sub> be the jth packet to finish, under either GPS or WFQ. At the time when P<sub>j</sub> finishes under WFQ, the router R will have devoted 100% of its output bandwidth exclusively to P<sub>1</sub> through P<sub>j</sub>. When P<sub>j</sub> finishes under GPS, R will also have transmitted P<sub>1</sub> through P<sub>j</sub>, and may have transmitted fractions of later packets as well. Therefore, the P<sub>j</sub> finishing time under GPS cannot be earlier.</p>
+<p>The finishing order and the relative GPS/WFQ finishing times may change, however, if &#8211; as will usually be the case &#8211; some subqueues are sometimes idle; that is, if packets sometimes &#8220;arrive late&#8221; for some subqueues.</p>
+</div>
+<div class="section" id="gps-example-1">
+<h4>17.5.4.3&nbsp;&nbsp;&nbsp;GPS Example 1<a class="headerlink" href="#gps-example-1" title="Permalink to this headline">¶</a></h4>
+<p>As a first example we return to the scenario of <a class="reference internal" href="queuing.html#first-virtual-finish-example"><em>17.5.2.1&nbsp;&nbsp;&nbsp;A first virtual-finish example</em></a>. The router&#8217;s two subqueues are <strong>always active</strong>; each has an allocation of 𝛼=50%. Packets P<sub>1</sub>, P<sub>2</sub>, P<sub>3</sub>, ..., all of size 1001, wait in the first queue; packets R<sub>1</sub>, R<sub>2</sub>, R<sub>3</sub>, ..., all of size 400, wait in the second queue. Output bandwidth is 1 byte per unit time, and T=0 is the starting point.</p>
+<p>The router&#8217;s virtual clock runs at wallclock speed, as both subqueues are always active. If F<sub>i</sub> represents the virtual finishing time of R<sub>i</sub>, then we now calculate F<sub>i</sub> as F<sub>i-1</sub> + 400/𝛼 = F<sub>i-1</sub> + 800. The virtual finishing times of P<sub>1</sub>, P<sub>2</sub>, etc are similarly at multiples of 2002.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="15%" />
+<col width="35%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Packet</th>
+<th class="head">virtual finish</th>
+<th class="head">actual finish time</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>R<sub>1</sub></td>
+<td>800</td>
+<td>400</td>
+</tr>
+<tr class="row-odd"><td>R<sub>2</sub></td>
+<td>1600</td>
+<td>800</td>
+</tr>
+<tr class="row-even"><td>P<sub>1</sub></td>
+<td>2002</td>
+<td>1801</td>
+</tr>
+<tr class="row-odd"><td>R<sub>3</sub></td>
+<td>2400</td>
+<td>2201</td>
+</tr>
+<tr class="row-even"><td>R<sub>4</sub></td>
+<td>3200</td>
+<td>2601</td>
+</tr>
+<tr class="row-odd"><td>R<sub>5</sub></td>
+<td>4000</td>
+<td>3001</td>
+</tr>
+<tr class="row-even"><td>P<sub>2</sub></td>
+<td>4004</td>
+<td>4002</td>
+</tr>
+</tbody>
+</table>
+<p>In the table above, the &#8220;virtual finish&#8221; column is simply double that of the BBRR version, reflecting the fact that the virtual finishing times are now scaled by a factor of 1/𝛼 = 2. The actual finish times are identical to what we calculated before.</p>
+<p>Note that, in every case, the actual WFQ finish time is always less than or equal to the virtual GPS finish time.</p>
+</div>
+<div class="section" id="gps-example-2">
+<span id="single-subqueue"></span><h4>17.5.4.4&nbsp;&nbsp;&nbsp;GPS Example 2<a class="headerlink" href="#gps-example-2" title="Permalink to this headline">¶</a></h4>
+<p>If the router has only a single active subqueue, with share 𝛼 and packets P<sub>1</sub>, P<sub>2</sub>, P<sub>3</sub>, ..., then the calculated virtual-clock packet finishing times will be equal to the time on the virtual clock at the point of actual finish, at least if this has been the case since the virtual clock last restarted at T=VC=0. Let r be the output rate of the router, let S<sub>1</sub>, S<sub>2</sub>, S<sub>3</sub> be the sizes of the packets and let F<sub>1</sub>, F<sub>2</sub>, F<sub>3</sub> be their virtual finishing times with F<sub>0</sub>=0. Then</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">F<sub>i</sub> = F<sub>i-1</sub> + S<sub>i</sub>/(r𝛼) = S<sub>1</sub>/(r𝛼) + ... + S<sub>i</sub>/(r𝛼)</div>
+</div>
+</div></blockquote>
+<p>The ith packet&#8217;s actual finishing time A<sub>i</sub> is (S<sub>1</sub> + ... + S<sub>i</sub>)/r, which is 𝛼×F<sub>i</sub>. But the virtual clock runs fast by a factor of 1/𝛼, so the actual finishing time on the virtual clock is A<sub>i</sub>/𝛼 = F<sub>i</sub>.</p>
+</div>
+<div class="section" id="gps-example-3">
+<span id="id10"></span><h4>17.5.4.5&nbsp;&nbsp;&nbsp;GPS Example 3<a class="headerlink" href="#gps-example-3" title="Permalink to this headline">¶</a></h4>
+<p>The next example illustrates a smaller but later-arriving packet, in this case P<sub>4</sub>, that finishes ahead of P<sub>3</sub> under GPS but not under WFQ. P<sub>3</sub> can be said to <em>leapfrog</em> P<sub>4</sub> and P<sub>5</sub> under WFQ.</p>
+<p>Suppose packets P<sub>1</sub> through P<sub>5</sub> arrive at R at the following times T, and with the following lengths L. The output bandwidth is 1 length unit per time unit; that is, r=1. The total number of length units is 24. Each subqueue is allocated an equal share of the bandwidth; <em>eg</em> 𝛼=1/3.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="34%" />
+<col width="32%" />
+<col width="34%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">subqueue 1</th>
+<th class="head">subqueue 2</th>
+<th class="head">subqueue3</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>P<sub>1</sub>: T=0, L=1</td>
+<td>P<sub>2</sub>: T=0, L=2</td>
+<td>P<sub>5</sub>: T=10, L=5</td>
+</tr>
+<tr class="row-odd"><td>P<sub>3</sub>: T=2, L=10</td>
+<td>P<sub>4</sub>: T=4, L=6</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<p>Under WFQ, we send P<sub>1</sub> and then P<sub>2</sub>; P<sub>2</sub> is second because its finishing time is later. When P<sub>2</sub> finishes the wallclock time is T=3. At this point, P<sub>3</sub> is the only packet available to send; it finishes at T=13.</p>
+<p>Up until T=10, we have two packets in progress under GPS (because P<sub>2</sub> finishes under GPS at T=4 and P<sub>4</sub> arrives at T=4), and so the GPS clock runs at rate 3/2 of wallclock time and the BBRR clock runs at rate 1/2 of wallclock time. At T=4, when P<sub>4</sub> arrives, the BBRR clock is at 2 and the VC clock is at 6 and we calculate the BBRR finishing time as 2+6=8 and the GPS finishing time as 6+6/(1/3) = 24. At T=10, the BBRR clock is at 5 and the GPS clock is 15. P<sub>5</sub> arrives then; we calculate its BBRR finishing time as 5+5=10 and its GPS finishing time as 15+5/𝛼 = 30.</p>
+<p>Because P<sub>4</sub> has the earlier virtual-clock finishing time, WFQ sends it next after P<sub>3</sub>, followed by P<sub>5</sub>.</p>
+<p>Here is a diagram of transmission under GPS. The chart itself is scaled to wallclock times. The BBRR clock is on the scale below; the VC clock always runs three times faster.</p>
+<img alt="_images/gps.png" src="_images/gps.png" />
+<p>The circled numbers represent the size of the portion of the packet sent in the intervals separated by the dotted vertical lines; for each packet, these add up to the packet&#8217;s total size.</p>
+<p>Note that, while the transmission order under WFQ is P<sub>1</sub>, P<sub>2</sub>, P<sub>3</sub>, P<sub>4</sub>, P<sub>5</sub>, the actual finishing order under GPS is P<sub>1</sub>, P<sub>2</sub>, P<sub>4</sub>, P<sub>5</sub>, P<sub>3</sub>. That is, P<sub>3</sub> managed to leapfrog P<sub>4</sub> and P<sub>5</sub> under WFQ by the simple expedient of being the only packet available for transmission at T=3.</p>
+</div>
+<div class="section" id="gps-example-4">
+<h4>17.5.4.6&nbsp;&nbsp;&nbsp;GPS Example 4<a class="headerlink" href="#gps-example-4" title="Permalink to this headline">¶</a></h4>
+<p>As a second example of leapfrogging, suppose we have the following arrivals; in this scenario, the smaller but later-arriving P<sub>4</sub> finishes ahead of P<sub>1</sub> and P<sub>3</sub> under GPS, but not under WFQ.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="31%" />
+<col width="35%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">subqueue 1</th>
+<th class="head">subqueue 2</th>
+<th class="head">subqueue3</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>P<sub>1</sub>: T=0, L=1000</td>
+<td>P<sub>2</sub>: T=0, L=200</td>
+<td>P<sub>4</sub>: T=600, L=100</td>
+</tr>
+<tr class="row-odd"><td></td>
+<td>P<sub>3</sub>: T=0, L=300</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<p>The following diagram shows how the packets shared the link under GPS over time. As can be seen, the GPS finishing order is P<sub>2</sub>, P<sub>4</sub>, P<sub>3</sub>, P<sub>1</sub>.</p>
+<img alt="_images/fluidtransmission.png" src="_images/fluidtransmission.png" />
+<p>Under WFQ, the transmission order is P<sub>2</sub>, P<sub>3</sub>, P<sub>1</sub>, P<sub>4</sub>, because when P<sub>3</sub> finishes at T=500, P<sub>4</sub> has not yet arrived.</p>
+</div>
+<div class="section" id="finishing-order-bound">
+<span id="index-13"></span><span id="id11"></span><h4>17.5.4.7&nbsp;&nbsp;&nbsp;Finishing-Order Bound<a class="headerlink" href="#finishing-order-bound" title="Permalink to this headline">¶</a></h4>
+<p>These examples bring us to the following delay-bound claim, due to Parekh and Gallager <a class="reference internal" href="bibliography.html#pg93" id="id12">[PG93]</a>; we will make use of it below in <a class="reference internal" href="queuing.html#parekh-gallager-theorem"><em>17.13.3&nbsp;&nbsp;&nbsp;Parekh-Gallager Theorem</em></a>. It is arguably the deepest part of the Parekh-Gallager theorem.</p>
+<p><strong>Claim</strong>: For any packet P, the wallclock finishing time of P at a router R under WFQ cannot be later than the wallclock finishing time of P at R under GPS by more than the time R needs to transmit the maximum-sized packet that can appear.</p>
+<p>Expressed symbolically, if F<sub>WFQ</sub> and F<sub>GPS</sub> are the finishing times for P under WFQ and GPS, R&#8217;s outbound transmission rate is r, and L<sub>max</sub> is the maximum packet size that can appear at R, then</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">F<sub>WFQ</sub> ≤ F<sub>GPS</sub> + L<sub>max</sub>/r</div>
+</div>
+</div></blockquote>
+<p>This is the best possible bound; L<sub>max</sub>/r is the time packet P must wait if it has arrived an instant too late and another packet of size L<sub>max</sub> has started instead.</p>
+<p>Note that, if a packet&#8217;s subqueue is inactive, the packet <em>starts</em> transmitting immediately upon arrival under GPS; however, GPS may send the packet relatively slowly.</p>
+<p>To prove this claim, let us number the packets P<sub>1</sub> through P<sub>k</sub> in order of WFQ transmission, starting from the most recent point when at least one subqueue of the router became active. For each i, let F<sub>i</sub> be the finishing time of P<sub>i</sub> under WFQ, let G<sub>i</sub> be the finishing time of P<sub>i</sub> under GPS, and let L<sub>i</sub> be the length of P<sub>i</sub>; note that, for each i, F<sub>i+1</sub> = L<sub>i+1</sub>/r + F<sub>i</sub>.</p>
+<p>If P<sub>k</sub> finishes after P<sub>1</sub> through P<sub>k-1</sub> under GPS, then the argument above (<a class="reference internal" href="queuing.html#finishing-order"><em>17.5.4.2&nbsp;&nbsp;&nbsp;Finishing Order under GPS and WFQ</em></a>) for the all-subqueues-active case still applies to show P<sub>k</sub> cannot finish earlier under GPS than it does under WFQ; that is, we have F<sub>k</sub> ≤ G<sub>k</sub>.</p>
+<p>Otherwise, some packet P<sub>i</sub> with i&lt;k must finish after P<sub>k</sub> under GPS; P<sub>i</sub> has <em>leapfrogged</em> P<sub>k</sub> under WFQ, presumably because P<sub>k</sub> was late in arriving. Let P<sub>m</sub> be the most recent (largest m&lt;k) such leapfrogger packet, so that P<sub>m</sub> finishes after P<sub>k</sub> under GPS but P<sub>m+1</sub> through P<sub>k-1</sub> finish earlier (or are tied); this was illustrated above in <a class="reference internal" href="queuing.html#gps-example-3"><em>17.5.4.5&nbsp;&nbsp;&nbsp;GPS Example 3</em></a> for k=5 and m=3.</p>
+<p>We next claim that none of the packets P<sub>m+1</sub> through P<sub>k</sub> could have yet arrived at R at the time T<sub>start</sub> when P<sub>m</sub> began transmission under WFQ. If some P<sub>i</sub> with i&gt;m were present at time T<sub>start</sub>, then the fact that it is transmitted after P<sub>m</sub> under WFQ would imply that the calculated GPS finishing time came after that of P<sub>m</sub>. But, as we argued earlier, calculated virtual-clock GPS finishing times are always the actual virtual-clock GPS finishing times, and we cannot have P<sub>i</sub> finishing both ahead of P<sub>m</sub> and behind it.</p>
+<p>Recalling that F<sub>m</sub> is the finishing time of P<sub>m</sub> under WFQ, the time T<sub>start</sub> above is simply F<sub>m</sub> - L<sub>m</sub>/r. Between T<sub>start</sub> and G<sub>k</sub>, all the packets P<sub>m+1</sub> through P<sub>k</sub> must arrive and then, under GPS, depart. The absolute minimum time to send these packets under GPS is the WFQ time for end-to-end transmission, which is (L<sub>m+1</sub> + .. + L<sub>k</sub>)/r = F<sub>k</sub> - F<sub>m</sub>. Therefore we have</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">G<sub>k</sub> - T<sub>start</sub> ≥ F<sub>k</sub> - F<sub>m</sub></div>
+<div class="line">G<sub>k</sub> - (F<sub>m</sub> - L<sub>m</sub>/r) ≥ F<sub>k</sub> - F<sub>m</sub></div>
+<div class="line">F<sub>k</sub> ≤ G<sub>k</sub> + L<sub>m</sub>/r ≤ G<sub>k</sub> + L<sub>max</sub>/r</div>
+</div>
+</div></blockquote>
+<p>The last line represents the desired conclusion.</p>
+</div>
+</div>
+<div class="section" id="the-quantum-algorithm">
+<span id="quantum-algorithm"></span><span id="index-14"></span><h3>17.5.5&nbsp;&nbsp;&nbsp;The Quantum Algorithm<a class="headerlink" href="#the-quantum-algorithm" title="Permalink to this headline">¶</a></h3>
+<p>The BBRR approach has cost O(log n), where n is the number of packets waiting, as outlined earlier. One simple though approximate alternative that has O(1) performance, introduced in <a class="reference internal" href="bibliography.html#sv96" id="id13">[SV96]</a>, is to give each input queue a <strong>quantum</strong>. At each round, a queue will be able to send a quantum&#8217;s worth of packets (plus, as we shall see, a carryover from the previous round). The quantum must be a number of bytes at least as large as the network MTU (so each time a per-class queue has a chance to send, it will be able to send at least one packet). Then, we again service the queues in round-robin fashion, but each time we take as many packets from the queue as we can such that the total size does not exceed the quantum.</p>
+<p>One cost of the quantum approach is that the elegant delay bound of <a class="reference internal" href="queuing.html#finishing-order-bound"><em>17.5.4.7&nbsp;&nbsp;&nbsp;Finishing-Order Bound</em></a> no longer holds. In fact, a sender may be forced to wait for all other senders each to send a full quantum, even if the sender has only a small packet.</p>
+<p>If we just allow senders to send up to a quantum&#8217;s worth of bytes, the strategy will be biased against classes that, for example, only include packets with size just over half the quantum. Fairness can be improved significantly by keeping track of the difference between the quantum and what was actually sent; we will call this the <strong>deficit</strong>. If the quantum is 1000 bytes and we have two 600-byte packets, the first of the packets is sent and the deficit is recorded as 400; if we have two 400-byte packets then the deficit is 0 as sending the two 400-byte packets empties the queue.</p>
+<p>The next time that queue is serviced, we add the previous deficit to the quantum, and send packets up to a total cumulative size of deficit+quantum. With this variation, if the quantum is 1000 bytes and a steady stream of 600-byte packets arrives on one subqueue, they are sent as follows</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="11%" />
+<col width="43%" />
+<col width="23%" />
+<col width="23%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">round</th>
+<th class="head">quantum + prev deficit</th>
+<th class="head">packets sent</th>
+<th class="head">new deficit</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1</td>
+<td>1000</td>
+<td>1</td>
+<td>400</td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td>1400</td>
+<td>2,3</td>
+<td>200</td>
+</tr>
+<tr class="row-even"><td>3</td>
+<td>1200</td>
+<td>4,5</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p>In three rounds the queue has been allowed to send 5×600 = 3000 bytes, which is exactly 3 quantums. We will refer to this strategy, with provision for deficits as above, as the <strong>quantum algorithm</strong> for fair queuing. If an input queue is ever empty, its deficit should immediately expire.</p>
+<p>We can implement weighted fair queuing using the quantum algorithm by adjusting the quantum sizes in proportion to the weights; that is, if the weights are 40% and 60% then the respective quanta might be 1000 bytes and 1500 bytes. The quantum should be at least as large as the largest packet (<em>eg</em> the MTU), so that if one input class is to have 10% weight and the other 90%, then the second class will have a quantum of 9 times the MTU. Of course, if the smaller-weighted class happens to be a VoIP stream with smaller packets as well, this is less of an issue.</p>
+</div>
+<div class="section" id="stochastic-fair-queuing">
+<span id="index-15"></span><span id="id14"></span><h3>17.5.6&nbsp;&nbsp;&nbsp;Stochastic Fair Queuing<a class="headerlink" href="#stochastic-fair-queuing" title="Permalink to this headline">¶</a></h3>
+<p>Stochastic fair queuing [McK90] is a different kind of approximation to fair queuing. The ideal is to give each individual TCP connection through a router its own fair queuing class, so that no connection has an incentive to keep more than the minimum number of packets in the queue. However, managing so many separate (and dynamically changing) input classes is computationally intensive. Instead, a hash function is used to put each TCP connection (as identified by its socketpair) into one of several buckets (the current default bucket count is 1024). The buckets are then used as the fair queuing input queues.</p>
+<p>If two connections hash to the same bucket, each will get only half the bandwidth to which it is entitled. Therefore the hash function has some additional parameters that allow it to be <em>perturbed</em> at regular intervals; after perturbation, socketpairs that formerly hashed to the same bucket likely now will not.</p>
+<p id="index-16">Stochastic fair queuing is available in the linux kernel.</p>
+</div>
+</div>
+<div class="section" id="applications-of-fair-queuing">
+<span id="fair-queuing-applications"></span><h2>17.6&nbsp;&nbsp;&nbsp;Applications of Fair Queuing<a class="headerlink" href="#applications-of-fair-queuing" title="Permalink to this headline">¶</a></h2>
+<p>As we saw in the Queue-Competition Rule in <a class="reference internal" href="dynamics.html#router-example-2"><em>14.2.2&nbsp;&nbsp;&nbsp;Example 2: router competition</em></a>, if a bottleneck router uses FIFO queuing then it pays a sender, in terms of the bandwidth it receives, to keep as many packets as possible in the queue. Fair queuing, however, can behave quite differently. If fair queuing is used with a separate class for each connection, this &#8220;greediness&#8221; benefit evaporates; a sender need only keep its per-class queue nonempty in order to be guaranteed its assigned share. Senders can limit their queue utilization to one or two packets without danger of being crowded out by competing traffic.</p>
+<p>As another application of fair queuing, suppose we have three web servers, A, B and C, to which we want to give equal shares at sending along a 6 Mbps link; all three reach the link through router R. One way would be to have R restrict them each to 2 Mbps, but that is not work-conserving: if one server is idle then its share goes unused. Fair queuing offers a better approach: if all three are busy, each gets 2 Mbps; if two are busy then each gets 3 Mbps, and if only one is busy it gets 6 Mbps. ISPs can also use this strategy internally whenever they have several flows competing for one outbound link.</p>
+<img alt="_images/3senders.png" src="_images/3senders.png" />
+<p>Unfortunately, this strategy does not work quite as well with three <em>receivers</em>. Suppose now A, B and C are three pools of users (<em>eg</em> three departments), and we want to give them each equal shares of an <em>inbound</em> 6 Mbps link:</p>
+<img alt="_images/3receivers.png" src="_images/3receivers.png" />
+<p>Inbound fair queuing could be used at the ISP (upstream) end of the connection, where the three flows would be identified by their destinations. But the ISP router is likely not ours to play with. Once the three flows arrive at R, it is too late to allocate shares; there is nothing to do but deliver the traffic to A, B and C respectively. We will return to this scenario below in <a class="reference internal" href="queuing.html#applications-of-token-bucket"><em>17.10&nbsp;&nbsp;&nbsp;Applications of Token Bucket</em></a>.</p>
+<p>Note that for these kinds of applications we need to be able to designate administratively how packets get classified into different input classes. The automatic classification of stochastic fair queuing, above, will not help here.</p>
+</div>
+<div class="section" id="hierarchical-queuing">
+<span id="id15"></span><h2>17.7&nbsp;&nbsp;&nbsp;Hierarchical Queuing<a class="headerlink" href="#hierarchical-queuing" title="Permalink to this headline">¶</a></h2>
+<p>Any queuing discipline with multiple input classes can participate in a <strong>hierarchy</strong>: the root queuing discipline is at the top of the tree, and each of its input classes is fed by a separate lower-level queuing discipline.</p>
+<p>The usual understanding of hierarchical queuing is that the non-leaf queuing-discipline nodes are &#8220;virtual&#8221;: they do not store data, but only make decisions as to which subqueue to serve. The only physical output interface is at the root, and all physical queues are attached to the leaf nodes.
+Each non-leaf queuing-discipline node is allowed to peek at what packet, if any, its subqueues <em>would</em> dequeue if asked, but any node will only actually dequeue a packet unless that packet will immediately be forwarded up the tree to the root. This might be referred to as a <strong>leaf-storage</strong> hierarchy.</p>
+<p>An immediate corollary is that leaf nodes, which now hold all the physical packets, will do all the packet dropping.</p>
+<p>While it is possible to chain real queue objects together with real links, to construct composite queuing structures in which packets are <em>not</em> stored only at leaf nodes, the resultant <strong>internal-storage</strong> hierarchy will often not function as might be expected. For example, a priority-queuing node that immediately forwards each arriving packet on to its parent has forfeited any control over the priority order of resultant packet transmissions. Similarly, if we try to avoid the complexity of hierarchical fair queuing, below, by connecting separate WFQ nodes into a tree with real links, then either packets simply pile up at the root, or else the interior links become the bottleneck. For a case where the internal-storage construction does work, see the end of <a class="reference internal" href="queuing.html#hierarchical-token-bucket"><em>17.12&nbsp;&nbsp;&nbsp;Hierarchical Token Bucket</em></a>.</p>
+<div class="section" id="generic-hierarchical-queuing">
+<span id="index-17"></span><span id="id16"></span><h3>17.7.1&nbsp;&nbsp;&nbsp;Generic Hierarchical Queuing<a class="headerlink" href="#generic-hierarchical-queuing" title="Permalink to this headline">¶</a></h3>
+<p>One simple way to enable lazy dequeuing is to require the following properties of the hierarchy&#8217;s component queuing disciplines:</p>
+<ul class="simple">
+<li>each node supports a <tt class="docutils literal"><span class="pre">peek()</span></tt> operation to return the packet it would dequeue if asked, and</li>
+<li>any non-leaf node can determine what packet it would itself dequeue simply by calling <tt class="docutils literal"><span class="pre">peek()</span></tt> on each of its child nodes</li>
+</ul>
+<p>With these in place, a dequeue operation at the root node will trigger a depth-first traversal of the entire tree through <tt class="docutils literal"><span class="pre">peek()</span></tt> calls; eventually one leaf node will dequeue its packet and pass it up towards the root. We will call this <strong>generic</strong> hierarchical queuing.</p>
+<p>Note that if we have a <tt class="docutils literal"><span class="pre">peek()</span></tt> operation at the leaf nodes, and the second property above for the interior nodes, we can recursively define <tt class="docutils literal"><span class="pre">peek()</span></tt> at every node.</p>
+<p>Many homogeneous queuing-discipline hierarchies support this generic mechanism. Priority queuing, as in the example below, works, because when a parent node needs to dequeue a packet it finds the highest-priority nonempty child subqueue, dequeues a packet from it, and sends it up the tree. In this case we do not even need <tt class="docutils literal"><span class="pre">peek()</span></tt>; all we need is <tt class="docutils literal"><span class="pre">is_empty()</span></tt>. Homogeneous FIFO queuing also works, assuming packets are each tagged with their arrival time, because for a node to determine which packet it would dequeue it needs only to <tt class="docutils literal"><span class="pre">peek()</span></tt> at its child nodes and find the earliest-arriving packet.</p>
+<p>As an example of where generic hierarchical queuing does not work, imagine a hierarchy consisting of a queuing discipline node that sends the <em>smallest</em> packet first, fed by two FIFO child nodes. The parent would have to dequeue all packets from the child nodes to determine the smallest.</p>
+<p>Fair queuing is not <em>quite</em> well-behaved with respect to generic hierarchical queuing. There is no problem if all packets are the same size; in this case the nodes can all implement simple round-robin selection in which they dequeue a packet from the next nonempty child node and send it immediately up the tree. Suppose, however, that to accommodate packets of different sizes all nodes use BBRR (or GPS). The problem is that without timely notification of when packets arrive at the leaf nodes, the interior nodes may not have enough information to determine the correct rates for their virtual clocks. An appropriate fair-queuing-specific modification to the generic hierarchical-queuing algorithm is below in <a class="reference internal" href="queuing.html#hierarchical-weighted-fair-queuing-algorithm"><em>17.8.1&nbsp;&nbsp;&nbsp;A Hierarchical Weighted Fair Queuing Algorithm</em></a>.</p>
+</div>
+<div class="section" id="hierarchical-examples">
+<h3>17.7.2&nbsp;&nbsp;&nbsp;Hierarchical Examples<a class="headerlink" href="#hierarchical-examples" title="Permalink to this headline">¶</a></h3>
+<p>Our first example is of hierarchical priority queuing, though as we shall see shortly it turns out in this case that the hierarchy collapses. It may still serve to illustrate some principles, however. The basic queuing-discipline unit will be the two-input-class priority queue, with priorities 0 (high) and 1 (low). We put one of these at the root, named QR, and then put a pair of such queues (QA and QB in the diagram) at the next level down, each feeding into one of the input classes of the root queue.</p>
+<img alt="_images/generic_hierarchy.png" src="_images/generic_hierarchy.png" />
+<p>We now need a <strong>classifier</strong>: something that can place input packets into one of the four leaf nodes labeled A, B, C and D above; these likely represent FIFO queues. Once everything is set up, the dequeuing rules are as follows:</p>
+<ul class="simple">
+<li>at the root node, we first see if packets are available in the left (high-priority) subqueue, QA. If so, we dequeue the packet from there; if not, we go on to the right subqueue QB.</li>
+<li>at either QA or QB, we first see if packets are available in the left input, labeled 0; if so, we dequeue from there. Otherwise we see if packets are available from the right input, labeled 1. If neither, then the subqueue is empty.</li>
+</ul>
+<p>The catch here is that hierarchical priority queuing collapses to a single layer, with four priority levels 00, 01, 10, and 11 (from high to low):</p>
+<img alt="_images/flattened_hierarchy.png" src="_images/flattened_hierarchy.png" />
+<p>For many other queuing disciplines, however, the hierarchy does not collapse. One example of this might be a root queuing discipline PQR using priority queuing, with two leaf nodes using fair queuing, FQA and FQB. (Fair queuing does not behave well as an interior node without modification, as mentioned above, but it can participate in generic hierarchical queuing just fine as a leaf node.)</p>
+<img alt="_images/PQ_FQ_hierarchy.png" src="_images/PQ_FQ_hierarchy.png" />
+<p>Senders A1 and A2 receive all the bandwidth, if either is active; when this is the case, B1 and B2 get nothing. If both A1 and A2 are active, they get equal shares. Only when neither is active do B1 and B2 receive anything, in which case they divide the bandwidth fairly between themselves. The root node will check on each <tt class="docutils literal"><span class="pre">dequeue()</span></tt> operation whether FQA is nonempty; if it is, it dequeues a packet from FQA and otherwise dequeues from FQB. Because the root does not dequeue a packet from FQA or FQB unless it is about to return it via its own <tt class="docutils literal"><span class="pre">dequeue()</span></tt> operation, those two child nodes do not have to decide which of their internal per-class queues to service until a packet is actually needed.</p>
+</div>
+</div>
+<div class="section" id="hierarchical-weighted-fair-queuing">
+<span id="hwfq"></span><h2>17.8&nbsp;&nbsp;&nbsp;Hierarchical Weighted Fair Queuing<a class="headerlink" href="#hierarchical-weighted-fair-queuing" title="Permalink to this headline">¶</a></h2>
+<p>Hierarchical weighted fair queuing is an elegant mechanism for addressing naturally hierarchical bandwidth-allocation problems, even if it cannot be properly implemented by &#8220;generic&#8221; methods of creating queuing-discipline hierarchies. There are, fortunately, algorithms specific to hierarchical fair queuing.</p>
+<p>The fluid model provides a convenient reference point for determining the goal of hierarchical weighted fair queuing. Each interior node divides its bandwidth according to the usual one-level WFQ mechanism: if N is an interior node, and if the ith child of N is guaranteed fraction 𝛼<sub>i</sub> of N&#8217;s bandwidth, and A is the set of N&#8217;s currently active children, then WFQ on N will allocate to active child j the fraction  𝛽<sub>j</sub> equal to 𝛼<sub>j</sub> divided by the sum of the 𝛼<sub>i</sub> for i in A.</p>
+<p>Now we can determine the bandwidth allocated to each leaf node L. Suppose L is at level r (with the root at level 0), and let 𝛽<sub>k</sub> be the fraction currently assigned to the node on the root-to-L path at level 0&lt;k≤r. Then L should receive service in proportion to 𝛽<sub>1</sub>×...×𝛽<sub>r</sub>, the product of the fractions along the root-to-L path. For example, in the following hierarchical model, leaf node L1 should receive fraction 70%×40%×50% = 14% of the total bandwidth.</p>
+<img alt="_images/hierarchical_WFQ.png" src="_images/hierarchical_WFQ.png" />
+<p>If, however, node FQD becomes inactive, then FQA will assign 100% to FQC, in which case L1 will receive 70%×100%×50% = 35% of the bandwidth.</p>
+<p>Alternatively, we can stick to real packets, but simplify by assuming all are the same size <em>and</em> that child allocations are all equal; in this situation we <em>can</em> implement hierarchical fair queuing via generic hierarchical queuing. Each parent node simply dequeues from its child nodes in round-robin fashion, skipping over any empty children.</p>
+<p>Hierarchical fair queuing &#8211; unlike priority queuing &#8211;  does <em>not</em> collapse; the hierarchical queuing discipline is not equivalent to any one-level queuing discipline.
+Here is an example illustrating this. We form a tree of three fair queuing nodes, labeled FQR, FQA and FQB in the diagram. Each grants 50% of the bandwidth to each of its two input classes.</p>
+<img alt="_images/hierarchical_v_flat.png" src="_images/hierarchical_v_flat.png" />
+<p>If all four input classes A,B,C,D are active in the hierarchical structure, then each gets 25% of the total bandwidth, just as for a flat four-input-class fair queuing structure. However, consider what happens when only A, B and C are active, and D is idle. In the flat model, A, B and C each get 33%. In the hierarchical model, however, as long as FQA and FQB are both active then each gets 50%, meaning that A and B split FQA&#8217;s allocation and receive 25% each, while C gets 50%.</p>
+<p>As an application, suppose two teams, Left and Right, are splitting a shared outbound interface; each team has contracted to receive at least 50% of the bandwidth. Each team then further subdivides its allocation among its own members, again using fair queuing. When A, B and C are the active senders, then Team Right &#8211; having active sender C &#8211; still expects to receive its contractual 50%. Team Right may in fact have decided to silence D specifically so C would receive the full allocation.</p>
+<p>Hierarchical fair queuing can <em>not</em> be implemented by computing a finishing time for each packet at the point it arrives. By way of demonstration, consider the following example from <a class="reference internal" href="bibliography.html#bz97" id="id17">[BZ97]</a>, with root node R and interior child node C.</p>
+<img alt="_images/no_finishing_times.png" src="_images/no_finishing_times.png" />
+<p>If A is idle, but B and D are active, then B should receive four times the bandwidth of D. Assume for a moment that a large number of packets have arrived for each of B and D. Then B should receive the entire 80% of C&#8217;s share. If transmission order can be determined by packet arrival, then the order will look something like</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">d<sub>1</sub>, b<sub>1</sub>, b<sub>2</sub>, b<sub>3</sub>, b<sub>4</sub>,</div>
+<div class="line">d<sub>2</sub>, b<sub>5</sub>, b<sub>6</sub>, b<sub>7</sub>, b<sub>8</sub>, ...</div>
+</div>
+</div></blockquote>
+<p>Now suppose A wakes up and becomes active. At that point, B goes from receiving 80% of the total bandwidth to 5% = 80% × 1/16, or from four times D&#8217;s bandwidth to a quarter of it. The new b/d relative rate, <em>not showing A&#8217;s packets</em>, must be</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">b<sub>1</sub>, d<sub>1</sub>, d<sub>2</sub>, d<sub>3</sub>, d<sub>4</sub>,</div>
+<div class="line">b<sub>2</sub>, d<sub>5</sub>, d<sub>6</sub>, d<sub>7</sub>, d<sub>8</sub>, ...</div>
+</div>
+</div></blockquote>
+<p>The relative frequencies of B and D packets have been reversed by the arrival of later A packets. The packet order for B and D is thus dependent on later arrivals on another queue entirely, and thus cannot be determined at the point the packets arrive.</p>
+<p>After presenting the actual hierarchical-WFQ virtual-clock algorithm, we will return to this example in <a class="reference internal" href="queuing.html#hierarchical-wfq-example"><em>17.8.1.2&nbsp;&nbsp;&nbsp;A Hierarchical-WFQ Example</em></a>.</p>
+<div class="section" id="a-hierarchical-weighted-fair-queuing-algorithm">
+<span id="hierarchical-weighted-fair-queuing-algorithm"></span><span id="index-18"></span><h3>17.8.1&nbsp;&nbsp;&nbsp;A Hierarchical Weighted Fair Queuing Algorithm<a class="headerlink" href="#a-hierarchical-weighted-fair-queuing-algorithm" title="Permalink to this headline">¶</a></h3>
+<p>The GPS-based WFQ scheduling algorithm is <em>almost</em> suitable for use in the generic-hierarchical-queuing framework; two adjustments must be made. The first adjustment is that each non-leaf node must be notified whenever any of its formerly empty subqueues becomes active; the second adjustment is a modification to how &#8211; and more importantly when &#8211; a packet&#8217;s virtual finishing time is calculated.</p>
+<p>As for the active-subqueue notification, each non-leaf node can, of course, check after dequeuing each packet which of its subqueues is active, using the <tt class="docutils literal"><span class="pre">is_empty()</span></tt> operation. This, however, may be significantly after the subqueue-activating packet has arrived. A WFQ node needs to know the exact time when a subqueue becomes active both to record the GPS virtual-clock start time for the subqueue, and to know when to change the rate of its virtual clock.</p>
+<p>Addition of this subqueue-activation notification to hierarchical queuing is straightforward. When a previously empty leaf node receives a packet, it must send a notification to its parent. Each interior node of the hierarchy must in turn forward any received subqueue-activation notification to <em>its</em> parent, provided that none of its other child subqueues were already active. If the interior node already had other active subqueues, then that node is itself active and no new notification needs to be sent. In this way, when a leaf node becomes active, the news will be propagated towards the root of the tree until either the root or an already-active interior node is reached.</p>
+<p>To complete the hierarchical WFQ algorithm, we next describe how to modify the algorithm of <a class="reference internal" href="queuing.html#gps"><em>17.5.4&nbsp;&nbsp;&nbsp;The GPS Model</em></a> to support subqueues of <em>any</em> type (<em>eg</em> FIFO, priority, or in our case hierarchical subtrees), provided inactive subqueues notify the WFQ parent when they become active.</p>
+<div class="section" id="wfq-with-non-fifo-subqueues">
+<span id="wfq-with-arbitrary-subqueues"></span><h4>17.8.1.1&nbsp;&nbsp;&nbsp;WFQ with non-FIFO subqueues<a class="headerlink" href="#wfq-with-non-fifo-subqueues" title="Permalink to this headline">¶</a></h4>
+<p>Suppose we want to implement WFQ where the per-class subqueues, instead of being FIFO, can be arbitrary queuing disciplines; again, the case in which we are interested is when the subqueue represents a sub-hierarchy. The order of dequeuing from each subqueue might be changed by later arrivals (<em>eg</em> as in priority queuing), and packets in the subqueues might even disappear (as with random-drop queuing). (We <em>will</em> assume that nonempty subqueues can only become empty through a dequeuing operation; this holds in all the cases we will consider here.)
+The original WFQ algorithm envisioned labeling each packet P with its finishing time as follows:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">F<sub>P</sub> = max(VC(now), F<sub>prev</sub>) + S/𝛼<sub>i</sub></div>
+</div>
+</div></blockquote>
+<p>Clearly, this labeling of each packet upon its arrival is incompatible with subqueues that might place later-arriving packets ahead of earlier-arriving ones. The original algorithm must be modified.</p>
+<p>It turns out, though, that a WFQ node need only calculate finishing times F<sub>P</sub> for the packets P that are at the heads of each of its subqueues, and even that needs only to be done at the time the <tt class="docutils literal"><span class="pre">dequeue()</span></tt> operation is invoked. No waiting packet needs to be labeled. In fact, a packet P1 might be at the head of one subqueue, and be passed over in a <tt class="docutils literal"><span class="pre">dequeue()</span></tt> operation for too large an F<sub>P1</sub>, only to be replaced by a different packet P2 during the next <tt class="docutils literal"><span class="pre">dequeue()</span></tt> call.</p>
+<p>It is sufficient for the WFQ node to maintain, for each of its subqueues, a variable <tt class="docutils literal"><span class="pre">NextStart</span></tt>, representing the virtual-clock time (according to the WFQ node&#8217;s own virtual clock) to be used as the start time for that subqueue&#8217;s next transmitted packet. A subqueue&#8217;s <tt class="docutils literal"><span class="pre">NextStart</span></tt> value serves as the max(VC(now), F<sub>prev</sub>) of the single-layer WFQ formula above. When the parent WFQ node is called upon to dequeue a packet, it calls the <tt class="docutils literal"><span class="pre">peek()</span></tt> operation on each of its subqueues and then calculates the finishing time F<sub>P</sub> for the packet P <em>currently</em> at the head of each subqueue as <tt class="docutils literal"><span class="pre">NextStart</span></tt> + size(P)/𝛼, where 𝛼 is the bandwidth fraction assigned to the subqueue.</p>
+<p>If a formerly inactive subqueue becomes active, it by hypothesis notifies the parent WFQ node. The parent node records the time on its virtual clock as the <tt class="docutils literal"><span class="pre">NextStart</span></tt> value for that subqueue. Whenever a subqueue is called upon to dequeue packet P, its <tt class="docutils literal"><span class="pre">NextStart</span></tt> value is updated to <tt class="docutils literal"><span class="pre">NextStart</span></tt> + size(P)/𝛼, the virtual-clock finishing time for P.</p>
+<p>The active-subqueue notification is also exactly what is necessary for the WFQ node to maintain its virtual clock. If A is the set of active subqueues, and the ith subqueue has bandwidth share 𝛼<sub>i</sub>, then the clock is to run at rate equal to the reciprocal of the sum of the 𝛼<sub>i</sub> for i in A. This rate needs to be updated whenever a subqueue becomes active  or inactive. In the first case, the parent node is notified by hypothesis, and the second case happens only after a <tt class="docutils literal"><span class="pre">dequeue()</span></tt> operation.</p>
+<p>There is one more modification needed for non-root WFQ nodes: we must suspend their virtual clocks when they are not &#8220;transmitting&#8221;, following the argument at the end of <a class="reference internal" href="queuing.html#gps"><em>17.5.4&nbsp;&nbsp;&nbsp;The GPS Model</em></a>. Non-root nodes do not have real interfaces and do not physically transmit. However, we can say that an interior node N is <strong>logically transmitting</strong> when the root node R is currently transmitting a packet from leaf node L, and N lies on the path from R to L. Note that all interior nodes on the path from R to L will be logically transmitting simultaneously. For a specific non-root node N, whenever it is called upon at time T to dequeue a packet P, its virtual clock should run during the <em>wallclock</em> interval from T to T + size(P)/r, where r is the root node&#8217;s physical bandwidth. The virtual finishing time of P need not have any direct correspondence to this actual finishing time T + size(P)/r. The rate of N&#8217;s virtual clock in the interval from T to T + size(P)/r will depend, of course, on the number of N&#8217;s active child nodes.</p>
+<p>We remark that the <tt class="docutils literal"><span class="pre">dequeue()</span></tt> operation described above is relatively inefficient; each <tt class="docutils literal"><span class="pre">dequeue()</span></tt> operation by the root results in recursive traversal of the entire tree. There have been several attempts to improve the algorithm performance. Other algorithms have also been used; the mechanism here has been taken from <a class="reference internal" href="bibliography.html#bz97" id="id18">[BZ97]</a>.</p>
+</div>
+<div class="section" id="a-hierarchical-wfq-example">
+<span id="hierarchical-wfq-example"></span><h4>17.8.1.2&nbsp;&nbsp;&nbsp;A Hierarchical-WFQ Example<a class="headerlink" href="#a-hierarchical-wfq-example" title="Permalink to this headline">¶</a></h4>
+<p>Let us consider again the example at the end of <a class="reference internal" href="queuing.html#hwfq"><em>17.8&nbsp;&nbsp;&nbsp;Hierarchical Weighted Fair Queuing</em></a>:</p>
+<img alt="_images/no_finishing_times.png" src="_images/no_finishing_times.png" />
+<p>Assume that all packets are of size 1 and R transmits at rate 1 packet per second. Initially, suppose FIFO leaf nodes B and D have long backlogs (<em>eg</em> b<sub>1</sub>, b<sub>2</sub>, b<sub>3</sub>, ...) but A is idle. Both of R&#8217;s subqueues are active, so R&#8217;s virtual clock runs at the wall-clock rate. C&#8217;s virtual clock is running 16× fast, though. R&#8217;s <tt class="docutils literal"><span class="pre">NextStart</span></tt> values for both its subqueues are 0.</p>
+<p>The finishing time assigned by R to d<sub>i</sub> will be 5i. Whenever packet d<sub>i</sub> reaches the head of the D queue, R&#8217;s <tt class="docutils literal"><span class="pre">NextStart</span></tt> for D will be 5(i-1). (Although we claimed in the previous section that hierarchical WFQ nodes shouldn&#8217;t need to assign finishing times beyond that for the current head packet, for FIFO subqueues this is safe.)</p>
+<p>At least during the initial A-idle period, whenever R checks C&#8217;s subqueue, if b<sub>i</sub> is the head packet then R&#8217;s <tt class="docutils literal"><span class="pre">NextStart</span></tt> for C will be 1.25(i-1) and the calculated virtual finishing time will be 1.25i. If ties are decided in B&#8217;s favor then in the first ten seconds R will send</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">b<sub>1</sub>, b<sub>2</sub>, b<sub>3</sub>, b<sub>4</sub>, <strong>d</strong><sub>1</sub>, b<sub>5</sub>, b<sub>6</sub>, b<sub>7</sub>, b<sub>8</sub>, <strong>d</strong><sub>2</sub></div>
+</div>
+</div></blockquote>
+<p>During the ten seconds needed to send the ten packets above, all of the packets dequeued by C come from B. Having only one active subqueue puts C is in the situation of <a class="reference internal" href="queuing.html#single-subqueue"><em>17.5.4.4&nbsp;&nbsp;&nbsp;GPS Example 2</em></a>, and so its packets&#8217; calculated finishing times will exactly match C&#8217;s virtual-clock value at the point of actual finish. C dequeues eight packets, so its virtual clock runs for only those 8 of the 10 seconds during which one of the b<sub>i</sub> is being transmitted. As a result, packet b<sub>i</sub> finishes at time 16i by C&#8217;s virtual clock.  At T=10, C&#8217;s virtual clock is 8×16 = 128.</p>
+<p>Now, at T=10, as the last of the ten packets above completes transmission, let subqueue A become backlogged with a<sub>1</sub>, a<sub>2</sub>, a<sub>3</sub>, etc.  C will assign a finishing time of 128 + 1.0667i to a<sub>i</sub> (1.0667 = 16/15); C has already assigned a virtual finishing time of 9×16=144 to b<sub>9</sub>. None of the virtual finishing times assigned by C to the remaining b<sub>i</sub> will change.</p>
+<p>At this point the virtual finishing times for C&#8217;s packets are as follows:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="27%" />
+<col width="40%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">packet</th>
+<th class="head">C finishing time</th>
+<th class="head">R finishing time</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>a<sub>1</sub></td>
+<td>128 + 1.0667</td>
+<td>10 + 1.25</td>
+</tr>
+<tr class="row-odd"><td>a<sub>2</sub></td>
+<td>128 + 2×1.0667</td>
+<td>10 + 2.50</td>
+</tr>
+<tr class="row-even"><td>a<sub>3</sub></td>
+<td>128 + 3×1.0667</td>
+<td>10 + 3.75</td>
+</tr>
+<tr class="row-odd"><td>a<sub>4</sub></td>
+<td>128 + 4×1.0667</td>
+<td>10 + 5</td>
+</tr>
+<tr class="row-even"><td>...</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>a<sub>15</sub></td>
+<td>128 + 15×1.0667 = 144</td>
+<td>10 + 15×1.25</td>
+</tr>
+<tr class="row-even"><td>b<sub>9</sub></td>
+<td>144</td>
+<td>10 + 16×1.25 = 30</td>
+</tr>
+</tbody>
+</table>
+<p>During the time the 16 packets in the table above are sent from C, R will also send four of D&#8217;s packets, for a total of 20.</p>
+<p>The virtual finishing times assigned by C to b<sub>9</sub> and b<sub>10</sub> have <em>not</em> changed, but note that the virtual finishing times <em>assigned to these packets by R</em>  are now very different from what they would have been had A remained idle. With A idle, these finishing times would have been F<sub>9</sub> = 11.25 and F<sub>10</sub> = 12.50, etc. Now, with A active, it is a<sub>1</sub> and a<sub>2</sub> that finish at 11.25 and 12.50; b<sub>9</sub> will now be assigned by R a finishing time of 30 and b<sub>10</sub> will be assigned a finishing time of 50. R is still assigning successive finishing times at increments of 1.25 to packets dequeued by C, but B&#8217;s contributions to this stream of packets have been bumped far back.</p>
+<p>R&#8217;s assignments of virtual finishing times to the d<sub>i</sub> are immutable, as are C&#8217;s assignments of virtual finishing times, but R can <em>not</em> assign a final virtual finishing time to any of C&#8217;s packets (that is, A&#8217;s or B&#8217;s) until the packet has reached the head of C&#8217;s queue. R assigns finishing times to C&#8217;s packets in the order they are dequeued, and until a packet is dequeued by C it is subject to potential preemption.</p>
+</div>
+</div>
+</div>
+<div class="section" id="token-bucket-filters">
+<span id="token-bucket"></span><span id="index-19"></span><h2>17.9&nbsp;&nbsp;&nbsp;Token Bucket Filters<a class="headerlink" href="#token-bucket-filters" title="Permalink to this headline">¶</a></h2>
+<p>Token-bucket filters provide an alternative to fair queuing for providing a traffic allocation to each of several groups. The main practical difference between fair queuing and token bucket is that if one sender is idle, fair queuing distributes that sender&#8217;s bandwidth among the other senders. Token bucket does not: the bandwidth a sender is allocated is a <strong>bandwidth cap</strong>.</p>
+<p>Suppose the outbound bandwidth is 4 packets/ms and we want to allocate to one particular sender, A, a bandwidth of 1 packet/ms. We could use fair queuing and give sender A a bandwidth fraction of 25%, but suppose we do not want A ever to get more bandwidth than 1 packet/ms. We might do this, for example, because A is paying a reduced rate, and any excess available bandwidth is to be divided among the <em>other</em> senders.</p>
+<p>The catch is that we want the flexibility to allow A&#8217;s packets to arrive at irregular intervals. We could simply wait 1 ms after each of A&#8217;s packets begins transmission, before the next can begin, but this may be too strict. Suppose A has been dutifully submitting packets at 1ms intervals and then the packet that was supposed to arrive at T=6ms instead arrives at T=6.5. If the following packet then arrives on time at T=7, does this mean it should now be held until T=7.5, etc? Or do we allow A to send one late packet at T=6.5 and the next at T=7, on the theory that the <em>average</em> rate is still 1 packet/ms?</p>
+<p>The latter option is generally what we want, and the solution is to define A&#8217;s quota in terms of a <strong>token-bucket specification</strong>, which allows for specification of both an average rate and also a burst capacity.</p>
+<p id="index-20">If a packet does not meet the token-bucket specification, it is <strong>non-compliant</strong>; we can do any of the following things:</p>
+<ul class="simple">
+<li><strong>delay</strong> the packet until the bucket is ready</li>
+<li><strong>drop</strong> the packet</li>
+<li><strong>mark</strong> the packet as non-compliant</li>
+</ul>
+<p>The first option here is often called <strong>shaping</strong>; the second, more authoritarian option is sometimes known as <strong>policing</strong>.</p>
+<p>Another use for token-bucket specifications is as a theoretical traffic description, rather than a rule to be enforced; in this context compliance is a non-issue.</p>
+<p>A token-bucket filter can be thought of as a queuing discipline, with an underlying FIFO queue. If non-compliant packets are delayed, it is non-work-conserving. Dropping non-compliant packets can be viewed as an alternative to tail-drop. The queuing-discipline definition above in <a class="reference internal" href="queuing.html#queuing-disciplines"><em>17.4&nbsp;&nbsp;&nbsp;Queuing Disciplines</em></a> does not provide for marking packets, but this is a straightforward extension.</p>
+<div class="section" id="token-bucket-definition">
+<span id="id19"></span><h3>17.9.1&nbsp;&nbsp;&nbsp;Token Bucket Definition<a class="headerlink" href="#token-bucket-definition" title="Permalink to this headline">¶</a></h3>
+<p>The idea behind a token bucket is that there is a notional bucket somewhere, being filled at a steady rate with tokens (or, if more divisibility is needed, with fluid); any overflow from the bucket is discarded. To send a packet, we need to be able to take one token from the bucket; if the bucket is empty then the packet is non-compliant and must suffer special treatment as above. If the bucket is full, however, then the sender may send a <strong>burst</strong> of packets corresponding to the bucket capacity (at which point the bucket will be empty).</p>
+<p>A common variation is requiring one token per byte rather than per packet, with the fill rate correspondingly scaled; this allows packet size to be taken into account.</p>
+<p>More precisely, a token-bucket specification TB(r,B<sub>max</sub>) includes a <strong>token fill rate</strong> of r tokens/sec, representing the rate at which the bucket fills with tokens, and also a <strong>bucket capacity</strong> (or depth) B<sub>max</sub>&gt;0. The bucket fills at the rate specified, subject to a maximum of B<sub>max</sub>; we will denote the current capacity by B, or by B(t) if we need to specify the time.
+In order for a packet of size S (possibly S=1 for counting size in units of whole packets) to be within the specification, the bucket must have at least S tokens; that is, B≥S. Otherwise the packet is non-compliant. When the packet is sent, S tokens are removed from the bucket, that is, B=B−S. It is possible for the packets of a given flow all to be compliant with a given token-bucket specification at one point (<em>eg</em> one router) in the network but not at another point; this can happen, for example, if more than B<sub>max</sub> packets pile up at a downstream router due to momentary congestion.</p>
+<p>The following graph is a visual representation of a token-bucket constraint. The black and purple curves plotted are of cumulative bits sent as a function of time, that is, bits(t). When bits(t) is horizontal, the sender is idle.</p>
+<img alt="_images/tokenbucketgraph.png" src="_images/tokenbucketgraph.png" />
+<p>The blue line represents a sender sending linearly at the rate r, with no burstiness. At vertical distance B<sub>max</sub> above the blue line is the red line. Graphs for compliant senders cannot cross this, because that would entail a burst of more than B<sub>max</sub> above the blue line; we give a more formal argument below. As a sender&#8217;s graph approaches the red line, the sender&#8217;s current bucket contents decreases; the instantaneous bucket contents for the black sender is shown at one point as B(t).</p>
+<p>The purple sender has fallen below the blue line at one point; as a result, it can never catch up. In fact, after passing through the vertex at point A the purple graph can never cross the dashed red line. A proof is in <a class="reference internal" href="queuing.html#token-bucket-queue-utilization"><em>17.11&nbsp;&nbsp;&nbsp;Token Bucket Queue Utilization</em></a>, following some numeric token-bucket examples that illustrate how a token-bucket filter works.</p>
+<div class="sidebar">
+<p class="first sidebar-title">Satellite Token Bucket</p>
+<p class="last">When I first got satellite Internet, my service was limited by a token-bucket filter with rate 56 Kbps and bucket 300 megabytes. When the bucket emptied, it took 12 hours to refill. The idea was that someone could use the Internet intensely but relatively briefly; satellite access is expensive. Within a year, the provider switched to a flat 300 MB cap per day; the token-bucket rule was apparently not well understood by customers.</p>
+</div>
+<p>If a packet arrives when there are not enough tokens in the bucket to send it, then as indicated above there are three options. The sender can engage in shaping, making the packet wait until sufficient tokens accumulate. The sender can engage in policing, dropping the packet. Or the sender can send the packet immediately but mark it as noncompliant.</p>
+<p>One common strategy is to send noncompliant packets &#8211; as marked in the third option above &#8211; with lower priority. Alternatively, marked packets may face a greater chance of being dropped by some downstream router. In ATM networks (<a class="reference internal" href="otherLANs.html#atm"><em>3.8&nbsp;&nbsp;&nbsp;Asynchronous Transfer Mode: ATM</em></a>) the cell-loss priority bit is often used to mark noncompliant packets.</p>
+<p>Token-bucket specifications supply a framework for making decisions about <strong>admission control</strong>: a router can decide whether to accept a new connection (or whether to accept the connection&#8217;s quality-of-service request) based on the requested rate and bucket (queue) requirements.</p>
+<p>Token-bucket specifications are the mirror-image equivalent to <strong>leaky-bucket specifications</strong>, in which the fluid leaks out of the leaky bucket at rate r and to send a packet we must add S units without overflowing. The two forms are completely equivalent.</p>
+<p id="index-21">So far we have been using token-bucket specifications to describe traffic; <em>eg</em> traffic <em>arriving</em> at a router. It is also possible to use token buckets to describe the router itself; in this setting, the leaky-bucket formulation may be clearer. The router&#8217;s queue represents the bucket, and the router&#8217;s packet transmissions represent tokens leaking out of the bucket. Arriving packets are added to the bucket; a bucket overflow represents lost packets. We will not pursue this interpretation further.</p>
+</div>
+<div class="section" id="token-bucket-examples">
+<h3>17.9.2&nbsp;&nbsp;&nbsp;Token-Bucket Examples<a class="headerlink" href="#token-bucket-examples" title="Permalink to this headline">¶</a></h3>
+<p>Suppose the token-bucket specification is <strong>TB(1/3 packet/ms, 4 packets)</strong>, and packets arrive at the following times, with the bucket initially full:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">0, 0, 0, 2, 3, 6, 9, 12</div>
+</div>
+</div></blockquote>
+<p>After all the T=0 packets are processed, the bucket holds 1 token. By the time the fourth packet arrives at T=2, the bucket volume has risen to 1 2/3; it immediately drops to 2/3 when packet 4 is sent. By T=3, the bucket volume has reached 1 and the fifth packet can be sent. The bucket is now empty, but fortunately the remaining packets arrive at 3-ms intervals and can all be sent.</p>
+<p>In the next set of packet arrival times, again with TB(1/3,4), we have three bursts of four packets each.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">0, 0, 0, 0, 12, 12, 12, 12, 24, 24, 24, 24</div>
+</div>
+</div></blockquote>
+<p>Each burst empties the bucket, which then takes 12 ms to refill. All packets are compliant.</p>
+<p>In the following set of packet arrival times, still with TB(1/3,4), the burst of four packets at T=0 drains the bucket. At T=3 the bucket size has increased back to 1, allowing the packet that arrives then to be sent but also draining the bucket again.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">0, 0, 0, 0, 3, 6, 12, 12</div>
+</div>
+</div></blockquote>
+<p>At T=6 the same thing happens. From T=6 to T=12 the bucket contents rise from 0 to 2, allowing the two packets arriving at T=12 to be sent.</p>
+<p>Finally, suppose packets arrive at the following times at our TB(1/3,4) filter.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">0, 1, 2, 3, 4, 5</div>
+</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line">Just after T=0 the bucket size is 3; just before T=1 it is 3 1/3.</div>
+<div class="line">Just after T=1 the bucket size is 2 1/3; just before T=2 it is 2 2/3</div>
+<div class="line">Just after T=2 the bucket size is 1 2/3; just before T=3 it is 2</div>
+<div class="line">Just after T=3 the bucket size is 1; just before T=4 it is 1 1/3</div>
+<div class="line">Just after T=4 the bucket size is 1/3; just before T=5 it is 2/3</div>
+<div class="line">At T=5 the bucket size is 2/3 and the arriving packet is <strong>noncompliant</strong>.</div>
+</div>
+<p>We can also represent this in tabular form as follows; note that for the noncompliant packet the bucket is not decremented.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="35%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">packet arrival</th>
+<th class="head">0</th>
+<th class="head">1</th>
+<th class="head">2</th>
+<th class="head">3</th>
+<th class="head">4</th>
+<th class="head">5</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>bucket just before</td>
+<td>4</td>
+<td>3&nbsp;1/3</td>
+<td>2&nbsp;2/3</td>
+<td>2</td>
+<td>1&nbsp;1/3</td>
+<td>2/3</td>
+</tr>
+<tr class="row-odd"><td>bucket just after</td>
+<td>3</td>
+<td>2&nbsp;1/3</td>
+<td>1&nbsp;2/3</td>
+<td>1</td>
+<td>1/3</td>
+<td>2/3</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="multiple-token-buckets">
+<span id="multiple-token-bucket"></span><span id="index-22"></span><h3>17.9.3&nbsp;&nbsp;&nbsp;Multiple Token Buckets<a class="headerlink" href="#multiple-token-buckets" title="Permalink to this headline">¶</a></h3>
+<p>It often makes sense to require that a sender comply with two (or more) separate token-bucket specifications. We can think of these being applied to the traffic sequentially. Often one filter will specify a peak rate, with a small bucket size, and the other will specify an average rate, with a larger bucket size. Consider, for example, the following pair:</p>
+<ol class="arabic simple">
+<li>TB(1 packet/ms, &nbsp; 1.5 packets)</li>
+<li>TB(1/5 packet/ms, 6 packets)</li>
+</ol>
+<p>The first specification, meant to apply to the peak rate, mandates 1 ms on average between packets, but packets can be only 0.5 ms early without being noncompliant. The second specification, meant to apply over the longer term, states that <em>on average</em> there will be 5 ms between packets, subject to a burst of 6. The following is compliant, assuming both buckets are initially full.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">0, 1, 2.5, 3, 4, 5, 6, 10, 15, 20</div>
+</div>
+</div></blockquote>
+<p>The first seven packets arrive at 1 ms intervals (the rate of the first filter) except for the packet that arrived at T=2.5 instead of T=2. The sender was allowed to send again at T=3 instead of waiting until T=3.5 because the bucket size in the first filter was 1.5 instead of 1.0. Here are the packet arrivals with the current size of each bucket <strong>at the time of packet arrival</strong>, just before the bucket is decremented. At T=2.0, the filter2 bucket would be 4.4.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="16%" />
+<col width="7%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">arrival:</th>
+<th class="head">T=0</th>
+<th class="head">T=1</th>
+<th class="head">T=2.5</th>
+<th class="head">T=3</th>
+<th class="head">T=4</th>
+<th class="head">T=5</th>
+<th class="head">T=6</th>
+<th class="head">T=10</th>
+<th class="head">T=15</th>
+<th class="head">T=20</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Filter 1:</td>
+<td>1.5</td>
+<td>1.5</td>
+<td>1.5</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>1.5</td>
+<td>1.5</td>
+<td>1.5</td>
+</tr>
+<tr class="row-odd"><td>Filter 2:</td>
+<td>6</td>
+<td>5.2</td>
+<td>4.5</td>
+<td>3.6</td>
+<td>2.8</td>
+<td>2</td>
+<td>1.2</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>1.0</td>
+</tr>
+</tbody>
+</table>
+<p id="index-23">If the packet arriving at T=2.5 had instead arrived at T=2, we would have the <strong>fastest compliant sequence</strong> for this pair of filters. This is the sequence generated by a token-bucket shaper when there is a steady backlog of packets and each is sent as soon as the bucket capacity (or capacities, when applicable) is full enough to allow sending.</p>
+</div>
+<div class="section" id="gcra">
+<h3>17.9.4&nbsp;&nbsp;&nbsp;GCRA<a class="headerlink" href="#gcra" title="Permalink to this headline">¶</a></h3>
+<p>Another formulation of the token-bucket specifications is the <strong>Generalized Cell Rate Algorithm</strong>, or GCRA; this formulation is frequently used in classification of ATM traffic. A GCRA specification takes two parameters, a mean packet spacing time T, and an early-arrival allowance 𝜏. For each packet we compute a <em>theoretical arrival time</em>, tat, initially zero. A packet may arrive earlier by amount at most 𝜏. Specifically, if t is the time of actual arrival, we have two cases:</p>
+<ol class="arabic simple">
+<li>t ≥ tat−𝜏: the packet is compliant, and we update tat to max(t,tat) + T</li>
+<li>t &lt; tat−𝜏: the packet is too early and is noncompliant; tat is unchanged.</li>
+</ol>
+<p>A flow satisfying GCRA(T,𝜏) is equivalent to a token-bucket specification with rate 1/T packets/unit time, and bucket size (𝜏+1)/T; tat represents the time the bucket would next be full. The time to fill an empty bucket is 𝜏+1; if the bucket becomes full at time tat then, working backwards, it would contain enough to send one packet at time tat−𝜏.</p>
+<p>For traffic flows with a more-or-less constant rate, 𝜏 represents the time by which one packet can be late without permanently falling behind its regular 1/T rate. The GCRA formulation is sometimes more convenient than the token-bucket formulation, particularly when 𝜏&lt;T.</p>
+</div>
+</div>
+<div class="section" id="applications-of-token-bucket">
+<span id="index-24"></span><span id="id20"></span><h2>17.10&nbsp;&nbsp;&nbsp;Applications of Token Bucket<a class="headerlink" href="#applications-of-token-bucket" title="Permalink to this headline">¶</a></h2>
+<p>Unlike fair queuing, token-bucket filtering can be implemented at the downstream end of a link, though possibly with results not quite in agreement with expectations. Let us return to the final scenario of <a class="reference internal" href="queuing.html#fair-queuing-applications"><em>17.6&nbsp;&nbsp;&nbsp;Applications of Fair Queuing</em></a>:</p>
+<img alt="_images/3receivers.png" src="_images/3receivers.png" />
+<p>While fair queuing cannot be applied at R to enforce equal shares to A, B and C, we <em>can</em> implement a token-bucket filter at R that limits each of A, B and C to 2 Mbps.</p>
+<p>There are two drawbacks. First, the filter is not work-conserving: if A is idle, B and C will still only receive 2 Mbps. Second, in the absence of feedback there is no guarantee that limiting the traffic at R will eventually result in reduced utilization of the ISP⟶R link. While this is true for TCP traffic, due to the self-clocking property, it is conceivable that a sender D somewhere is trying to send 8 Mbps of real-time UDP traffic to A, via ISP and R. Three-quarters of the traffic would then fail to be compliant, and might be dropped by R, but unless D gets feedback from A that not much of the traffic is getting through, and that it should reduce its sending rate, the token-bucket filter at R will not achieve what we want. Most protocols <em>do</em> provide this kind of feedback, but not all.</p>
+<div class="section" id="guaranteeing-voip-bandwidth">
+<span id="voip-bandwidth"></span><span id="index-25"></span><h3>17.10.1&nbsp;&nbsp;&nbsp;Guaranteeing VoIP Bandwidth<a class="headerlink" href="#guaranteeing-voip-bandwidth" title="Permalink to this headline">¶</a></h3>
+<p>As a particular instance of the previous situation, suppose we have an Internet connection from our ISP and want to begin using VoIP for telephony. We would like to reserve something like 64 Kbps of bandwidth for VoIP (plus room for headers), so that large downloads do not degrade voice quality. We can easily do this for the upstream direction, either with fair or priority queuing;  priority queuing is an option here as the total VoIP traffic is limited by the number of lines.</p>
+<p>However, the downstream direction may be more of a problem, if we are unable to enlist the ISP to apply fair queuing at the upstream end. As we argued in <a class="reference internal" href="queuing.html#fair-queuing-applications"><em>17.6&nbsp;&nbsp;&nbsp;Applications of Fair Queuing</em></a>, fair queuing at the downstream end has no effect.</p>
+<p><strong>Token-bucket</strong> at the downstream end might be an option. If we knew that the total link bandwidth was 500 bits/ms we might reserve 100 bits/ms, say, for VoIP traffic by limiting further delivery of non-VoIP traffic to 400 bits/ms. This is indeed sometimes done. Unfortunately, we encounter three problems. The first is that if no VoIP traffic is flowing then we probably do not want the 400 bits/ms cap on other traffic; we might arrange this by applying the cap only when the phone is in use, or by setting aside a small enough bandwidth fraction that it does not have a material affect on overall bulk bandwidth. The second problem is the (remote) possibility discussed in the previous example that the sender might keep sending anyway, at 500 bits/ms; our downstream router can throw away as many bits as it wants but the link itself will still be saturated. Finally, it is often quite difficult to determine exactly what the bandwidth of a particular Internet connection <em>is</em>. Especially if, as is often the case, it is shared, or configured to change with time, or subject to time-varying caps by the ISP.</p>
+<p>If the competing downstream traffic is TCP, we theoretically could reduce the rate of upstream ACKs until the downstream VoIP traffic no longer encounters excessive losses, but that is largely hypothetical and likely to respond slowly.</p>
+<p>Fortunately, typical VoIP bandwidth needs are low enough that one can often muddle through without providing any quality-of-service guarantees at all. This remains, however, a good example of the difficulties often faced by real-time traffic.</p>
+</div>
+</div>
+<div class="section" id="token-bucket-queue-utilization">
+<span id="index-26"></span><span id="id21"></span><h2>17.11&nbsp;&nbsp;&nbsp;Token Bucket Queue Utilization<a class="headerlink" href="#token-bucket-queue-utilization" title="Permalink to this headline">¶</a></h2>
+<p>Suppose traffic meeting token-bucket specification TB(r,B<sub>max</sub>) arrives at a router R, with no competition from other traffic. The bucket fill rate r corresponds to the minimum outbound link bandwidth needed by R to guarantee that the traffic does not build up; we do not want traffic on average arriving faster than it can depart.</p>
+<p>Intuitively, the bucket size B<sub>max</sub> corresponds to the amount of <strong>queue space</strong> at R that the flow can consume. To make this more precise, we will argue that, if the output rate from R is at least r, then the number of untransmitted bits stored at R is never more than B<sub>max</sub>.</p>
+<p>To show this more formally, we start by proving the &#8220;red line lemma&#8221; implicit in the discussion of the graph in <a class="reference internal" href="queuing.html#token-bucket-definition"><em>17.9.1&nbsp;&nbsp;&nbsp;Token Bucket Definition</em></a> above, that the sender can never cross the red line. Specifically, assume the flow satisfies TB(r,B<sub>max</sub>) and has a full bucket at time t=0. Let bits(t) be the cumulative number of bits sent (packetized or not) by time t. The blue line is the graph bits = rt and the red line is the graph bits = rt + B<sub>max</sub>; we show the following:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">bits(t) &lt;= rt + B<sub>max</sub></div>
+</div>
+</div></blockquote>
+<p>We first prove this so long as the graph is above the blue line; that is, bits(t) &gt;= rt.
+We claim that the right-hand side minus the left-hand side above, rt + B<sub>max</sub> - bits(t), represents the volume B(t) of fluid (or tokens) in the bucket. Equating and rearranging slightly, we need to show B(t) + bits(t) - rt is always equal to B<sub>max</sub>. This is true at t=0 when bits(t) = rt = 0 and the bucket is full. We next establish that its rate of change is also 0, and so it is constant.</p>
+<p>While the bucket is not full, B(t) is always being filled at rate r. Correspondingly, rt is increasing at rate r, so B(t) - rt is not affected by the fill rate. Similarly, B(t) is being reduced at exactly the rate bits(t) is increasing. If we use the packet formulation, then when a packet arrives B(t) is reduced by the packet size and bits(t) increases by exactly the same amount.</p>
+<div class="sidebar">
+<p class="first sidebar-title">The Calculus Version</p>
+<p class="last">For readers familiar with calculus it may help to note dB(t)/dt = r - bits&#8217;(t), at least if we assume, say, a fluid bit-arrival model where bits(t) is differentiable. That is, the bucket volume B(t) increases at rate r and also decreases at a rate equal to that of arriving data. Therefore, the rate of change of B(t) + bits(t) - rt is just r - bits&#8217;(t) + bits&#8217;(t) - r = 0.</p>
+</div>
+<p>This does not quite apply when bits(t) falls below the blue line. However, we have nothing to prove then. If bits(t) has a later interval above the blue line, starting at time t<sub>1</sub>, we can reapply the argument above re-starting the clock and the bits counter at t=t<sub>1</sub>.</p>
+<p>In fact, we can argue that whenever the bits(t) graph passes through a point below the blue line, such as point A in the diagram above, then bits(t) cannot in the future climb above the new red line (the dashed red line in the diagram) B<sub>max</sub> units above point A.</p>
+<div class="section" id="token-bucket-through-one-router">
+<span id="id22"></span><h3>17.11.1&nbsp;&nbsp;&nbsp;Token Bucket Through One Router<a class="headerlink" href="#token-bucket-through-one-router" title="Permalink to this headline">¶</a></h3>
+<p>We now return to the claim about accumulation at a router R with outbound flow at least r; as before, let bits(t) represent the cumulative amount of data received. As long as bits(t) is above the blue line, the router can continuously transmit at rate r and the net number of bits held within the router is bits(r) - rt. By the argument above, this is bounded by B<sub>max</sub>. If bits(t) falls below the blue line, the router&#8217;s queue is empty and the router can transmit incoming data at least as fast as it is arriving.</p>
+<p>While R can never be holding more than B<sub>max</sub> bytes, at the instant just before a packet finishes transmission it can have B<sub>max</sub> bytes in the queue, plus the currently transmitting packet still taking up an entire buffer. As a practical matter, then, we may need space equal to B<sub>max</sub> plus one packet.</p>
+<p>While a token-bucket specification does not include a delay bound specifically, we can compute an upper bound to the queuing delay at a router R as B<sub>max</sub>/r; this is the time it takes for one full bucket&#8217;s worth of packets to be transmitted.</p>
+<p>If we have N flows each individually satisfying TB(r,B), then the collective traffic will satisfy TB(Nr, NB) (see exercise 12). However, a bucket size of NB will be needed only when all N individual flows have their bursts &#8220;gang up&#8221; at a particular instant. Often it is possible to take advantage of theoretical or empirical statistical information and conclude that the collective traffic &#8220;most of the time&#8221; meets a token-bucket specification TB(Nr, B<sub>N</sub>) for B<sub>N</sub> significantly less than NB.</p>
+</div>
+<div class="section" id="token-bucket-through-multiple-routers">
+<span id="id23"></span><h3>17.11.2&nbsp;&nbsp;&nbsp;Token Bucket Through Multiple Routers<a class="headerlink" href="#token-bucket-through-multiple-routers" title="Permalink to this headline">¶</a></h3>
+<p>If we have a single TB(r,B<sub>max</sub>) flow through N routers, however, the queuing delay is <em>not</em> larger than for a single router, again assuming no competition. More specifically, assume that the traffic flow arrives at router R<sub>1</sub> satisfying TB(r,B), and passes in turn through R<sub>1</sub> to R<sub>N</sub>. Each router R<sub>i</sub> has an outbound bandwidth at least as large as r. Then the total queuing delay through all N routers remains B<sub>max</sub>/r. If the packets pile up to the maximum size B<sub>max</sub>, they only do so once.</p>
+<p>To prove this we compare the TB sequence of packets with the same sequence of packets sent at a steady rate r through the same series of routers. If the last bit of packet k is the Nth bit since we began, then for the steady stream we send packet k at time N/r. We assume the link rates are all reduced to r.</p>
+<p>Let t=0 represent the time we start counting bits. For every n, we established above that the nth bit of the TB packet flow can be transmitted at most B<sub>max</sub>/r seconds ahead of the nth steady-stream bit, which is sent at time n/r. The steady-stream packets do not encounter queuing delays at all, as each router has always finished the previous one. The TB packets can each arrive no later than the steady-stream packets, as they were sent earlier and they cannot cross. Therefore, the maximum delay faced by any TB packet is B<sub>max</sub>/r, exactly as for traffic through a single router.</p>
+</div>
+<div class="section" id="delay-constraints">
+<span id="index-27"></span><span id="id24"></span><h3>17.11.3&nbsp;&nbsp;&nbsp;Delay Constraints<a class="headerlink" href="#delay-constraints" title="Permalink to this headline">¶</a></h3>
+<p>If a traffic flow arriving at a router R is compliant for token-bucket specification TB(r,B), then as we showed above the amount of R&#8217;s queue space used by the flow will be bounded by B so long as R can devote at least rate r to the flow&#8217;s traffic.</p>
+<p>Now let us add a <strong>real-time delay constraint</strong>: suppose that R is not to be allowed to delay any of the flow&#8217;s packets by more than time D. For the time being, assume that there is no other traffic at R. We now need to make sure that R has sufficient bandwidth to forward a bucketful of size B within the time interval D.  To send a burst of size B in time D, bandwidth B/D is needed. Therefore, to satisfy the real-time constraint, R needs outbound bandwidth</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">s = max(r, B/D)</div>
+</div>
+</div></blockquote>
+<p><strong>Example 1</strong>: suppose the traffic specification is TB(1/3, 10), where the rate is in (equal-sized) packets/µsec, and D is 40 µsec. Then B/D is 1/4 packets/µsec, and the necessary outbound bandwidth s is simply r=1/3.</p>
+<p><strong>Example 2</strong>: now suppose in the previous example that the delay limit D is 20 µsec. In this case, we need s = B/D = 1/2 packets/µsec.</p>
+<p>If there <em>is</em> other traffic, the delay constraint still holds, provided s represents the bandwidth allocated by R to the flow, and the flow&#8217;s packets receive priority service at R, and we first subtract the largest-packet delay as in <a class="reference internal" href="packets.html#realtime-packet-size"><em>5.3.2&nbsp;&nbsp;&nbsp;Packet Size and Real-Time Traffic</em></a>.</p>
+<p>Calculations of this sort often play a role in a router&#8217;s decision on whether to accept a <strong>reservation</strong> for an additional TB(r,B) flow with associated delay constraint.</p>
+</div>
+</div>
+<div class="section" id="hierarchical-token-bucket">
+<span id="index-28"></span><span id="id25"></span><h2>17.12&nbsp;&nbsp;&nbsp;Hierarchical Token Bucket<a class="headerlink" href="#hierarchical-token-bucket" title="Permalink to this headline">¶</a></h2>
+<p>Token-bucket filters can also be used to form a hierarchy, as in <a class="reference internal" href="queuing.html#generic-hierarchical-queuing"><em>17.7.1&nbsp;&nbsp;&nbsp;Generic Hierarchical Queuing</em></a>. In this section we will assume that token bucket is used only for shaping; that is, delaying packets until the bucket has sufficiently filled. As usual, packets will remain in the leaf FIFO queues until they are ready to be transmitted.</p>
+<p>Central to the hierarchy is the conceptual time each internal token-bucket node <strong>releases</strong> its next packet; that is, becomes able to inform its parent node (when asked) that it has a packet ready to send, even if the packet physically remains waiting in one of the leaf queues. If a node N is informed by a child node that a packet has been released and N&#8217;s bucket has sufficient capacity, then N releases the packet in turn to its parent immediately; otherwise N waits until its bucket fills sufficiently to make the packet compliant. When a packet arrives at a leaf node, it will be progressively released by each node along the path to the root; when it is released by the root node it can be sent.</p>
+<p>To make token-bucket filters classful, we will assume that each node may have multiple input subqueues, but treats these as if they were consolidated into a single FIFO subqueue. That is, the node releases packets to its parent in the order they were released to the node by its children.</p>
+<p>Leaf nodes can mark each packet with its release time at the moment of arrival. Interior nodes may only be able to determine their release times for packets that have been released by their child nodes.</p>
+<p>It is now straightforward to define the <tt class="docutils literal"><span class="pre">peek()</span></tt> operation of <a class="reference internal" href="queuing.html#generic-hierarchical-queuing"><em>17.7.1&nbsp;&nbsp;&nbsp;Generic Hierarchical Queuing</em></a>: a node looks at the set of packets it has released and returns the one with the earliest release time.</p>
+<p>In a token-bucket hierarchy it makes a sense to say that two child flows have bucket sizes of 200 and 300, respectively, while the combined flow is to be limited to a bucket size of 400.</p>
+<p>The following diagram illustrates an example of a token-bucket hierarchy. The three token-bucket filters TB1, TB2 and TB3 have rates in packets/ms and bucket sizes in packets.</p>
+<img alt="_images/hierarchical_tokenbucket.png" src="_images/hierarchical_tokenbucket.png" />
+<p>If TB1&#8217;s rate is, as here, less than the sum of its child rates, then as long as its children always have packets ready to send, the children will receive bandwidth in proportion to their token bucket rates. In the example above, TB1&#8217;s rate is 4 packets/ms and yet the sum of the rates of its children is 5 packets/ms. Each child will therefore receive 4/5 its promised rate: TB2 will send at a rate of 2×(4/5) packets/ms while TB3 will send at rate of 3×(4/5) packets/ms.</p>
+<p>To see this, assume FIFO2 and FIFO3 remain nonempty for a period long enough for their buckets to empty. TB2 and TB3 will then each release packets to TB1 at their respective rates of 2 packets/ms and 3 packets/ms. In the following sequence of release times to TB1, we assume TB3 starts at T=0 and TB2 at T=0.01, to avoid ties. Packets from A released by TB2 are shown in italic:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">0, <em>0.01</em>, .33, <em>0.51</em>, .67, 1.0, <em>1.01</em>, 1.33, <em>1.51</em>, 1.67, 2.0, <em>2.01</em></div>
+</div>
+</div></blockquote>
+<p>They will be dequeued by TB1 at 4 packets/ms, once TB1&#8217;s bucket is empty. In the long run, TB3 has released three packets into this sequence for every two of TB2&#8217;s, so sender B will receive 3/5 of the dequeuings, and thus 3/5 of the 4 packet/ms root bandwidth.</p>
+<p>We can also have each token-bucket node physically forward released packets to FIFO queues attached to each parent node; we called this an internal-storage hierarchy in <a class="reference internal" href="queuing.html#hierarchical-queuing"><em>17.7&nbsp;&nbsp;&nbsp;Hierarchical Queuing</em></a>. In this particular case, the leaf-storage and internal-storage mechanisms function identically, provided the internal links are infinitely fast and the internal queues infinitely large. See exercise 18.</p>
+<p>There is no point in having a node with a bucket larger than the sum of its child buckets and also a rate larger than the sum of its child rates. In the example above, in which the sum of the child rates exceeds the parent rates, A would be able to send at a sustained rate of 2 packets/ms provided B sends at only 2 packets/ms as well; reducing the child rates to 2×(4/5) and 3×(4/5) packets/ms respectively is not equivalent. If a node&#8217;s rate is larger than the sum of the child rates, then it will be able to handle the child traffic without delay once the child buckets have emptied. Before that, though, the parent bucket may be the limiting factor.</p>
+</div>
+<div class="section" id="fair-queuing-token-bucket-combinations">
+<h2>17.13&nbsp;&nbsp;&nbsp;Fair Queuing / Token Bucket combinations<a class="headerlink" href="#fair-queuing-token-bucket-combinations" title="Permalink to this headline">¶</a></h2>
+<p>At first glance, combining fair queuing with token bucket might seem improbable: the goal of fair queuing is to be <em>work-conserving</em>, allowing the bandwidth assigned to an idle input class to be divided among the active input classes, and the goal of token bucket is generally to limit a class to its token-bucket-defined maximum transmission rate. The usual approach to a hierarchy-based synthesis is to allow the administrator to decide, at each node of the hierarchy, whether or not the node can &#8220;borrow&#8221; (without repayment) bandwidth from inactive siblings. If it can, the set of siblings with mutual borrowing privileges resembles a fair-queuing scheduler; if not, the node is more like a token-bucket scheduler.</p>
+<div class="section" id="cbq">
+<h3>17.13.1&nbsp;&nbsp;&nbsp;CBQ<a class="headerlink" href="#cbq" title="Permalink to this headline">¶</a></h3>
+<p>CBQ was introduced in <a class="reference internal" href="bibliography.html#cj91" id="id26">[CJ91]</a> and analyzed in <a class="reference internal" href="bibliography.html#fj95" id="id27">[FJ95]</a>. It did not actually use the token-bucket mechanism, but instead implemented shaping by keeping track of the average idle time (more precisely, non-transmitting time) for a given input class. Input classes that tried to send too much were restricted, unless the node was permitted to &#8220;borrow&#8221; bandwidth from a sibling. When an input class sent less than it was allowed, its average utilization would fall; if a burst arrived then it would take some time for the average to &#8220;catch up&#8221; and thus the node could briefly send faster than its assigned rate. However, the size of the &#8220;bucket&#8221; could be controlled only indirectly.</p>
+</div>
+<div class="section" id="linux-htb">
+<span id="index-29"></span><h3>17.13.2&nbsp;&nbsp;&nbsp;Linux htb<a class="headerlink" href="#linux-htb" title="Permalink to this headline">¶</a></h3>
+<p>The linux <strong>htb</strong> queuing discipline allows the same general functionality of CBQ, but replaces the average-idle calculations with token-bucket filters. This permits more direct control of burst sizes, and also avoided some technical timing issues that CBQ users had to watch out for.
+For efficiency, htb uses the quantum algorithm for fair queuing; as noted in <a class="reference internal" href="queuing.html#quantum-algorithm"><em>17.5.5&nbsp;&nbsp;&nbsp;The Quantum Algorithm</em></a>, this means less precise control over packet delay.</p>
+<p>It is common to arrange for htb to apply token-bucket shaping only at the leaf nodes, and to configure the interior nodes do fair queuing only.</p>
+<p>Each node in the tree has the following attributes:</p>
+<ul class="simple">
+<li>its guaranteed rate, r, corresponding to the token-bucket rate</li>
+<li>its burst allowance B, corresponding to the bucket size</li>
+<li>its ceiling rate r<sub>ceil</sub>; nodes never send faster than this</li>
+</ul>
+<p>In many cases r<sub>ceil</sub> may simply be the output rate of the root node.</p>
+<p>The most important attribute of each node is its guaranteed rate. If inner nodes are not doing token-bucket shaping then the rate at each node should be at least as large as the sum of the child rates; in the following diagram, all rates are in Kbps. Burst allowances are not shown. We will assume the root guaranteed rate, 600 Kbps, is also its ceiling rate.</p>
+<img alt="_images/linux_htb.png" src="_images/linux_htb.png" />
+<p>Packets are marked <strong>green</strong>, <strong>yellow</strong> or <strong>red</strong> depending on their situation. Red packets are those that must wait; eventually they will turn yellow and then green.</p>
+<p>Packets are considered <strong>green</strong> if they are now compliant (perhaps after waiting earlier) for one of the leaf token-bucket nodes; green packets are sent as soon as possible. If the parent-node rate is at least as large as the sum of the child-node rates, the parent node will not be a bottleneck.</p>
+<p>After L1, L2 and L3 have each emptied their buckets, they will not exhaust N&#8217;s rate. Similarly, after N and M have emptied their buckets they will use only half of R&#8217;s rate. Packets are allowed to &#8220;borrow&#8221; &#8211; without payback &#8211; from their parent&#8217;s rates; such packets are marked <strong>yellow</strong>, and may also be sent immediately if no green packets are waiting. Borrowing is always in proportion to a node&#8217;s guaranteed rate, in the manner of fair queuing. That is, the guaranteed rates of the child nodes are treated as unnormalized fair-queuing weights; normalized weight fractions are obtained by dividing by their total. N above would have normalized weight fraction 200/(200+100) = 2/3.</p>
+<p>If L1, L2 and L3 engage in borrowing from N, and each has traffic to send, then each gets a total bandwidth of 50, 50 and 100 Kbps, respectively. If L3 is idle, then L1 and L2 each would get 100 Kbps. If N and M borrow in turn from R, they each can send at 400 and 200 Kbps respectively, in which case L1, L2 and L3 (again assuming all are active) get 100, 100 and 200 Kbps. If M elects not do do any borrowing, because it has nothing to send, then N will get 600 Kbps and L1, L2 and L3 will get 150, 150 and 300.</p>
+<p>If fair-queuing behavior is not desired, we can set r<sub>ceil</sub> = r so that a node can never send faster than its guaranteed rate. This allows htb to model the token-bucket-only hierarchy of <a class="reference internal" href="queuing.html#hierarchical-token-bucket"><em>17.12&nbsp;&nbsp;&nbsp;Hierarchical Token Bucket</em></a>.</p>
+</div>
+<div class="section" id="parekh-gallager-theorem">
+<span id="index-30"></span><span id="id28"></span><h3>17.13.3&nbsp;&nbsp;&nbsp;Parekh-Gallager Theorem<a class="headerlink" href="#parekh-gallager-theorem" title="Permalink to this headline">¶</a></h3>
+<p>As a final example relating token-bucket specifications and fair queuing, we present the Parekh-Gallager Theorem, which provides a precise queuing-delay bound on traffic that enters a network meeting a token-bucket specification TB(r,B) and which has a guaranteed weighted-fair-queuing fraction through each router along the path.</p>
+<p>Specifically, let us assume that the traffic travels from sender A to destination B through N routers R<sub>1</sub> ... R<sub>N</sub>. The output rate of the ith router R<sub>i</sub> is r<sub>i</sub>, of which our flow is guaranteed rate f<sub>i</sub>≤r<sub>i</sub>. Let f = min {f<sub>i</sub>|i&lt;N}. Suppose the maximum packet size for packets in our flow is S, and the maximum packet size including competing traffic is S<sub>max</sub>. Then the total delay encountered by the flow&#8217;s packets is bounded by the sum of the following:</p>
+<ol class="arabic simple">
+<li>propagation delay (total single-bit delay along all N+1 links)</li>
+<li>B/f</li>
+<li>The sum from 1 to N of S/f<sub>i</sub></li>
+<li>The sum from 1 to N of S<sub>max</sub>/r<sub>i</sub></li>
+</ol>
+<p>The second term B/f represents the queuing delay introduced by a single burst of size B; we showed in <a class="reference internal" href="queuing.html#token-bucket-through-multiple-routers"><em>17.11.2&nbsp;&nbsp;&nbsp;Token Bucket Through Multiple Routers</em></a> that this delay bound applied regardless of the number of routers.</p>
+<p>The third term represents the total store-and-forward delay at each router for packets belonging to our flow under GPS; the delay at R<sub>i</sub> is S/f<sub>i</sub>.</p>
+<p>The final term represents the degree to which fair-queuing may delay a packet beyond the theoretical GPS time expressed in the third term. If the routers were to use GPS, then the first three terms above would bound the packet delay; we established in <a class="reference internal" href="queuing.html#finishing-order-bound"><em>17.5.4.7&nbsp;&nbsp;&nbsp;Finishing-Order Bound</em></a> that router R<sub>i</sub> may introduce an additional delay above and beyond the GPS delay of at most S<sub>max</sub>/r<sub>i</sub>.</p>
+</div>
+</div>
+<div class="section" id="epilog">
+<h2>17.14&nbsp;&nbsp;&nbsp;Epilog<a class="headerlink" href="#epilog" title="Permalink to this headline">¶</a></h2>
+<p>If we want to use 100% the outbound bandwidth, but divide it among several senders according to a predetermined ratio, fair queuing is the tool to use. If we want to impose an absolute rather than a relative cap on traffic, token bucket is appropriate.</p>
+<p>Fair queuing has applications to the routing of ordinary packets; for example, if routers implement fair queuing on a per-connection basis, then TCP senders will have no incentive to maximize queue utilization and TCP Reno will lose its competitive advantage.</p>
+<p>It is for real-time traffic, however, that queuing disciplines such as fair queuing, token bucket and even priority queuing come into their own as fundamental building blocks. These tools allow us to guarantee a bandwidth fraction to VoIP traffic, or to allow such traffic to be sent with minimal delay. In the next chapter <a class="reference internal" href="realtime.html#quality-of-service"><em>18&nbsp;&nbsp;&nbsp;Quality of Service</em></a> we will encounter fair queuing and token-bucket specifications repeatedly.</p>
+</div>
+<div class="section" id="exercises">
+<h2>17.15&nbsp;&nbsp;&nbsp;Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<p>1. Suppose a router uses fair queuing with three input classes, and uses the quantum algorithm of <a class="reference internal" href="queuing.html#different-packet-sizes"><em>17.5.2&nbsp;&nbsp;&nbsp;Different Packet Sizes</em></a>. The first class sends packets of size 900 bytes, the second sends packets of 400 bytes, and the third sends packets of 200 bytes. List what would be sent by each flow in each of the first five rounds.</p>
+<p>2. Suppose we attempt to simulate BBRR as follows with the following strategy we will call SBBRR. Each subqueue has a bit-position marker that advances by one bit for each bit we have available to send from that queue. If three queues are active, then in the time it takes us to send three bits, each marker would advance by one bit. When all the bits of a packet have been ticked through, the packet is sent.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">(a). Explain why this is not the same as BBRR fair queuing (even with equal-sized packets).</div>
+<div class="line">(b). Is it the same as BBRR if all input queues are active?</div>
+</div>
+</div></blockquote>
+<p>3. Suppose we modify the SBBRR strategy of the previous exercise so that, if the output link is ever idle, and no packet has yet had all its bits ticked through by the bit-position marker, then we immediately send the packet with the fewest bits remaining to be ticked through by the bit-position marker.</p>
+<p>Suppose packets P1 of size 1000 and P2 of size 100 arrive on subqueue 1. Just after P1 begins transmission, packet Q1 of size 400 arrives on subqueue 2. Fair queuing should send the packets in the order P1, Q1, P2; show that the mechanism described here does not do that.</p>
+<p>4. Suppose we attempt to implement fair queuing by calculating the finishing time F<sub>j</sub> for P<sub>j</sub>, the jth packet in subqueue i, as follows.</p>
+<blockquote>
+<div><ul class="simple">
+<li>Start<sub>j+1</sub> = max(F<sub>j</sub>, now)         (&#8220;now&#8221; by wallclock time)</li>
+<li>F<sub>j</sub> = Start<sub>j</sub> + N×L<sub>j</sub></li>
+</ul>
+</div></blockquote>
+<p>where N is the total number of subqueues, active or not.</p>
+<div class="line-block">
+<div class="line">(a). Suppose a router has three subqueues; <em>ie</em> N=3. The outbound bandwidth is 1 size unit / 1 time unit. At T=0, packets P1, P2, P3, P4 and P5 arrive for subqueue 1, each of size 1 unit.  At T=2 (by which point P1 and P2 will have finished transmission), packets Q1 and Q2 arrive on subqueue 2, also of size 1. What finishing times will all the packets be assigned? In what order will they be transmitted?</div>
+<div class="line">(b). Is this strategy approximately equivalent to fair queuing if we are given that all subqueues of the router are always active?</div>
+</div>
+<p>5. Suppose we modify the strategy of the previous exercise by letting N be the number of active subqueues at the time of arrival of packet P<sub>j</sub>. What happens if we have three input subqueues, and at T=0 five packets arrive for subqueue 1, and at T=1 five packets arrive for subqueue 2. Assume all ten packets are of size 1, and the output bandwidth is again 1 size unit per time unit.</p>
+<p>6. The following packets all arrive at time T=0 at a router with an output rate of one size unit per time unit.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">Subqueue 1: P1 of size 100, P2 of size 500, P3 of size 400</div>
+<div class="line">Subqueue 2: Q1 of size 300, Q2 of size 200, Q3 of size 600</div>
+<div class="line">Subqueue 3: R1 of size 400, R2 of size</div>
+</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line">(a). Find the BBRR virtual finishing time of each packet</div>
+<div class="line">(b). Give the actual wallclock finishing time of each packet, if the packets were sent via BBRR</div>
+</div>
+<p id="index-31">7. Calculate GPS finishing times for the following packets, all present at T=0. There are two subqueues, and their bandwidth fractions are 𝛼 and 𝛽 where 𝛼 = (√5-1)/2 ≃ 0.618 and 𝛽 = 𝛼<sup>2</sup> = 1-𝛼. The packet sizes for the two subqueues are as follows (they follow the Fibonacci sequence, except 2 appears twice):</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">𝛼: 2, 3, 8, 21, 55, 144, 377, 987</div>
+<div class="line">𝛽: 1, 2, 5, 13, 34, &nbsp;&nbsp;89, 233, 610</div>
+</div>
+</div></blockquote>
+<p>Hint: you will have to evaluate 𝛼 to more decimal places than is shown here.</p>
+<p>8. Suppose a WFQ router has two subqueues, each with a bandwidth fraction of 𝛼=50%. The router transmits 1 byte per ms. Initially, the subqueues are empty and T=0 and the GPS virtual clock is 0. At that moment a packet P1 of size 1000 bytes arrives at the first subqueue. At T=500, a similarly sized packet P2 arrives at the second subqueue. Give, for each of P1 and P2,</p>
+<div class="line-block">
+<div class="line">(a). Its finishing time under the GPS virtual clock</div>
+<div class="line">(b). Its wallclock finishing time</div>
+<div class="line">(c). The value of the GPS virtual clock at the moment of WFQ finishing.</div>
+</div>
+<p>9. Suppose a router has three subqueues, and an outbound bandwidth of 1 packet per unit time. Twelve packets arrive at or after T=0, timed so that the router remains busy until finishing the packets at T=12.</p>
+<div class="line-block">
+<div class="line">(a). What packet arrival schedule leads to the minimum final BBRR clock value?</div>
+<div class="line">(b). What schedule leads to the maximum final BBRR clock value?</div>
+</div>
+<p>Hint: the rate of the BBRR clock depends only on the number of active subqueues.</p>
+<p>10. Suppose packets from three subqueues are sent using the quantum algorithm of <a class="reference internal" href="queuing.html#quantum-algorithm"><em>17.5.5&nbsp;&nbsp;&nbsp;The Quantum Algorithm</em></a>. The packets are listed below in order of arrival for each subqueue, along with their lengths L; the packets are all available at time T=0. The quantum is 1000 bytes.  Give the order of transmission.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Subqueue 1</th>
+<th class="head">Subqueue 2</th>
+<th class="head">Subqueue 3</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>P1, L=700</td>
+<td>Q1, L=400</td>
+<td>R1, L=500</td>
+</tr>
+<tr class="row-odd"><td>P2, L=700</td>
+<td>Q2, L=500</td>
+<td>R2, L=600</td>
+</tr>
+<tr class="row-even"><td>P3, L=700</td>
+<td>Q3, L=1000</td>
+<td>R3, L=200</td>
+</tr>
+<tr class="row-odd"><td>P4, L=700</td>
+<td>Q4, L=200</td>
+<td>R4, L=900</td>
+</tr>
+</tbody>
+</table>
+<p>11. At Disneyland, patrons often wait in a queue that winds slowly through one large waiting room, only to feed into another queue in another room. Is this an example of hierarchical queuing, <em>eg</em> of one FIFO queue feeding another, without classes?</p>
+<p>12. If two traffic streams meet token-bucket specifications of TB(r1,b1) and TB(r2,b2) respectively, show their commingled traffic must meet TB(r1+r2,b1+b2). Hint: imagine a common bucket of size b1+b2, filled at rate r1 with red tokens and at rate r2 with blue tokens.</p>
+<p>13. For each sequence of arrival times, indicate which packets are compliant for the given token-bucket specification. If a packet is noncompliant, go on to the next arrival without decrementing the bucket.</p>
+<div class="line-block">
+<div class="line">(a). TB(1/4,5):  0, 0, 0, 2, 3, 4, 5, 7, 9, 11, 15, 18</div>
+<div class="line">(b). TB(1/3,6):  0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9</div>
+<div class="line">(c). TB(1/3,6):  0, 2, 4, 6, 8, 10, 12, 14, 16, 18</div>
+</div>
+<p>14. Find the fastest sequence (see the end of <a class="reference internal" href="queuing.html#multiple-token-bucket"><em>17.9.3&nbsp;&nbsp;&nbsp;Multiple Token Buckets</em></a>) for the following flows. Both start at T=0, and all buckets are initially full.</p>
+<div class="line-block">
+<div class="line">(a). TB(1/4, 4); packets can depart at a minimum of 1 time unit apart. Continue the sequence to at least T=10</div>
+<div class="line">(b). TB(1/2, 4) and TB(1/8, 8); multiple packets can depart at the same instant. Continue to at least T=25.</div>
+</div>
+<p>15. Give the fastest sequence of packets compliant for all three of the following token-bucket specifications. Continue the sequence at least until T=60.</p>
+<ul class="simple">
+<li>TB(1/2, 1)</li>
+<li>TB(1/6, 4)</li>
+<li>TB(1/12, 8)</li>
+</ul>
+<p>Hint: the first specification means arrival times must always be separated by at least 2. The middle specification should kick in by T=12.</p>
+<p>16. Show that if a GPS traffic flow satisfies a token-bucket specification TB(r,B), then in any interval of time t<sub>1</sub>≤t≤t<sub>2</sub> the amount of traffic is at most B + r×(t<sub>2</sub>−t<sub>1</sub>). Hint: during the interval t<sub>1</sub>≤t≤t<sub>2</sub> the amount of fluid added to the bucket is exactly r×(t<sub>2</sub>−t<sub>1</sub>).</p>
+<p>17. Show that a generic hierarchy of FIFO queuing disciplines, described in <a class="reference internal" href="queuing.html#generic-hierarchical-queuing"><em>17.7.1&nbsp;&nbsp;&nbsp;Generic Hierarchical Queuing</em></a>, collapses to a single FIFO queue.</p>
+<p>18. Show that the token-bucket leaf-storage hierarchy of <a class="reference internal" href="queuing.html#hierarchical-token-bucket"><em>17.12&nbsp;&nbsp;&nbsp;Hierarchical Token Bucket</em></a> produces the same result as an &#8220;internal-storage&#8221; hierarchy in which each intermediate token-bucket node contained a real, infinite-capacity FIFO queue, and each node instantaneously transmitted each packet to the parent&#8217;s FIFO queue as soon as it was released. Show that packets are transmitted by each hierarchy at the same times. Hint: show that each node in the leaf-storage hierarchy &#8220;releases&#8221; a packet at the same time the corresponding internal-storage hierarchy forwards the packet upwards.</p>
+<p>19. The following linux htb hierarchies are labeled with their guaranteed rates. Is there any difference in terms of the bandwidth allocations that would be received by senders A and B?</p>
+<div class="highlight-python"><div class="highlight"><pre>   (a)                                 (b)
+    R                                   R
+   100                                 100
+  /   \                               /   \
+ /     \                             /     \
+L1     L2                           L1     L2
+60     40                           30     20
+|       |                           |       |
+A       B                           A       B
+</pre></div>
+</div>
+<p>20. Suppose we know that the real-time traffic through a given router R uses at most 1 Mbps of the total 10 Mbps bandwidth. Consider the following two ways of giving the real-time traffic special treatment:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">i. Using priority queuing, and giving the real-time traffic higher priority.</div>
+<div class="line">ii. Using weighted fair queuing, and giving the real-time traffic a 10% share</div>
+</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line">(a). Show that, if the real-time traffic meets a token-bucket specification with rate 1 Mbps and negligible bucket size, then the two mechanisms are equivalent, in the sense that if the real-time and non-real-time traffic flows are sending at fractions 𝛼 and 𝛽, respectively, of the 10 Mbps outbound rate, with 𝛼+𝛽=1 (and with 𝛼≤10%), then the two methods above will actually send at the same rates.</div>
+<div class="line">(b). What differences can be expected if the bucket size is <em>not</em> negligible? Which approach will favor the real-time fraction?</div>
+</div>
+<p>21. In the previous exercise, now suppose we have <em>two</em> separate real-time flows, each guaranteed by a token-bucket specification not to exceed 1 Mbps. Is there a material difference between any pair of the following?</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">i. Sending the two real-time flows at priority 1, and the remaining traffic at priority 2.</div>
+<div class="line">ii. Sending the first real-time flow at priority 1, the second at priority 2, and the remaining traffic at priority 3.</div>
+<div class="line">iii. Giving each real-time flow a WFQ share of 10%, and the rest a WFQ share of 80%</div>
+</div>
+</div></blockquote>
+<p>22. Suppose a router uses priority queuing. There is one low-priority and one high-priority input. The outbound bandwidth is r.</p>
+<div class="line-block">
+<div class="line">(a). If the high-priority queue is currently empty, what is the maximum time that an arriving high-priority packet must wait?</div>
+</div>
+<div class="line-block">
+<div class="line">(b). If the high-priority traffic follows a token-bucket description TB(rp,B), with rp &lt; r, what is the maximum time an arriving high-priority packet must wait? Hint: use <a class="reference internal" href="queuing.html#token-bucket-queue-utilization"><em>17.11&nbsp;&nbsp;&nbsp;Token Bucket Queue Utilization</em></a>.</div>
+</div>
+<p>Your answer may include symbolic representations of any necessary additional parameters.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="index.html">An Introduction to Computer Networks</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Peter L Dordal.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

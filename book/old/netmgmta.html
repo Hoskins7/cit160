@@ -1,0 +1,1260 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>24   Network Management and SNMP &#8212; An Introduction to Computer Networks, edition 1.9.12</title>
+    <link rel="stylesheet" href="_static/csbnetbook.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.9.12',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/mobile.js"></script>
+    <script type="text/javascript" src="_static/rightsidebar.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="25   Network Management and SNMP" href="netmgmtb.html" />
+    <link rel="prev" title="23   Quality of Service" href="realtime.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="netmgmtb.html" title="25   Network Management and SNMP"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="realtime.html" title="23   Quality of Service"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, edition 1.9.12</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">24&nbsp;&nbsp;&nbsp;Network Management and SNMP</a><ul>
+<li><a class="reference internal" href="#network-architecture">24.1&nbsp;&nbsp;&nbsp;Network Architecture</a></li>
+<li><a class="reference internal" href="#snmp-basics">24.2&nbsp;&nbsp;&nbsp;SNMP Basics</a><ul>
+<li><a class="reference internal" href="#snmp-versions">24.2.1&nbsp;&nbsp;&nbsp;SNMP versions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#snmp-naming-and-oids">24.3&nbsp;&nbsp;&nbsp;SNMP Naming and OIDs</a></li>
+<li><a class="reference internal" href="#mibs">24.4&nbsp;&nbsp;&nbsp;MIBs</a></li>
+<li><a class="reference internal" href="#snmpv1-data-types">24.5&nbsp;&nbsp;&nbsp;SNMPv1 Data Types</a></li>
+<li><a class="reference internal" href="#asn-1-syntax-and-snmp">24.6&nbsp;&nbsp;&nbsp;ASN.1 Syntax and SNMP</a></li>
+<li><a class="reference internal" href="#snmp-tables">24.7&nbsp;&nbsp;&nbsp;SNMP Tables</a></li>
+<li><a class="reference internal" href="#snmp-operations">24.8&nbsp;&nbsp;&nbsp;SNMP Operations</a><ul>
+<li><a class="reference internal" href="#multi-attribute-get">24.8.1&nbsp;&nbsp;&nbsp;Multi-attribute <code class="docutils literal"><span class="pre">Get()</span></code></a></li>
+<li><a class="reference internal" href="#set">24.8.2&nbsp;&nbsp;&nbsp;<code class="docutils literal"><span class="pre">Set()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#mib-browsing">24.9&nbsp;&nbsp;&nbsp;MIB Browsing</a></li>
+<li><a class="reference internal" href="#mib-2">24.10&nbsp;&nbsp;&nbsp;MIB-2</a><ul>
+<li><a class="reference internal" href="#the-system-group">24.10.1&nbsp;&nbsp;&nbsp;The system Group</a></li>
+<li><a class="reference internal" href="#table-definitions-and-the-interfaces-group">24.10.2&nbsp;&nbsp;&nbsp;Table definitions and the interfaces Group</a></li>
+<li><a class="reference internal" href="#the-ip-group">24.10.3&nbsp;&nbsp;&nbsp;The ip Group</a></li>
+<li><a class="reference internal" href="#the-icmp-group">24.10.4&nbsp;&nbsp;&nbsp;The icmp Group</a></li>
+<li><a class="reference internal" href="#the-tcp-group">24.10.5&nbsp;&nbsp;&nbsp;The tcp Group</a></li>
+<li><a class="reference internal" href="#the-udp-group">24.10.6&nbsp;&nbsp;&nbsp;The udp Group</a></li>
+<li><a class="reference internal" href="#the-snmp-group">24.10.7&nbsp;&nbsp;&nbsp;The snmp Group</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#snmpv1-communities-and-security">24.11&nbsp;&nbsp;&nbsp;SNMPv1 communities and security</a></li>
+<li><a class="reference internal" href="#snmp-and-asn-1-encoding">24.12&nbsp;&nbsp;&nbsp;SNMP and ASN.1 Encoding</a><ul>
+<li><a class="reference internal" href="#primitive-types">24.12.1&nbsp;&nbsp;&nbsp;Primitive Types</a></li>
+<li><a class="reference internal" href="#composite-types">24.12.2&nbsp;&nbsp;&nbsp;Composite Types</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#exercises">24.13&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="realtime.html"
+                        title="previous chapter">23&nbsp;&nbsp;&nbsp;Quality of Service</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="netmgmtb.html"
+                        title="next chapter">25&nbsp;&nbsp;&nbsp;Network Management and SNMP</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="network-management-and-snmp">
+<span id="netmgmta"></span><span id="fcaps"></span><h1>24&nbsp;&nbsp;&nbsp;Network Management and SNMP<a class="headerlink" href="#network-management-and-snmp" title="Permalink to this headline">¶</a></h1>
+<p>Network management, broadly construed, consists of all the administrative actions taken to keep a network running efficiently. This may include a number of non-technical considerations, <em>eg</em> staffing the help desk and negotiating contracts with vendors, but we will restrict attention exclusively to the technical aspects of network management.</p>
+<p id="index-0">The ISO and the International Telecommunications Union have defined a formal model for telecommunications and network management. The original model defined five areas of concern, and was sometimes known as FCAPS after the first letter of each area:</p>
+<ul class="simple">
+<li>fault</li>
+<li>configuration</li>
+<li>accounting</li>
+<li>performance</li>
+<li>security</li>
+</ul>
+<p>Most non-ISP organizations have little interest in network accounting (the A in FCAPS is often replaced with “administration” for that reason, but that is a rather vague category). Network security is arguably its own subject entirely. As for the others, we can identify some important subcategories:</p>
+<p><strong>fault</strong>:</p>
+<ul class="simple">
+<li><strong>device management</strong>: monitoring of all switches, routers, servers and other network hardware to make sure they are running properly.</li>
+<li><strong>server management</strong>: monitoring of the network’s application layer, that is, all network-based software services; these include login authentication, email, web servers, business applications and file servers.</li>
+<li><strong>link management</strong>: monitoring of long-haul links to ensure they are working.</li>
+</ul>
+<p><strong>configuration</strong>:</p>
+<ul class="simple">
+<li>network <strong>architecture</strong>: the overall design, including topology, switching vs routing and subnet layout.</li>
+<li><strong>configuration management</strong>: arranging for the consistent configuration of large numbers of network devices.</li>
+<li><strong>change management</strong>: how does a site roll out new changes, from new IP addresses to software updates and patches?</li>
+</ul>
+<p><strong>performance</strong>:</p>
+<ul class="simple">
+<li><strong>traffic management</strong>: using the techniques of <a class="reference internal" href="fairqueuing.html#queuing-alternatives"><span class="std std-ref">21&nbsp;&nbsp;&nbsp;Queuing and Scheduling</span></a> to allocate bandwidth shares (and perhaps bucket sizes) among varying internal or external clients or customers.</li>
+<li><strong>service-level management</strong>: making sure that agreed-upon service targets – <em>eg</em> bandwidth – are met (depending on the focus, this could also be placed in the fault category).</li>
+</ul>
+<p id="index-1">While all these aspects are important, technical network management narrowly construed often devolves to an emphasis on fault management and its companion, reliability management: making sure nothing goes wrong, and, when it does, fixing it promptly. It is through fault management that some network providers achieve the elusive availability goal of 99.999% uptime.</p>
+<div class="sidebar">
+<p class="first sidebar-title">SNMP <em>versus</em> Management</p>
+<p class="last">While SNMP is a very important <em>tool</em> for network management, it <em>is</em> just a tool. Network management is the process of making decisions to achieve the goals outlined above, subject to resource constraints. SNMP simply provides some input for those decisions.</p>
+</div>
+<p>By far the most common device-monitoring protocol, and the primary focus for this chapter, is the <strong>Simple Network Management Protocol</strong> or <strong>SNMP</strong> (<a class="reference internal" href="#snmp"><span class="std std-ref">24.2&nbsp;&nbsp;&nbsp;SNMP Basics</span></a>). This protocol allows a device to report information about its current operational state; for example, a switch or router may report the configuration of each interface and the total numbers of bytes and packets sent via each interface.</p>
+<p>In this chapter we describe the basics of SNMP, and, in particular, SNMP version 1. In the following chapter we describe version 2 and version 3; the latter is where reasonable security is finally implemented.</p>
+<p>Implicit in any device-monitoring strategy is initial device <strong>discovery</strong>: the process by which the monitor learns of new devices. The ping protocol (<a class="reference internal" href="ipv4companions.html#ping"><span class="std std-ref">10.4&nbsp;&nbsp;&nbsp;Internet Control Message Protocol</span></a>) is common here, though there are other options as well; for example, it is possible to probe sequential IPv4 addresses on the UDP port used for SNMP – usually 161. As was the case with router configuration (<a class="reference internal" href="routing.html#routing-update"><span class="std std-ref">13&nbsp;&nbsp;&nbsp;Routing-Update Algorithms</span></a>), manual entry is simply not a realistic alternative.</p>
+<div class="sidebar">
+<p class="first sidebar-title">SNMP and the Application Layer</p>
+<p class="last">SNMP can be studied entirely from a network-management perspective, but it also makes an excellent self-contained case study of the application layer. Like essentially all applications, SNMP defines rules for client and server roles and for the format of requests and responses. SNMP also contains its own authentication mechanisms (<a class="reference internal" href="#snmp-community"><span class="std std-ref">24.11&nbsp;&nbsp;&nbsp;SNMPv1 communities and security</span></a> and <a class="reference internal" href="netmgmtb.html#snmpv3-security"><span class="std std-ref">25.3&nbsp;&nbsp;&nbsp;SNMPv3</span></a>), generally unrelated to any operating-system-based login authentication.</p>
+</div>
+<p id="index-2">It is a practical necessity, for networks of even modest size, to automate the job of checking whether everything is working properly. Waiting for complaints is not an option. Such a monitoring system is known as a <strong>network management system</strong> or <strong>NMS</strong>; there are a wide range of both proprietary and open-source NMS’s available. At its most basic, an NMS consists of a library of scripts to discover new network devices and then to poll each device (possibly but not necessarily using SNMP) at regular intervals. Generally the data received is recorded and analyzed, and alarms are sounded if a failure is detected.</p>
+<p id="index-3">When SNMP was first established, there was a common belief that it would soon be replaced by the OSI’s Common Management Interface Protocol. <strong>CMIP</strong> is defined in the International Telecommunication Union’s X.711 protocol and companion protocols. CMIP uses the same ASN.1 syntax as SNMP, but has a richer operations set. It remains the network management protocol of choice for OSI networks, and was once upon a time believed to be destined for adoption in the TCP/IP world as well.</p>
+<p>But it was not to be. TCP/IP-based network-equipment vendors never supported CMIP widely, and so any network manager had to support SNMP as well. With SNMP support essentially universal, there was never a need for a site to bother with CMIP.</p>
+<p>CMIP, unlike SNMP, is supported over TCP, using the CMIP Over Tcp, or <strong>CMOT</strong>, protocol. One advantage of using TCP is the elimination of uncertainty as to whether a request or a reply was received.</p>
+<div class="section" id="network-architecture">
+<span id="index-4"></span><h2>24.1&nbsp;&nbsp;&nbsp;Network Architecture<a class="headerlink" href="#network-architecture" title="Permalink to this headline">¶</a></h2>
+<p>Before turning to SNMP in depth, we offer a few references to other parts of this book relating to <strong>network architecture</strong>. At the LAN and Internetwork layers local to a site, perhaps the main issues are redundancy, bandwidth and cost. Cabling between buildings, in particular, needs to provide redundancy. See <a class="reference internal" href="ethernet2.html#spanning-tree"><span class="std std-ref">3.1&nbsp;&nbsp;&nbsp;Spanning Tree Algorithm and Redundancy</span></a> and <a class="reference internal" href="ethernet2.html#vlan"><span class="std std-ref">3.2&nbsp;&nbsp;&nbsp;Virtual LAN (VLAN)</span></a> for some considerations at the Ethernet level, and <a class="reference internal" href="ipv4.html#subnets-versus-switching"><span class="std std-ref">9.6.3&nbsp;&nbsp;&nbsp;Subnets versus Switching</span></a>.</p>
+<p>Next, a site must determine what sort of connection to the Internet it will have. ISP contracts vary greatly in terms of bandwidth, burst bandwidth, and agreed-upon responses in the event of an outage. Some aspects of service-level specification appear in <a class="reference internal" href="tokenbucket.html#token-bucket"><span class="std std-ref">22&nbsp;&nbsp;&nbsp;Token Bucket Rate Limiting</span></a> and <a class="reference internal" href="realtime.html#af"><span class="std std-ref">23.7.2&nbsp;&nbsp;&nbsp;Assured Forwarding</span></a>.</p>
+<p>Organizations with geographically dispersed internal networks – ISPs and larger corporations – must decide how their internal sites should be connected. Should they communicate over the public Internet? Should a VPN be used (<a class="reference internal" href="otherLANs.html#vpn"><span class="std std-ref">5.1&nbsp;&nbsp;&nbsp;Virtual Private Networks</span></a>)? Or should private lines (such as SONET, <a class="reference internal" href="links.html#sonet"><span class="std std-ref">6.2.2&nbsp;&nbsp;&nbsp;SONET</span></a>, or carrier Ethernet, <a class="reference internal" href="otherLANs.html#carrier-ethernet"><span class="std std-ref">5.2&nbsp;&nbsp;&nbsp;Carrier Ethernet</span></a>) be leased between sites? If private lines are used, link monitoring becomes essential.</p>
+<p>One increasingly important architectural decision at the application layer is the extent to which network software services are outsourced to the cloud, and run on remote servers managed by third parties.</p>
+</div>
+<div class="section" id="snmp-basics">
+<span id="snmp"></span><h2>24.2&nbsp;&nbsp;&nbsp;SNMP Basics<a class="headerlink" href="#snmp-basics" title="Permalink to this headline">¶</a></h2>
+<p>SNMP is far and away the most popular protocol for supporting network device monitoring. At its most basic level, SNMP allows polling of individual designated device attributes, such as the system name or the number of packets received via interface <code class="docutils literal"><span class="pre">eth0</span></code>. Attributes may, however, be organized into records, sets and tables. Tables may be indexed contiguously, like an array – <em>eg</em> interface[1], interface[2], interface[3], <em>etc</em> – or sparsely – <em>eg</em> interface[1], interface[32767].</p>
+<p id="index-5">While the simplest routers and switches may have quite limited provisions for SNMP, virtually all “serious” networking hardware provides extensive support, for both standard sets of “basic” device attributes and for proprietary attributes as well. Devices with significant SNMP support are sometimes referred to as <strong>managed</strong> devices.</p>
+<p id="index-6">An SNMP node that replies to requests for information is known as an <strong>SNMP agent</strong>. The network node doing the SNMP querying is known as the <strong>manager</strong>; it may be part of an NMS or – more simply – be a standalone tool known as an SNMP browser or MIB browser (where MIB stands for Management Information Base, below). While most MIB browsers are understood to have a graphical user interface, there are also command-line tools to make SNMP queries, such as the <code class="docutils literal"><span class="pre">snmpget</span></code> and <code class="docutils literal"><span class="pre">snmpwalk</span></code> commands of the Net-SNMP project at <a class="reference external" href="http://www.net-snmp.org">net-snmp.org</a>. These can be invoked by scripting languages to build a simple if rudimentary NMS.</p>
+<p>SNMP runs exclusively over UDP. The choice of UDP was made to avoid the connection overhead of what was envisioned to be a simple request-reply protocol; if a manager polls 1,000 devices once a minute, that is 2,000 packets in all over UDP but might easily be 8,000 packets with TCP and the necessary SYN/FIN packets. This may be especially significant when the network is congested to near the point of failure.</p>
+<p>The use of UDP does raise two problems: lost packets and having more data than will fit in one packet. For the simplest case of manager-initiated data requests, a manager can handle packet loss by polling a device until a response is received. If a response (or even a request) is too big, the usual strategy is to use IP-layer fragmentation (<a class="reference internal" href="ipv4.html#ipv4-fragmentation"><span class="std std-ref">9.4&nbsp;&nbsp;&nbsp;Fragmentation</span></a> and <a class="reference internal" href="ipv6a.html#ipv6-fragmentation"><span class="std std-ref">11.5.4&nbsp;&nbsp;&nbsp;IPv6 Fragment Header</span></a>). This is not ideal, but as most SNMP data stays within local and organizational networks it is at least workable.</p>
+<p>Another consequence of the use of UDP is that every SNMP device needs an IP address. For devices acting at the IP layer and above, this is not an issue, but an Ethernet switch or hub has no need of an IP address for its basic function. Devices like switches and hubs that are to use SNMP must be provided with a suitable IP interface and address.  Sometimes, for security, these IP addresses for SNMP management are placed on a private, more-or-less hidden subnet.</p>
+<p>SNMP also supports the <strong>writing</strong> of attributes to devices, thus implementing a remote-configuration mechanism. As writing to devices has rather more security implications than reading from them, this mechanism must be used with care. Even for read-only SNMP, however, security is an important issue; see <a class="reference internal" href="#snmp-community"><span class="std std-ref">24.11&nbsp;&nbsp;&nbsp;SNMPv1 communities and security</span></a> and <a class="reference internal" href="netmgmtb.html#snmpv3-security"><span class="std std-ref">25.3&nbsp;&nbsp;&nbsp;SNMPv3</span></a>.</p>
+<p>Writing to agents may be done either to configure the network behavior of the device – <em>eg</em> to bring an interface up or down, or to set an IP address – or specifically to configure the SNMP behavior of the agent.</p>
+<p id="index-7">Finally, SNMP supports asynchronous notification through its <strong>traps</strong> mechanism: a device can be configured to report an error immediately rather than wait until asked. While traps are quite important at many sites, we will largely ignore them here.</p>
+<p>SNMP is sometimes used for server monitoring as well as device monitoring; alternatively, simple scripts can initiate connections to services and discern at least something about their readiness. It is one thing, however, to verify that an email server is listening on TCP port 25 and responds with the correct <span class="target" id="index-8"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc5321.html"><strong>RFC 5321</strong></a> (originally <span class="target" id="index-9"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc821.html"><strong>RFC 821</strong></a>) EHLO message; it is another to verify that messages are accepted and then actually delivered.</p>
+<div class="section" id="snmp-versions">
+<span id="index-10"></span><span id="id1"></span><h3>24.2.1&nbsp;&nbsp;&nbsp;SNMP versions<a class="headerlink" href="#snmp-versions" title="Permalink to this headline">¶</a></h3>
+<p>SNMP has three official versions, SNMPv1, SNMPv2 and SNMPv3. SNMPv1 made its first appearance in 1988 in a collection of RFCs starting with <span class="target" id="index-11"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1065.html"><strong>RFC 1065</strong></a> (updated in <span class="target" id="index-12"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1155.html"><strong>RFC 1155</strong></a>); the current definition for “core” attribute reporting was released as <span class="target" id="index-13"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1213.html"><strong>RFC 1213</strong></a> in 1991. We will return to this below in <a class="reference internal" href="#mib2"><span class="std std-ref">24.10&nbsp;&nbsp;&nbsp;MIB-2</span></a>.</p>
+<p>SNMPv2 was introduced in 1993 with <span class="target" id="index-14"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1441.html"><strong>RFC 1441</strong></a>. Loosely speaking, SNMPv2 expanded on the basic information, starting with <span class="target" id="index-15"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1442.html"><strong>RFC 1442</strong></a> (currently <span class="target" id="index-16"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2578.html"><strong>RFC 2578</strong></a>), and also introduced improved techniques for managing tables.</p>
+<p>SNMPv2 also included a proposed security mechanism, but it was largely rejected by the marketplace. Ultimately, a version of SNMPv2 that used the SNMPv1 “community” security mechanism (<a class="reference internal" href="#snmp-community"><span class="std std-ref">24.11&nbsp;&nbsp;&nbsp;SNMPv1 communities and security</span></a>) was introduced; see <span class="target" id="index-17"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1901.html"><strong>RFC 1901</strong></a>. This “community”-security version became known as SNMPv2<strong>c</strong>.</p>
+<p>SNMPv3 then finally delivered a model for reasonably effective security. The “User-based Security Model” or <strong>USM</strong> was first proposed in 1998 in <span class="target" id="index-18"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2264.html"><strong>RFC 2264</strong></a>; the final 2002 version is in <span class="target" id="index-19"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3414.html"><strong>RFC 3414</strong></a>.</p>
+</div>
+</div>
+<div class="section" id="snmp-naming-and-oids">
+<span id="snmp-naming"></span><span id="index-20"></span><h2>24.3&nbsp;&nbsp;&nbsp;SNMP Naming and OIDs<a class="headerlink" href="#snmp-naming-and-oids" title="Permalink to this headline">¶</a></h2>
+<p>A central part of the SNMP protocol is how to <strong>name</strong> each device attribute in a consistent manner. The naming scheme chosen was the <strong>Object Identifier</strong>, or <strong>OID</strong>, hierarchy.</p>
+<p>Starting in 1985, the International Standards Organization (<a class="reference external" href="http://www.iso.org">ISO</a>) and the standardization sector of the International Telecommunications Union (<a class="reference external" href="http://www.itu.int/en/ITU-T">ITU-T</a>, then known as CCITT) developed the Object Identifier scheme for naming anything in the world that needed naming. Names, or OIDs, consist of strings of non-negative integers. In textual representation these component integers are often written separated by periods, <em>eg</em> 1.3.6.1; the notation { 1 3 6 1 } is also used. The scheme is standardized in ITU-T X.660.</p>
+<p>All OIDs used by SNMP begin with the prefix 1.3.6.1. For example, the <code class="docutils literal"><span class="pre">sysName</span></code> attribute corresponds to OID 1.3.6.1.2.1.1.5. The prefix 1.3.6.1.2.1 is known as <code class="docutils literal"><span class="pre">mib-2</span></code>, and the one-step-longer prefix 1.3.6.1.2.1.1 is <code class="docutils literal"><span class="pre">system</span></code>. Occasionally we will abuse notation and act as if names referred to single additional levels rather than full prefixes, <em>eg</em> the latter two names in <code class="docutils literal"><span class="pre">mib-2.system.sysName</span></code>.</p>
+<p>The basic SNMP read operation is <code class="docutils literal"><span class="pre">Get()</span></code> (sent via the <code class="docutils literal"><span class="pre">GetRequest</span></code> protocol message), which takes an OID as parameter. The agent receiving the <code class="docutils literal"><span class="pre">Get</span></code> request will, if authentication checks out and if the OID corresponds to a valid attribute, return a pair consisting of the OID and the attribute value. We will return to this in <a class="reference internal" href="#snmp-get"><span class="std std-ref">24.8&nbsp;&nbsp;&nbsp;SNMP Operations</span></a>, and see how multiple attribute values can be requested in a single operation.</p>
+<p>OIDs form a tree or hierarchy; the immediate child nodes of, say, 1.3.6.1 of length 4 are all nodes 1.3.6.1.N of length 5. The root node, with this understanding, is anonymous; OIDs are sometimes rendered with a leading “.” to emphasize this: .1.3.6.1. Alternatively, the numbers can be thought of as labels on the <em>arcs</em> of the tree rather than the nodes.</p>
+<p>There is no intrinsic way to distinguish internal OID nodes – prefixes – from leaf OID nodes that correspond to actual named objects. Context is essential here.</p>
+<p>It is common to give the numeric labels at any specific level human-readable string equivalents. The three nodes immediately below the root are, with their standard string equivalents</p>
+<ul class="simple">
+<li>itu-t(0)</li>
+<li>iso(1)</li>
+<li>joint-iso-itu-t(2)</li>
+</ul>
+<p>The string equivalents can be thought of as external data; when OIDs are encoded only the numeric values are included.</p>
+<p>OID naming has been adopted in several non-SNMP contexts as well. ISO and ITU-T both use OIDs to identify official standards documents. The X.509 standard uses OID naming in encryption certificates; see <span class="target" id="index-21"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc5280.html"><strong>RFC 5280</strong></a>. The X.500 directory standard also uses OIDs; the related <span class="target" id="index-22"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc4524.html"><strong>RFC 4524</strong></a> defines several OID classes prefixed by 0.9.2342.19200300.100.1. As a non-computing example, <a class="reference external" href="http://www.hl7.org/">Health Level Seven</a> names US healthcare information beginning with the OID prefix 2.16.840.1.113883.</p>
+<p>As mentioned above, SNMP uses OIDs beginning with 1.3.6.1; in the OID tree these levels correspond to</p>
+<ul class="simple">
+<li>iso(1)</li>
+<li>org(3): organizations</li>
+<li>dod(6): the US Department of Defense, the original sponsor of the Internet</li>
+<li>internet(1), apparently the only sublevel of DOD</li>
+</ul>
+<p>Here is a portion of the OID tree showing a few other assignments in the iso subtree, and highlighting the 1.3.6.1 prefix above. More entries are available from <a class="reference external" href="http://oid-info.com/get">oid-info.com/get</a>.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">itu-t(0)</div>
+<div class="line"><strong>iso(1)</strong></div>
+<div class="line-block">
+<div class="line">standard(0)</div>
+<div class="line">registration-authority(1)</div>
+<div class="line">member-body(2)</div>
+<div class="line"><strong>identified-organization(3)</strong></div>
+<div class="line-block">
+<div class="line">nist(5)</div>
+<div class="line"><strong>dod(6)</strong></div>
+<div class="line">icd-ecma(12) (European Computer Manufacturers Association)</div>
+<div class="line">oiw(14) (OSE Implementers Workshop)</div>
+<div class="line">edifactboard(15)</div>
+<div class="line">ewos(16)  (European Workshop on Open Systems)</div>
+<div class="line">osf(22)  (Open Software Foundation)</div>
+<div class="line">nordunet(23)</div>
+<div class="line">nato(26)</div>
+<div class="line">icao(27) (International Civil Aviation Organization)</div>
+<div class="line">…</div>
+<div class="line">amazon(187) (the author has no idea if Amazon currently uses this)</div>
+</div>
+</div>
+<div class="line">joint-iso-itu-t(2)</div>
+</div>
+</div></blockquote>
+<p id="index-23">This SNMP 1.3.6.1 prefix is spelled out in <span class="target" id="index-24"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1155.html"><strong>RFC 1155</strong></a> via the syntax</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">internet</span>      <span class="n">OBJECT</span> <span class="n">IDENTIFIER</span> <span class="p">::</span><span class="o">=</span> <span class="p">{</span> <span class="n">iso</span> <span class="n">org</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="n">dod</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>which means that the string <code class="docutils literal"><span class="pre">internet</span></code> has the type <code class="docutils literal"><span class="pre">OBJECT</span> <span class="pre">IDENTIFIER</span></code> and its actual value is the list to the right of <code class="docutils literal"><span class="pre">::=</span></code>: 1.3.6.1. The use of <code class="docutils literal"><span class="pre">iso</span></code> here represents the OID <em>prefix</em> .1, conceptually different from just the level iso(1). The formal syntax here is <strong>ASN.1</strong>, as defined by the ITU-T standard X.680. We will expand on this below in <a class="reference internal" href="#asn-1"><span class="std std-ref">24.6&nbsp;&nbsp;&nbsp;ASN.1 Syntax and SNMP</span></a>, though the presentation will mostly be informal; further details can be found at <a class="reference external" href="http://www.itu.int/en/ITU-T/asn1/Pages/introduction.aspx">http://www.itu.int/en/ITU-T/asn1/Pages/introduction.aspx</a>.</p>
+<p>After the above, <span class="target" id="index-25"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1155.html"><strong>RFC 1155</strong></a> then defines the OID prefixes for management information, <code class="docutils literal"><span class="pre">mgmt</span></code>, and for private-vendor use, <code class="docutils literal"><span class="pre">private</span></code>, as</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mgmt</span>          <span class="n">OBJECT</span> <span class="n">IDENTIFIER</span> <span class="p">::</span><span class="o">=</span> <span class="p">{</span> <span class="n">internet</span> <span class="mi">2</span> <span class="p">}</span>
+<span class="n">private</span>       <span class="n">OBJECT</span> <span class="n">IDENTIFIER</span> <span class="p">::</span><span class="o">=</span> <span class="p">{</span> <span class="n">internet</span> <span class="mi">4</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Again, <code class="docutils literal"><span class="pre">internet</span></code> represents the newly defined prefix 1.3.6.1. Most general-purpose SNMP OIDs begin with the <code class="docutils literal"><span class="pre">mgmt</span></code> prefix. The <code class="docutils literal"><span class="pre">private</span></code> prefix is for OIDs representing vendor-specific information; for example, the prefix 1.3.6.1.4.1.<strong>9</strong> has been delegated to Cisco Systems, Inc. <span class="target" id="index-26"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1155.html"><strong>RFC 1155</strong></a> states that both the mgmt and private prefixes are delegated by the IAB to the IANA.</p>
+<p>Responsibility for assigning names that begin with a given OID prefix can easily be delegated. The Internet Activities Board, for example, is in charge of 1.3.6.1. (According to <span class="target" id="index-27"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1155.html"><strong>RFC 1155</strong></a>, this delegation by the Department of Defense to the IAB was never made officially; the IAB just began using it.)</p>
+</div>
+<div class="section" id="mibs">
+<span id="id2"></span><h2>24.4&nbsp;&nbsp;&nbsp;MIBs<a class="headerlink" href="#mibs" title="Permalink to this headline">¶</a></h2>
+<p>A MIB, or <strong>Management Information Base</strong>, is a set of definitions that associate OIDs with specific attributes, and, along the way, associates each numeric level of the OIDs with a symbolic name. For example, below is the set of so-called <code class="docutils literal"><span class="pre">System</span></code> definitions in the core <span class="target" id="index-28"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1213.html"><strong>RFC 1213</strong></a> MIB known as MIB-2 (<a class="reference internal" href="#mib2"><span class="std std-ref">24.10&nbsp;&nbsp;&nbsp;MIB-2</span></a>). The <code class="docutils literal"><span class="pre">mib-2</span></code> and <code class="docutils literal"><span class="pre">system</span></code> prefixes are first defined as</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mib</span><span class="o">-</span><span class="mi">2</span>          <span class="n">OBJECT</span> <span class="n">IDENTIFIER</span> <span class="p">::</span><span class="o">=</span> <span class="p">{</span> <span class="n">mgmt</span> <span class="mi">1</span> <span class="p">}</span>
+<span class="n">system</span>         <span class="n">OBJECT</span> <span class="n">IDENTIFIER</span> <span class="p">::</span><span class="o">=</span> <span class="p">{</span> <span class="n">mib</span><span class="o">-</span><span class="mi">2</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>that is, 1.3.6.1.2.1 and 1.3.6.1.2.1.1 respectively. The <code class="docutils literal"><span class="pre">system</span></code> definitions, which represent actual attributes that can be retrieved, are as follows</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">sysDescr</span>       <span class="p">{</span> <span class="n">system</span> <span class="mi">1</span> <span class="p">}</span>
+<span class="n">sysObjectID</span>    <span class="p">{</span> <span class="n">system</span> <span class="mi">2</span> <span class="p">}</span>
+<span class="n">sysUpTime</span>      <span class="p">{</span> <span class="n">system</span> <span class="mi">3</span> <span class="p">}</span>
+<span class="n">sysContact</span>     <span class="p">{</span> <span class="n">system</span> <span class="mi">4</span> <span class="p">}</span>
+<span class="n">sysName</span>        <span class="p">{</span> <span class="n">system</span> <span class="mi">5</span> <span class="p">}</span>
+<span class="n">sysLocation</span>    <span class="p">{</span> <span class="n">system</span> <span class="mi">6</span> <span class="p">}</span>
+<span class="n">sysServices</span>    <span class="p">{</span> <span class="n">system</span> <span class="mi">7</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Most of these attributes represent string values that need to be administratively defined; we will return to these in <a class="reference internal" href="#mib2"><span class="std std-ref">24.10&nbsp;&nbsp;&nbsp;MIB-2</span></a>.</p>
+<p>The MIB is <em>not</em> the actual attributes themselves; the set of all ⟨OID,value⟩ pairs stored by an SNMP manager – perhaps the result of a single set of queries, perhaps the result of a sequence of queries over time – is sometimes known as the management database, or MDB, though that term is not as universal.</p>
+<p>Colloquially, a MIB can be either the abstract set of OID definitions or a particular ASCII file that defines the set. The latter must be run through a <strong>MIB compiler</strong> to be used by other software; users of a MIB browser generally find the information much more useful if the appropriate MIB file is loaded before making SNMP queries. Some RFCs can be read directly by the MIB compiler, which knows to edit out the non-MIB discussion.</p>
+<p id="index-29">The Net-SNMP package contains SNMP agents for Linux and Macintosh computers (Microsoft has their own SNMP-agent software), and command-line tools for making SNMP queries; these latter tools are also available for Windows. The sysName value, for example, can be retrieved with the <code class="docutils literal"><span class="pre">snmpget</span></code> command</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">snmpget</span> <span class="o">-</span><span class="n">v1</span> <span class="o">-</span><span class="n">c</span> <span class="n">public</span> <span class="n">localhost</span> <span class="mf">1.3</span><span class="o">.</span><span class="mf">6.1</span><span class="o">.</span><span class="mf">2.1</span><span class="o">.</span><span class="mf">1.5</span><span class="o">.</span><span class="mi">0</span>
+</pre></div>
+</div>
+<p>The OID here corresponds to { system 5 0 }; the final 0 represents a SNMP convention that indicates this is a scalar value and is not part of a table. See <a class="reference internal" href="#mib-browsing"><span class="std std-ref">24.9&nbsp;&nbsp;&nbsp;MIB Browsing</span></a> for further examples.</p>
+<p>MIBs serve as both documentation and data. As documentation, they tell the implementer of a given SNMP agent what information is to be returned for each OID request. As data, they serve to translate numeric OIDs into human-readable data. For example, if the above <code class="docutils literal"><span class="pre">snmpget</span></code> command understands the appropriate MIB (<em>eg</em> because the MIB file is in the right place), we can type</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">snmpget</span> <span class="o">-</span><span class="n">v1</span> <span class="o">-</span><span class="n">c</span> <span class="n">public</span> <span class="n">localhost</span> <span class="n">sysName</span><span class="o">.</span><span class="mi">0</span>
+</pre></div>
+</div>
+<p>It is not uncommon for an installation to involve several hundred different (possibly overlapping) MIBs, each defining a different portion of the OID tree. This is particularly true of the <code class="docutils literal"><span class="pre">private</span></code> subtree 1.3.6.1.4.1, for which one might have a separate MIB file for each manufacturer and device.</p>
+</div>
+<div class="section" id="snmpv1-data-types">
+<span id="index-30"></span><span id="id3"></span><h2>24.5&nbsp;&nbsp;&nbsp;SNMPv1 Data Types<a class="headerlink" href="#snmpv1-data-types" title="Permalink to this headline">¶</a></h2>
+<p>SNMP uses OIDs as the indexes for retrieval of attributes. The attributes themselves can have the following types, as of <span class="target" id="index-31"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1155.html"><strong>RFC 1155</strong></a>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="78%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Datatype</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>INTEGER</td>
+<td>A 32-bit integer</td>
+</tr>
+<tr class="row-odd"><td>OCTET STRING</td>
+<td>Either a text string or a network address</td>
+</tr>
+<tr class="row-even"><td>Counter</td>
+<td>A non-negative INTEGER that increases from 0, and can wrap around.</td>
+</tr>
+<tr class="row-odd"><td>Gauge</td>
+<td>An INTEGER that can rise and fall but that never wraps around</td>
+</tr>
+<tr class="row-even"><td>TimeTicks</td>
+<td>An INTEGER used to measure time in 1/100ths of a second</td>
+</tr>
+<tr class="row-odd"><td>OBJECT&nbsp;IDENTIFIER</td>
+<td>An OID appearing as data</td>
+</tr>
+<tr class="row-even"><td>IpAddress</td>
+<td>An IPv4 address, as an OCTET STRING of fixed length 4</td>
+</tr>
+<tr class="row-odd"><td>NetworkAddress</td>
+<td>An IpAddress, in theory allowing for other kinds of addresses later</td>
+</tr>
+<tr class="row-even"><td>Opaque</td>
+<td>Any other data, ultimately an OCTET STRING</td>
+</tr>
+</tbody>
+</table>
+<p>The type of the <code class="docutils literal"><span class="pre">sysName</span></code> attribute, for example, is OCTET STRING.</p>
+<p>When SNMP data values are returned by an agent, they are tagged with their type. Thus, the receiver can  See <a class="reference internal" href="#snmp-encoding"><span class="std std-ref">24.12&nbsp;&nbsp;&nbsp;SNMP and ASN.1 Encoding</span></a> for further details.</p>
+<p>When the INTEGER type is used to represent an enumerated type, the value of zero must not be used; an example is the status type <code class="docutils literal"><span class="pre">up(1)</span></code>, <code class="docutils literal"><span class="pre">down(2)</span></code>, <code class="docutils literal"><span class="pre">testing(3)</span></code>.</p>
+</div>
+<div class="section" id="asn-1-syntax-and-snmp">
+<span id="asn-1"></span><span id="index-32"></span><h2>24.6&nbsp;&nbsp;&nbsp;ASN.1 Syntax and SNMP<a class="headerlink" href="#asn-1-syntax-and-snmp" title="Permalink to this headline">¶</a></h2>
+<p>We have already seen the ASN.1 definition of some OBJECT IDENTIFIERs in <a class="reference internal" href="#snmp-naming"><span class="std std-ref">24.3&nbsp;&nbsp;&nbsp;SNMP Naming and OIDs</span></a>.</p>
+<p>The attribute corresponding to any single OID is always a scalar type, <em>eg</em> one of the above. However, SNMP also uses some composite type definitions:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">SEQUENCE { <em>fieldname1</em> <em>type1</em>, <em>fieldname2</em> <em>type2</em>, … }: This defines a <strong>record</strong> type.</div>
+</div>
+<div class="line-block">
+<div class="line">SEQUENCE OF <em>type</em>: This defines a homogeneous list – an array or table – of objects of type <em>type</em>. In most cases, <em>type</em> represents a SEQUENCE type, and so the list is a list of records, or table in the database sense.</div>
+</div>
+</div></blockquote>
+<p>Note the importance of the keyword OF here to distinguish records from lists.</p>
+<p id="index-33">The OBJECT-TYPE macro is heavily used in MIB definitions. It has the format</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><em>objname</em> <code class="docutils literal"><span class="pre">OBJECT-TYPE</span></code></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal"><span class="pre">SYNTAX</span></code>  <em>type</em></div>
+<div class="line"><code class="docutils literal"><span class="pre">ACCESS</span></code>  read-write <em>or</em> read-only <em>or</em> write-only <em>or</em> not-accessible</div>
+<div class="line"><code class="docutils literal"><span class="pre">STATUS</span></code>  mandatory <em>or</em> optional <em>or</em> obsolete</div>
+<div class="line"><code class="docutils literal"><span class="pre">DESCRIPTION</span></code> <em>descriptive string</em></div>
+<div class="line"><code class="docutils literal"><span class="pre">INDEX</span></code>   <em>OID used for table indexing</em></div>
+<div class="line"><code class="docutils literal"><span class="pre">::=</span></code>     <em>OID assigned to objname</em></div>
+</div>
+</div>
+</div></blockquote>
+<p>The <em>objname</em>, sometimes called the OBJECT DESCRIPTOR, is intended to be globally unique. The value for <code class="docutils literal"><span class="pre">SYNTAX</span></code> must be a valid ASN.1 syntax specification; see <a class="reference internal" href="#mib2"><span class="std std-ref">24.10&nbsp;&nbsp;&nbsp;MIB-2</span></a> for examples. The values for <code class="docutils literal"><span class="pre">ACCESS</span></code> and <code class="docutils literal"><span class="pre">STATUS</span></code> are, in each case, one of the literal strings shown above. The value for <code class="docutils literal"><span class="pre">DESCRIPTION</span></code> is optional.</p>
+<p>Many of the objects so defined will represent tables or other higher-level structures; in this case the Object ID of the last line will represent an internal node of the OID tree rather than a leaf node, and the ACCESS will be <code class="docutils literal"><span class="pre">not-accessible</span></code>. It is not that the table is actually inaccessible, but rather that the attributes must be retrieved one by one rather than collectively.</p>
+<p>Here is a concrete simple example; other examples appear in the following section. The OID value of <code class="docutils literal"><span class="pre">ifEntry</span></code> here is 1.3.6.1.2.1.2.2.1.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ifInOctets</span> <span class="n">OBJECT</span><span class="o">-</span><span class="n">TYPE</span>
+    <span class="n">SYNTAX</span>  <span class="n">Counter</span>
+    <span class="n">ACCESS</span>  <span class="n">read</span><span class="o">-</span><span class="n">only</span>
+    <span class="n">STATUS</span>  <span class="n">mandatory</span>
+    <span class="n">DESCRIPTION</span>
+            <span class="s2">&quot;The total number of octets received on the</span>
+            <span class="n">interface</span><span class="p">,</span> <span class="n">including</span> <span class="n">framing</span> <span class="n">characters</span><span class="o">.</span><span class="s2">&quot;</span>
+    <span class="p">::</span><span class="o">=</span> <span class="p">{</span> <span class="n">ifEntry</span> <span class="mi">10</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p id="index-34">The data type definitions and the above ASN.1 syntax used for  are collectively known as the <strong>structure of management information</strong>, or SMI. The SMI in effect defines all the types and structures needed by the various MIBs. For SNMPv1, the SMI is defined in <span class="target" id="index-35"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1155.html"><strong>RFC 1155</strong></a>.</p>
+</div>
+<div class="section" id="snmp-tables">
+<span id="tables"></span><span id="index-36"></span><span id="id4"></span><h2>24.7&nbsp;&nbsp;&nbsp;SNMP Tables<a class="headerlink" href="#snmp-tables" title="Permalink to this headline">¶</a></h2>
+<p>We have seen in <a class="reference internal" href="#mibs"><span class="std std-ref">24.4&nbsp;&nbsp;&nbsp;MIBs</span></a> how SNMP organizes the OID names for the <code class="docutils literal"><span class="pre">system</span></code> group, which consists of scalar values. Each agent attribute is assigned a permanent OID name; <em>eg</em> { system 5 0 } is the full OID for the <code class="docutils literal"><span class="pre">sysName</span></code> attribute. OIDs for scalar (non-table) attributes always include a final “.0”.</p>
+<p>Most agent data, however, comes in the form of <strong>tables</strong>, that is, lists of records. In SNMP, they are sometimes referred to as <em>conceptual</em> tables, as the SNMP agent offering the table is often not responsible for its storage or physical organization. In this sense, SNMP tables resemble database “views”.</p>
+<p>These tables can be accessed by linear search or by primary key lookup; the key can be a single attribute or a set of attributes and is known as the <strong>index</strong>. SNMP does not support secondary keys on tables, though it would in principle be possible for an agent to present the same data in two tables, each with a different index (a related example of this trick appears in <a class="reference internal" href="netmgmtb.html#matrix"><span class="std std-ref">25.2.1.5&nbsp;&nbsp;&nbsp;Matrix</span></a>).</p>
+<p>SNMP tables are almost always small enough that the agent keeps all the records in main memory; database-style concerns about disk-storage organization and indexing are not an issue.</p>
+<p>As in databases, an SNMP table index acts as a <em>constraint</em>, disallowing two distinct rows with identical index values. When an SNMP table mirrors a “real” table (<em>eg</em> the IP forwarding table), problems sometimes occur when the SNMP index is too “small” – has too few attributes – and so the SNMP table may not be able to accurately represent the original table. See <a class="reference internal" href="netmgmtb.html#ip-forward-mib"><span class="std std-ref">25.1.12.2&nbsp;&nbsp;&nbsp;IP-Forward MIB</span></a> for an example.</p>
+<p>In the world of databases, a key with too <em>many</em> attributes may fail to capture an important constraint; it may also be less efficient. Neither is a concern with SNMP, with the exception of tables that support row creation, which we may take to be a special case. SNMP table indexes may thus sometimes include attributes that from a database perspective would likely be omitted from the key; again, see <a class="reference internal" href="netmgmtb.html#ip-forward-mib"><span class="std std-ref">25.1.12.2&nbsp;&nbsp;&nbsp;IP-Forward MIB</span></a> for examples.</p>
+<p>We will look here at three examples of SNMPv1 tables, each part of MIB-2. The goal right now is to present how the tabular structure is mapped onto the underlying OID-tree structure; we will return to the syntactic definition of tables in <a class="reference internal" href="#interfaces-group"><span class="std std-ref">24.10.2&nbsp;&nbsp;&nbsp;Table definitions and the interfaces Group</span></a> and to the semantics of each table in <a class="reference internal" href="#mib-2"><span class="std std-ref">24.10&nbsp;&nbsp;&nbsp;MIB-2</span></a>. SNMPv2 has made some modest improvements to how tables are defined.</p>
+<p>The first example will be the SNMP <strong>interface table</strong>, <code class="docutils literal"><span class="pre">ifTable</span></code>. For each network interface (<em>eg</em> loopback, Ethernet 0, Ethernet 1, Wireless 0, Point-to-Point 0, <em>etc</em>) a collection of attributes including the device name, MTU, bitrate, physical address, and the number of bytes and packets received and sent. The index here (as we shall see later) is an abstractly assigned interface number, known as <code class="docutils literal"><span class="pre">ifIndex</span></code>. Here is some sample data, <em>not</em> showing all columns that the actual MIB-2 table includes, and not (yet) showing any OIDs. The header of the index column, ifIndex, is in italic; the value is a single integer. The <code class="docutils literal"><span class="pre">eth0</span></code> interface has a higher number for packets than bytes (octets) because the 32-bit <code class="docutils literal"><span class="pre">inOctets</span></code> value has wrapped around.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="17%" />
+<col width="11%" />
+<col width="11%" />
+<col width="18%" />
+<col width="22%" />
+<col width="22%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><em>ifIndex</em></th>
+<th class="head">name</th>
+<th class="head">MTU</th>
+<th class="head">bitrate</th>
+<th class="head">inOctets</th>
+<th class="head">inPackets</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1</td>
+<td>lo</td>
+<td>16436</td>
+<td>10,000,000</td>
+<td>171</td>
+<td>3</td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td>eth0</td>
+<td>1500</td>
+<td>100,000,000</td>
+<td>37155014</td>
+<td>1833455677</td>
+</tr>
+<tr class="row-even"><td>3</td>
+<td>eth1</td>
+<td>1500</td>
+<td>100,000,000</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr class="row-odd"><td>4</td>
+<td>ppp0</td>
+<td>1420</td>
+<td>0</td>
+<td>2906687015</td>
+<td>2821825</td>
+</tr>
+</tbody>
+</table>
+<div class="sidebar">
+<p class="first sidebar-title">Routes</p>
+<p class="last">Although the data here is mostly a mash-up of records from different sources, the 10.38.0.0 route below was a VPN route using the <code class="docutils literal"><span class="pre">ppp0</span></code> tunnel above. Otherwise, workstation forwarding tables often have just two entries, for the local subnet and the default route.</p>
+</div>
+<p>The SNMP <strong>routing table</strong>, <code class="docutils literal"><span class="pre">ipRouteTable</span></code>, based on the IP forwarding table of <a class="reference internal" href="intro.html#ip-overview"><span class="std std-ref">1.10&nbsp;&nbsp;&nbsp;IP - Internet Protocol</span></a>, has a column representing the destination network, a variety of status and information columns (<em>eg</em> for RouteAge), and a NextHop column; the index is the destination-network attribute. Again, here is some sample data with the index column again in italic. The index here – an IP address – is a compound object: a list of four integers. We return to this below.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="23%" />
+<col width="11%" />
+<col width="24%" />
+<col width="21%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><em>dest</em></th>
+<th class="head">mask</th>
+<th class="head">metric</th>
+<th class="head">next_hop</th>
+<th class="head">type</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0.0.0.0</td>
+<td>0.0.0.0</td>
+<td>1</td>
+<td>192.168.1.1</td>
+<td>indirect(4)</td>
+</tr>
+<tr class="row-odd"><td>10.0.0.0</td>
+<td>255.255.255.0</td>
+<td>0</td>
+<td>0.0.0.0</td>
+<td>direct(3)</td>
+</tr>
+<tr class="row-even"><td>10.38.0.0</td>
+<td>255.255.0.0</td>
+<td>1</td>
+<td>192.168.4.1</td>
+<td>indirect(4)</td>
+</tr>
+</tbody>
+</table>
+<p>(The <code class="docutils literal"><span class="pre">type</span></code> column indicates whether the destination is local or nonlocal; the host is on subnet 10.0.0.0/24 and so the middle entry involves local delivery. The use of <code class="docutils literal"><span class="pre">indirect(4)</span></code> and <code class="docutils literal"><span class="pre">direct(3)</span></code> is an example of an SNMP enumerated type.)</p>
+<p>The indexing of the interfaces table is (usually) <strong>dense</strong>: the values for <code class="docutils literal"><span class="pre">ifIndex</span></code> are typically consecutive numbers. The routing table, on the other hand, has a <strong>sparse</strong> index: the index values are likely nowhere near one another.</p>
+<p>The <strong>TCP Connections table</strong> <code class="docutils literal"><span class="pre">tcpConnTable</span></code> lists every TCP connection together with its connection state as in <a class="reference internal" href="tcpA.html#tcp-state-diagram"><span class="std std-ref">17.7&nbsp;&nbsp;&nbsp;TCP state diagram</span></a>; one can obtain this on most Linux, Windows or Macintosh systems with the command <code class="docutils literal"><span class="pre">netstat</span> <span class="pre">-a</span></code>. The index in this case consists of the <em>four</em> attributes of the connection-defining socketpair: the local address, the local port, the remote address and the remote port. In this table, the only attribute not part of the index is an integer representing the connection state (again represented by an SNMP enumerated type).</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><em>localAddr</em></th>
+<th class="head"><em>localPort</em></th>
+<th class="head"><em>remoteAddr</em></th>
+<th class="head"><em>remotePort</em></th>
+<th class="head">state</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>10.0.0.3</td>
+<td>31895</td>
+<td>147.126.1.209</td>
+<td>993</td>
+<td>established(5)</td>
+</tr>
+<tr class="row-odd"><td>10.0.0.3</td>
+<td>40113</td>
+<td>74.125.225.98</td>
+<td>80</td>
+<td>timeWait(11)</td>
+</tr>
+<tr class="row-even"><td>10.0.0.3</td>
+<td>20459</td>
+<td>10.38.2.42</td>
+<td>22</td>
+<td>established(5)</td>
+</tr>
+</tbody>
+</table>
+<p>SNMP has adopted conventions for how tabular data such as the above is to be encoded in the OID tree. The first step in this strategy is to define, statically, an OID prefix for the subtree representing the table; in this section we will denote this by <strong>T</strong> (later, in <a class="reference internal" href="#interfaces-group"><span class="std std-ref">24.10.2&nbsp;&nbsp;&nbsp;Table definitions and the interfaces Group</span></a>, we will see that <strong>T</strong> often represents two OID levels of the form Table.Entry, or T.E). Each attribute of the table (that is, each column) is then assigned a non-leaf OID by appending successive integers to the table prefix, starting at 1. For example, the root prefix for the interfaces table is <strong>T</strong> = 1.3.6.1.2.1.2.2.1, known as <code class="docutils literal"><span class="pre">ifEntry</span></code>. The columns shown in the fraction of the interfaces table above have the following OIDs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="45%" />
+<col width="55%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">OID</th>
+<th class="head">table column</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">{</span> <span class="pre">ifEntry</span> <span class="pre">1</span> <span class="pre">}</span></code> or <strong>T</strong>.1</td>
+<td>The interface number, <code class="docutils literal"><span class="pre">ifIndex</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">{</span> <span class="pre">ifEntry</span> <span class="pre">2</span> <span class="pre">}</span></code> or <strong>T</strong>.2</td>
+<td>The interface name or description</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">{</span> <span class="pre">ifEntry</span> <span class="pre">4</span> <span class="pre">}</span></code> or <strong>T</strong>.4</td>
+<td>The interface MTU</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">{</span> <span class="pre">ifEntry</span> <span class="pre">5</span> <span class="pre">}</span></code> or <strong>T</strong>.5</td>
+<td>The interface bitrate</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">{</span> <span class="pre">ifEntry</span> <span class="pre">10</span> <span class="pre">}</span></code> or <strong>T</strong>.10</td>
+<td>The number of inbound octets (bytes)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">{</span> <span class="pre">ifEntry</span> <span class="pre">11</span> <span class="pre">}</span></code> or <strong>T</strong>.11</td>
+<td>The number of inbound unicast packets</td>
+</tr>
+</tbody>
+</table>
+<p>The second step is to establish a convention for converting the index attributes to a list of integers that can be used as an <strong>OID suffix</strong> identifying a particular row. This index OID suffix is then appended to the attribute OID prefix (identifying the column) to obtain the full OID (with no trailing .0 this time) that represents the name of the table data value.</p>
+<p>For the case of the interfaces table, the interface number is used as a single-level OID suffix. The <code class="docutils literal"><span class="pre">eth1</span></code> value for <code class="docutils literal"><span class="pre">inOctets</span></code> thus has OID name <strong>T</strong>.10.3: 10 is the number assigned to the <code class="docutils literal"><span class="pre">inOctets</span></code> column and 3 is the <code class="docutils literal"><span class="pre">ifIndex</span></code> value for the <code class="docutils literal"><span class="pre">eth1</span></code> row. Written in full, this is 1.3.6.1.2.1.2.2.1.<strong>10</strong>.<strong>3</strong>. Note this numbering has the form <strong>T</strong>.col.row, the transposition of the more common programming-language row-first convention T[row][col].</p>
+<p>For the routing and TCP tables presented here, IPv4 addresses are written in dotted-decimal notation, <em>eg</em> 10.38.0.0, and then converted to four levels of OID suffix, <em>eg</em> .10.38.0.0. (Note that 10.38.0.0 has the same <em>textual</em> representation as an IPv4 address and as a four-level OID suffix (though a leading ‘.’ has been added here to the latter), but <em>logically</em> they are entirely different things).</p>
+<p>This OID-suffix encoding may seem obvious, but this is deceptive, and in <a class="reference internal" href="netmgmtb.html#tcp-mib"><span class="std std-ref">25.1.13&nbsp;&nbsp;&nbsp;TCP-MIB</span></a> we will see a newer convention in which the IPv4 address 10.38.0.0 would be encoded as the OID suffix .<strong>1</strong>.<strong>4</strong>.10.38.0.0, where the <strong>1</strong> denotes an IPv4 address (2 for IPv6) and the <strong>4</strong> denotes the address length as an OCTET STRING. The present rule, for the .10.38.0.0 four-level encoding, comes from <span class="target" id="index-37"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2578.html"><strong>RFC 2578</strong></a>, §7.7; the <code class="docutils literal"><span class="pre">IpAddress</span></code> type (for IPv4 only) is defined as <code class="docutils literal"><span class="pre">IMPLICIT</span> <span class="pre">OCTET</span> <span class="pre">STRING</span> <span class="pre">(SIZE</span> <span class="pre">(4))</span></code> (in <span class="target" id="index-38"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1155.html"><strong>RFC 1155</strong></a>), of predetermined length. An IP address <em>might</em> have been encoded as a single OID level using the address as a single unsigned 32-bit integer, but this option was not chosen.</p>
+<p>In the routing table above, the nextHop column is assigned the number 7, so the nextHop for 10.38.0.0 thus has the OID <strong>T</strong>.7.10.38.0.0.</p>
+<p>The OID suffix encoding used for indexing has nothing to do with the ASN.1 BER encoding used for data values, <a class="reference internal" href="#snmp-encoding"><span class="std std-ref">24.12&nbsp;&nbsp;&nbsp;SNMP and ASN.1 Encoding</span></a>.</p>
+<p>For the TCP connections table, the two IP addresses involved each translate to four-level OID chunks, as in the routing table, and the two port numbers each translate to one-level chunks; the resultant OID suffix for the state of the first connection in the table above would be</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">.10.0.0.3.<em>31895</em>.147.126.1.209.<em>993</em></div>
+</div>
+</div></blockquote>
+<p>where, for clarity, the port-number levels are shown in italic. The state column is assigned the identifier 1, so this would all be appended to <strong>T</strong>.1 (it is common, but, as we see here, not universal, for column-number assignment to begin with the index columns).</p>
+<p>Here is a column-oriented diagram of the interfaces-table fragment from above. As we have been doing, the table prefix is denoted <strong>T</strong> and nodes are labeled <strong>T</strong>.col.row. The topmost T and the first row (with the <strong>T</strong>.col OIDs) are internal nodes; these are drawn with the heavier, blue boxes. The lower four rows, with black boxes, are leaf nodes.</p>
+<img alt="_images/mini_interface_cols.svg" src="_images/mini_interface_cols.svg" /><p>The diagram above emphasizes the arrangement into columns. The actual OID tree structure, however, is as in the diagram below; all the leaf nodes in one column above are actually sibling nodes.</p>
+<img alt="_images/mini_interface_tree.svg" src="_images/mini_interface_tree.svg" /><p>In all three tables here, the index columns are part of the table data. This is unnecessary; all the index columns are of necessity encoded in the full OID of any table entry. In SNMPv2 it is required (though not necessarily enforced) to in effect omit the index columns from the table as presented by the agent (though they are still declared); see <a class="reference internal" href="netmgmtb.html#snmpv2-indexes"><span class="std std-ref">25.1.4&nbsp;&nbsp;&nbsp;SNMPv2 Indexes</span></a>.</p>
+<p>We also note that, in all three tables here (and in most SNMP tables that serve purely as sources of information), new rows cannot be added via the SNMP manager. Some SNMP tables, however, do support row creation; see <a class="reference internal" href="netmgmtb.html#row-additions"><span class="std std-ref">25.2&nbsp;&nbsp;&nbsp;Table Row Creation</span></a>.</p>
+</div>
+<div class="section" id="snmp-operations">
+<span id="snmp-get"></span><h2>24.8&nbsp;&nbsp;&nbsp;SNMP Operations<a class="headerlink" href="#snmp-operations" title="Permalink to this headline">¶</a></h2>
+<p>As mentioned earlier, the fundamental read operation is <code class="docutils literal"><span class="pre">Get()</span></code>; the protocol message itself is known as <code class="docutils literal"><span class="pre">GetRequest</span></code>, and also contains the authentication information (that is, the community string for SNMPv1 and SNMPv2c). A request-id is included so multiple outstanding <code class="docutils literal"><span class="pre">GetRequest</span></code>s aren’t mixed up.</p>
+<p id="index-39">The <code class="docutils literal"><span class="pre">GetRequest</span></code> message can contain a <em>list</em> of OIDs (actually encoded as a list of ⟨OID,null⟩ pairs called a <code class="docutils literal"><span class="pre">VarBind</span></code> list). A single-OID get simply entails a <code class="docutils literal"><span class="pre">VarBind</span></code> list of length 1.</p>
+<p>The agent receiving the <code class="docutils literal"><span class="pre">GetRequest</span></code> validates the authentication and then, if successful, looks up each OID in the received list to find the corresponding value. The filled-in <code class="docutils literal"><span class="pre">VarBind</span></code> list of all ⟨OID,value⟩ pairs is returned.</p>
+<p>If any value cannot be found, <em>eg</em> because the OID represented an interior node of the OID tree instead of an actual value, or because the OID lay outside the portion of the OID tree that the request was authorized to access, then in SNMPv1 <em>no</em> values are returned. Only if every OID in the list corresponds to a valid value is a list of all the ⟨OID,value⟩ pairs returned. SNMPv2 later relaxed this rule to allow the return of whatever individual requests were successful.</p>
+<p>If the exact OID is not known – which is often the case for tabular data – the <code class="docutils literal"><span class="pre">GetNext()</span></code> operation can be used. It works like <code class="docutils literal"><span class="pre">Get()</span></code>, except that for each OID <em>oid</em> in the request list the agent finds the <strong>next leaf OID</strong> strictly following <em>oid</em> in lexicographical order, which we will call <em>oidʹ</em>. The agent then includes the pair ⟨<em>oidʹ</em>,<em>value</em>⟩ in its response, where <em>value</em> is the value corresponding to <em>oidʹ</em>. Note that in the <code class="docutils literal"><span class="pre">GetNext()</span></code> case <em>oidʹ</em> is not previously known to the manager. Note also that SNMP <em>always</em> returns, with each value, the corresponding OID, which for tabular data encodes the full index for the value.</p>
+<p>The <code class="docutils literal"><span class="pre">GetNext()</span></code> operation allows a manager to <strong>walk</strong> through any subtree of the OID tree. If the root of the subtree is prefix <strong>T</strong>, then the first call is to GetNext(<strong>T</strong>). This returns ⟨oid<sub>1</sub>,value<sub>1</sub>⟩. The next call to GetNext has parameter oid<sub>1</sub>; the agent returns ⟨oid<sub>2</sub>,value<sub>2</sub>⟩. The manager continues with the series of GetNext calls until, finally, the subtree is exhausted and the agent returns either an error or else (more likely) an ⟨oid<sub>N</sub>,value<sub>N</sub>⟩ for which oid<sub>N</sub> is no longer an extension of the original prefix p.</p>
+<p>As an example, let us start with the prefix 1.3.6.1.2.1.1, the start of the <code class="docutils literal"><span class="pre">system</span></code> group. The first call to <code class="docutils literal"><span class="pre">GetNext()</span></code> will return the pair</p>
+<blockquote>
+<div>⟨1.3.6.1.2.1.1.<strong>1.0</strong>, sysDescr_value⟩</div></blockquote>
+<p>The OID 1.3.6.1.2.1.1.<strong>1.0</strong> is the first leaf node below the interior node 1.3.6.1.2.1.1.</p>
+<p>The second call to GetNext will take OID 1.3.6.1.2.1.1.<strong>1.0</strong> as parameter and <code class="docutils literal"><span class="pre">GetNext()</span></code> will return</p>
+<blockquote>
+<div>⟨1.3.6.1.2.1.1.<strong>2.0</strong>, sysObjectID_value⟩</div></blockquote>
+<p>Here, the OID returned is the next leaf node strictly following 1.3.6.1.2.1.1.<strong>1.0</strong>. The process will continue on through {system 3 0}, {system 4 0}, <em>etc</em>, until an OID is found that is <em>not</em> part of the system group. As we have seen, this will likely be the first entry of the interfaces group, <code class="docutils literal"><span class="pre">ifNumber.0</span></code>, with OID 1.3.6.1.2.1.<strong>2</strong>.1.0.</p>
+<p>The action of <code class="docutils literal"><span class="pre">GetNext()</span></code> is particularly useful when retrieving a table, such as the interfaces table presented in the preceding section. In that example the index values are consecutive integers, and so an SNMP manager could likely guess them. However, guessing the index values for the other two tables – the IP forwarding table and the TCP connections table – would be well nigh impossible. And without the index values, we do not have a complete OID.</p>
+<p>Consider again the partial-column version of the interfaces table as diagrammed in this format:</p>
+<img alt="_images/mini_interface_cols.svg" src="_images/mini_interface_cols.svg" /><p>Let us initially call GetNext(<strong>T</strong>). The next leaf node is the upper left black box, with OID <strong>T</strong>.1.1. The call to GetNext(<strong>T</strong>) returns the pair ⟨<strong>T</strong>.1.1,1⟩. We now continue with a call to GetNext(<strong>T</strong>.1.1); this returns ⟨<strong>T</strong>.1.2,2⟩ and represents the black box immediately below the first one. The next two calls to <code class="docutils literal"><span class="pre">GetNext()</span></code> return, successively, ⟨<strong>T</strong>.1.3,3⟩ and ⟨<strong>T</strong>.1.4,4⟩.</p>
+<p>Now we call GetNext(<strong>T</strong>.1.4). The next leaf node following is the first leaf node in the <em>second</em> column, <strong>T</strong>.2.1; the value returned is ⟨<strong>T</strong>.2.1,”lo”⟩. The next three calls to GetNext, each time supplied with parameter the value returned by the previous <code class="docutils literal"><span class="pre">GetNext()</span></code>, return the next three values making up the second, <code class="docutils literal"><span class="pre">ifDesc</span></code> column of the table.</p>
+<p>At the bottom of the second column, the call to GetNext(<strong>T</strong>.2.4) returns the ⟨OID,value⟩ pair that is the first leaf node of the third column, ⟨<strong>T</strong>.3.1,16436⟩. At the bottom of the third column, <code class="docutils literal"><span class="pre">GetNext()</span></code> jumps to the top of the fourth column, and so on. In this manner <code class="docutils literal"><span class="pre">GetNext()</span></code> iterates through the entire table, one column at a time.</p>
+<p>When we finally get to the last leaf node of the table, shown here as the lower-right <strong>T</strong>.11.4 (though the actual <code class="docutils literal"><span class="pre">ifTable</span></code> has additional columns). The call to GetNext(<strong>T</strong>.11.4) returns something outside the table. It will either return an error – in the event that there is no next OID that the manager is authorized to receive – or the next leaf node up and to the right of T. (In the normal MIB-2 collection, this is would be the first entry of the <code class="docutils literal"><span class="pre">atTable</span></code> table.)</p>
+<p>Either way, the manager receiving the data can tell that its request for GetNext(<strong>T</strong>.11.4) has gone past the end of table <strong>T</strong>, and so <strong>T</strong> has been completely traversed.</p>
+<p>Here is a diagram of the above sequence of <code class="docutils literal"><span class="pre">GetNext()</span></code> operations involved in traversing our partial interfaces table; it shows the GetNext(<strong>T</strong>.11.4) at the table’s lower right returning the beyond-the-table ⟨OID,value⟩ pair ⟨<strong>A</strong>,avalue⟩:</p>
+<img alt="_images/getnext_sequence.svg" src="_images/getnext_sequence.svg" /><p>Some manager utilities performing this kind of table retrieval – often called a “walk” – will present the data in the order retrieved, one column at a time, and some will (perhaps as an option) format the data visually to look more like a table. See Net-SNMP’s <code class="docutils literal"><span class="pre">snmpwalk</span></code> and <code class="docutils literal"><span class="pre">snmptable</span></code> in <a class="reference internal" href="#mib-browsing"><span class="std std-ref">24.9&nbsp;&nbsp;&nbsp;MIB Browsing</span></a>.</p>
+<div class="section" id="multi-attribute-get">
+<span id="multi-col-get"></span><h3>24.8.1&nbsp;&nbsp;&nbsp;Multi-attribute <code class="docutils literal"><span class="pre">Get()</span></code><a class="headerlink" href="#multi-attribute-get" title="Permalink to this headline">¶</a></h3>
+<p>A single <code class="docutils literal"><span class="pre">Get()/GetNext()</span></code> request can in fact include a list of attributes to be retrieved. This provides an efficient way to request entire rows of a table.</p>
+<p>A manager in general does not know all the index values of a table, but likely <em>does</em> know all the column OIDs (as in the blue full-length row above). The manager can speed up the table-retrieval process by asking for entire rows at a time. The first such <code class="docutils literal"><span class="pre">GetNext()</span></code> might be</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">GetNext(<strong>T</strong>.1, <strong>T</strong>.2, <strong>T</strong>.3, <strong>T</strong>.4, <strong>T</strong>.10, <strong>T</strong>.11)</div>
+</div>
+</div></blockquote>
+<p>These are the OIDs of the blue full-length row; these are all non-leaf OIDs. The result is the list of pairs</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">⟨<strong>T</strong>.1.1,1⟩, ⟨<strong>T</strong>.2.1,”lo”⟩, ⟨<strong>T</strong>.3.1,16436⟩, ⟨<strong>T</strong>.4.1,10000000⟩, ⟨<strong>T</strong>.10.1,171⟩, ⟨<strong>T</strong>.11.1,3⟩</div>
+</div>
+</div></blockquote>
+<p>That is, the table’s entire first row is returned (where we are assuming again that the only columns are 1, 2, 3, 4, 10 and 11). The next call to <code class="docutils literal"><span class="pre">GetNext()</span></code> would use the OIDs returned above:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">GetNext(<strong>T</strong>.1.1, <strong>T</strong>.2.1, <strong>T</strong>.3.1, <strong>T</strong>.4.1, <strong>T</strong>.10.1, <strong>T</strong>.11.1)</div>
+</div>
+</div></blockquote>
+<p>This would then return the table’s entire second row, and so on. When we got to the very last row, the call</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">GetNext(<strong>T</strong>.1.4, <strong>T</strong>.2.4, <strong>T</strong>.3.4, <strong>T</strong>.4.4, <strong>T</strong>.10.4, <strong>T</strong>.11.4)</div>
+</div>
+</div></blockquote>
+<p>would return (assuming now that the columns shown are the only columns that exist)</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">⟨<strong>T</strong>.2.1,”lo”⟩, ⟨<strong>T</strong>.3.1,16436⟩, ⟨<strong>T</strong>.4.1,10000000⟩, ⟨<strong>T</strong>.10.1,171⟩, ⟨<strong>T</strong>.11.1,3⟩, ⟨<strong>A</strong>,avalue⟩</div>
+</div>
+</div></blockquote>
+<p>where <strong>A</strong> is the next leaf OID above and to the right of <strong>T</strong> (assuming no error). At this point the manager knows, as in the single-attribute-get case, that the entire table has been retrieved.</p>
+<p>It does not matter whether the manager uses this multi-attribute form of <code class="docutils literal"><span class="pre">GetNext()</span></code> to return all the columns of the relevant table, or only the subset of columns in which the manager is interested.</p>
+<p>We will see in <a class="reference internal" href="netmgmtb.html#getbulk"><span class="std std-ref">25.1.3&nbsp;&nbsp;&nbsp;SNMPv2 GetBulk()</span></a> that SNMPv2 introduced an operation <code class="docutils literal"><span class="pre">GetBulk()</span></code> that can return multiple rows of multiple columns in a single operation.</p>
+<p>Tables are not necessarily static. New dynamic interfaces may be added, and new routes and TCP connections are added all the time. A manager reading a table using the single-attribute form of <code class="docutils literal"><span class="pre">GetNext()</span></code> may find that only the latter part of a new row is retrieved, or, alternatively, that the first part of a deleted row is retrieved. The multi-attribute <code class="docutils literal"><span class="pre">GetNext()</span></code> offers a little more protection from this.</p>
+</div>
+<div class="section" id="set">
+<span id="id5"></span><h3>24.8.2&nbsp;&nbsp;&nbsp;<code class="docutils literal"><span class="pre">Set()</span></code><a class="headerlink" href="#set" title="Permalink to this headline">¶</a></h3>
+<p>SNMP also allows a <code class="docutils literal"><span class="pre">Set()</span></code> operation. Not all attributes are writable, of course, and a manager must have write authority for those that <em>are</em> writable. And there is no <code class="docutils literal"><span class="pre">SetNext()</span></code>; the exact OID of each value must be supplied.</p>
+<p>In the system group, the <code class="docutils literal"><span class="pre">sysName</span></code> attribute is writable. It has OID 1.3.6.1.2.1.1.5.0; to update this we would invoke</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">Set(1.3.6.1.2.1.1.5.0, “newsysname”)</div>
+</div>
+</div></blockquote>
+<p>Like <code class="docutils literal"><span class="pre">Get()</span></code>, <code class="docutils literal"><span class="pre">Set()</span></code> can be invoked on multiple attributes. Suppose table <strong>T</strong> has three columns <strong>T</strong>.1, <strong>T</strong>.2 and <strong>T</strong>.3, and two rows:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><strong>T</strong>.1</th>
+<th class="head"><strong>T</strong>.2</th>
+<th class="head"><strong>T</strong>.3</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>10</td>
+<td>eth0</td>
+<td>3.14159</td>
+</tr>
+<tr class="row-odd"><td>11</td>
+<td>eth1</td>
+<td>2.71828</td>
+</tr>
+</tbody>
+</table>
+<p>We can then change the second <code class="docutils literal"><span class="pre">eth1</span></code> row to ⟨11,ppp1,0.577216⟩ with</p>
+<blockquote>
+<div>Set( (<strong>T</strong>.2.11,ppp1), (<strong>T</strong>.3.11,0.577216) )</div></blockquote>
+<p>We cannot change the indexing this way, but see <a class="reference internal" href="netmgmtb.html#row-additions"><span class="std std-ref">25.2&nbsp;&nbsp;&nbsp;Table Row Creation</span></a>.</p>
+<p>The semantics for multi-attribute <code class="docutils literal"><span class="pre">Set()</span></code> explicitly require – and still require – that either all the assignments succeed, or all fail; that is, multi-attribute <code class="docutils literal"><span class="pre">Set()</span></code> operations are <strong>atomic</strong>. (The usual reason for a failure is that the manager issuing the <code class="docutils literal"><span class="pre">Set()</span></code> lacked write permission for some item.) SNMPv1 had the same all-or-nothing rule for multi-attribute <code class="docutils literal"><span class="pre">Get()</span></code>, but that requirement was relaxed in SNMPv2. The all-or-nothing <code class="docutils literal"><span class="pre">Set()</span></code> semantics mean that certain updates cannot end up completed only half-way.</p>
+<p>The multi-attribute <code class="docutils literal"><span class="pre">Set()</span></code> semantics do <em>not</em> mean, however, that near-simultaneous assignments by different managers are <strong>serialized</strong>. Suppose, for example, two separate managers both attempt to update attributes specified by OIDs <strong>X</strong> and <strong>Y</strong>, one to 10 and 100 and the other to 20 and 200. If the updates are scheduled at about the same time,</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">Set((<strong>X</strong>,10), (<strong>Y</strong>,100))</div>
+<div class="line">Set((<strong>X</strong>,20), (<strong>Y</strong>,200))</div>
+</div>
+</div></blockquote>
+<p>then it is possible for the Set()s to be performed in the order (<strong>X</strong>,20), (<strong>X</strong>,10), (<strong>Y</strong>,100), (<strong>Y</strong>,200), leaving <strong>X</strong> = 10 and <strong>Y</strong> = 200. See <a class="reference internal" href="netmgmtb.html#testandincr"><span class="std std-ref">25.1.5&nbsp;&nbsp;&nbsp;TestAndIncr</span></a> for a workaround.</p>
+</div>
+</div>
+<div class="section" id="mib-browsing">
+<span id="index-40"></span><span id="id6"></span><h2>24.9&nbsp;&nbsp;&nbsp;MIB Browsing<a class="headerlink" href="#mib-browsing" title="Permalink to this headline">¶</a></h2>
+<p>Tools for individual SNMP reading are widely available, and are very helpful for viewing what is going on.</p>
+<p id="index-41">We have already mentioned the Net-SNMP package. The command <code class="docutils literal"><span class="pre">snmpget</span></code> issues a single (perhaps multi-attribute) <code class="docutils literal"><span class="pre">Get()</span></code> request; the very similar <code class="docutils literal"><span class="pre">snmpgetnext</span></code> issues a GetNext request. The command <code class="docutils literal"><span class="pre">snmpwalk</span></code> takes an OID representing the root of a subtree, and returns everything in that subtree. Here is an example that assumes the snmp agent on localhost is configured to use community string “tengwar” (see <a class="reference internal" href="#snmp-community"><span class="std std-ref">24.11&nbsp;&nbsp;&nbsp;SNMPv1 communities and security</span></a>):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">snmpwalk</span> <span class="o">-</span><span class="n">v</span> <span class="mi">1</span> <span class="o">-</span><span class="n">c</span> <span class="n">tengwar</span> <span class="n">localhost</span> <span class="mf">1.3</span><span class="o">.</span><span class="mf">6.1</span><span class="o">.</span><span class="mf">2.1</span><span class="o">.</span><span class="mf">2.2</span>
+</pre></div>
+</div>
+<p>The OID here is that of <code class="docutils literal"><span class="pre">ifTable</span></code>. Multiple OIDs are permitted for <code class="docutils literal"><span class="pre">snmpget</span></code> and <code class="docutils literal"><span class="pre">snmpgetnext</span></code> but not for <code class="docutils literal"><span class="pre">snmpwalk</span></code>.</p>
+<p>If the appropriate MIB files are loaded, the above command can also be entered as</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">snmpwalk</span> <span class="o">-</span><span class="n">v</span> <span class="mi">1</span> <span class="o">-</span><span class="n">c</span> <span class="n">tengwar</span> <span class="n">localhost</span> <span class="n">ifTable</span>
+</pre></div>
+</div>
+<p>This entails putting the RFC1213-MIB file into a special directory (<em>eg</em> $HOME/.snmp/mibs), and then either adding a line like</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mibs</span> <span class="o">+</span><span class="n">RFC1213</span><span class="o">-</span><span class="n">MIB</span>
+</pre></div>
+</div>
+<p>to the snmp.conf file, or by including the MIB name on the command line:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">snmpwalk</span> <span class="o">-</span><span class="n">v</span> <span class="mi">1</span> <span class="o">-</span><span class="n">c</span> <span class="n">tengwar</span> <span class="o">-</span><span class="n">m</span> <span class="n">RFC1213</span><span class="o">-</span><span class="n">MIB</span> <span class="n">localhost</span> <span class="n">ifTable</span>
+</pre></div>
+</div>
+<p>Note that <code class="docutils literal"><span class="pre">RFC1213-MIB</span></code> is the identifier assigned to the MIB file in its first line, as below, and <em>not</em> necessarily the name of the file containing the MIB.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">RFC1213</span><span class="o">-</span><span class="n">MIB</span> <span class="n">DEFINITIONS</span> <span class="p">::</span><span class="o">=</span> <span class="n">BEGIN</span>
+</pre></div>
+</div>
+<p>If the appropriate MIB file is loaded, the OIDs may be displayed symbolically rather than numerically, but the data presentation will not change:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>   <span class="n">iso</span><span class="o">.</span><span class="mf">3.6</span><span class="o">.</span><span class="mf">1.2</span><span class="o">.</span><span class="mf">1.1</span><span class="o">.</span><span class="mf">5.0</span> <span class="o">=</span> <span class="n">STRING</span><span class="p">:</span> <span class="s2">&quot;valhal&quot;</span>       <span class="p">;;</span> <span class="n">without</span> <span class="n">MIB</span>
+<span class="n">RFC1213</span><span class="o">-</span><span class="n">MIB</span><span class="p">::</span><span class="n">sysName</span><span class="o">.</span><span class="mi">0</span> <span class="o">=</span> <span class="n">STRING</span><span class="p">:</span> <span class="s2">&quot;valhal&quot;</span>       <span class="p">;;</span> <span class="k">with</span> <span class="n">MIB</span>
+</pre></div>
+</div>
+<p>(Actually, if the data is of type Object ID, then without the MIB the OID will be displayed numerically, and with the appropriate MIB all or part of it may be displayed symbolically.)</p>
+<p>Finally, the Net-SNMP manager package includes <code class="docutils literal"><span class="pre">snmptable</span></code>, which is like <code class="docutils literal"><span class="pre">snmpwalk</span></code> except that the data is displayed as a table rather than one column at a time. For the <code class="docutils literal"><span class="pre">snmptable</span></code> command, the appropriate MIB file <em>must</em> be installed.
+Net-SNMP comes with a mib browser with a graphical interface, <code class="docutils literal"><span class="pre">tkmib</span></code>.</p>
+<p>The personal edition of the <a class="reference external" href="http://www.ireasoning.com/mibbrowser.shtml">iReasoning MIB browser</a> is not open-source, but it <em>is</em> free, and works well on Windows, Macs and Linux; SNMPv3 is not supported. The license does prohibit the publication of benchmark tests without consent.</p>
+</div>
+<div class="section" id="mib-2">
+<span id="mib2"></span><span id="index-42"></span><span id="id7"></span><h2>24.10&nbsp;&nbsp;&nbsp;MIB-2<a class="headerlink" href="#mib-2" title="Permalink to this headline">¶</a></h2>
+<p>We can now turn to the MIB that represents the core of SNMPv1 data, known as MIB-2, and defined in <span class="target" id="index-43"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1213.html"><strong>RFC 1213</strong></a>. The “2” here – often represented with a Roman numeral: MIB-II – represents the second iteration of the definition, but it is still part of SNMPv<strong>1</strong>. The predecessor MIB-1 was first documented in <span class="target" id="index-44"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1066.html"><strong>RFC 1066</strong></a>, 1988.</p>
+<p>As we saw in <a class="reference internal" href="#mibs"><span class="std std-ref">24.4&nbsp;&nbsp;&nbsp;MIBs</span></a>, the MIB-2 OID prefix is 1.3.6.1.2.1.</p>
+<p>MIB-2 has since been extended. We look at a few extensions below in <a class="reference internal" href="netmgmtb.html#sysortable"><span class="std std-ref">25.1.7&nbsp;&nbsp;&nbsp;SNMPv2 MIB Changes</span></a>, <a class="reference internal" href="netmgmtb.html#ifxtable"><span class="std std-ref">25.1.9&nbsp;&nbsp;&nbsp;IF-MIB and ifXTable</span></a>, <a class="reference internal" href="netmgmtb.html#tcp-mib"><span class="std std-ref">25.1.13&nbsp;&nbsp;&nbsp;TCP-MIB</span></a> and <a class="reference internal" href="netmgmtb.html#ip-forward-mib"><span class="std std-ref">25.1.12.2&nbsp;&nbsp;&nbsp;IP-Forward MIB</span></a>. In general, serious network management should make use of these newer versions. However, MIB-2 is still an excellent place to get started, even if partly obsolete.</p>
+<p>The original MIB-2 is divided into ten groups, not all of which are in current use:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">system(1)</span></code>:        above</li>
+<li><code class="docutils literal"><span class="pre">interfaces(2)</span></code>: above, in brief</li>
+<li><code class="docutils literal"><span class="pre">at(3)</span></code>: the ARP cache, <a class="reference internal" href="ipv4companions.html#address-resolution-protocol"><span class="std std-ref">10.2&nbsp;&nbsp;&nbsp;Address Resolution Protocol: ARP</span></a></li>
+<li><code class="docutils literal"><span class="pre">ip(4)</span></code>: including the IP forwarding table used as an example above</li>
+<li><code class="docutils literal"><span class="pre">icmp(5)</span></code>: information about ICMP, <a class="reference internal" href="ipv4companions.html#icmp"><span class="std std-ref">10.4&nbsp;&nbsp;&nbsp;Internet Control Message Protocol</span></a></li>
+<li><code class="docutils literal"><span class="pre">tcp(6)</span></code>: including the TCP connections table used as an example above</li>
+<li><code class="docutils literal"><span class="pre">udp(7)</span></code>: information about UDP activity</li>
+<li><code class="docutils literal"><span class="pre">egp(8)</span></code>: information about the now-obsolete EGP protocol, replaced by BGP</li>
+<li><code class="docutils literal"><span class="pre">transmission(10)</span></code>: never used</li>
+<li><code class="docutils literal"><span class="pre">snmp(11)</span></code>: about the SNMP agent itself</li>
+</ul>
+<p>Originally group 9 was for CMOT, above, but this entry is commented out in <span class="target" id="index-45"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1213.html"><strong>RFC 1213</strong></a> (though it does not appear at all in MIB-1).</p>
+<p>The <code class="docutils literal"><span class="pre">at</span></code> group is officially deprecated; the same ARP-cache information is available within the <code class="docutils literal"><span class="pre">ip</span></code> group. The EGP protocol has been entirely replaced by BGP, and management of BGP routers is highly specialized; <span class="target" id="index-46"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc4273.html"><strong>RFC 4273</strong></a> contains a BGP MIB but private MIBs are almost universally used here as well.</p>
+<p>The transmission group was included anticipating the day when “definitions for managed transmission media are defined”. This day has not come to pass.</p>
+<p>The Net-SNMP agent implementation returns nothing for the egp and transmission groups.</p>
+<div class="section" id="the-system-group">
+<span id="system-group"></span><h3>24.10.1&nbsp;&nbsp;&nbsp;The system Group<a class="headerlink" href="#the-system-group" title="Permalink to this headline">¶</a></h3>
+<p>We have already looked at this in <a class="reference internal" href="#mibs"><span class="std std-ref">24.4&nbsp;&nbsp;&nbsp;MIBs</span></a> and will not say much more, except to note that several of the entries in this group must be manually configured. This can be done either through editing of the configuration file, <em>eg</em> <code class="docutils literal"><span class="pre">snmpd.conf</span></code>, or else (in the case of <code class="docutils literal"><span class="pre">read-write</span></code> attributes) by using SNMP itself.</p>
+<p id="index-47">The <code class="docutils literal"><span class="pre">sysObjectID</span></code> value represents a vendor-specific OID for this particular system’s SNMP agent. For example, the Net-SNMP package installed on my system returns 1.3.6.1.4.1.8072.3.2.10. The 1.3.6.1.4.1 is the root of the <code class="docutils literal"><span class="pre">private</span></code>, vendor-specific, OID tree, and 8072 has been assigned to the Net-SNMP project. This often represents, in practice, the way an SNMP manager can figure out the vendor of an agent, and thus determine what vendor-specific information to query. One can use the 8072 discovered here to ask for the subtree 1.3.6.1.4.1.8072, and find all sorts of Net-SNMP-specific information. Similarly, on one particular Windows XP installation with Microsoft Network Monitoring installed, the sysObjectID value is 1.3.6.1.4.1.<strong>311</strong>.1.1.3.1.1; 311 is the OID level assigned to Microsoft in the private subtree 1.3.6.1.4.1.</p>
+<p>The system group has been expanded in SNMPv2 with an Object Resource table, <code class="docutils literal"><span class="pre">sysORTable</span></code>; see <a class="reference internal" href="netmgmtb.html#sysortable"><span class="std std-ref">25.1.7&nbsp;&nbsp;&nbsp;SNMPv2 MIB Changes</span></a>.</p>
+</div>
+<div class="section" id="table-definitions-and-the-interfaces-group">
+<span id="interfaces-group"></span><h3>24.10.2&nbsp;&nbsp;&nbsp;Table definitions and the interfaces Group<a class="headerlink" href="#table-definitions-and-the-interfaces-group" title="Permalink to this headline">¶</a></h3>
+<p>The interfaces group consists of a single INTEGER value <code class="docutils literal"><span class="pre">ifNumber</span></code> representing the number of current network interfaces (including “down” interfaces), and the interfaces table partially introduced earlier. We take the opportunity here to outline exactly how MIB table definitions – and enumerated types – are structured using ASN.1.</p>
+<p>Some of the interfaces-group definitions have later been updated. See, for example, <span class="target" id="index-48"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2863.html"><strong>RFC 2863</strong></a>, which also redefines the group to use the additional features of the SNMPv2 SMI. We will return to an extension of the interfaces group in <a class="reference internal" href="netmgmtb.html#ifxtable"><span class="std std-ref">25.1.9&nbsp;&nbsp;&nbsp;IF-MIB and ifXTable</span></a>.</p>
+<p>MIB table definitions almost always involve a two-level process: an OID is defined for the table, and then a second OID is defined for a <strong>table entry</strong>, that is, for one row of the table. This second OID is usually generated from the first by appending “.1”, and it is this second OID that represents the table prefix in the sense of <a class="reference internal" href="#tables"><span class="std std-ref">24.7&nbsp;&nbsp;&nbsp;SNMP Tables</span></a>, denoted there by <strong>T</strong>.</p>
+<p>The actual ASN.1, slightly annotated, is as follows:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ifTable</span> <span class="n">OBJECT</span><span class="o">-</span><span class="n">TYPE</span>
+    <span class="n">SYNTAX</span>  <span class="n">SEQUENCE</span> <span class="n">OF</span> <span class="n">IfEntry</span>       <span class="o">--</span> <span class="n">note</span> <span class="n">UPPER</span><span class="o">-</span><span class="n">CASE</span><span class="o">-</span><span class="n">I</span> <span class="n">IfEntry</span>
+    <span class="n">ACCESS</span>  <span class="ow">not</span><span class="o">-</span><span class="n">accessible</span>
+    <span class="n">STATUS</span>  <span class="n">mandatory</span>
+    <span class="n">DESCRIPTION</span>
+            <span class="s2">&quot;A list of interface entries.  The number of</span>
+            <span class="n">entries</span> <span class="ow">is</span> <span class="n">given</span> <span class="n">by</span> <span class="n">the</span> <span class="n">value</span> <span class="n">of</span> <span class="n">ifNumber</span><span class="o">.</span><span class="s2">&quot;</span>
+    <span class="p">::</span><span class="o">=</span> <span class="p">{</span> <span class="n">interfaces</span> <span class="mi">2</span> <span class="p">}</span>              <span class="o">--</span> <span class="n">that</span> <span class="ow">is</span><span class="p">,</span> <span class="mf">1.3</span><span class="o">.</span><span class="mf">6.1</span><span class="o">.</span><span class="mf">2.1</span><span class="o">.</span><span class="mf">2.2</span>
+
+<span class="n">ifEntry</span> <span class="n">OBJECT</span><span class="o">-</span><span class="n">TYPE</span>                   <span class="o">--</span> <span class="n">note</span> <span class="n">lower</span><span class="o">-</span><span class="n">case</span><span class="o">-</span><span class="n">i</span> <span class="n">ifEntry</span>
+    <span class="n">SYNTAX</span>  <span class="n">IfEntry</span>                   <span class="o">--</span> <span class="n">note</span> <span class="n">UPPER</span><span class="o">-</span><span class="n">CASE</span><span class="o">-</span><span class="n">I</span> <span class="n">IfEntry</span>
+    <span class="n">ACCESS</span>  <span class="ow">not</span><span class="o">-</span><span class="n">accessible</span>
+    <span class="n">STATUS</span>  <span class="n">mandatory</span>
+    <span class="n">DESCRIPTION</span>
+            <span class="s2">&quot;An interface entry containing objects at the</span>
+            <span class="n">subnetwork</span> <span class="n">layer</span> <span class="ow">and</span> <span class="n">below</span> <span class="k">for</span> <span class="n">a</span> <span class="n">particular</span> <span class="n">interface</span><span class="o">.</span><span class="s2">&quot;</span>
+    <span class="n">INDEX</span>   <span class="p">{</span> <span class="n">ifIndex</span> <span class="p">}</span>
+    <span class="p">::</span><span class="o">=</span> <span class="p">{</span> <span class="n">ifTable</span> <span class="mi">1</span> <span class="p">}</span>                 <span class="o">--</span> <span class="n">that</span> <span class="ow">is</span><span class="p">,</span> <span class="mf">1.3</span><span class="o">.</span><span class="mf">6.1</span><span class="o">.</span><span class="mf">2.1</span><span class="o">.</span><span class="mf">2.2</span><span class="o">.</span><span class="mi">1</span>
+</pre></div>
+</div>
+<p>Both these entries are <code class="docutils literal"><span class="pre">not-accessible</span></code> as they do not represent leaf nodes. The second declaration above is for the lower-case-i <code class="docutils literal"><span class="pre">ifEntry</span></code>; the next definition in <span class="target" id="index-49"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1213.html"><strong>RFC 1213</strong></a> is for the UPPER-CASE-I version. The latter represents the complete list of all columns of an ifEntry/IfEntry object, together with their types from (in most cases) <a class="reference internal" href="#snmpv1-data-types"><span class="std std-ref">24.5&nbsp;&nbsp;&nbsp;SNMPv1 Data Types</span></a>. The <code class="docutils literal"><span class="pre">PhysAddress</span></code> type is defined in <span class="target" id="index-50"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1213.html"><strong>RFC 1213</strong></a> as a synonym for <code class="docutils literal"><span class="pre">OCTET</span> <span class="pre">STRING</span></code>. Definitions for the OID associated with each column comes later.</p>
+<p>It is <code class="docutils literal"><span class="pre">ifEntry</span></code> that represents an actual row, and thus includes an <code class="docutils literal"><span class="pre">INDEX</span></code> entry to specify the attribute or attributes that make up the primary key for that row.</p>
+<p>We now define <strong>I</strong>fEntry:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">IfEntry</span> <span class="p">::</span><span class="o">=</span>
+    <span class="n">SEQUENCE</span> <span class="p">{</span>
+        <span class="n">ifIndex</span>            <span class="n">INTEGER</span><span class="p">,</span>
+        <span class="n">ifDescr</span>            <span class="n">DisplayString</span><span class="p">,</span>
+        <span class="n">ifType</span>             <span class="n">INTEGER</span><span class="p">,</span>
+        <span class="n">ifMtu</span>              <span class="n">INTEGER</span><span class="p">,</span>
+        <span class="n">ifSpeed</span>            <span class="n">Gauge</span><span class="p">,</span>
+        <span class="n">ifPhysAddress</span>      <span class="n">PhysAddress</span><span class="p">,</span>
+        <span class="n">ifAdminStatus</span>      <span class="n">INTEGER</span><span class="p">,</span>
+        <span class="n">ifOperStatus</span>       <span class="n">INTEGER</span><span class="p">,</span>
+        <span class="n">ifLastChange</span>       <span class="n">TimeTicks</span><span class="p">,</span>
+        <span class="n">ifInOctets</span>         <span class="n">Counter</span><span class="p">,</span>
+        <span class="n">ifInUcastPkts</span>      <span class="n">Counter</span><span class="p">,</span>
+        <span class="n">ifInNUcastPkts</span>     <span class="n">Counter</span><span class="p">,</span>
+        <span class="n">ifInDiscards</span>       <span class="n">Counter</span><span class="p">,</span>
+        <span class="n">ifInErrors</span>         <span class="n">Counter</span><span class="p">,</span>
+        <span class="n">ifInUnknownProtos</span>  <span class="n">Counter</span><span class="p">,</span>
+        <span class="n">ifOutOctets</span>        <span class="n">Counter</span><span class="p">,</span>
+        <span class="n">ifOutUcastPkts</span>     <span class="n">Counter</span><span class="p">,</span>
+        <span class="n">ifOutNUcastPkts</span>    <span class="n">Counter</span><span class="p">,</span>
+        <span class="n">ifOutDiscards</span>      <span class="n">Counter</span><span class="p">,</span>
+        <span class="n">ifOutErrors</span>        <span class="n">Counter</span><span class="p">,</span>
+        <span class="n">ifOutQLen</span>          <span class="n">Gauge</span><span class="p">,</span>
+        <span class="n">ifSpecific</span>         <span class="n">OBJECT</span> <span class="n">IDENTIFIER</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+<div class="sidebar">
+<p class="first sidebar-title">Attributes</p>
+<p class="last">There can be a certain eye-glazing tedium in some of SNMP’s lengthy attribute lists, such as the one above. This can be replaced by panic in a hurry, though, when a problem has arisen and the proper attribute to diagnose it doesn’t seem to be included anywhere.</p>
+</div>
+<p>It would have been possible to plug in the above definition of <strong>I</strong>fEntry into the <code class="docutils literal"><span class="pre">SYNTAX</span></code> specification of the previous <strong>i</strong>fEntry, but that is cumbersome. The <strong>I</strong>fEntry definition is not a stand-alone <code class="docutils literal"><span class="pre">OBJECT-TYPE</span></code> and does not have its own OID.</p>
+<p>If all we wanted to do was to implement the interfaces table using the shortest possible OIDs, we would not have created separate ifTable and ifEntry OIDs. This would mean, however, that we could not use the <code class="docutils literal"><span class="pre">OBJECT-TYPE</span></code> macro to define <code class="docutils literal"><span class="pre">ifTable</span></code>, which would have been less consistent (especially as the ASN.1 syntax also determines the packet encoding, as in <a class="reference internal" href="#snmp-encoding"><span class="std std-ref">24.12&nbsp;&nbsp;&nbsp;SNMP and ASN.1 Encoding</span></a>). Essentially every table prefix in SNMP is defined using two additional OID levels, as here, rather than one.</p>
+<p id="index-51">We now turn to the 22 specific interface attributes. Here is the definition for the first, <code class="docutils literal"><span class="pre">ifIndex</span></code>; it defines column 1 of the interfaces table to be, in effect, ifEntry.1. As we are now talking about a leaf node, once the OID suffix is appended to represent the index, the <code class="docutils literal"><span class="pre">ACCESS</span></code> is no longer <code class="docutils literal"><span class="pre">not-accessible</span></code>.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ifIndex</span> <span class="n">OBJECT</span><span class="o">-</span><span class="n">TYPE</span>
+    <span class="n">SYNTAX</span>  <span class="n">INTEGER</span>
+    <span class="n">ACCESS</span>  <span class="n">read</span><span class="o">-</span><span class="n">only</span>
+    <span class="n">STATUS</span>  <span class="n">mandatory</span>
+    <span class="n">DESCRIPTION</span>
+            <span class="s2">&quot;A unique value for each interface.  Its value ranges</span>
+            <span class="n">between</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">value</span> <span class="n">of</span> <span class="n">ifNumber</span><span class="o">.</span>  <span class="n">The</span> <span class="n">value</span> <span class="k">for</span> <span class="n">each</span>
+            <span class="n">interface</span> <span class="n">must</span> <span class="n">remain</span> <span class="n">constant</span> <span class="n">at</span> <span class="n">least</span> <span class="kn">from</span> <span class="nn">one</span>
+            <span class="n">reinitialization</span> <span class="n">of</span> <span class="n">the</span> <span class="n">entity</span><span class="s1">&#39;s network management system</span>
+            <span class="n">to</span> <span class="n">the</span> <span class="nb">next</span> <span class="n">reinitialization</span><span class="o">.</span><span class="s2">&quot;</span>
+    <span class="p">::</span><span class="o">=</span> <span class="p">{</span> <span class="n">ifEntry</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">DESCRIPTION</span></code> clearly indicates that the values for <code class="docutils literal"><span class="pre">ifIndex</span></code>, used to specify interfaces, are to be consecutive integers. Compliance with this rule has been an early casualty, for various reasons, and is formally withdrawn in <span class="target" id="index-52"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2863.html"><strong>RFC 2863</strong></a>. Some vendors simply number physical interfaces non-consecutively. In other cases, there is some underlying issue with consecutive numbering. For example, one of the author’s systems running Net-SNMP returns <code class="docutils literal"><span class="pre">ifNumber</span></code> = 3, and then the following table values:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="56%" />
+<col width="44%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><code class="docutils literal"><span class="pre">ifIndex</span></code></th>
+<th class="head"><code class="docutils literal"><span class="pre">ifName</span></code></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1</td>
+<td>lo</td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td>eth0</td>
+</tr>
+<tr class="row-even"><td>549</td>
+<td>ppp0</td>
+</tr>
+</tbody>
+</table>
+<p>It turns out that ppp0 is a virtual interface corresponding to a VPN tunnel, <a class="reference internal" href="otherLANs.html#vpn"><span class="std std-ref">5.1&nbsp;&nbsp;&nbsp;Virtual Private Networks</span></a>, and the underlying tunnel regularly fails and is then automatically re-instantiated. Each time it does so, the <code class="docutils literal"><span class="pre">ifIndex</span></code> is incremented by 1.</p>
+<p>The rule that interfaces be numbered consecutively was formally deprecated in <span class="target" id="index-53"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2863.html"><strong>RFC 2863</strong></a>, an SNMPv2 update of the interface group. This, in turn, makes the <code class="docutils literal"><span class="pre">ifNumber</span></code> value rather less useful than it might be; most SNMP tables are not associated with a count attribute and seem to do just fine.</p>
+<p>Most SNMP data values correspond straightforwardly with attributes defined by the hardware and the underlying operating system. The <code class="docutils literal"><span class="pre">ifIndex</span></code> value does not, at least not necessarily. Generally the agent must maintain at least some state to keep the <code class="docutils literal"><span class="pre">ifIndex</span></code> value consistent. In some cases, the <code class="docutils literal"><span class="pre">ifIndex</span></code> value may be taken from the relative position of the interface in some internal operating-system table. This is not, however, universally the case, as with the <code class="docutils literal"><span class="pre">ifIndex</span></code> value of 549 for ppp0 in the table above.</p>
+<p>The <code class="docutils literal"><span class="pre">ifIndex</span></code> value is widely used throughout SNMP, and is often referenced in other tables. SNMPv2 even defines a special type (a TEXTUAL CONVENTION) for it, named <code class="docutils literal"><span class="pre">InterfaceIndex</span></code> (<a class="reference internal" href="netmgmtb.html#snmpv2-smi"><span class="std std-ref">25.1.1&nbsp;&nbsp;&nbsp;SNMPv2 SMI and Data Types</span></a>).</p>
+<p>As we mentioned earlier, there is no reason to include <code class="docutils literal"><span class="pre">ifIndex</span></code> as an actual column in the table; the value of <code class="docutils literal"><span class="pre">ifIndex</span></code> can always be calculated from the OID of any component of the row. The SNMPv2 approach here – basically to define <code class="docutils literal"><span class="pre">ifIndex</span></code> as <code class="docutils literal"><span class="pre">not-accessible</span></code> – is described below in <a class="reference internal" href="netmgmtb.html#snmpv2-indexes"><span class="std std-ref">25.1.4&nbsp;&nbsp;&nbsp;SNMPv2 Indexes</span></a>.</p>
+<p id="index-54">The <code class="docutils literal"><span class="pre">ifDescr</span></code> is a textual description of the interface; it is usually the device name associated with the interface. <span class="target" id="index-55"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1213.html"><strong>RFC 1213</strong></a> states “this string should include the name of the manufacturer, the product name and the version of the hardware interface”, but this is inconsistent with Linux device-naming conventions. The current rule is that it is merely unique.</p>
+<p id="index-56">The <code class="docutils literal"><span class="pre">ifType</span></code> attribute is our first example of how ASN.1 handles <strong>enumerated types</strong>. The value is a small integer and the hardware type associated with each integer is spelled out as follows. The majority of the networking technologies in this 1991 list have pretty much vanished from the face of the earth.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ifType</span> <span class="n">OBJECT</span><span class="o">-</span><span class="n">TYPE</span>
+    <span class="n">SYNTAX</span>  <span class="n">INTEGER</span> <span class="p">{</span>
+                <span class="n">other</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>          <span class="o">--</span> <span class="n">none</span> <span class="n">of</span> <span class="n">the</span> <span class="n">following</span>
+                <span class="n">regular1822</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+                <span class="n">hdh1822</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+                <span class="n">ddn</span><span class="o">-</span><span class="n">x25</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
+                <span class="n">rfc877</span><span class="o">-</span><span class="n">x25</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span>
+                <span class="n">ethernet</span><span class="o">-</span><span class="n">csmacd</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span>
+                <span class="n">iso88023</span><span class="o">-</span><span class="n">csmacd</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span>
+                <span class="n">iso88024</span><span class="o">-</span><span class="n">tokenBus</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span>
+                <span class="n">iso88025</span><span class="o">-</span><span class="n">tokenRing</span><span class="p">(</span><span class="mi">9</span><span class="p">),</span>
+                <span class="n">iso88026</span><span class="o">-</span><span class="n">man</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
+                <span class="n">starLan</span><span class="p">(</span><span class="mi">11</span><span class="p">),</span>
+                <span class="n">proteon</span><span class="o">-</span><span class="mi">10</span><span class="n">Mbit</span><span class="p">(</span><span class="mi">12</span><span class="p">),</span>
+                <span class="n">proteon</span><span class="o">-</span><span class="mi">80</span><span class="n">Mbit</span><span class="p">(</span><span class="mi">13</span><span class="p">),</span>
+                <span class="n">hyperchannel</span><span class="p">(</span><span class="mi">14</span><span class="p">),</span>
+                <span class="n">fddi</span><span class="p">(</span><span class="mi">15</span><span class="p">),</span>
+                <span class="n">lapb</span><span class="p">(</span><span class="mi">16</span><span class="p">),</span>
+                <span class="n">sdlc</span><span class="p">(</span><span class="mi">17</span><span class="p">),</span>
+                <span class="n">ds1</span><span class="p">(</span><span class="mi">18</span><span class="p">),</span>           <span class="o">--</span> <span class="n">T</span><span class="o">-</span><span class="mi">1</span>
+                <span class="n">e1</span><span class="p">(</span><span class="mi">19</span><span class="p">),</span>            <span class="o">--</span> <span class="n">European</span> <span class="n">equiv</span><span class="o">.</span> <span class="n">of</span> <span class="n">T</span><span class="o">-</span><span class="mi">1</span>
+                <span class="n">basicISDN</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span>
+                <span class="n">primaryISDN</span><span class="p">(</span><span class="mi">21</span><span class="p">),</span>   <span class="o">--</span> <span class="n">proprietary</span> <span class="n">serial</span>
+                <span class="n">propPointToPointSerial</span><span class="p">(</span><span class="mi">22</span><span class="p">),</span>
+                <span class="n">ppp</span><span class="p">(</span><span class="mi">23</span><span class="p">),</span>
+                <span class="n">softwareLoopback</span><span class="p">(</span><span class="mi">24</span><span class="p">),</span>
+                <span class="n">eon</span><span class="p">(</span><span class="mi">25</span><span class="p">),</span>            <span class="o">--</span> <span class="n">CLNP</span> <span class="n">over</span> <span class="n">IP</span> <span class="p">[</span><span class="mi">11</span><span class="p">]</span>
+                <span class="n">ethernet</span><span class="o">-</span><span class="mi">3</span><span class="n">Mbit</span><span class="p">(</span><span class="mi">26</span><span class="p">),</span>
+                <span class="n">nsip</span><span class="p">(</span><span class="mi">27</span><span class="p">),</span>           <span class="o">--</span> <span class="n">XNS</span> <span class="n">over</span> <span class="n">IP</span>
+                <span class="n">slip</span><span class="p">(</span><span class="mi">28</span><span class="p">),</span>           <span class="o">--</span> <span class="n">generic</span> <span class="n">SLIP</span>
+                <span class="n">ultra</span><span class="p">(</span><span class="mi">29</span><span class="p">),</span>          <span class="o">--</span> <span class="n">ULTRA</span> <span class="n">technologies</span>
+                <span class="n">ds3</span><span class="p">(</span><span class="mi">30</span><span class="p">),</span>            <span class="o">--</span> <span class="n">T</span><span class="o">-</span><span class="mi">3</span>
+                <span class="n">sip</span><span class="p">(</span><span class="mi">31</span><span class="p">),</span>            <span class="o">--</span> <span class="n">SMDS</span>
+                <span class="n">frame</span><span class="o">-</span><span class="n">relay</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+            <span class="p">}</span>
+    <span class="n">ACCESS</span>  <span class="n">read</span><span class="o">-</span><span class="n">only</span>
+    <span class="n">STATUS</span>  <span class="n">mandatory</span>
+    <span class="n">DESCRIPTION</span>
+            <span class="s2">&quot;The type of interface, distinguished according to</span>
+            <span class="n">the</span> <span class="n">physical</span><span class="o">/</span><span class="n">link</span> <span class="n">protocol</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">immediately</span> <span class="s1">&#39;below&#39;</span>
+            <span class="n">the</span> <span class="n">network</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">protocol</span> <span class="n">stack</span><span class="o">.</span><span class="s2">&quot;</span>
+    <span class="p">::</span><span class="o">=</span> <span class="p">{</span> <span class="n">ifEntry</span> <span class="mi">3</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p id="index-57">A more serious problem is that over two hundred new technologies are unlisted here. To address this, the values for <code class="docutils literal"><span class="pre">ifType</span></code> have been placed under control of the IANA, as defined in <code class="docutils literal"><span class="pre">IANAifType</span></code>; see <span class="target" id="index-58"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2863.html"><strong>RFC 2863</strong></a> and <a class="reference external" href="https://www.iana.org/assignments/ianaiftype-mib/ianaiftype-mib">https://www.iana.org/assignments/ianaiftype-mib/ianaiftype-mib</a>. The IANA can then add new types without formally updating any RFC.</p>
+<p>For the meaning of <code class="docutils literal"><span class="pre">ifMtu</span></code>, the interface MTU, see <a class="reference internal" href="ipv4.html#ipv4-fragmentation"><span class="std std-ref">9.4&nbsp;&nbsp;&nbsp;Fragmentation</span></a>. The 32-bit <code class="docutils literal"><span class="pre">ifSpeed</span></code> value will be unusable once speeds exceed 2 Gbps; <span class="target" id="index-59"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2863.html"><strong>RFC 2863</strong></a> defines an <code class="docutils literal"><span class="pre">ifHighSpeed</span></code> object with speed measured in units of Mbps. This entry is part of the <code class="docutils literal"><span class="pre">ifXTable</span></code> table, <a class="reference internal" href="netmgmtb.html#ifxtable"><span class="std std-ref">25.1.9&nbsp;&nbsp;&nbsp;IF-MIB and ifXTable</span></a>. <span class="target" id="index-60"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2863.html"><strong>RFC 2863</strong></a> also clarifies that, for virtual interfaces that do not really have a bandwidth, the value to be reported is zero (though in the example earlier the loopback interface <code class="docutils literal"><span class="pre">lo</span></code> was reported to have a bandwidth of 10 Mbps). The <code class="docutils literal"><span class="pre">ifPhysAddress</span></code> is, on Ethernets, the Ethernet address of the interface.</p>
+<p>The <code class="docutils literal"><span class="pre">ifAdminStatus</span></code> and <code class="docutils literal"><span class="pre">ifOperStatus</span></code> attributes are enumerated types: up(1), down(2), testing(3). If the <code class="docutils literal"><span class="pre">ifAdminStatus</span></code> is up(1), and the <code class="docutils literal"><span class="pre">ifOperStatus</span></code> disagrees, then there is a likely hardware malfunction. The <code class="docutils literal"><span class="pre">ifLastChange</span></code> attribute reflects the last time, in TimeTicks, there was a change in <code class="docutils literal"><span class="pre">ifOperStatus</span></code>.</p>
+<p>The next eleven entries count bytes, packets and errors. The <code class="docutils literal"><span class="pre">ifInOctets</span></code> and <code class="docutils literal"><span class="pre">ifOutOctets</span></code> count bytes received and sent (including framing bytes, <a class="reference internal" href="links.html#framing"><span class="std std-ref">6.1.5&nbsp;&nbsp;&nbsp;Framing</span></a>, if applicable). The problem with these is that they may wrap around too fast: in 34 seconds at 1 Gbps. The MIB-2 values are still used, but are generally supplemented with 64-bit counters defined in <code class="docutils literal"><span class="pre">ifXTable</span></code>, <a class="reference internal" href="netmgmtb.html#ifxtable"><span class="std std-ref">25.1.9&nbsp;&nbsp;&nbsp;IF-MIB and ifXTable</span></a>.</p>
+<p>The packet counters are for unicast packets, non-unicast packets, discarded packets, errors, and, for inbound packets only, packets with unknown protocols. The count of non-unicast packets is separated in <code class="docutils literal"><span class="pre">ifXTable</span></code> into separate counts of broadcast and multicast packets.</p>
+<p>The interface queue length is available in <code class="docutils literal"><span class="pre">ifOutQLen</span></code>. It takes a considerable amount of traffic to make this anything other than 0. <span class="target" id="index-61"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1213.html"><strong>RFC 1213</strong></a> says nothing about the timescale for averaging the queue length.</p>
+<p>The last member of the classic MIB-2 interfaces group is <code class="docutils literal"><span class="pre">ifSpecific</span></code>, which has type ObjectID. It was to return an OID that may be queried for additional ifType-specific information about the interface. It was formally deprecated in <span class="target" id="index-62"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2233.html"><strong>RFC 2233</strong></a>.</p>
+</div>
+<div class="section" id="the-ip-group">
+<h3>24.10.3&nbsp;&nbsp;&nbsp;The ip Group<a class="headerlink" href="#the-ip-group" title="Permalink to this headline">¶</a></h3>
+<p>The ip group contains several scalar attributes and three tables.</p>
+<p>The first two attributes are writable:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">ipForwarding</span></code>: a Boolean attribute to enable or disable forwarding</li>
+<li><code class="docutils literal"><span class="pre">ipDefaultTTL</span></code>: the default TTL in outgoing packets (<a class="reference internal" href="ipv4.html#ipv4-header"><span class="std std-ref">9.1&nbsp;&nbsp;&nbsp;The IPv4 Header</span></a>)</li>
+</ul>
+<p>The next scalar attributes are as follows. Here and later, we summarize these informally.</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">ipInReceives</span></code>: the number of received IP packets</li>
+<li><code class="docutils literal"><span class="pre">ipInHdrErrors</span></code>: the number of apparent IP packets received with header errors</li>
+<li><code class="docutils literal"><span class="pre">ipInAddrErrors</span></code>: the number of IP packets received with bad destination addresses</li>
+<li><code class="docutils literal"><span class="pre">ipForwDatagrams</span></code>: the number of forwarded IP packets</li>
+<li><code class="docutils literal"><span class="pre">ipInUnknownProtos</span></code>: the number of received IP packets with unknown higher-level protocol</li>
+<li><code class="docutils literal"><span class="pre">ipInDiscards</span></code>: the number of received IP packets that had no errors, but which were still discarded due to resource limits</li>
+<li><code class="docutils literal"><span class="pre">ipInDelivers</span></code>: the number of received IP packets delivered locally</li>
+<li><code class="docutils literal"><span class="pre">ipOutRequests</span></code>: the number of IP packets originated by this node for delivery elsewhere</li>
+<li><code class="docutils literal"><span class="pre">ipOutDiscards</span></code>: the number of outbound IP packets discarded due to resource limits</li>
+<li><code class="docutils literal"><span class="pre">ipOutNoRoutes</span></code>: the number of outbound IP packets for which there was no route in the IP forwarding table</li>
+<li><code class="docutils literal"><span class="pre">ipReasmTimeout</span></code>: the value, in seconds, of the IP fragment-reassembly timer</li>
+<li><code class="docutils literal"><span class="pre">ipReasmReqds</span></code>: the number of IP proper fragments received that needed reassembly at this node (forwarded fragments are reassembled at their destination)</li>
+<li><code class="docutils literal"><span class="pre">ipReasmOKs</span></code>: the number of fragmented IP packets successfully reassembled</li>
+<li><code class="docutils literal"><span class="pre">ipReasmFails</span></code>: the number of fragmented IP packets <em>not</em> successfully reassembled</li>
+<li><code class="docutils literal"><span class="pre">ipFragFails</span></code>: primarily, packets that needed fragmentation but their Dont Fragment bit (<a class="reference internal" href="ipv4.html#ipv4-fragmentation"><span class="std std-ref">9.4&nbsp;&nbsp;&nbsp;Fragmentation</span></a>) was set</li>
+<li><code class="docutils literal"><span class="pre">ipFragCreates</span></code>: the number of IP fragments created by this node</li>
+<li><code class="docutils literal"><span class="pre">ipRoutingDiscards</span></code>: the number of packets that should have been forwarded, but were discarded due to resource limits</li>
+</ul>
+<p>The first table is the <code class="docutils literal"><span class="pre">ipAddrTable</span></code>, a list of all IP addresses assigned to this node together with interfaces and netmasks.</p>
+<p>The second table is the <code class="docutils literal"><span class="pre">ipRouteTable</span></code>, that is, the forwarding table. We looked briefly at this in <a class="reference internal" href="#tables"><span class="std std-ref">24.7&nbsp;&nbsp;&nbsp;SNMP Tables</span></a>. Note that the index consists solely of the destination IP address <code class="docutils literal"><span class="pre">ipRouteDest</span></code>, which is not sufficient for CIDR-based forwarding in which the forwarding-table key is the ⟨dest,netmask⟩ pair. Traffic to 10.38.0.0/16 might be routed differently than traffic to 10.38.0.0/24!</p>
+<p>This table contains four attributes <code class="docutils literal"><span class="pre">ipRouteMetric1</span></code> through <code class="docutils literal"><span class="pre">ipRouteMetric4</span></code>. <span class="target" id="index-63"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1213.html"><strong>RFC 1213</strong></a> states that unused metrics should be set to -1, but many agents simply omit such columns entirely. Agents may similarly omit <code class="docutils literal"><span class="pre">ipRouteAge</span></code>.</p>
+<p>The third table is <code class="docutils literal"><span class="pre">ipNetToMediaTable</span></code>, which is the ARP-cache table and which replaces a similar now-deprecated table in the at group. The <code class="docutils literal"><span class="pre">ipNetToMedia</span></code> table adds one column, <code class="docutils literal"><span class="pre">ipNetToMediaType</span></code>, not present in the at-group table; this column indicates whether an physical-to-IP-address mapping is invalid(2), dynamic(3) or static(4). Most ARP entries are dynamic.</p>
+<p>For an updated version of the ip group, see <a class="reference internal" href="netmgmtb.html#ip-mib"><span class="std std-ref">25.1.12.1&nbsp;&nbsp;&nbsp;IP-MIB</span></a> and <a class="reference internal" href="netmgmtb.html#ip-forward-mib"><span class="std std-ref">25.1.12.2&nbsp;&nbsp;&nbsp;IP-Forward MIB</span></a>.</p>
+</div>
+<div class="section" id="the-icmp-group">
+<h3>24.10.4&nbsp;&nbsp;&nbsp;The icmp Group<a class="headerlink" href="#the-icmp-group" title="Permalink to this headline">¶</a></h3>
+<p>The icmp group consists of 26 counters for various ICMP events. ICMP Echo Request (ping request) packets have their own counter.</p>
+</div>
+<div class="section" id="the-tcp-group">
+<h3>24.10.5&nbsp;&nbsp;&nbsp;The tcp Group<a class="headerlink" href="#the-tcp-group" title="Permalink to this headline">¶</a></h3>
+<p>The tcp group includes the following scalars:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">tcpRtoAlgorithm</span></code>: the method for calculating the retransmission timeout, normally vanj(4) for the Jacobson-Karels algorithm in <a class="reference internal" href="tcpB.html#tcp-rto"><span class="std std-ref">18.12&nbsp;&nbsp;&nbsp;TCP Timeout and Retransmission</span></a>.</li>
+<li><code class="docutils literal"><span class="pre">tcpRtoMin</span></code>: the minimum TCP retransmission timeout, in milliseconds</li>
+<li><code class="docutils literal"><span class="pre">tcpRtoMax</span></code>: the maximum TCP retransmission timeout, again in ms</li>
+<li><code class="docutils literal"><span class="pre">tcpMaxConn</span></code>: if the system imposes a static cap on the number of allowed TCP connections, that is returned. Most systems have no static cap, though, and return -1.</li>
+<li><code class="docutils literal"><span class="pre">tcpActiveOpens</span></code>: the number of TCP connections opened from this node; specifically, the number of TCP state transitions CLOSED → SYN_SENT</li>
+<li><code class="docutils literal"><span class="pre">tcpPassiveOpens</span></code>: literally, the number of TCP state transitions LISTEN → SYN_RECD</li>
+<li><code class="docutils literal"><span class="pre">tcpAttemptFails</span></code>: the number of TCP connections that went to CLOSED without ever being ESTABLISHED</li>
+<li><code class="docutils literal"><span class="pre">tcpEstabResets</span></code>: the number of TCP connections that went from ESTABLISHED or CLOSE_WAIT directly to CLOSED, via RST packets</li>
+<li><code class="docutils literal"><span class="pre">tcpCurrEstab</span></code>: the number of TCP connections currently in either state ESTABLISHED or state CLOSE_WAIT</li>
+<li><code class="docutils literal"><span class="pre">tcpInSegs</span></code>: the count of received TCP packets, including errors and duplicates (though duplicate <em>reception</em> is relatively rare)</li>
+<li><code class="docutils literal"><span class="pre">tcpOutSegs</span></code>: the count of sent TCP packets, <em>not</em> including retransmissions</li>
+<li><code class="docutils literal"><span class="pre">tcpRetransSegs</span></code>: the count of TCP packets with at least one retransmitted byte; the packet may also contain new data</li>
+<li><code class="docutils literal"><span class="pre">tcpInErrs</span></code>: the number of TCP packets received with errors, including checksum errors</li>
+<li><code class="docutils literal"><span class="pre">tcpOutRsts</span></code>: the number of RST packets sent</li>
+</ul>
+<p>Perhaps surprisingly, there is no counter provided for total number of TCP <em>bytes</em> sent or received. There is also no entry for the congestion-management strategy, <em>eg</em> Reno v NewReno v TCP Cubic (<a class="reference internal" href="newtcps.html#newtcps"><span class="std std-ref">22&nbsp;&nbsp;&nbsp;Newer TCP Implementations</span></a>).</p>
+<p>The tcp group also includes the <code class="docutils literal"><span class="pre">tcpConnTable</span></code> table, which lists, for each connection (identified by ⟨localAddress,localPort,remoteAddress,remotePort⟩) the connection state. We looked at this earlier in <a class="reference internal" href="#snmp-tables"><span class="std std-ref">24.7&nbsp;&nbsp;&nbsp;SNMP Tables</span></a>. The table is noteworthy in that four of its five columns are part of the INDEX. A consequence is that to extract all the information from the table, a manager need only retrieve the <code class="docutils literal"><span class="pre">tcpConnState</span></code> column: the other four attributes will all be encoded in the OID index that is returned with each <code class="docutils literal"><span class="pre">tcpConnState</span></code> value.</p>
+<p>We will look at the newer SNMPv2 replacement in <a class="reference internal" href="netmgmtb.html#tcp-mib"><span class="std std-ref">25.1.13&nbsp;&nbsp;&nbsp;TCP-MIB</span></a>.</p>
+</div>
+<div class="section" id="the-udp-group">
+<h3>24.10.6&nbsp;&nbsp;&nbsp;The udp Group<a class="headerlink" href="#the-udp-group" title="Permalink to this headline">¶</a></h3>
+<p>The udp group contains the following scalars:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">udpInDatagrams</span></code>: a count of the number of UDP packets received and deliverable to a socket</li>
+<li><code class="docutils literal"><span class="pre">udpNoPorts</span></code>: a count of UDP packets received but undeliverable because the port was not open</li>
+<li><code class="docutils literal"><span class="pre">udpInErrors</span></code>: a count of the number of UDP packets undeliverable due to any other errors</li>
+<li><code class="docutils literal"><span class="pre">udpOutDatagrams</span></code>: a count of the number of UDP packets sent</li>
+</ul>
+<p>The udp group also contains the table <code class="docutils literal"><span class="pre">udpTable</span></code>. This table lists those UDP ports that the node has open. The table rows have the form ⟨localAddr,localPort⟩, with both columns included in the index. If a UDP socket accepts connections from anywhere, the localAddr will appear as 0.0.0.0.</p>
+</div>
+<div class="section" id="the-snmp-group">
+<h3>24.10.7&nbsp;&nbsp;&nbsp;The snmp Group<a class="headerlink" href="#the-snmp-group" title="Permalink to this headline">¶</a></h3>
+<p>The SNMP group consists of 28 SNMP status and error attributes, numbered from 1 to 30 with 7 and 23 not used.</p>
+</div>
+</div>
+<div class="section" id="snmpv1-communities-and-security">
+<span id="snmp-community"></span><span id="index-64"></span><h2>24.11&nbsp;&nbsp;&nbsp;SNMPv1 communities and security<a class="headerlink" href="#snmpv1-communities-and-security" title="Permalink to this headline">¶</a></h2>
+<p>An SNMPv1 manager authenticates itself to an agent by providing a string known as a <strong>community</strong> string that is a combination of both userid and password. That is, the single string identifies the manager (or manager group) and at the same time authenticates the manager.</p>
+<p>The community string identifies a manager as a member of a designated “community”, in the conventional use of the word, of managers. Of course, at many sites there will be only one manager that interacts with any given agent.</p>
+<p>Community strings are sent unencrypted, and so are vulnerable to sniffing. Even sniffing is not always necessary; far and away the most popular value – the default for many agents – is the string “public”. While the community string can be made obscure, and changed frequently, these are not enough; the only appropriate security practice today is to use SNMPv3 authentication (<a class="reference internal" href="netmgmtb.html#snmpv3-security"><span class="std std-ref">25.3&nbsp;&nbsp;&nbsp;SNMPv3</span></a>).</p>
+<p>If a manager sends an incorrect community string, then in SNMPv1 and SNMPv2c there is no reply. SNMPv3 relaxed this rule somewhat, <a class="reference internal" href="netmgmtb.html#snmpv3-engines"><span class="std std-ref">25.3.3&nbsp;&nbsp;&nbsp;SNMPv3 Engines</span></a>.</p>
+<p id="index-65">A single agent can support multiple community strings. Each community has an associated subset of the MIB (a <em>view</em>) that it allows. For example, an agent can be configured so that the community string “system” allows the manager access to the <code class="docutils literal"><span class="pre">system</span></code> group, the community string “tengwar” allows access to the entire MIB-2 group, and the community string “galadriel” allows access to the preceding plus the <code class="docutils literal"><span class="pre">private</span></code> group(s). Using Net-SNMP (the most common agent on Linux and Macintosh machines) this would be achieved by the following entries in the <code class="docutils literal"><span class="pre">snmpd.conf</span></code> file:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">rocommunity</span>  <span class="n">system</span>    <span class="n">default</span>   <span class="mf">1.3</span><span class="o">.</span><span class="mf">6.1</span><span class="o">.</span><span class="mf">2.1</span><span class="o">.</span><span class="mi">1</span>
+<span class="n">rocommunity</span>  <span class="n">tengwar</span>   <span class="n">default</span>   <span class="mf">1.3</span><span class="o">.</span><span class="mf">6.1</span><span class="o">.</span><span class="mf">2.1</span>
+<span class="n">rocommunity</span>  <span class="n">galadriel</span> <span class="n">default</span>   <span class="o">-</span><span class="n">V</span> <span class="n">mib2</span><span class="o">+</span><span class="n">private</span>
+
+<span class="n">view</span>   <span class="n">mib2</span><span class="o">+</span><span class="n">private</span> <span class="n">included</span>  <span class="mf">1.3</span><span class="o">.</span><span class="mf">6.1</span><span class="o">.</span><span class="mf">2.1</span>
+<span class="n">view</span>   <span class="n">mib2</span><span class="o">+</span><span class="n">private</span> <span class="n">included</span>  <span class="mf">1.3</span><span class="o">.</span><span class="mf">6.1</span><span class="o">.</span><span class="mf">4.1</span>
+</pre></div>
+</div>
+<p>In order that the galadriel community could contain two disconnected OID subtrees, it was necessary to make use of the View-based Access Control Model (VACM). Community galadriel has access to the OID-tree view named “mib2+private”; this view is in turn defined in the last two lines above.</p>
+<p>For our purposes here, VACM can be seen as an implementation mechanism for specifying what portion of the OID tree is accessible to a given community. VACM allows read and write permissions to be granted to specific OID trees, and also to be excluded from specific subtrees (<em>eg</em> table columns). Using the “mask” mechanism, access can even be granted to specific rows of a table. We return to VACM for SNMPv3 very briefly in <a class="reference internal" href="netmgmtb.html#vacm-for-snmpv3"><span class="std std-ref">25.3.9&nbsp;&nbsp;&nbsp;VACM for SNMPv3</span></a>.</p>
+<p id="index-66">On Microsoft operating systems, an SNMP agent is generally included but must be enabled, <em>eg</em> from “Windows components” or “Programs and Features”. After that, the agent must still be configured. This is done by accessing “Services” (<em>eg</em> through Control Panel → Administrative Tools or by launching services.msc), selecting “SNMP service”, and clicking on “Properties”. This applet only allows setting the community name and read vs write permissions; specifying collections of visible OID subtrees (views) is not supported here (though it may be via SNMP itself).</p>
+<p>The community mechanism <em>can</em> offer a reasonable degree of security, if community names are changed frequently and if eavesdropping is not a concern. Perhaps the real problem with community-based security is that just how much information can leak out if an attacker knows the community string  is not always well understood. SNMP access can reveal a site’s complete network and host structure, including VPNs, subnets, TCP connections, host-to-host trust relationships, and much more. Most sites block the SNMP port 161 at their firewall; some even go so far as to run SNMP only on a “hidden” network largely invisible even within the organization.</p>
+<p id="index-67">The view model for OID-tree access is formalized in <span class="target" id="index-68"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3415.html"><strong>RFC 3415</strong></a> as part of SNMPv3; it is called the View-based Access Control Model or <strong>VACM</strong>. It allows the creation of named views. The <code class="docutils literal"><span class="pre">vacmAccessTable</span></code> spells out the viewing rights assigned to a given VACM <strong>group</strong>, which, in a rough sense, corresponds to an SNMPv1/SNMPv2c community. VACM supports, in addition to views consisting of disjoint unions of OID subtrees, table views that limit access to a specific set of columns.</p>
+</div>
+<div class="section" id="snmp-and-asn-1-encoding">
+<span id="asn-1-encoding"></span><span id="snmp-encoding"></span><span id="index-69"></span><h2>24.12&nbsp;&nbsp;&nbsp;SNMP and ASN.1 Encoding<a class="headerlink" href="#snmp-and-asn-1-encoding" title="Permalink to this headline">¶</a></h2>
+<p>When SNMP data is entered into a packet, it is encoded according to the ASN.1 Basic Encoding Rules, or <strong>BER</strong>. This is a hierarchical syntax-driven binary encoding strategy in which each atomic value (INTEGER, OCTET STRING, OBJECT IDENTIFIER, <em>etc</em>) is <em>tagged</em> with its type, and each compound structure is also tagged. This means that the receiver can understand a complex packet format <em>without</em> prior knowledge of its structure. The BER rules are part of the ITU standard <a class="reference external" href="http://www.itu.int/ITU-T/studygroups/com17/languages/X.690-0207.pdf">X.690</a>. (ASN.1 also supports several other encoding-rule formats, including the human-readable XML Encoding Rules, but SNMP uses BER.)</p>
+<p>The general representation of an object is a “type-length-value” triple of the following form; the <code class="docutils literal"><span class="pre">type</span></code> tag makes the data self-identifying.</p>
+<img alt="_images/type_length_contents.svg" src="_images/type_length_contents.svg" /><p>The first two bits of the <code class="docutils literal"><span class="pre">type</span></code> field, the <code class="docutils literal"><span class="pre">class</span></code> bits, identify the context. <strong>Universal</strong> types such as INTEGER and OBJECT IDENTIFIER have class bits 00; <strong>application-specific</strong> types such as Counter32 and TimeTicks have class bits 01.</p>
+<p>The third bit is 0 for <strong>p</strong>rimitive types and 1 for <strong>c</strong>onstructed types such as STRUCTURE.</p>
+<p>The rest of the first byte is the type tag. If a second byte is needed, the tag bits of the first byte are 11111.</p>
+<div class="section" id="primitive-types">
+<h3>24.12.1&nbsp;&nbsp;&nbsp;Primitive Types<a class="headerlink" href="#primitive-types" title="Permalink to this headline">¶</a></h3>
+<p>The standard ASN.1 universal-type primitive tag values used by SNMP are as follows:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="9%" />
+<col width="91%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>00000</td>
+<td>NULL</td>
+</tr>
+<tr class="row-even"><td>00010</td>
+<td>INTEGER</td>
+</tr>
+<tr class="row-odd"><td>00100</td>
+<td>OCTET STRING</td>
+</tr>
+<tr class="row-even"><td>00110</td>
+<td>OBJECT IDENTIFIER</td>
+</tr>
+</tbody>
+</table>
+<p>SNMP also defines several application-specific tags (the following are from <span class="target" id="index-70"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2578.html"><strong>RFC 2578</strong></a>):</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="9%" />
+<col width="91%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>00000</td>
+<td>IpAddress</td>
+</tr>
+<tr class="row-even"><td>00001</td>
+<td>Counter32</td>
+</tr>
+<tr class="row-odd"><td>00010</td>
+<td>Gauge32</td>
+</tr>
+<tr class="row-even"><td>00011</td>
+<td>TimeTicks</td>
+</tr>
+<tr class="row-odd"><td>00100</td>
+<td>Opaque</td>
+</tr>
+<tr class="row-even"><td>00110</td>
+<td>Counter64</td>
+</tr>
+</tbody>
+</table>
+<p>The second field of the type-length-value structure is the length of the <code class="docutils literal"><span class="pre">value</span></code> portion, in bytes. Most lengths of primitive types will fit into a single byte. If a data item is longer than 127 bytes (true for many composite types), the multi-byte integer encoding below is used.</p>
+<p>The actual data is then encoded into the <code class="docutils literal"><span class="pre">value</span></code> field. For nonnegative integers, the integer is converted to a twos-complement bitstring and then encoded in as few bytes as possible, provided there is at least one leading 0-bit to represent the sign. Similarly, negative numbers must have at least one leading 1-bit to represent the sign.</p>
+<p>For example, 127 can be encoded as a length=1 INTEGER with <code class="docutils literal"><span class="pre">value</span></code> byte 0111 1111, while 128 must be encoded as a length=2 integer with <code class="docutils literal"><span class="pre">value</span></code> bytes 0000 0000 and 1000 0000. The second <code class="docutils literal"><span class="pre">value</span></code> byte represents 128, but the first byte represents the sign; without the first byte  the INTEGER represented by a length of 1 and a <code class="docutils literal"><span class="pre">value</span></code> byte of 1000 0000 is −128. Similarly, to encode decimal 10,000,000 (0x989680), four <code class="docutils literal"><span class="pre">value</span></code> bytes are needed as otherwise the leading bit would be 1 and the number would be interpreted as negative.</p>
+<p>For OCTET STRINGs, the string bytes are placed in the <code class="docutils literal"><span class="pre">value</span></code> portion and the number of bytes is placed in the <code class="docutils literal"><span class="pre">length</span></code> portion.</p>
+<p>Object IDs are generally encoded using one byte per level; there are two exceptions. First, the initial two levels x.y of the OID are encoded using a single level with value 40×x + y; all SNMP OIDs begin with 1.3 and so the first byte is 43 (0x2b). Second, if a level is greater than 127, it is encoded as multiple bytes. The first bit of the last byte is 0; the first bit of each of the preceding bytes is 1. The seven remaining bits of each byte contain the bits of the OID level. For example, 1.3.6.1.2.1.<strong>128</strong>.9 would have a <code class="docutils literal"><span class="pre">value</span></code> encoding of the following bytes in hexadecimal:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">2b 06 01 02 01 <strong>81</strong> <strong>00</strong> 09</div>
+</div>
+</div></blockquote>
+<p>where <strong>128</strong> is represented as the two seven-bit blocks 0000001 0000000 and the first block is prefixed by 1 and the second block by 0. Note that the encoding of 128 in an OID is quite different from the encoding of 128 as an INTEGER.</p>
+</div>
+<div class="section" id="composite-types">
+<h3>24.12.2&nbsp;&nbsp;&nbsp;Composite Types<a class="headerlink" href="#composite-types" title="Permalink to this headline">¶</a></h3>
+<p>Now that we have the encodings of the primitive types we can build structures. For composite types the P/C bit will be set to 1. The only universal composite type we will consider is</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="9%" />
+<col width="91%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>10000</td>
+<td>SEQUENCE and SEQUENCE OF</td>
+</tr>
+</tbody>
+</table>
+<p>There are also several application-specific composite types; the first three bits of the tag field for these will be 101.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="9%" />
+<col width="91%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>00000</td>
+<td>Get-Request</td>
+</tr>
+<tr class="row-even"><td>00001</td>
+<td>Get-Next-Request</td>
+</tr>
+<tr class="row-odd"><td>00010</td>
+<td>Get-Response</td>
+</tr>
+<tr class="row-even"><td>00011</td>
+<td>Set-Request</td>
+</tr>
+<tr class="row-odd"><td>00100</td>
+<td>Trap</td>
+</tr>
+</tbody>
+</table>
+<p>A <code class="docutils literal"><span class="pre">VarBind</span></code> pair is encoded in SNMPv1 as</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">SEQUENCE</span> <span class="p">{</span> <span class="n">name</span> <span class="n">OBJECT</span> <span class="n">IDENTIFIER</span><span class="p">,</span> <span class="n">value</span> <span class="n">ObjectSyntax</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">ObjectSyntax</span></code> is specified as a <code class="docutils literal"><span class="pre">CHOICE</span></code> that can contain any of the tagged SNMP primitive types above; the <code class="docutils literal"><span class="pre">CHOICE</span></code> syntax adds no bytes so the <code class="docutils literal"><span class="pre">value</span></code> is simply encoded as above. The <code class="docutils literal"><span class="pre">VarBind</span></code> pair ⟨1.3.6.1.2.1.1.3.0, 8650000⟩ – the OID is <code class="docutils literal"><span class="pre">sysUpTime</span></code> and the value is 24 hours – would then be represented in hexadecimal bytes as below; the hexadecimal representation of 8650000 is 0x83d600.</p>
+<img alt="_images/varbind.svg" src="_images/varbind.svg" /><p>The first byte of 0x30 marks this as a SEQUENCE; recall that the <code class="docutils literal"><span class="pre">type</span></code> byte for a SEQUENCE has a P/C bit of 1 and five low-order bits of 10000, for a numeric value of 48 decimal or 0x30.</p>
+<p>The <code class="docutils literal"><span class="pre">VarBindList</span></code> is defined to be a <code class="docutils literal"><span class="pre">SEQUENCE</span> <span class="pre">OF</span> <span class="pre">VarBind</span></code>. If we have only the single <code class="docutils literal"><span class="pre">VarBind</span></code> above, the resultant enclosing <code class="docutils literal"><span class="pre">VarBindList</span></code> would be as follows; the <code class="docutils literal"><span class="pre">length</span></code> field is 0x12 = 18.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><strong>30</strong> <strong>12</strong> 30 10 06 08 2b 06 01 02 01 01 03 00 02 04 00 83 d6 00</div>
+</div>
+</div></blockquote>
+<p>The BER encoding rules do not stop with the <code class="docutils literal"><span class="pre">VarBindList</span></code>. A slightly simplified ASN.1 specification for an entire SNMPv1 Get-Request packet portion (or “protocol data unit”) is</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">SEQUENCE</span> <span class="p">{</span>
+       <span class="n">request</span><span class="o">-</span><span class="nb">id</span>   <span class="n">INTEGER</span><span class="p">,</span>
+       <span class="n">error</span><span class="o">-</span><span class="n">status</span> <span class="n">INTEGER</span><span class="p">,</span>
+       <span class="n">error</span><span class="o">-</span><span class="n">index</span>  <span class="n">INTEGER</span><span class="p">,</span>
+       <span class="n">variable</span><span class="o">-</span><span class="n">bindings</span> <span class="n">VarBindList</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The encoding of the whole packet would also be by the above BER rules.</p>
+<p>The BER encoding mechanism represents a very different approach from the fixed-field layout of, say, the IP and TCP headers (<a class="reference internal" href="ipv4.html#ipv4-header"><span class="std std-ref">9.1&nbsp;&nbsp;&nbsp;The IPv4 Header</span></a> and <a class="reference internal" href="tcpA.html#tcp-header"><span class="std std-ref">17.2&nbsp;&nbsp;&nbsp;TCP Header</span></a>). The latter approach is generally quite a bit more compact, as only four bytes are needed for a larger integer versus six under BER, and no bytes are used for SEQUENCE specifications. The biggest advantage of the SNMP BER approach, however, is that all objects, from entire packets down to individual values, are <strong>self-describing</strong>. Given the variety of types used by SNMP, the fact that many are of variable length, and the fact that value “readers” such as MIB browsers often operate without having all the type-specifying MIBs loaded, this self-describing feature is quite useful.</p>
+</div>
+</div>
+<div class="section" id="exercises">
+<h2>24.13&nbsp;&nbsp;&nbsp;Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<p>1. Consider the table below (<a class="reference internal" href="#tables"><span class="std std-ref">24.7&nbsp;&nbsp;&nbsp;SNMP Tables</span></a>). The first column is the index.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="32%" />
+<col width="32%" />
+<col width="36%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">count</th>
+<th class="head">veggie</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1</td>
+<td>401</td>
+<td>kale</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td>523</td>
+<td>kohlrabi</td>
+</tr>
+<tr class="row-even"><td>57</td>
+<td>607</td>
+<td>mâche</td>
+</tr>
+<tr class="row-odd"><td>92</td>
+<td>727</td>
+<td>okra</td>
+</tr>
+</tbody>
+</table>
+<p>Give the OID for each data value, assuming this table were encoded in SNMP. Assume the columns are assigned OID levels 1, 2, and 3 in order (including the index column), and the root of the subtree (the <code class="docutils literal"><span class="pre">tableEntry</span></code> OID) is represented by <strong>T</strong>. Note that rows are not numbered consecutively.</p>
+<p>2.0. Suppose interface data appears in a table (:ref:<a href="#id8"><span class="problematic" id="id9">``</span></a>) as follows; missing entries are simply not present. The four columns are numbered 1, 2, 3 and 4. Only physical interfaces have an ifSpeed; tunnel interfaces built on top of a physical interface identify the latter in the physIface column</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="21%" />
+<col width="21%" />
+<col width="34%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">ifIndex(1)</th>
+<th class="head">ifName(2)</th>
+<th class="head">ifSpeed(3)</th>
+<th class="head">physIface(4)</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1</td>
+<td>loopback</td>
+<td></td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td>eth0</td>
+<td>10000000</td>
+<td></td>
+</tr>
+<tr class="row-even"><td>37</td>
+<td>ppp0</td>
+<td></td>
+<td>2</td>
+</tr>
+<tr class="row-odd"><td>101</td>
+<td>ipv6tun</td>
+<td></td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p>Suppose we traverse this table using <code class="docutils literal"><span class="pre">GetNext()</span></code> sequentially. Give the order of values returned, and the OID for each. As above, let <strong>T</strong> represent the root OID, so leaf OIDs are of the form T.col.row. The first two values, with OIDs, are thus as follows:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">value</th>
+<th class="head">OID</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1</td>
+<td>T.1.1</td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td>T.1.2</td>
+</tr>
+</tbody>
+</table>
+<p>4. Consider the following multi-attribute <code class="docutils literal"><span class="pre">GetNext()</span></code> as presented in <a class="reference internal" href="#multi-col-get"><span class="std std-ref">24.8.1&nbsp;&nbsp;&nbsp;Multi-attribute Get()</span></a>:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">GetNext(<strong>T</strong>.1.4, <strong>T</strong>.2.4, <strong>T</strong>.3.4, <strong>T</strong>.4.4, <strong>T</strong>.10.4, <strong>T</strong>.11.4)</div>
+</div>
+</div></blockquote>
+<p>The answer given in the text explicitly assumed that the only columns existing were those shown: 1, 2, 3, 4, 10 and 11. What would be the result if all columns of <code class="docutils literal"><span class="pre">ifTable</span></code> were present? Assume, as before, that row 4 is the final row.</p>
+<p>5. Suppose you want an SNMP table <code class="docutils literal"><span class="pre">identTable</span></code> to hold ⟨idNum,userName⟩ pairs, where idnum is to be an INTEGER and username an OCTET STRING. The INDEX is idnum. Give ASN.1 definitions for the following:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">identTable</span></code></li>
+<li><code class="docutils literal"><span class="pre">identEntry</span></code></li>
+<li><code class="docutils literal"><span class="pre">IdentEntry</span></code></li>
+<li><code class="docutils literal"><span class="pre">idNum</span></code></li>
+<li><code class="docutils literal"><span class="pre">userName</span></code></li>
+</ul>
+<p>Follow the SNMPv1 convention of including the index column as regular table data.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="netmgmtb.html" title="25   Network Management and SNMP"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="realtime.html" title="23   Quality of Service"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, edition 1.9.12</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015, Peter L Dordal.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+    </div>
+  </body>
+</html>

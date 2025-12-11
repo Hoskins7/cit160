@@ -1,0 +1,808 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>2   Ethernet &#8212; An Introduction to Computer Networks, edition 1.9.12</title>
+    <link rel="stylesheet" href="_static/csbnetbook.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.9.12',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/mobile.js"></script>
+    <script type="text/javascript" src="_static/rightsidebar.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="3   Other LANs" href="otherLANs.html" />
+    <link rel="prev" title="1   An Overview of Networks" href="intro.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="otherLANs.html" title="3   Other LANs"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="1   An Overview of Networks"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, edition 1.9.12</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">2&nbsp;&nbsp;&nbsp;Ethernet</a><ul>
+<li><a class="reference internal" href="#mbps-classic-ethernet">2.1&nbsp;&nbsp;&nbsp;10-Mbps Classic Ethernet</a><ul>
+<li><a class="reference internal" href="#ethernet-packet-format">2.1.1&nbsp;&nbsp;&nbsp;Ethernet Packet Format</a></li>
+<li><a class="reference internal" href="#ethernet-multicast">2.1.2&nbsp;&nbsp;&nbsp;Ethernet Multicast</a></li>
+<li><a class="reference internal" href="#ethernet-address-internal-structure">2.1.3&nbsp;&nbsp;&nbsp;Ethernet Address Internal Structure</a></li>
+<li><a class="reference internal" href="#the-lan-layer">2.1.4&nbsp;&nbsp;&nbsp;The LAN Layer</a></li>
+<li><a class="reference internal" href="#the-slot-time-and-collisions">2.1.5&nbsp;&nbsp;&nbsp;The Slot Time and Collisions</a></li>
+<li><a class="reference internal" href="#exponential-backoff-algorithm">2.1.6&nbsp;&nbsp;&nbsp;Exponential Backoff Algorithm</a></li>
+<li><a class="reference internal" href="#capture-effect">2.1.7&nbsp;&nbsp;&nbsp;Capture effect</a></li>
+<li><a class="reference internal" href="#hubs-and-topology">2.1.8&nbsp;&nbsp;&nbsp;Hubs and topology</a></li>
+<li><a class="reference internal" href="#errors">2.1.9&nbsp;&nbsp;&nbsp;Errors</a></li>
+<li><a class="reference internal" href="#csma-persistence">2.1.10&nbsp;&nbsp;&nbsp;CSMA persistence</a></li>
+<li><a class="reference internal" href="#analysis-of-classic-ethernet">2.1.11&nbsp;&nbsp;&nbsp;Analysis of Classic Ethernet</a><ul>
+<li><a class="reference internal" href="#the-aloha-models">2.1.11.1&nbsp;&nbsp;&nbsp;The ALOHA models</a></li>
+<li><a class="reference internal" href="#aloha-and-ethernet">2.1.11.2&nbsp;&nbsp;&nbsp;ALOHA and Ethernet</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#mbps-fast-ethernet">2.2&nbsp;&nbsp;&nbsp;100 Mbps (Fast) Ethernet</a></li>
+<li><a class="reference internal" href="#gigabit-ethernet">2.3&nbsp;&nbsp;&nbsp;Gigabit Ethernet</a></li>
+<li><a class="reference internal" href="#ethernet-switches">2.4&nbsp;&nbsp;&nbsp;Ethernet Switches</a><ul>
+<li><a class="reference internal" href="#ethernet-learning-algorithm">2.4.1&nbsp;&nbsp;&nbsp;Ethernet Learning Algorithm</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spanning-tree-algorithm-and-redundancy">2.5&nbsp;&nbsp;&nbsp;Spanning Tree Algorithm and Redundancy</a><ul>
+<li><a class="reference internal" href="#example-1-switches-only">2.5.1&nbsp;&nbsp;&nbsp;Example 1: Switches Only</a></li>
+<li><a class="reference internal" href="#example-2-switches-and-segments">2.5.2&nbsp;&nbsp;&nbsp;Example 2: Switches and Segments</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#virtual-lan-vlan">2.6&nbsp;&nbsp;&nbsp;Virtual LAN (VLAN)</a></li>
+<li><a class="reference internal" href="#software-defined-networking">2.7&nbsp;&nbsp;&nbsp;Software-Defined Networking</a><ul>
+<li><a class="reference internal" href="#openflow-switches">2.7.1&nbsp;&nbsp;&nbsp;OpenFlow Switches</a></li>
+<li><a class="reference internal" href="#learning-switches-in-openflow">2.7.2&nbsp;&nbsp;&nbsp;Learning Switches in OpenFlow</a></li>
+<li><a class="reference internal" href="#other-openflow-examples">2.7.3&nbsp;&nbsp;&nbsp;Other OpenFlow examples</a><ul>
+<li><a class="reference internal" href="#interconnection-fabric">2.7.3.1&nbsp;&nbsp;&nbsp;Interconnection Fabric</a></li>
+<li><a class="reference internal" href="#load-balancer">2.7.3.2&nbsp;&nbsp;&nbsp;Load Balancer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#epilog">2.8&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li><a class="reference internal" href="#exercises">2.9&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="intro.html"
+                        title="previous chapter">1&nbsp;&nbsp;&nbsp;An Overview of Networks</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="otherLANs.html"
+                        title="next chapter">3&nbsp;&nbsp;&nbsp;Other LANs</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="ethernet">
+<span id="id1"></span><h1>2&nbsp;&nbsp;&nbsp;Ethernet<a class="headerlink" href="#ethernet" title="Permalink to this headline">¶</a></h1>
+<p>We now turn to a deeper analysis of the ubiquitous Ethernet LAN protocol. Current user-level Ethernet today (2013) is usually 100 Mbps, with Gigabit and 10 Gigabit Ethernet standard in server rooms and backbones, but because the potential for collisions makes Ethernet speeds scale in odd ways, we will start with the 10 Mbps formulation. While the 10 Mbps speed is obsolete, and while even the Ethernet collision mechanism is largely obsolete, collision management itself continues to play a significant role in wireless networks.</p>
+<p>The original Ethernet specification was the 1976 paper of Metcalfe and Boggs, <a class="reference internal" href="bibliography.html#mb76" id="id2">[MB76]</a>. The data rate was 10 megabits per second, and all connections were made with coaxial cable instead of today’s twisted pair. The authors described their architecture as follows:</p>
+<blockquote>
+<div>We cannot afford the redundant connections and dynamic routing of store-and-forward packet switching to assure reliable communication, so we choose to achieve reliability through simplicity.  We choose to make the shared communication facility passive so that the failure of an active element will tend to affect the communications of only a single station.</div></blockquote>
+<p>Classic Ethernet was indeed simple, and – mostly – passive. In its most basic form, the Ethernet medium was one long piece of coaxial cable, onto which stations could be connected via <strong>taps</strong>. If two stations happened to transmit at the same time – most likely because they were both waiting for a third station to finish – their signals were lost to the resultant <strong>collision</strong>. The only active components besides the stations were <strong>repeaters</strong>, originally intended simply to make end-to-end joins between cable segments.</p>
+<p>Repeaters soon evolved into multiport devices, allowing the creation of arbitrary tree (that is, loop-free) topologies. At this point the standard wiring model shifted from one long cable, snaking from host to host, to a “star” network, where each host connected directly to a central multipoint repeater. This shift allowed for the replacement of expensive coaxial cable by the much-cheaper twisted pair; links could not be as long, but they did not need to be.</p>
+<p>Repeaters, which forwarded collisions, soon gave way to <strong>switches</strong>, which did not (<a class="reference internal" href="#ethernet-switches"><span class="std std-ref">2.4&nbsp;&nbsp;&nbsp;Ethernet Switches</span></a>). Switches thus partitioned an Ethernet into disjoint <strong>collision domains</strong>, or physical Ethernets, through which collisions could propagate; an aggregation of physical Ethernets connected by switches was then sometimes known as a <strong>virtual</strong> Ethernet. Collision domains became smaller and smaller, eventually down to individual links and then vanishing entirely.</p>
+<p>Throughout all these changes, Ethernet never implemented true redundant connections, in that at any one instant the topology was always required to be loop-free. However, Ethernet did adopt a mechanism by which idle backup links can quickly be placed into service after a primary link fails; <a class="reference internal" href="#spanning-tree"><span class="std std-ref">2.5&nbsp;&nbsp;&nbsp;Spanning Tree Algorithm and Redundancy</span></a>.</p>
+<div class="section" id="mbps-classic-ethernet">
+<span id="classic-ethernet"></span><span id="index-0"></span><h2>2.1&nbsp;&nbsp;&nbsp;10-Mbps Classic Ethernet<a class="headerlink" href="#mbps-classic-ethernet" title="Permalink to this headline">¶</a></h2>
+<p>Originally, Ethernet consisted of a long piece of cable (possibly spliced by <strong>repeaters</strong>). When a station transmitted, the data went everywhere along that cable.
+Such an arrangement is known as a <strong>broadcast bus</strong>; all packets were, at least at the physical layer, broadcast onto the shared medium and could be seen, theoretically, by all other nodes. Logically, however, most packets would appear to be transmitted point-to-point, not broadcast. This was because between each station CPU and the cable there was a peripheral device (that is, a card) known as a <strong>network interface</strong>, which would take care of the details of transmitting and receiving. The network interface would (and still does) decide when a received packet should be forwarded to the host, via a CPU interrupt.</p>
+<img alt="_images/ni.svg" src="_images/ni.svg" /><p>Whenever two stations transmitted at the same time, the signals would <strong>collide</strong>, and interfere with one another; both transmissions would fail as a result. Proper handling of collisions was an essential part of the access-mediation strategy for the shared medium. In order to minimize collision loss, each station implemented the following:</p>
+<ol class="arabic simple">
+<li>Before transmission, wait for the line to become quiet</li>
+<li>While transmitting, continually monitor the line for signs that a collision has occurred; if a collision is detected, cease transmitting</li>
+<li>If a collision occurs, use a backoff-and-retransmit strategy</li>
+</ol>
+<p id="index-1">These properties can be summarized with the <strong>CSMA/CD</strong> acronym: Carrier
+Sense, Multiple Access, Collision Detect. (The term “carrier sense” was used by Metcalfe and Boggs as a synonym for “signal sense”; there is no literal carrier frequency to be sensed.) It should be emphasized that collisions are a normal event in Ethernet, well-handled by the mechanisms above.</p>
+<span class="target" id="index-2"></span><div class="sidebar">
+<p class="first sidebar-title">IEEE 802 Network Standards</p>
+<p class="last">The IEEE network standards all begin with 802: 802.3 is Ethernet, 802.11 is Wi-Fi, 802.16 is WiMAX, and there are many others. One sometimes encounters the claim that 802 represents the date of an early meeting: February 1980. However, the IEEE has a continuous stream of standards (with occasional gaps): 799: Handling and Disposal of Transformer PCBs, 800: D-C Aircraft Rotating Machines, 803: Recommended Practice for Unique Identification in Power Plants, <em>etc</em>.</p>
+</div>
+<p id="index-3">Classic Ethernet came in version 1 [1980, DEC-Intel-Xerox], version 2 [1982, DIX], and <strong>IEEE 802.3</strong>. There are some minor electrical differences between these, and one rather substantial packet-format difference, below. In addition to these, the Berkeley Unix trailing-headers packet format was used for a while.</p>
+<p>There were three physical formats for 10 Mbps Ethernet cable: thick coax (10BASE-5), thin coax (10BASE-2), and, last to arrive, twisted pair (10BASE-T). Thick coax was the original; economics drove the successive development of the later two. The cheaper twisted-pair cabling eventually almost entirely displaced coax, at least for host connections.</p>
+<p id="index-4">The original specification included support for <strong>repeaters</strong>, which were in effect signal amplifiers although they might attempt to clean up a noisy signal. Repeaters processed each bit individually and did no buffering. In the telecom world, a repeater might be called a <strong>digital regenerator</strong>. A repeater with more than two ports was commonly called a <strong>hub</strong>; hubs allowed branching and thus much more complex topologies.</p>
+<p id="index-5">It was the rise of hubs that enabled <strong>star topologies</strong> in which each host connects directly to the hub rather than to one long run of coax. This in turn enabled twisted-pair cable: while this supported maximum runs of about 100 meters, versus the 500 meters of thick coax, each run simply had to go from the host to the central hub in the wiring closet. This was much more convenient than having to snake coax all around the building. A hub failure would bring the network down, but hubs proved largely reliable.</p>
+<p><strong>Bridges</strong> – later known as <strong>switches</strong> – came along a short time later. While repeaters act at the bit layer, a switch reads in and forwards an entire packet as a unit, and the destination address is consulted to determine to where the packet is forwarded. Except for possible collision-related performance issues, hubs and switches are interchangeable. Eventually, most wiring-closet hubs were replaced with switches.</p>
+<p>Hubs propagate collisions; switches do not. If the signal representing a collision were to arrive at one port of a hub, it would, like any other signal, be retransmitted out all other ports. If a switch were to detect a collision one one port, no other ports would be involved; only packets received successfully are ever retransmitted out other ports.</p>
+<p>Originally, switches were seen as providing interconnection (“bridging”) between separate physical Ethernets, but later a switched Ethernet was seen as one large “virtual” Ethernet, composed of smaller collision domains. We return to switching below in <a class="reference internal" href="#ethernet-switches"><span class="std std-ref">2.4&nbsp;&nbsp;&nbsp;Ethernet Switches</span></a>.</p>
+<p>In the original thick-coax cabling, connections were made via <strong>taps</strong>, often literally drilled into the coax central conductor. Thin coax allowed the use of T-connectors to attach hosts. Twisted-pair does not allow mid-cable attachment; it is only used for point-to-point links between hosts, switches and hubs. Mid-cable attachment, however, was always simply a way of avoiding the need for active devices like hubs and switches.</p>
+<p>There is still a role for hubs today when one wants to monitor the Ethernet signal from A to B (<em>eg</em> for intrusion detection analysis), although some switches now also support a form of monitoring.</p>
+<p>All three cable formats could interconnect, although only through repeaters and hubs, and all used the same 10 Mbps transmission speed. While twisted-pair cable is still used by 100 Mbps Ethernet, it generally needs to be a higher-performance version known as Category 5, versus the 10 Mbps Category 3.</p>
+<p>Data in 10 Mbps Ethernets was transmitted using Manchester encoding; see <a class="reference internal" href="links.html#manchester"><span class="std std-ref">4.1.3&nbsp;&nbsp;&nbsp;Manchester</span></a>. This meant that the electronics had to operate, in effect, at 20 Mbps. Faster Ethernets use different encodings.</p>
+<div class="section" id="ethernet-packet-format">
+<span id="index-6"></span><span id="id3"></span><h3>2.1.1&nbsp;&nbsp;&nbsp;Ethernet Packet Format<a class="headerlink" href="#ethernet-packet-format" title="Permalink to this headline">¶</a></h3>
+<p>Here is the format of a typical Ethernet packet (DIX specification); it is still used for newer, faster Ethernets:</p>
+<img alt="_images/Ethernet_packet.svg" src="_images/Ethernet_packet.svg" /><p>The destination and source addresses are 48-bit quantities; the type is 16 bits, the data length is variable up to a maximum of 1500 bytes, and the final CRC checksum is 32 bits. The checksum is added by the Ethernet hardware, never by the host software. There is also a preamble, not shown: a block of 1 bits followed by a 0, in the front of the packet, for synchronization. The type field identifies the next higher protocol layer; a few common type values are 0x0800 = IP, 0x8137 = IPX, 0x0806 = ARP.</p>
+<p>The IEEE 802.3 specification replaced the type field by the length field, though this change never caught on. The two formats can be distinguished as long as the type values used are larger than the maximum Ethernet length of 1500 (or 0x05dc); the type values given in the previous paragraph all meet this condition.</p>
+<p>The Ethernet maximum packet length of 1500 bytes worked well in the past, but can seem inconveniently small at 10 Gbit speeds. But 1500 bytes has become the <em>de facto</em> maximum packet size throughout the Internet, not just on Ethernet LANs; increasing it would be difficult. TCP TSO (<a class="reference internal" href="tcp.html#tcp-offloading"><span class="std std-ref">12.5&nbsp;&nbsp;&nbsp;TCP Offloading</span></a>) is one alternative.</p>
+<p>Each Ethernet card has a (hopefully unique) physical address in ROM; by default any packet sent to this address will be received by the board and passed up to the host system. Packets addressed to other physical addresses will be seen by the card, but ignored (by default). All Ethernet devices also agree on a broadcast address of all 1’s: a packet sent to the broadcast address will be delivered to all attached hosts.</p>
+<p id="index-7">It is sometimes possible to change the physical address of a given card in software. It is almost universally possible to put a given card into <strong>promiscuous mode</strong>, meaning that all packets on the network, no matter what the destination address, are delivered to the attached host. This mode was originally intended for diagnostic purposes but became best known for the security breach it opens: it was once not unusual to find a host with network board in promiscuous mode and with a process collecting the first 100 bytes (presumably including userid and password) of every telnet connection.</p>
+</div>
+<div class="section" id="ethernet-multicast">
+<span id="multicast-ethernet"></span><span id="index-8"></span><h3>2.1.2&nbsp;&nbsp;&nbsp;Ethernet Multicast<a class="headerlink" href="#ethernet-multicast" title="Permalink to this headline">¶</a></h3>
+<p>Another category of Ethernet addresses is <strong>multicast</strong>, used to transmit to a <em>set</em> of stations; streaming video to multiple simultaneous viewers might use Ethernet multicast.
+The lowest-order bit in the first byte of an address indicates whether the address is
+physical or multicast. To receive packets addressed to a given multicast address, the host must inform its network interface that it wishes to do so; once this is done, any arriving packets addressed to that multicast address are forwarded to the host. The set of subscribers to a given multicast address may be called a <strong>multicast group</strong>. While higher-level protocols might prefer that the subscribing host also notifies some other host, <em>eg</em> the sender, this is not required, although that might be the easiest way to learn the multicast address involved. If several hosts subscribe to the same multicast address, then each will receive a copy of each multicast packet transmitted.</p>
+<p>We are now able to list all cases in which a network interface forwards a received packet up to its attached host:</p>
+<ul class="simple">
+<li>if the destination address of the received packet maches the physical address of the interface</li>
+<li>if the destination address of the received packet is the broadcast address</li>
+<li>if the interface is in promiscuous mode</li>
+<li>if the destination address of the received packet is a multicast address and the host has told the network interface to accept packets sent to that multicast address</li>
+</ul>
+<p>If switches (below) are involved, they must normally forward multicast packets on all outbound links, exactly as they do for broadcast packets; switches have no obvious way of telling where multicast subscribers might be. To avoid this, some switches do try to engage in some form of multicast filtering, sometimes by snooping on higher-layer multicast protocols. Multicast Ethernet is seldom used by IPv4, but plays a larger role in IPv6 configuration.</p>
+</div>
+<div class="section" id="ethernet-address-internal-structure">
+<span id="id4"></span><h3>2.1.3&nbsp;&nbsp;&nbsp;Ethernet Address Internal Structure<a class="headerlink" href="#ethernet-address-internal-structure" title="Permalink to this headline">¶</a></h3>
+<p>The second-to-lowest-order bit of a physical Ethernet address indicates whether that address is believed to be globally unique or if it is only locally unique; this is known as the <strong>Universal/Local</strong> bit. For real Ethernet physical addresses, the multicast and universal/local bits of the first byte should both be 0.</p>
+<p>When (global) Ethernet IDs are assigned to physical Ethernet cards by the manufacturer, the first three bytes serve to indicate the manufacturer. They are allocated by the IEEE, and are officially known as <em>organizationally unique identifiers</em>. These can be looked up at any of several sites on the Internet to identify the manufacturer associated with any given Ethernet address; the official IEEE site is <a class="reference external" href="http://standards.ieee.org/develop/regauth/oui/public.html">standards.ieee.org/develop/regauth/oui/public.html</a> (OUIs must be entered here without colons).</p>
+<p>As long as the manufacturer involved is diligent in assigning the second three bytes, every manufacturer-provided Ethernet address <em>should</em> be globally unique. Lapses, however, are not unheard of.</p>
+<p>Ethernet addresses for <em>virtual</em> machines must be distinct from the Ethernet address of the host system, and may be (<em>eg</em> with so-called “bridged” configurations) as visible on the LAN as that host system’s address. The first three bytes of virtual Ethernet addresses are often taken from the OUI assigned to the manufacturer whose card is being emulated; the last three bytes are then either set randomly or via configuration. In principle, the universal/local bit should be 1, as the address is only locally unique, but this is often ignored. It is entirely possible for virtual Ethernet addresses to be assigned so as to have some local meaning, though this appears not to be common.</p>
+</div>
+<div class="section" id="the-lan-layer">
+<span id="lan-layer"></span><span id="index-9"></span><h3>2.1.4&nbsp;&nbsp;&nbsp;The LAN Layer<a class="headerlink" href="#the-lan-layer" title="Permalink to this headline">¶</a></h3>
+<p>The LAN layer, at its upper end, supplies to the network layer a mechanism for addressing a packet and sending it from one station to another. At its lower end, it handles interactions with the physical layer. The LAN layer covers packet addressing, delivery and receipt, forwarding, error detection, collision detection and collision-related retransmission attempts.</p>
+<p>In IEEE protocols, the LAN layer is divided into the <strong>media access control</strong>, or MAC, sublayer and a higher <strong>logical link control</strong>, or LLC, sublayer for higher-level flow-control functions that today have moved largely to the transport layer. For example, the HDLC protocol (<a class="reference internal" href="links.html#hdlc"><span class="std std-ref">4.1.5.1&nbsp;&nbsp;&nbsp;HDLC</span></a>) supports sliding windows (<a class="reference internal" href="slidingwindows.html#sliding-windows"><span class="std std-ref">6.2&nbsp;&nbsp;&nbsp;Sliding Windows</span></a>) as an option, as did the early X.25 protocol. ATM, <a class="reference internal" href="otherLANs.html#atm"><span class="std std-ref">3.5&nbsp;&nbsp;&nbsp;Asynchronous Transfer Mode: ATM</span></a>, also supports some higher-level functions, though not sliding windows.</p>
+<p>Because the LLC layer is so often insignificant, and because the most well-known LAN-layer functions are in fact part of the MAC sublayer, it is common to identify the LAN layer with its MAC sublayer, especially for IEEE protocols where the MAC layer has official standing. In particular, LAN-layer addresses are perhaps most often called MAC addresses.</p>
+<p>Generally speaking, much of the operation of the LAN/MAC layer takes place in the network card. Host systems (including drivers) are, for example, generally oblivious to collisions (although they may query the card for collision statistics). In some cases, <em>eg</em> with Wi-Fi rate scaling (<a class="reference internal" href="otherLANs.html#rate-scaling"><span class="std std-ref">3.7.2&nbsp;&nbsp;&nbsp;Dynamic Rate Scaling</span></a>), the host-system driver may get involved.</p>
+</div>
+<div class="section" id="the-slot-time-and-collisions">
+<span id="id5"></span><h3>2.1.5&nbsp;&nbsp;&nbsp;The Slot Time and Collisions<a class="headerlink" href="#the-slot-time-and-collisions" title="Permalink to this headline">¶</a></h3>
+<p>The <strong>diameter</strong> of an Ethernet is the maximum distance between any pair of stations. The actual total length of cable can be much greater than this, if, for example, the topology is a “star” configuration. The maximum allowed diameter, measured in bits, is limited to 232 (a sample “budget” for this is below). This makes the round-trip-time 464 bits. As each station involved in a collision discovers it, it transmits a special <strong>jam signal</strong> of up to 48 bits. These 48 jam bits bring the total above to 512 bits, or 64 bytes. The time to send these 512 bits is the <strong>slot time</strong> of an Ethernet; time intervals on Ethernet are often described in bit times but in conventional time units the slot time is 51.2 µsec.</p>
+<p>The value of the slot time determines several subsequent aspects of Ethernet. If a station has transmitted for one slot time, then no collision can occur (unless there is a hardware error) for the remainder of that packet. This is because one slot time is enough time for any other station to have realized that the first station has started transmitting, so after that time they will wait for the first station to finish. Thus, after one slot time a station is said to have <strong>acquired</strong> the network. The slot time is also used as the basic interval for retransmission scheduling, below.</p>
+<p>Conversely, a collision <em>can</em> be received, in principle, at any point up until the end of the slot time. As a result, Ethernet has a <strong>minimum packet size</strong>, equal to the slot time, <em>ie</em> 64 bytes (or 46 bytes in the data portion).
+A station transmitting a packet this size is assured that <em>if</em> a collision were to occur, the sender would detect it (and be able to apply the retransmission algorithm, below). Smaller packets might collide and yet the sender not know it, ultimately leading to greatly reduced throughput.</p>
+<p>If we need to send less than 46 bytes of data (for example, a 40-byte TCP ACK packet), the Ethernet packet must be padded out to the minimum length. As a result, all protocols running on top of Ethernet need to provide some way to specify the actual data length, as it cannot be inferred from the received packet size.</p>
+<p>As a specific example of a collision occurring as late as possible, consider the diagram below. A and B are 5 units apart, and the bandwidth is 1 byte/unit. A begins sending “helloworld” at T=0; B starts sending just as A’s message arrives, at T=5. B has listened before transmitting, but A’s signal was not yet evident. A doesn’t discover the collision until 10 units have elapsed, which is twice the distance.</p>
+<img alt="_images/Ethernet_collision_rtt_scaled.svg" src="_images/Ethernet_collision_rtt_scaled.svg" /><p>Here are typical maximum values for the delay in 10 Mbps Ethernet due to various components. These are taken from the Digital-Intel-Xerox (DIX) standard of 1982, except that “point-to-point link cable” is replaced by standard cable. The DIX specification allows 1500m of coax with two repeaters and 1000m of point-to-point cable; the table below shows 2500m of coax and four repeaters, following the later IEEE 802.3 Ethernet specification. Some of the more obscure delays have been eliminated. Entries are one-way delay times, in bits. The maximum path may have four repeaters, and ten transceivers (simple electronic devices between the coax cable and the NI cards), each with its drop cable (two transceivers per repeater, plus one at each endpoint).</p>
+<p><strong>Ethernet delay budget</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="8%" />
+<col width="26%" />
+<col width="44%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">item</th>
+<th class="head">length</th>
+<th class="head">delay, in bits</th>
+<th class="head">explanation (c = speed of light)</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>coax</td>
+<td>2500M</td>
+<td>110 bits</td>
+<td>23 meters/bit (.77c)</td>
+</tr>
+<tr class="row-odd"><td>transceiver cables</td>
+<td>500M</td>
+<td>25 bits</td>
+<td>19.5 meters/bit (.65c)</td>
+</tr>
+<tr class="row-even"><td>transceivers</td>
+<td></td>
+<td>40 bits, max 10 units</td>
+<td>4 bits each</td>
+</tr>
+<tr class="row-odd"><td>repeaters</td>
+<td></td>
+<td>25 bits, max 4 units</td>
+<td>6+ bits each (DIX 7.6.4.1)</td>
+</tr>
+<tr class="row-even"><td>encoders</td>
+<td></td>
+<td>20 bits, max 10 units</td>
+<td>2 bits each (for signal generation)</td>
+</tr>
+</tbody>
+</table>
+<p>The total here is 220 bits; in a full accounting it would be 232. Some of the numbers shown are a little high, but there are also signal rise time delays, sense delays, and timer delays that have been omitted. It works out fairly closely.</p>
+<p>Implicit in the delay budget table above is the “length” of a bit. The speed of propagation in copper is about 0.77×c, where c=3×10<sup>8</sup> m/sec = 300 m/µsec is the speed of light in vacuum. So, in 0.1 microseconds (the time to send one bit at 10 Mbps), the signal propagates approximately 0.77×c×10<sup>-7</sup> = 23 meters.</p>
+<p>Ethernet packets also have a <strong>maximum</strong> packet size, of 1500 bytes. This
+limit is primarily for the sake of fairness, so one station cannot unduly
+monopolize the cable (and also so stations can reserve buffers guaranteed to hold an entire packet). At one time hardware vendors often marketed their own incompatible “extensions” to Ethernet which enlarged the maximum packet size to as much as 4KB. There is no technical reason, actually, not to do this, except compatibility.</p>
+<p>The signal loss in any single segment of cable is limited to 8.5 db, or about 14% of original strength. Repeaters will restore the signal to its original strength. The reason for the per-segment length restriction is that Ethernet collision detection requires a strict limit on how much the remote signal can be allowed to lose strength. It is possible for a station to detect and reliably read very weak remote signals, but <em>not at the same time that it is transmitting locally</em>. This is exactly what must be done, though, for collision detection to work: remote signals must arrive with sufficient strength to be heard even while the receiving station is itself transmitting. The per-segment limit, then, has nothing to do with the overall length limit; the latter is set only to ensure that a sender is guaranteed of detecting a collision, even if it sends the minimum-sized packet.</p>
+</div>
+<div class="section" id="exponential-backoff-algorithm">
+<span id="index-10"></span><span id="id6"></span><h3>2.1.6&nbsp;&nbsp;&nbsp;Exponential Backoff Algorithm<a class="headerlink" href="#exponential-backoff-algorithm" title="Permalink to this headline">¶</a></h3>
+<p>Whenever there is a collision the exponential backoff algorithm – operating at the MAC layer – is used to determine when each station will retry its transmission. Backoff here is called <em>exponential</em> because the range from which the backoff value is chosen is doubled after every successive collision involving the same packet. Here is the full Ethernet transmission algorithm, including backoff and retransmissions:</p>
+<ol class="arabic simple">
+<li>Listen before transmitting (“carrier detect”)</li>
+<li>If line is busy, wait for sender to stop and then wait an additional 9.6 microseconds (96 bits). One consequence of this is that there is always a 96-bit gap between packets, so packets do not run together.</li>
+<li>Transmit while simultaneously monitoring for collisions</li>
+<li>If a collision does occur, send the jam signal, and choose a <strong>backoff time</strong> as follows: For transmission N, 1≤N≤10 (N=0 represents the original attempt), choose k randomly with 0 ≤ k &lt; 2<sup>N</sup>. Wait k slot times (k×51.2 µsec). Then check if the line is idle, waiting if necessary for someone else to finish, and then retry step 3. For 11≤N≤15, choose k randomly with 0 ≤ k &lt;  1024 (= 2<sup>10</sup>)</li>
+<li>If we reach N=16 (16 transmission attempts), give up.</li>
+</ol>
+<p>If an Ethernet sender does not reach step 5, there is a very high probability that the packet was delivered successfully.</p>
+<p>Exponential backoff means that if two hosts have waited for a third to finish and transmit simultaneously, and collide, then when N=1 they have a 50% chance of recollision; when N=2 there is a 25% chance, <em>etc</em>. When N≥10 the maximum wait is 52 milliseconds; without this cutoff the maximum wait at N=15 would be 1.5 seconds. As indicated above in the minimum-packet-size discussion, this retransmission strategy assumes that the sender is able to detect the collision while it is still sending, so it knows that the packet must be resent.</p>
+<p>In the following diagram is an example of several stations attempting to transmit all at once, and using the above transmission/backoff algorithm to sort out who actually gets to acquire the channel. We assume we have five prospective senders A1, A2, A3, A4 and A5, all waiting for a sixth station to finish. We will assume that collision detection always takes one slot time (it will take much less for nodes closer together) and that the slot start-times for each station are synchronized; this allows us to measure time in slots. A solid arrow at the start of a slot means that sender began transmission in that slot; a red X signifies a collision. If a collision occurs, the backoff value k is shown underneath. A dashed line shows the station waiting k slots for its next attempt.</p>
+<img alt="_images/Ethernet_collisions.svg" src="_images/Ethernet_collisions.svg" /><p>At T=0 we assume the transmitting station finishes, and all the Ai transmit and collide. At T=1, then, each of the Ai has discovered the collision; each chooses a random k&lt;2. Let us assume that A1 chooses k=1, A2 chooses k=1, A3 chooses k=0, A4 chooses k=0, and A5 chooses k=1.</p>
+<p>Those stations choosing k=0 will retransmit immediately, at T=1. This means A3 and A4 collide again, and at T=2 they now choose random k&lt;4. We will Assume A3 chooses k=3 and A4 chooses k=0; A3 will try again at T=2+3=5 while A4 will try again at T=2, that is, now.</p>
+<p>At T=2, we now have the original A1, A2, and A5 transmitting for the second time, while A4 trying again for the third time. They collide. Let us suppose A1 chooses k=2, A2 chooses k=1, A5 chooses k=3, and A4 chooses k=6 (A4 is choosing k&lt;8 at random). Their scheduled transmission attempt times are now A1 at T=3+2=5, A2 at T=4, A5 at T=6, and A4 at T=9.</p>
+<p>At T=3, nobody attempts to transmit. But at T=4, A2 is the only station to transmit, and so successfully seizes the channel. By the time T=5 rolls around, A1 and A3 will check the channel, that is, listen first, and wait for A2 to finish. At T=9, A4 will check the channel again, and also begin waiting for A2 to finish.</p>
+<p>A maximum of 1024 hosts is allowed on an Ethernet. This number apparently comes from the maximum range for the backoff time as 0 ≤ k &lt;  1024. If there are 1024 hosts simultaneously trying to send, then, once the backoff range has reached k&lt;1024 (N=10), we have a good chance that one station will succeed in seizing the channel, that is; the minimum value of all the random k’s chosen will be unique.</p>
+<p>This backoff algorithm is not “fair”, in the sense that the longer a station has been waiting to send, the lower its priority sinks. Newly transmitting stations with N=0 need not delay at all. The Ethernet capture effect, below, illustrates this unfairness.</p>
+</div>
+<div class="section" id="capture-effect">
+<span id="index-11"></span><h3>2.1.7&nbsp;&nbsp;&nbsp;Capture effect<a class="headerlink" href="#capture-effect" title="Permalink to this headline">¶</a></h3>
+<p>The capture effect is a scenario illustrating the potential lack of fairness in the exponential backoff algorithm. The unswitched Ethernet must be fully busy, in that each of two senders always has a packet ready to transmit.</p>
+<p>Let A and B be two such busy nodes, simultaneously starting to transmit their first packets. They collide. Suppose A wins, and sends. When A is finished, B tries to transmit again. But A has a
+second packet, and so A tries too. A chooses a backoff k&lt;2 (that is, between 0 and 1 inclusive), but since B is on its second attempt it must choose k&lt;4. This means A is favored to win. Suppose it does.</p>
+<p>After that transmission is finished, A and B try yet again: A on its
+first attempt for its third packet, and B on its third attempt for its first
+packet. Now A again chooses k&lt;2 but B must choose k&lt;8; this time A is much more likely to win.
+Each time B fails to win a given backoff, its probability of winning the next one is reduced by about 1/2. It is quite possible, and does occur in practice, for B to lose <em>all</em> the backoffs until it reaches the maximum of N=16 attempts; once it has lost the first three or four this is in fact quite likely. At this point B simply discards the packet and goes on to the next one with N reset to 1 and k chosen from {0,1}.</p>
+<p id="index-12">The capture effect can be fixed with appropriate modification of the backoff algorithm; the Binary Logarithmic Arbitration Method (BLAM) was proposed in <a class="reference internal" href="bibliography.html#mm94" id="id7">[MM94]</a>.
+The BLAM algorithm was considered for the then-nascent 100 Mbps Fast Ethernet standard. But in the end a hardware strategy won out: Fast Ethernet supports “full-duplex” mode which is collision-free (see <a class="reference internal" href="#fast-ethernet"><span class="std std-ref">2.2&nbsp;&nbsp;&nbsp;100 Mbps (Fast) Ethernet</span></a>, below). While Fast Ethernet continues to support the original “half-duplex” mode, it was assumed that any sites concerned enough about performance to be worried about the capture effect would opt for full-duplex.</p>
+</div>
+<div class="section" id="hubs-and-topology">
+<h3>2.1.8&nbsp;&nbsp;&nbsp;Hubs and topology<a class="headerlink" href="#hubs-and-topology" title="Permalink to this headline">¶</a></h3>
+<p>Ethernet hubs (multiport repeaters) change the topology, but not the fundamental constraints. Hubs enabled the model in which each station now had its own link to the wiring closet. Loops are still forbidden. The maximum diameter of an Ethernet consisting of multiple segments joined by hubs is still constrained by the round-trip-time, and the need to detect collisions before the sender has completed sending, as before. However, the network “diameter”, or maximum distance between two hosts, is no longer synonymous with “total length”. Because twisted-pair links are much shorter, about 100 meters, the diameter constraint is often immaterial.</p>
+</div>
+<div class="section" id="errors">
+<h3>2.1.9&nbsp;&nbsp;&nbsp;Errors<a class="headerlink" href="#errors" title="Permalink to this headline">¶</a></h3>
+<p>Packets can have bits flipped or garbled by electrical noise on the cable; estimates of the frequency with which this occurs range from 1 in 10<sup>4</sup> to 1 in 10<sup>6</sup>. Bit errors are not uniformly likely; when they occur, they are likely to occur in bursts. Packets can also be lost in hubs, although this appears less likely. Packets can be lost due to collisions only if the sending host makes 16 unsuccessful transmission attempts and gives up. Ethernet packets contain a 32-bit CRC error-detecting code (see <a class="reference internal" href="packets.html#crc"><span class="std std-ref">5.4.1&nbsp;&nbsp;&nbsp;Cyclical Redundancy Check: CRC</span></a>) to detect bit errors. Packets can also be misaddressed by the sending host, or, most likely of all, they can arrive at the receiving host at a point when the receiver has no free buffers and thus be dropped by a higher-layer protocol.</p>
+</div>
+<div class="section" id="csma-persistence">
+<span id="index-13"></span><h3>2.1.10&nbsp;&nbsp;&nbsp;CSMA persistence<a class="headerlink" href="#csma-persistence" title="Permalink to this headline">¶</a></h3>
+<p>A carrier-sense/multiple-access transmission strategy is said to be <strong>nonpersistent</strong> if, when the line is busy, the sender waits a randomly selected time. A strategy is <strong>p-persistent</strong> if, after waiting for the line to clear, the sender sends with probability p≤1. Ethernet uses 1-persistence. A consequence of 1-persistence is that, if more than one station is waiting for line to clear, then when the line does clear a collision is certain. However, Ethernet then gracefully handles the resulting collision via the usual exponential backoff. If N stations are waiting to transmit, the time required for one station to win the backoff is linear in N.</p>
+<p id="index-14">When we consider the Wi-Fi collision-handling mechanisms in <a class="reference internal" href="otherLANs.html#wi-fi"><span class="std std-ref">3.7&nbsp;&nbsp;&nbsp;Wi-Fi</span></a>, we will see that collisions cannot be handled quite as cheaply: for one thing, there is no way to detect a collision in progress, so the entire packet-transmission time is wasted. In the Wi-Fi case, p-persistence is used with p&lt;1.</p>
+<p>An Ethernet broadcast storm was said to occur when there were too many transmission attempts, and most of the available bandwidth was tied up in collisions. A properly functioning classic Ethernet had an effective bandwidth of as much as 50-80% of the nominal 10Mbps capacity, but attempts to transmit more than this typically resulted in <em>successfully</em> transmitting a good deal less.</p>
+</div>
+<div class="section" id="analysis-of-classic-ethernet">
+<span id="id8"></span><h3>2.1.11&nbsp;&nbsp;&nbsp;Analysis of Classic Ethernet<a class="headerlink" href="#analysis-of-classic-ethernet" title="Permalink to this headline">¶</a></h3>
+<p id="index-15">How much time does Ethernet “waste” on collisions? A paradoxical attribute of Ethernet is that raising the transmission-attempt rate on a busy segment can <em>reduce</em> the actual throughput. More transmission attempts can lead to longer <strong>contention intervals</strong> between packets, as senders use the transmission backoff algorithm to attempt to acquire the channel. What effective throughput can be achieved?</p>
+<p>It is convenient to refer to the time between packet transmissions as the contention interval even if there is no actual contention, that is, even if the network is idle; we cannot tell if stations are not transmitting because they have nothing to send, or if they are simply waiting for their backoff timer to expire. Thus, a timeline for Ethernet always consists of alternating packet transmissions and contention intervals:</p>
+<img alt="_images/contention.svg" src="_images/contention.svg" /><p>As a first look at contention intervals, assume that there are N stations waiting to transmit at the start of the interval. It turns out that, if all follow the exponential backoff algorithm, we can expect O(N) slot times before one station successfully acquires the channel; thus, Ethernets are happiest when N is small and there are only a few stations simultaneously transmitting. However, multiple stations are not necessarily a severe problem. Often the number of slot times needed turns out to be about N/2, and slot times are short. If N=20, then N/2 is 10 slot times, or 640 bytes. However, one packet time might be 1500 bytes. If packet intervals are 1500 bytes and contention intervals are 640 byes, this gives an overall throughput of 1500/(640+1500) = 70% of capacity. In practice, this seems to be a reasonable upper limit for the throughput of classic shared-media Ethernet.</p>
+<div class="section" id="the-aloha-models">
+<span id="index-16"></span><h4>2.1.11.1&nbsp;&nbsp;&nbsp;The ALOHA models<a class="headerlink" href="#the-aloha-models" title="Permalink to this headline">¶</a></h4>
+<p>Another approach to analyzing the Ethernet contention interval is by using the ALOHA model that was a precursor to Ethernet. In the ALOHA model, stations transmit packets <em>without</em> listening first for a quiet line or monitoring the transmission for collisions (this models the situation of several ground stations transmitting to a satellite; the ground stations are presumed unable to see one another). Similarly, during the Ethernet contention interval, stations transmit one-slot packets under what are effectively the same conditions (we return to this below).</p>
+<p>The ALOHA model yields roughly similar throughput values to the O(N) model of the previous section. We make, however, a rather artificial assumption: that there are a very large number of active senders, each transmitting at a very low rate. The model may thus have limited direct applicability to typical Ethernets.</p>
+<p>To model the success rate of ALOHA, assume all the packets are the same size and let T be the time to send one (fixed-size) packet; T represents the Aloha slot time. We will find the transmission rate that optimizes throughput.</p>
+<p>The core assumption of this model is that that a large number N of hosts are transmitting, each at a relatively low rate of s packets/slot. Denote by G the average number of transmission attempts per slot; we then have G = Ns. We will derive an expression for S, the average rate of <em>successful</em> transmissions per slot, in terms of G.</p>
+<p>If two packets overlap during transmissions, both are lost. Thus, a successful transmission requires everyone else quiet for an interval of 2T: if a sender succeeds in the interval from t to t+T, then no other node can have tried to begin transmission in the interval t−T to t+T. The probability of one station transmitting during an interval of time T is G = Ns; the probability of the remaining N−1 stations all quiet for an interval of 2T is (1−s)<sup>2(N−1)</sup>. The probability of a successful transmission is thus</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">S = Ns*(1−s)<sup>2(N−1)</sup></div>
+<div class="line">= G(1−G/N)<sup>2N</sup></div>
+</div>
+</div></blockquote>
+<div class="sidebar">
+<p class="first sidebar-title">Math Warning</p>
+<p class="last">Finding the limit of G(1−G/N)<sup>2N</sup> and finding the maximum of Ge<sup>-2G</sup> realistically requires a little background in calculus. However, these are not central to applying the model.</p>
+</div>
+<p>As N gets large, the second line approaches Ge<sup>-2G</sup>.
+The function S = G e<sup>-2G</sup> has a maximum at G=1/2, S=1/2e. The rate G=1/2 means that, on average, a transmission is attempted every other slot; this yields the maximum successful-transmission throughput of 1/2e. In other words, at this maximum attempt rate G=1/2, we expect about 2e−1 slot times worth of contention between successful transmissions. What happens to the remaining G−S unsuccessful attempts is not addressed by this model; presumably some higher-level mechanism (<em>eg</em> backoff) leads to retransmissions.</p>
+<p>A given throughput S&lt;1/2e may be achieved at either of two values for G; that is, a given
+success rate may be due to a comparable attempt rate or else due to a very high attempt rate with a similarly high failure rate.</p>
+</div>
+<div class="section" id="aloha-and-ethernet">
+<span id="index-17"></span><h4>2.1.11.2&nbsp;&nbsp;&nbsp;ALOHA and Ethernet<a class="headerlink" href="#aloha-and-ethernet" title="Permalink to this headline">¶</a></h4>
+<p>The relevance of the Aloha model to Ethernet is that during one Ethernet slot time there is no way to detect collisions (they haven’t reached the sender yet!) and so the Ethernet contention phase resembles ALOHA with an Aloha slot time T of 51.2 microseconds. Once an Ethernet sender succeeds, however, it continues with a full packet transmission, which is presumably many times longer than T.</p>
+<p>The average length of the contention interval, at the maximum throughput calculated above, is 2e−1 slot times (from ALOHA); recall that our model here supposed many senders sending at very low individual rates. This is the minimum contention interval; with lower loads the contention interval is longer due to greater idle times and with higher loads the contention interval is longer due to more collisions.</p>
+<p>Finally, let P be the time to send an entire packet in units of T; <em>ie</em> the average
+packet size in units of T. P is thus the length of the “packet” phase in the diagram above. The contention phase has length 2e−1, so the total time to send one packet (contention+packet time) is 2e−1+P. The useful fraction of this is, of course, P, so the effective maximum throughput is P/(2e−1+P).</p>
+<p>At 10Mbps, T=51.2 microseconds is 512 bits, or 64 bytes. For P=128
+bytes = 2*64, the effective bandwidth becomes 2/(2e-1+2), or 31%. For
+P=512 bytes=8*64, the effective bandwidth is 8/(2e+7), or 64%.
+For P=1500 bytes, the model here calculates an effective bandwidth of 80%.</p>
+<p>These numbers are quite similar to our earlier values based on a small number of stations sending constantly.</p>
+</div>
+</div>
+</div>
+<div class="section" id="mbps-fast-ethernet">
+<span id="fast-ethernet"></span><span id="index-18"></span><h2>2.2&nbsp;&nbsp;&nbsp;100 Mbps (Fast) Ethernet<a class="headerlink" href="#mbps-fast-ethernet" title="Permalink to this headline">¶</a></h2>
+<p>In all the analysis here of 10 Mbps Ethernet, what happens when the bandwidth is increased to 100 Mbps, as is done in the so-called Fast Ethernet standard? If the network physical diameter remains the same, then the round-trip time will be the same in microseconds but will be 10-fold larger measured in bits; this might mean a minimum packet size of 640 bytes instead of 64 bytes.  (Actually, the minimum packet size might be somewhat smaller, partly because the “jam signal” doesn’t have to become longer, and partly because some of the numbers in the 10 Mbps delay budget above were larger than necessary, but it would still be large enough that a substantial amount of bandwidth would be consumed by padding.) The designers of Fast Ethernet felt this was impractical.</p>
+<p>However, Fast Ethernet was developed at a time (~1995) when reliable switches (below) were widely available; the quote above at <a class="reference internal" href="#ethernet"><span class="std std-ref">2&nbsp;&nbsp;&nbsp;Ethernet</span></a> from <a class="reference internal" href="bibliography.html#mb76" id="id9">[MB76]</a> had become obsolete. Large “virtual” Ethernet networks could be formed by connecting small physical Ethernets with switches, effectively eliminating the need to support large-diameter physical Ethernets. So instead of increasing the minimum packet size, the decision was made to ensure collision detectability by reducing the network diameter instead. The network diameter chosen was a little over 400 meters, with reductions to account for the presence of hubs. At 2.3 meters/bit, 400 meters is 174 bits, for a round-trip of 350 bits.</p>
+<p>This 400-meter number, however, may be misleading: by far the most popular Fast Ethernet standard is 100BASE-TX which uses twisted-pair copper wire (so-called Category 5, or better), and in which any individual cable segment is limited to 100 meters. The maximum 100BASE-TX network diameter – allowing for hubs – is just over 200 meters.
+The 400-meter distance does apply to optical-fiber-based 100BASE-FX in half-duplex mode, but this is not common.</p>
+<p>The 100BASE-TX network-diameter limit of 200 meters might seem small; it amounts in many cases to a single hub with multiple 100-meter cable segments radiating from it. In practice, however, such “star” configurations could easily be joined with switches. As we will see below in <a class="reference internal" href="#ethernet-switches"><span class="std std-ref">2.4&nbsp;&nbsp;&nbsp;Ethernet Switches</span></a>, switches partition an Ethernet into separate “collision domains”; the network-diameter rules apply to each domain separately but not to the aggregated whole. In a fully switched (that is, no hubs) 100BASE-TX LAN, each collision domain is simply a single twisted-pair link, subject to the 100-meter maximum length.</p>
+<p id="index-19">Fast Ethernet also introduced the concept of <strong>full-duplex</strong> Ethernet: two twisted pairs could be used, one for each direction. Full-duplex Ethernet is limited to paths not involving hubs, that is, to single <strong>station-to-station</strong> links, where a station is either a host or a switch. Because such a link has only two potential senders, and each sender has its own transmit line, full-duplex Ethernet is entirely <strong>collision-free</strong>.</p>
+<p>Fast Ethernet uses 4B/5B encoding, covered in <a class="reference internal" href="links.html#b5b"><span class="std std-ref">4.1.4&nbsp;&nbsp;&nbsp;4B/5B</span></a>. This means that the electronics have to handle 125 Mbps, versus the 200 Mbps if Manchester encoding were still used.</p>
+<p>Fast Ethernet 100BASE-TX does not particularly support links between buildings, due to the maximum-cable-length limitation. However, fiber-optic point-to-point links are an effective alternative here, provided full-duplex is used to avoid collisions. We mentioned above that the coax-based 100BASE-FX standard allowed a maximum half-duplex run of 400 meters, but 100BASE-FX is much more likely to use full duplex, where the maximum cable length rises to 2,000 meters.</p>
+</div>
+<div class="section" id="gigabit-ethernet">
+<span id="index-20"></span><span id="id10"></span><h2>2.3&nbsp;&nbsp;&nbsp;Gigabit Ethernet<a class="headerlink" href="#gigabit-ethernet" title="Permalink to this headline">¶</a></h2>
+<p>The problem of scaling Ethernet to handle collision detection gets harder as the transmission rate increases. If we were continue to maintain the same 51.2 µsec slot time but raise the transmission rate to 1000 Mbps, the maximum network diameter would now be 20-40 meters. Instead of that, Gigabit Ethernet moved to a 4096-bit (512-byte, or 4.096 µsec) slot time, at least for the twisted-pair versions. Short frames need to be padded, but this padding is done by the hardware. Gigabit Ethernet 1000Base-T uses so-called PAM-5 encoding, below, which supports a special pad pattern (or symbol) that cannot appear in the data. The hardware pads the frame with these special patterns, and the receiver can thus infer the unpadded length as set by the host operating system.</p>
+<div class="sidebar">
+<p class="first sidebar-title">Gigabit vs Disks</p>
+<p class="last">Once a network has reached Gigabit speed, the network is generally as fast as reading from or writing to a disk. Keeping data on another node no longer slows things down. This greatly expands the range of possibilities for constructing things like clustered databases.</p>
+</div>
+<p>However, the Gigabit Ethernet slot time is largely irrelevant, as full-duplex (bidirectional) operation is almost always supported. Combined with the restriction that each length of cable is a station-to-station link (that is, hubs are no longer allowed), this means that collisions simply do not occur and the network diameter is no longer a concern. (10 Gigabit Ethernet has officially abandoned any pretense of supporting collisions; everything <em>must</em> be full-duplex.)</p>
+<p>There are actually multiple Gigabit Ethernet standards (as there are for Fast Ethernet). The different standards apply to different cabling situations. There are full-duplex optical-fiber formulations good for many miles (<em>eg</em> 1000Base-LX10), and even a version with a 25-meter maximum cable length (1000Base-CX), which would in theory make the original 512-bit slot practical.</p>
+<p>The most common gigabit Ethernet over copper wire is 1000BASE-T (sometimes incorrectly referred to as 1000BASE-TX. While there exists a TX, it requires Category 6 cable and is thus seldom used; many devices labeled TX are in fact 1000BASE-T). For 1000BASE-T, all four twisted pairs in the cable are used. Each pair transmits at 250 Mbps, and each pair is <em>bidirectional</em>, thus supporting full-duplex communication. Bidirectional communication on a single wire pair takes some careful echo cancellation at each end, using a circuit known as a “hybrid” that in effect allows detection of the incoming signal by filtering out the outbound signal.</p>
+<p id="index-21">On any one cable pair, there are five signaling levels. These are used to transmit two-bit <strong>symbols</strong> at a rate of 125 symbols/µsec, for a data rate of 250 bits/µsec. Two-bit symbols in theory only require four signaling levels; the fifth symbol allows for some redundancy which is used for error detection and correction, for avoiding long runs of identical symbols, and for supporting a special pad symbol, as mentioned above. The encoding is known as 5-level pulse-amplitude modulation, or PAM-5. The target bit error rate (BER) for 1000BASE-T is 10<sup>-10</sup>, meaning that the packet error rate is less than 1 in 10<sup>6</sup>.</p>
+<p>In developing faster Ethernet speeds, economics plays at least as important a role as technology. As new speeds reach the market, the earliest adopters often must take pains to buy cards, switches and cable known to “work together”; this in effect amounts to installing a proprietary LAN. The real benefit of Ethernet, however, is arguably that it <em>is</em> standardized, at least eventually, and thus a site can mix and match its cards and devices. Having a given Ethernet standard support existing cable is even more important economically; the costs of replacing inter-office cable often dwarf the costs of the electronics.</p>
+<p id="index-22">As Ethernet speeds continue to climb, it has become harder and harder for host systems to keep up. As a result, it is common for quite a bit of higher-layer processing to be offloaded onto the Ethernet hardware, for example, TCP checksum calculation. See <a class="reference internal" href="tcp.html#tcp-offloading"><span class="std std-ref">12.5&nbsp;&nbsp;&nbsp;TCP Offloading</span></a>.</p>
+</div>
+<div class="section" id="ethernet-switches">
+<span id="index-23"></span><span id="id11"></span><h2>2.4&nbsp;&nbsp;&nbsp;Ethernet Switches<a class="headerlink" href="#ethernet-switches" title="Permalink to this headline">¶</a></h2>
+<p>Switches join separate physical Ethernets (or sometimes Ethernets and other kinds of networks). A switch has two or more Ethernet interfaces; when a packet is received on one interface it is retransmitted on one or more other interfaces. Only valid packets are forwarded; collisions are <strong>not</strong> propagated. The term <strong>collision domain</strong> is sometimes used to describe the region of an Ethernet in between switches; a given collision propagates only within its collision domain. All the collision-detection rules, including the rules for maximum network diameter, apply only to collision domains, and not to the larger “virtual Ethernets” created by stringing collision domains together with switches.</p>
+<div class="sidebar">
+<p class="first sidebar-title">Switch Costs</p>
+<p class="last">In the 1980’s the author once installed a two-port 10-Mbps Ethernet switch (then called a “bridge”) that cost $3000; <em>cf</em> the <a class="reference internal" href="bibliography.html#mb76" id="id12">[MB76]</a> quote at <a class="reference internal" href="#ethernet"><span class="std std-ref">2&nbsp;&nbsp;&nbsp;Ethernet</span></a>. Today a wide variety of multiport 100-Mbps Ethernet switches are available for around $10, and almost all installed Ethernets are fully switched.</p>
+</div>
+<p>As we shall see below, a switched Ethernet offers much more resistance to eavesdropping than a non-switched (<em>eg</em> hub-based) Ethernet.</p>
+<p>Like simpler unswitched Ethernets, the topology for a switched Ethernet is in principle required to be loop-free, although in practice, most switches support the spanning-tree loop-detection protocol and algorithm, <a class="reference internal" href="#spanning-tree"><span class="std std-ref">2.5&nbsp;&nbsp;&nbsp;Spanning Tree Algorithm and Redundancy</span></a>, which automatically “prunes” the network topology to make it loop-free while allowing the pruned links to be placed back in service if a primary link fails.</p>
+<p>While a switch does not propagate collisions, it must maintain a queue for each outbound interface in case it needs to forward a packet at a moment when the interface is busy; on (rare) occasion packets are lost when this queue overflows.</p>
+<div class="section" id="ethernet-learning-algorithm">
+<span id="index-24"></span><span id="id13"></span><h3>2.4.1&nbsp;&nbsp;&nbsp;Ethernet Learning Algorithm<a class="headerlink" href="#ethernet-learning-algorithm" title="Permalink to this headline">¶</a></h3>
+<p>Traditional Ethernet switches use datagram forwarding as described in <a class="reference internal" href="intro.html#datagram-forwarding"><span class="std std-ref">1.4&nbsp;&nbsp;&nbsp;Datagram Forwarding</span></a>; the trick is to build their forwarding tables without any cooperation from ordinary, non-switch hosts. Indeed, to the extent that a switch is to act as a drop-in replacement for a hub, it cannot count on cooperation from other <em>switches</em>.</p>
+<p>The solution is for the switch to start out with an empty forwarding table, and then incrementally build the table through a <strong>learning</strong> process. If a switch does not have an entry for a particular destination, it will <strong>fall back to flooding</strong>: it will forward the packet out every interface other than the one on which the packet arrived. This is sometimes also called “unknown unicast flooding”; it is equivalent to treating the destination as a broadcast address. The availability of fallback-to-flooding for unknown destinations is what makes it possible for Ethernet switches to learn their forwarding tables without any switch-to-switch or switch-to-host communication or coordination.</p>
+<p>A switch learns address locations as follows: for each interface, the switch maintains a table of physical (MAC) addresses that have appeared as <em>source</em> addresses in packets arriving via that interface. The switch thus knows that to reach these addresses, if one of them later shows up as a <em>destination</em> address, the packet needs to be sent only via that interface. Specifically, when a packet arrives on interface I with source address S and destination unicast address D, the switch enters ⟨S,I⟩ into its forwarding table.</p>
+<p>To actually deliver the packet, the switch also looks up the destination D in the forwarding table. If there is an entry ⟨D,J⟩ with J≠I – that is, D is known to  be reached via interface J – then the switch <strong>forwards</strong> the packet out interface J. If J=I, that is, the packet has arrived on the same interfaces by which the destination is reached, then the packet does not get forwarded at all; it presumably arrived at interface I only because that interface was connected to a shared Ethernet segment that also either contained D or contained another switch that would bring the packet closer to D. If there is no entry for D, the switch must <strong>flood</strong> the packet out all interfaces J with J≠I; this represents the unknown-destination fallback to flooding. After a short while, the fallback-to-flooding alternative is needed less and less often, as switches learn where the active hosts are located. (However, in some switch implementations, forwarding tables also include timestamps, and entries are removed if they have not been used for, say, five minutes.)</p>
+<p>If the destination address D is the broadcast address, or, for many switches, a multicast address, broadcast (flooding) is required. Some switches try to keep track of multicast groups, so as to forward multicast traffic only out interfaces with known subscribers; see <a class="reference internal" href="#multicast-ethernet"><span class="std std-ref">2.1.2&nbsp;&nbsp;&nbsp;Ethernet Multicast</span></a>.</p>
+<img alt="_images/learning_bridge.svg" src="_images/learning_bridge.svg" /><p>In the diagram above, each switch’s tables are indicated by listing near each interface the destinations (identified by MAC addresses) known to be reachable by that interface. The entries shown are the result of the following packets:</p>
+<ul class="simple">
+<li><strong>A sends to B</strong>; all switches learn where A is</li>
+<li><strong>B sends to A</strong>; this packet goes directly to A; only S3, S2 and S1 learn where B is</li>
+<li><strong>C sends to B</strong>; S4 does not know where B is so this packet goes to S5; S2 <em>does</em> know where B is so the packet does <em>not</em> go to S1.</li>
+</ul>
+<p>It is worth observing that, at the application layer, hosts do not commonly identify one another by their MAC addresses. In an IPv4-based network, the use of ARP (<a class="reference internal" href="ipv4.html#arp"><span class="std std-ref">7.9&nbsp;&nbsp;&nbsp;Address Resolution Protocol: ARP</span></a>) to translate from IPv4 to MAC addresses would introduce additional broadcasts, which would cause the above scenario to play out differently. See exercise 11.0.</p>
+<p>Switches do <em>not</em> automatically discover directly connected neighbors; S1 does not learn about A until A transmits a packet.</p>
+<p>Once all the switches have learned where all (or most of) the hosts are, each packet is forwarded rather than flooded. At this point packets are never sent on links unnecessarily; a packet from A to B only travels those links that lie along the (unique) path from A to B. (Paths must be unique because switched Ethernet networks cannot have loops, at least not active ones. If a loop existed, then a packet sent to an unknown destination would be forwarded around the loop endlessly.)</p>
+<p>Switches have an additional privacy advantage in that traffic that does not flow where it does not need to flow is much harder to eavesdrop on. On an unswitched Ethernet, one host configured to receive all packets can eavesdrop on all traffic. Early Ethernets were notorious for allowing one unscrupulous station to capture, for instance, all passwords in use on the network. On a fully switched Ethernet, a host physically sees only the traffic actually addressed to it; other traffic remains inaccessible. This switch-based eavesdropping protection is, however, potentially vulnerable to attackers flooding the network with fake source addresses, forcing switches into fallback-to-flooding mode.</p>
+<div class="sidebar" id="index-25">
+<p class="first sidebar-title">CAM Table</p>
+<p class="last">On Cisco switches, the forwarding table is often called the CAM table, after the specialized high-speed <a class="reference external" href="https://en.wikipedia.org/wiki/Content-addressable_memory">content-addressable memory</a> used to store it.</p>
+</div>
+<p>Typical large switches have room for a forwarding table with 10<sup>4</sup> - 10<sup>5</sup> entries, though fully switched networks at the upper end of this size range are not common. The main size limitations specific to switching are the requirement that the topology must be loop-free (thus disallowing duplicate paths which might otherwise provide redundancy), and that all broadcast traffic must always be forwarded everywhere. As a switched Ethernet grows, broadcast traffic comprises a larger and larger percentage of the total traffic, and the organization must at some point move to a routing architecture (<em>eg</em> as in <a class="reference internal" href="ipv4.html#ip-subnets"><span class="std std-ref">7.6&nbsp;&nbsp;&nbsp;IPv4 Subnets</span></a>). A common recommendation is to have no more than 1000 hosts per LAN (or VLAN, <a class="reference internal" href="#vlan"><span class="std std-ref">2.6&nbsp;&nbsp;&nbsp;Virtual LAN (VLAN)</span></a>).</p>
+<p id="index-26">One of the differences between an inexpensive Ethernet switch and a pricier one is the degree of internal parallelism it can support. If three packets arrive simultaneously on ports 1, 2 and 3, and are destined for respective ports 4, 5 and 6, can the switch actually transmit the packets simultaneously? A simple switch likely has a single CPU and a single memory bus, both of which can introduce transmission bottlenecks.  For commodity five-port switches, at most two simultaneous transmissions can occur; such switches can generally handle that degree of parallelism. It becomes harder as the number of ports increases, but at some point the need to support full parallel operation can be questioned; in many settings the majority of traffic involves one or two server or router ports. If a high degree of parallelism is in fact required, there are various architectures – known as <strong>switch fabrics</strong> – that can be used; these typically involve multiple simple processor elements.</p>
+</div>
+</div>
+<div class="section" id="spanning-tree-algorithm-and-redundancy">
+<span id="spanning-tree"></span><span id="index-27"></span><h2>2.5&nbsp;&nbsp;&nbsp;Spanning Tree Algorithm and Redundancy<a class="headerlink" href="#spanning-tree-algorithm-and-redundancy" title="Permalink to this headline">¶</a></h2>
+<p>In theory, if you form a loop with Ethernet switches, any packet with destination not already present in the forwarding tables will circulate endlessly; some early switches would actually do this.</p>
+<p>In practice, however, loops allow redundancy – if one link breaks there is still 100% connectivity – and so are desirable. As a result, Ethernet switches have incorporated a switch-to-switch protocol to construct a subset of the switch-connections graph that has no loops and yet allows reachability of every host, known in graph theory as a <strong>spanning tree</strong>. Once the spanning tree is built, links that are not part of the tree are disabled, even if they would represent the most efficient path between two nodes. If a link that is part of the spanning tree fails, partitioning the network, a new tree is constructed, and some formerly disabled links may now return to service.</p>
+<p>One might ask, if switches can work together to negotiate a a spanning tree, whether they can also work together to negotiate loop-free forwarding tables for the original non-tree topology, thus keeping all links active. The difficulty here is not the switches’ ability to coordinate, but the underlying Ethernet broadcast feature. As long as the topology has loops and broadcast is enabled, broadcast packets might circulate forever. And disabling broadcast is not a straightforward option; switches rely on the broadcast-based fallback-to-flooding strategy of <a class="reference internal" href="#ethernet-learning-algorithm"><span class="std std-ref">2.4.1&nbsp;&nbsp;&nbsp;Ethernet Learning Algorithm</span></a> to deliver to unknown destinations. However, we will return to this point in <a class="reference internal" href="#sdn"><span class="std std-ref">2.7&nbsp;&nbsp;&nbsp;Software-Defined Networking</span></a>. See also exercise 10.0.</p>
+<p>The presence of hubs and other unswitched Ethernet <strong>segments</strong> slightly complicates the switch-connections graph. In the absence of these, the graph’s nodes and edges are simply the hosts (including switches) and links of the Ethernet itself. If unswitched multi-host Ethernet segments are present, then each of these becomes a single node in the graph, with a graph edge to each switch to which it directly connects. (Any Ethernet switches not participating in the spanning-tree algorithm would be treated as hubs.)</p>
+<p>Every switch has an ID, <em>eg</em> its smallest Ethernet address, and every edge that attaches to a switch does so via a particular, numbered interface. The goal is to disable redundant (cyclical) paths while retaining the ability to deliver to any segment. The algorithm is due to Radia Perlman, <a class="reference internal" href="bibliography.html#rp85" id="id14">[RP85]</a>.</p>
+<p>The switches first elect a root node, <em>eg</em> the one with the smallest ID. Then, if a given segment connects to two switches that both connect to the root node, the switch with the shorter path to the root is used, if possible; in the event of ties, the switch with the smaller ID is used. The simplest measure of path cost is the number of hops, though current implementations generally use a cost factor inversely proportional to the bandwidth (so larger bandwidth has lower cost).  Some switches permit other configuration here. The process is dynamic, so if an outage occurs then the spanning tree is recomputed. If the outage should partition the network into two pieces, both pieces will build spanning trees.</p>
+<p id="index-28">All switches send out regular messages on all interfaces called <em>bridge protocol data units</em>, or BPDUs (or “Hello” messages). These are sent to the Ethernet multicast address 01:80:c2:00:00:00, from the Ethernet physical address of the interface. (Note that Ethernet switches do not otherwise need a unique physical address for each interface.) The BPDUs contain</p>
+<ul class="simple">
+<li>The switch ID</li>
+<li>the ID of the node the switch believes is the root</li>
+<li>the path cost (<em>eg</em> number of hops) to that root</li>
+</ul>
+<p>These messages are recognized by switches and are not forwarded naively. Switches process each message, looking for</p>
+<ul class="simple">
+<li>a switch with a lower ID than any the receiving switch has seen before (thus becoming the new root)</li>
+<li>a shorter path to the existing root</li>
+<li>an equal-length path to the existing root, but via a neighbor switch with a lower ID (the tie-breaker rule). If there are two ports that connect to that switch, the port number is used as an additional tie-breaker.</li>
+</ul>
+<p>In a heterogeneous Ethernet we would also introduce a preference for <em>faster</em> paths, but we will assume here that all links have the same bandwidth.</p>
+<p>When a switch sees a new root candidate, it sends BPDUs on all interfaces, indicating the distance. The switch includes the interface leading towards the root.</p>
+<p>Once this process has stabilized, each switch knows</p>
+<ul class="simple">
+<li>its own path to the root</li>
+<li>which of its ports any further-out switches will be using to reach the root</li>
+<li>for each port, its directly connected neighboring switches</li>
+</ul>
+<p>Now the switch can “prune” some (or all!) of its interfaces. It disables all interfaces that are not <em>en</em>abled by the following rules:</p>
+<ol class="arabic simple">
+<li>It enables the port via which it reaches the root</li>
+<li>It enables any of its ports that further-out switches use to reach the root</li>
+<li>If a remaining port connects to a segment to which other “segment-neighbor” switches connect as well, the port is enabled if the switch has the minimum cost to the root among those segment-neighbors, or, if a tie, the smallest ID among those neighbors, or, if two ports are tied, the port with the smaller ID.</li>
+<li>If a port has no directly connected switch-neighbors, it presumably connects to a host or segment, and the port is enabled.</li>
+</ol>
+<p>Rules 1 and 2 construct the spanning tree; if S3 reaches the root via S2, then Rule 1 makes sure S3’s port towards S2 is open, and Rule 2 makes sure S2’s corresponding port towards S3 is open. Rule 3 ensures that each network segment that connects to multiple switches gets a unique path to the root: if S2 and S3 are segment-neighbors each connected to segment N, then S2 enables its port to N and S3 does not (because 2&lt;3). The primary concern here is to create a path for any <em>host</em> nodes on segment N; S2 and S3 will create their own paths via Rules 1 and 2. Rule 4 ensures that any “stub” segments retain connectivity; these would include all hosts directly connected to switch ports.</p>
+<div class="section" id="example-1-switches-only">
+<span id="spanning1"></span><h3>2.5.1&nbsp;&nbsp;&nbsp;Example 1: Switches Only<a class="headerlink" href="#example-1-switches-only" title="Permalink to this headline">¶</a></h3>
+<p>We can simplify the situation somewhat if we assume that the network is <strong>fully switched</strong>: each switch port connects to another switch or to a (single-interface) host; that is, no repeater hubs (or coax segments!) are in use. In this case we can dispense with Rule 3 entirely.</p>
+<p>Any switch ports directly connected to a host can be identified because they are “silent”; the switch never receives any BPDU messages on these interfaces because hosts do not send these. All these host port ends up enabled via Rule 4. Here is our sample network, where the switch numbers (<em>eg</em> 5 for S5) represent their IDs; no hosts are shown and interface numbers are omitted.</p>
+<img alt="_images/Ethernet_switches.svg" src="_images/Ethernet_switches.svg" /><p>S1 has the lowest ID, and so becomes the root. S2 and S4 are directly connected, so they will enable the interfaces by which they reach S1 (Rule 1) while S1 will enable its interfaces by which S2 and S4 reach it (Rule 2).</p>
+<p>S3 has a unique lowest-cost route to S1, and so again by Rule 1 it will enable its interface to S2, while by Rule 2 S2 will enable its interface to S3.</p>
+<p>S5 has two choices; it hears of equal-cost paths to the root from both S2 and S4. It picks the lower-numbered neighbor S2; the interface to S4 will never be enabled. Similarly, S4 will never enable its interface to S5.</p>
+<p>Similarly, S6 has two choices; it selects S3.</p>
+<p>After these links are enabled (strictly speaking it is interfaces that are enabled, not links, but in all cases here either both interfaces of a link will be enabled or neither), the network in effect becomes:</p>
+<img alt="_images/Ethernet_switches_cut.svg" src="_images/Ethernet_switches_cut.svg" /></div>
+<div class="section" id="example-2-switches-and-segments">
+<h3>2.5.2&nbsp;&nbsp;&nbsp;Example 2: Switches and Segments<a class="headerlink" href="#example-2-switches-and-segments" title="Permalink to this headline">¶</a></h3>
+<p>As an example involving switches that may join via unswitched Ethernet segments, consider the following network; S1, S2 and S3, for example, are all segment-neighbors via their common segment B. As before, the switch numbers represent their IDs. The letters in the clouds represent network segments; these clouds may include multiple hosts. Note that switches have no way to detect these hosts; only (as above) other switches.</p>
+<img alt="_images/spanningtree.svg" src="_images/spanningtree.svg" /><p>Eventually, all switches discover S1 is the root (because 1 is the smallest of {1,2,3,4,5,6}). S2, S3 and S4 are one (unique) hop away; S5, S6 and S7 are two hops away.</p>
+<div class="sidebar">
+<p class="first sidebar-title">Algorhyme</p>
+<div class="last line-block">
+<div class="line">I think that I shall never see</div>
+<div class="line">a graph more lovely than a tree.</div>
+<div class="line">A tree whose crucial property</div>
+<div class="line">is loop-free connectivity.</div>
+<div class="line">A tree that must be sure to span</div>
+<div class="line">so packet can reach every LAN.</div>
+<div class="line">First, the root must be selected.</div>
+<div class="line">By ID, it is elected.</div>
+<div class="line">Least-cost paths from root are traced.</div>
+<div class="line">In the tree, these paths are placed.</div>
+<div class="line">A mesh is made by folks like me,</div>
+<div class="line">then bridges find a spanning tree.</div>
+<div class="line"><br /></div>
+<div class="line-block">
+<div class="line">Radia Perlman</div>
+</div>
+</div>
+</div>
+<p>For the switches one hop from the root, Rule 1 enables S2’s port 1, S3’s port 1, and S4’s port 1. Rule 2 enables the corresponding ports on S1: ports 1, 5 and 4 respectively. Without the spanning-tree algorithm S2 could reach S1 via port 2 as well as port 1, but port 1 has a smaller number.</p>
+<p>S5 has two equal-cost paths to the root: S5⟶S4⟶S1 and S5⟶S3⟶S1. S3 is the switch with the lower ID; its port 2 is enabled and S5 port 2 is enabled.</p>
+<p>S6 and S7 reach the root through S2 and S3 respectively; we enable S6 port 1, S2 port 3, S7 port 2 and S3 port 3.</p>
+<p>The ports still disabled at this point are S1 ports 2 and 3, S2 port 2, S4 ports 2 and 3, S5 port 1, S6 port 2 and S7 port 1.</p>
+<p>Now we get to Rule 3, dealing with how segments (and thus their hosts) connect to the root. Applying Rule 3,</p>
+<ul class="simple">
+<li>We do not enable S2 port 2, because the network (B) has a direct connection to the root, S1</li>
+<li>We do enable S4 port 3, because S4 and S5 connect that way and S4 is closer to the root. This enables connectivity of network D. We do not enable S5 port 1.</li>
+<li>S6 and S7 are tied for the path-length to the root. But S6 has smaller ID, so it enables port 2. S7’s port 1 is not enabled.</li>
+</ul>
+<p>Finally, Rule 4 enables S4 port 2, and thus connectivity for host J. It also enables S1 port 2; network F has two connections to S1 and port 2 is the lower-numbered connection.</p>
+<p>All this port-enabling is done using only the data collected during the root-discovery phase; there is no additional negotiation. The BPDU exchanges continue, however, so as to detect any changes in the topology.</p>
+<p>If a link is disabled, it is not used even in cases where it would be more efficient to use it. That is, traffic from F to B is sent via B1, D, and B5; it never goes through B7. IP routing, on the other hand, uses the “shortest path”. To put it another way, all spanning-tree Ethernet traffic goes through the root node, or along a path to or from the root node.</p>
+<p>The traditional (IEEE 802.1D) spanning-tree protocol is relatively slow; the need to go through the tree-building phase means that after switches are first turned on no normal traffic can be forwarded for ~30 seconds. Faster, revised protocols have been proposed to reduce this problem.</p>
+<p id="index-29">Another issue with the spanning-tree algorithm is that a rogue switch can announce an ID of 0, thus likely becoming the new root; this leaves that switch well-positioned to eavesdrop on a considerable fraction of the traffic. One of the goals of the Cisco “Root Guard” feature is to prevent this. Another goal of this and related features is to put the spanning-tree topology under some degree of administrative control. One likely wants the root switch, for example, to be  geographically at least somewhat centered, and for the high-speed backbone links to be preferred to slow links.</p>
+</div>
+</div>
+<div class="section" id="virtual-lan-vlan">
+<span id="vlan"></span><span id="index-30"></span><h2>2.6&nbsp;&nbsp;&nbsp;Virtual LAN (VLAN)<a class="headerlink" href="#virtual-lan-vlan" title="Permalink to this headline">¶</a></h2>
+<p>What do you do when you have different people in different places who are “logically” tied together? For example, for a while the Loyola University CS department was split, due to construction, between two buildings.</p>
+<p>One approach is to continue to keep LANs local, and use IP routing between different subnets. However, it is often convenient (printers are one reason) to configure workgroups onto a single “virtual” LAN, or <strong>VLAN</strong>. A VLAN looks like a single LAN, usually a single Ethernet LAN, in that all VLAN members will see broadcast packets sent by other members and the VLAN will ultimately be considered to be a single IP <em>subnet</em> (<a class="reference internal" href="ipv4.html#ip-subnets"><span class="std std-ref">7.6&nbsp;&nbsp;&nbsp;IPv4 Subnets</span></a>). Different VLANs are ultimately connected together, but likely only by passing through a single, central IP router.</p>
+<p>VLANs can be visualized and designed by using the concept of coloring. We logically assign all nodes on the same VLAN the same color, and switches forward packets accordingly. That is, if S1 connects to red machines R1 and R2 and blue machines B1 and B2, and R1 sends a broadcast packet, then it goes to R2 but not to B1 or B2. Switches must, of course, be told the color of each of their ports.</p>
+<img alt="_images/vlan.svg" id="index-31" src="_images/vlan.svg" /><p>In the diagram above, S1 and S3 each have both red and blue ports. The switch network S1-S4 will deliver traffic only when the source and destination ports are the same color. Red packets can be forwarded to the blue VLAN <em>only</em> by passing through the router R, entering R’s red port and leaving its blue port. R may apply firewall rules to restrict red–blue traffic.</p>
+<p>When the source and destination ports are on the same switch, nothing needs to be added to the packet; the switch can keep track of the color of each of its ports. However, switch-to-switch traffic must be additionally tagged to indicate the source. Consider, for example, switch S1 above sending packets to S3 which has nodes R3 (red) and B3 (blue). Traffic between S1 and S3 must be tagged with the color, so that S3 will know to what ports it may be delivered. The IEEE <strong>802.1Q</strong> protocol is typically used for this packet-tagging; a 32-bit “color” tag is inserted into the Ethernet header after the source address and before the type field. The first 16 bits of this field is 0x8100, which becomes the new Ethernet type field and which identifies the frame as tagged.</p>
+<p>Double-tagging is possible; this would allow an ISP to have one level of tagging and its customers to have another level.</p>
+<p>Finally, most commercial-grade switches do provide some way of selectively allowing traffic between different VLANs; with such switches, for example, rules could be created to allow R1 to connect to B3 without the use of the router R. One difficulty with this approach is that there is often little standardization among switch manufacturers. This makes it difficult to create, for example, authorization applications that allow opening inter-VLAN connections on the fly. Another issue is that some switches allow inter-VLAN rules based only on MAC addresses, and not, for example, on TCP port numbers. The OpenFlow protocol (<a class="reference internal" href="#openflow"><span class="std std-ref">2.7.1&nbsp;&nbsp;&nbsp;OpenFlow Switches</span></a>) has the potential to create the necessary standardization here. Even without OpenFlow, however, some specialty access-and-authentication systems have been developed that do enable host access by dynamic creation of the appropriate switch rules.</p>
+</div>
+<div class="section" id="software-defined-networking">
+<span id="sdn"></span><span id="index-32"></span><h2>2.7&nbsp;&nbsp;&nbsp;Software-Defined Networking<a class="headerlink" href="#software-defined-networking" title="Permalink to this headline">¶</a></h2>
+<p>The Spanning-Tree mechanism has been effective in allowing large Ethernets to contain redundant “backup” links, normally “suspended” but which can be returned to service promptly if any of the “primary” links should fail. But what about the possibility of actually making first-class use of <em>all</em> links? How can we avoid disabling links? In a high-performance datacenter, disabled links are a wasted resource.</p>
+<p>As we indicated earlier, the central difficulty here is in forwarding packets to unknown destinations: Ethernet switches traditionally rely on fallback-to-flooding here, and safely using flooding (broadcast) in the presence of a loop topology is quite difficult (see, for example, “reliable flooding” in <a class="reference internal" href="routing.html#link-state"><span class="std std-ref">9.5&nbsp;&nbsp;&nbsp;Link-State Routing-Update Algorithm</span></a>).</p>
+<p>The strategy of Software-Defined Networking, or <strong>SDN</strong>, is to move away from the traditional distributed Ethernet learning algorithm, and instead to place the forwarding mechanism of each participating switch under the aegis of a <strong>controller</strong>, in such a way that forwarding and redundancy can coexist. The controller can be a single node on the network, or can be a distributed set of nodes. The controller then manages the forwarding tables of the switches.</p>
+<p>To handle legitimate broadcast traffic, the controller can, at startup, probe the switches to determine their layout, and, from this, construct a suitable spanning tree. The switches can then be instructed to forward broadcast traffic only along the links of this spanning tree. Links that are not part of the spanning tree can still be used for forwarding to known destinations, however, unlike conventional switches using the spanning tree algorithm.</p>
+<p>Typically, if a switch sees a packet addressed to an unknown destination, it reports it to the controller, which then must figure out what to do next. One option is to have traffic to unknown destinations forwarded along the same spanning tree used for broadcast traffic. This allows fallback-to-flooding to coexist safely with the full use of loop topologies.</p>
+<p>Switches are sometimes configured to report new <em>source</em> addresses to the controller, so that the controller can tell all the other switches the best route to that new source.</p>
+<p id="index-33">SDN controllers can be configured as simple firewalls, disallowing forwarding between selected pairs of nodes for security reasons. For example, if a data center has customers A and B, each with multiple nodes, then it is possible to configure the network so that no node belonging to customer A can send packets to a node belonging to customer B. See also the following section.</p>
+<p>At many sites, the SDN implementation is based on standardized modules. However, controller software can also be developed locally, allowing very local control of network functionality. This control, rather than the ability to combine loop topologies with Ethernet, is arguably SDN’s most important feature. See <a class="reference internal" href="bibliography.html#frz13" id="id15">[FRZ13]</a>.</p>
+<div class="section" id="openflow-switches">
+<span id="openflow"></span><span id="index-34"></span><h3>2.7.1&nbsp;&nbsp;&nbsp;OpenFlow Switches<a class="headerlink" href="#openflow-switches" title="Permalink to this headline">¶</a></h3>
+<p>At the heart of SDN is the ability of controllers to tell switches how to forward packets. We next look at the packet-forwarding architecture for <strong>OpenFlow</strong> switches;
+OpenFlow is a specific SDN standard created by the <a class="reference external" href="https://www.opennetworking.org/">Open Networking Foundation</a>. See <a class="reference internal" href="bibliography.html#mabpprst08" id="id16">[MABPPRST08]</a> and the <a class="reference external" href="https://www.opennetworking.org/images/stories/downloads/sdn-resources/onf-specifications/openflow/openflow-switch-v1.5.1.pdf">OpenFlow switch specification</a> (2015 version).</p>
+<p id="index-35">OpenFlow forwarding is built around one or more <strong>flow tables</strong>. The primary components of a flow-table entry are a set of <strong>match fields</strong> and a set of packet-response instructions, or <strong>actions</strong>, if the match succeeds. T Some common forms for the latter include</p>
+<ul class="simple">
+<li>drop the packet</li>
+<li>forward the packet out a specified single interface</li>
+<li>flood the packet out a <em>set</em> of interfaces</li>
+<li>forward the packet to the controller</li>
+<li>modify some field of the packet</li>
+<li>match the packet at another (higher-numbered) flow table</li>
+</ul>
+<p>The match fields <em>can</em>, of course, be a single entry for the destination Ethernet address. But it can also include any other packet bit-field, and can include the ingress interface number. For example, the forwarding can be done entirely (or partially) on IP addresses rather than Ethernet addresses, thus allowing the OpenFlow switch to act as a so-called Layer 3 switch (<a class="reference internal" href="ipv4.html#subnets-versus-switching"><span class="std std-ref">7.6.3&nbsp;&nbsp;&nbsp;Subnets versus Switching</span></a>), that is, resembling an IP router. Matching can be by the destination IP address and the destination TCP port, allowing separate forwarding for different TCP protocols. In <a class="reference internal" href="routing.html#lartc-use"><span class="std std-ref">9.6&nbsp;&nbsp;&nbsp;Routing on Other Attributes</span></a> we define <em>policy-based routing</em>; arbitrary such routing decisions can be implemented using OpenFlow switches. In SDN settings the policy-based-routing abilities are sometimes used to segregate real-time traffic and large-volume “elephant” flows. In the <code class="docutils literal"><span class="pre">l2_pairs.py</span></code> example of the following section, matching is done on both Ethernet source and destination addresses.</p>
+<p>Flow tables bear a rough similarity to forwarding tables, with the match fields corresponding to destinations and the actions corresponding to the next_hop. In simple cases, the match field contains a single destination address and the action is to forward out the corresponding switch port.</p>
+<p>Normally, OpenFlow switches handle broadcast packets by flooding them; that is, by forwarding them out all interfaces other than the arrival interface. It is possible, however, to set the NO_FLOOD attribute on specific interfaces, which means that packets designated for flooding (broadcast or otherwise) will not be sent out on those interfaces. This is typically how spanning trees for broadcast traffic are implemented (see <a class="reference internal" href="mininet.html#l2-multi"><span class="std std-ref">18.9.6&nbsp;&nbsp;&nbsp;l2_multi.py</span></a> for a Mininet example). An interface marked NO_FLOOD, however, may still be used for unicast traffic. Generally, broadcast flooding does not require a flow-table entry.</p>
+<p>Match fields are also assigned a <strong>priority</strong> value. In the event that a packet matches two or more flow-table entries, the entry with the highest priority wins. The <strong>table-miss</strong> entry is the entry with no match fields (thereby matching every packet) and with priority 0. Often the table-miss entry’s action is to forward the packet to the controller, although a packet that matches no entry is simply dropped.</p>
+<p id="index-36">Flow-table instructions can also involve modifying (“mangling”) packets. One Ethernet-layer application might be VLAN coloring (<a class="reference internal" href="#vlan"><span class="std std-ref">2.6&nbsp;&nbsp;&nbsp;Virtual LAN (VLAN)</span></a>); at the IPv4 layer, this could be used to decrement the TTL and update the checksum (<a class="reference internal" href="ipv4.html#ipv4-header"><span class="std std-ref">7.1&nbsp;&nbsp;&nbsp;The IPv4 Header</span></a>).</p>
+<p>In addition to match fields and instructions, flow tables also include counters, flags, and a last_used time. The latter allows flows to be removed if no matching packets have been seen for a while. The counters allow the OpenFlow switch to implement Quality-of-Service constraints – <em>eg</em> bandwidth limiting – on the traffic.</p>
+</div>
+<div class="section" id="learning-switches-in-openflow">
+<span id="openflow-learning-switch"></span><span id="index-37"></span><h3>2.7.2&nbsp;&nbsp;&nbsp;Learning Switches in OpenFlow<a class="headerlink" href="#learning-switches-in-openflow" title="Permalink to this headline">¶</a></h3>
+<p>Suppose we want to implement a standard Ethernet learning switch (<a class="reference internal" href="#ethernet-learning-algorithm"><span class="std std-ref">2.4.1&nbsp;&nbsp;&nbsp;Ethernet Learning Algorithm</span></a>). The obvious approach is to use flows matching only on the destination address. But we encounter a problem because, by default, packets are reported to the controller only when there is no flow-entry match. Suppose switch S sees a packet from host B to host A and reports it to the controller, which installs a flow entry in S matching destination B (much as a real learning switch would do). If a packet now arrives at S from a third host C to B, it would simply be forwarded, as it would match the B flow entry, and therefore would not be reported to the controller. This means the controller would never learn about address C, and would never install a flow entry for C.</p>
+<p>One straightforward alternative approach that avoids this problem is to match on Ethernet ⟨destaddr,srcaddr⟩ <strong>pairs</strong>. If a packet from A to B arrives at switch S and does not match any existing flow entry at S, it is reported to the controller, which now learns that A is reached via the port by which the packet arrived at S.</p>
+<img alt="_images/ASB.svg" src="_images/ASB.svg" /><p>In the network above, suppose A sends a packet to B (or broadcasts a packet meant for B), and the flow table of S is empty. S will report the packet to the controller (not shown in the diagram), which will send it back to S to be flooded. However, the controller will also record that A can be reached from S via port 1.</p>
+<p>Next, suppose B responds. When this packet from B arrives at S, there are still no flow-table entries, and so S again reports the packet to the controller. But this time the controller knows, because it learned from the first packet, that S can reach A via port 1. The controller also now knows, from the just-arrived packet, that B can be reached via port 2. Knowing both of these forwarding rules, the controller now installs two flow-table entries in S:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">dst=B,src=A: forward out port 2</div>
+<div class="line">dst=A,src=B: forward out port 1</div>
+</div>
+</div></blockquote>
+<p>If a packet from a third host <strong>C</strong> now arrives at S, addressed to B, it will not be forwarded, even though its destination address matches the first rule above, as its source address does not match A. It will instead be sent to the controller (and ultimately be flooded). When B responds to C, the controller will install rules for dst=C,src=B and dst=B,src=C. If the packet from C were not reported to the controller – perhaps because S had a flow rule for dst=B only – then the controller would never learn about C, and would never be in a position to install a flow rule for reaching C.</p>
+<p>The pairs approach to OpenFlow learning is pretty much optimal, if a single flow-entry table is available. The problem with this approach is that it does not scale well; with 10,000 addresses on the network, we will need 100,000,000 flowtable-entry pairs to describe all the possible forwarding. This is prohibitive.</p>
+<p>We examine a real implementation (in Python) of the pairs approach in <a class="reference internal" href="mininet.html#l2pairs"><span class="std std-ref">18.9.2&nbsp;&nbsp;&nbsp;l2_pairs.py</span></a>, using the Mininet network emulator and the Pox controller (<a class="reference internal" href="mininet.html#mininet"><span class="std std-ref">18&nbsp;&nbsp;&nbsp;Mininet</span></a>).</p>
+<p id="index-38">A more compact approach is to use <strong>multiple flow tables</strong>: one for matching the destination, and one for matching the source. In this version, the controller never has to remember partial forwarding information, as the controller in the version above had to do after receiving the first packet from A. When a packet arrives, it is matched against the first table, and any actions specified by the match are carried out. One of the actions may be a request to repeat the match against the second table, which may lead to a second set of actions. We repeat the A→B, B→A example above, letting T<sub>0</sub> denote the first table and T<sub>1</sub> denote the second.</p>
+<p>Initially, before any packets are seen, the controller installs the following low-priority match rules in S:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">T<sub>0</sub>: match nothing: flood, send to T<sub>1</sub></div>
+<div class="line">T<sub>1</sub>: match nothing: send to controller</div>
+</div>
+</div></blockquote>
+<p>These are in effect <em>default</em> rules: because there are no packet fields to match, they match all packets. The low priority ensures that better-matching rules are always used when available.</p>
+<p>When the packet from A to B arrives, the T<sub>0</sub> rule above means the packet is flooded to B, while the T<sub>1</sub> rule means the packet is sent to the controller. The controller then installs the following rules in S:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">T<sub>0</sub>: match dst=A: forward via port 1, send to T<sub>1</sub></div>
+<div class="line">T<sub>1</sub>: match src=A: do nothing</div>
+</div>
+</div></blockquote>
+<p>Now B sends its reply to A. The first rule above matches, so the packet is forwarded by S to A, and is resubmitted to T<sub>1</sub>. The T<sub>1</sub> rule immediately above, however, does <em>not</em> match. The only match is to the original default rule, and the packet is sent to the controller. The controller then installs another two rules in S:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">T<sub>0</sub>: match dst=B: forward via port 2, send to T<sub>1</sub></div>
+<div class="line">T<sub>1</sub>: match src=B: do nothing</div>
+</div>
+</div></blockquote>
+<p>At this point, as A and B continue to communicate, the T<sub>0</sub> rules ensure proper forwarding, while the T<sub>1</sub> rules ensure that no more packets from this flow are sent to the controller.</p>
+<p>Note that the controller always installs the same address in the T<sub>0</sub> table and the T<sub>1</sub> table, so the list of addresses present in these two tables will always be identical. The T<sub>0</sub> table always matches destinations, though, while the T<sub>1</sub> table matches source addresses.</p>
+<p>The Mininet/Pox version of this appears in <a class="reference internal" href="mininet.html#l2nx"><span class="std std-ref">18.9.3&nbsp;&nbsp;&nbsp;l2_nx.py</span></a>.</p>
+<p>Another application for multiple flow tables involves switches that make quality-of-service prioritization decisions. A packet’s destination would be found using the first flow table, while its priority would be found by matching to the second table. The packet would then be forwarded out the port determined by the first table, using the priority determined by the second table. Like building a learning switch, this can be done with a single table by listing all combinations of ⟨destaddr,priority⟩, but sometimes that’s too many entries.</p>
+<p id="index-39">We mentioned above that SDN controllers can be used as firewalls. At the Ethernet-address level this is tedious to configure, but by taking advantage of OpenFlow’s understanding of IP addresses, it is straightforward, for example, to block traffic between different IP subnets, much like a router might do. OpenFlow also allows blocking all such traffic <em>except</em> that between specific pairs of hosts using specific protocols. For example, we might want customer A’s web servers to be able to communicate with A’s database servers using the standard TCP port, while still blocking all other web-to-database traffic.</p>
+</div>
+<div class="section" id="other-openflow-examples">
+<h3>2.7.3&nbsp;&nbsp;&nbsp;Other OpenFlow examples<a class="headerlink" href="#other-openflow-examples" title="Permalink to this headline">¶</a></h3>
+<p>After emulating a learning switch, perhaps the next most straightforward OpenFlow application, conceptually, is the support of Ethernet topologies that contain loops. This can be done quite generically; the controller does not need any special awareness of the network topology.</p>
+<p>On startup, switches are instructed by the controller to report their neighboring switches. With this information the controller is then able to form a complete map of the switch topology. (One way to implement this is for the controller to order each switch to send a special marked packet out each of its ports, and then for the receiving switches to report these packets back to the controller.) Once the controller knows the switch topology, it can calculate a spanning tree, and then instruct each switch that flooded packets should be sent out only via ports that correspond to links on the spanning tree.</p>
+<p>Once the location of a destination host has been learned by the controller (that is, the controller learns which switch the host is directly connected to), the controller calculates the shortest (or lowest-cost, if the application supports differential link costs) path from each switch to that host. The controller then instructs each switch how to forward to that host. Forwarding will likely use links that are not part of the spanning tree, unlike traditional Ethernet switches.</p>
+<p>We outline an implementation of this strategy in <a class="reference internal" href="mininet.html#l2-multi"><span class="std std-ref">18.9.6&nbsp;&nbsp;&nbsp;l2_multi.py</span></a>.</p>
+<div class="section" id="interconnection-fabric">
+<span id="index-40"></span><span id="id17"></span><h4>2.7.3.1&nbsp;&nbsp;&nbsp;Interconnection Fabric<a class="headerlink" href="#interconnection-fabric" title="Permalink to this headline">¶</a></h4>
+<p>The previous Ethernet-loop example is quite general; it works for any switch topology. Many other OpenFlow applications require that the controller contains some prior knowledge of the switch topology. As an example of this, we present what we will refer to as an <strong>interconnection fabric</strong>. This is the S1-S5 network illustrated below, in which every upper (S1-S2) switch  connects directly to every lower (S3-S5) switch. The bottom row in the diagram represents server racks, as interconnection fabrics are very common in datacenters. (For a real-world datacenter example, <a class="reference external" href="https://code.facebook.com/posts/360346274145943/introducing-data-center-fabric-the-next-generation-facebook-data-center-network/">see here</a>, although real-world interconnection fabrics are often joined using routing rather than switching.)  The red and blue numbers identify the switch ports.</p>
+<img alt="_images/of_datacenter.svg" src="_images/of_datacenter.svg" /><p>The first two rows here contain many loops, eg S1–S3–S2–S4–S1 (omitting the S3-S5 row, and having S1 and S2 connect directly to the server racks, does not eliminate loops). In the previous example we described how we could handle loops in a switched network by computing a spanning tree and then allowing packet flooding only along this spanning tree. This is certainly possible here, but if we allow the spanning-tree algorithm to prune the loops, we will lose most of the parallelism between the S1-S2 and S3-S5 layers; see exercise 8.5. This generic spanning-tree approach is not what we want.</p>
+<p>If we use IP routing at S1 through S5, as in <a class="reference internal" href="routing.html#routing-update"><span class="std std-ref">9&nbsp;&nbsp;&nbsp;Routing-Update Algorithms</span></a>, we then need the three clusters of server racks below S3, S4 and S5 to be on three <em>separate</em> IP subnets (<a class="reference internal" href="ipv4.html#ip-subnets"><span class="std std-ref">7.6&nbsp;&nbsp;&nbsp;IPv4 Subnets</span></a>). While this is always technically possible, it can be awkward, if the separate subnets function for most other purposes as a single unit.</p>
+<p>One OpenFlow approach is to assume that the three clusters of server racks below S3-S4-S5 form a <em>single</em> IP subnet. We can then configure S1-S5 with OpenFlow so that traffic <em>from</em> the subnet is always forwarded upwards while traffic <em>to</em> the subnet is always forwarded downwards.</p>
+<p>But an even simpler solution – one not requiring any knowledge of the server subnet – is to use OpenFlow to configure the switches S1-S5 so that unknown-destination traffic entering on a red (upper) port is flooded out only on the blue (lower) ports, and vice-versa. This eliminates loops by ensuring that all traffic goes through the interconnection fabric either upwards-only or downwards-only. After the destination server below S3-S5 has replied, of course, S1 or S2 will learn to which of S3-S5 it should forward future packets to that server.</p>
+<p>This example works the way it does because the topology has a particular property: once we eliminate paths that both enter and leave S1 or S2 via blue nodes, or that enter and leave S3, S4 and S5 via red nodes, there is a unique path between any input port (red upper port) and any output port (towards the server racks). From there, it is easy to avoid loops. Given a more general topology, on the other hand, in which unique paths <em>cannot</em> be guaranteed by such a rule, the OpenFlow controller has to <em>choose</em> a path. This in turn generally entails path discovery, shortest-path selection and loop avoidance, as in the previous example.</p>
+</div>
+<div class="section" id="load-balancer">
+<span id="sdn-load-balancer"></span><span id="index-41"></span><h4>2.7.3.2&nbsp;&nbsp;&nbsp;Load Balancer<a class="headerlink" href="#load-balancer" title="Permalink to this headline">¶</a></h4>
+<p>The previous example was quite <em>local</em>, in that all the OpenFlow actions are contained within the interconnection fabric. As a larger-scale (and possiby more typical) special-purpose OpenFlow example, we next describe how to achieve <strong>server load-balancing</strong> via SDN; that is, users are connected transparently to one of several identical servers. Each server handles only its assigned fraction of the total load. For this example, the controller must not only have knowledge of the topology, but also of the implementation goal.</p>
+<p>To build the load-balancer, imagine that the SDN controller is in charge of, in the diagram of the previous section, all switches in the interconnection fabric and also all switches among the server racks below. At this point, we configure all the frontline servers within the server racks identically, including <em>giving them all identical IPv4 addresses</em>. When an incoming TCP connection request arrives, the controller picks a server (perhaps using round robin, perhaps selecting the server with the lowest load) and sets up OpenFlow forwarding rules so all traffic on that TCP connection arriving from the outside world is sent to the designated server, and vice-versa. Different servers with the same IPv4 address are not allowed to talk directly with one another at all, thereby averting chaos. The lifetime of the OpenFlow forwarding rule can be adjusted as desired, <em>eg</em> to match the typical lifetime of a user session.</p>
+<p>When the first TCP packet of a connection arrives at the selected server, the server may or may not need to use ARP to figure out the appropriate internal LAN address to which to send its reply. Sometimes ARP needs to be massaged a bit to work acceptably in an environment in which some hosts have the same IPv4 address.</p>
+<p>At no point is the fact that multiple servers have been assigned the same IPv4 address directly exposed: not to other servers, not to internal routers, and not to end users. (Servers never initiate outbound connections to users, so there is no risk of two servers contacting the same user.)</p>
+<p>For an example of this sort of load balancing implemented in Mininet and Pox, see <a class="reference internal" href="mininet.html#loadbalance"><span class="std std-ref">18.9.5&nbsp;&nbsp;&nbsp;loadbalance31.py</span></a>.</p>
+<p>The identical frontline servers might need to access a common internal database cluster. This can be implemented by assigning each server a second IPv4 address for this purpose, not shared with other servers, or by using the common public-facing IPv4 address and a little more OpenFlow cleverness in setting up appropriate forwarding rules. If the latter approach is taken, it is now in principle possible that two servers would connect to the database using the same TCP port, by coincidence. This <em>would</em> expose the identical IPv4 addresses, and the SDN controllers would have to take care to ensure that this did not happen. One approach, if supported, would be to have the OpenFlow switches “mangle” the server IPv4 addresses or ports, as is done with NAT (<a class="reference internal" href="ipv4.html#nat"><span class="std std-ref">7.7&nbsp;&nbsp;&nbsp;Network Address Translation</span></a>).</p>
+<p id="index-42">There are also several “traditional” strategies for implementing load balancing. For example, one can give each server its own IPv4 address but then use round-robin DNS (<a class="reference internal" href="ipv4.html#dns"><span class="std std-ref">7.8&nbsp;&nbsp;&nbsp;DNS</span></a>) to assign different users to different servers. Alternatively, one can place a device called a <em>load balancer</em> at the front of the network that assigns incoming connection requests to an internal server and then takes care of setting up the appropriate forwarding. Forwarding can be at the IP layer (that is, via routing), or at the TCP layer, or at the application layer. The load balancer can be thought of as NAT-like (<a class="reference internal" href="ipv4.html#nat"><span class="std std-ref">7.7&nbsp;&nbsp;&nbsp;Network Address Translation</span></a>) in that it maintains a table of associations between external-user connections and a internal servers; once a user connects, the association with the chosen server remains in place for a period of time. One advantage of the SDN approach described here is that the individual front-line servers need no special configuration; all of the load-sharing awareness is contained within the SDN network. Furthermore, the SDN switches do virtually no additional work beyond ordinary forwarding; they need only involve the controller when the first new TCP packet of each connection arrives.</p>
+</div>
+</div>
+</div>
+<div class="section" id="epilog">
+<h2>2.8&nbsp;&nbsp;&nbsp;Epilog<a class="headerlink" href="#epilog" title="Permalink to this headline">¶</a></h2>
+<p>Ethernet dominates the LAN layer, but is not one single LAN protocol: it comes in a variety of speeds and flavors. Higher-speed Ethernet seems to be moving towards fragmenting into a range of physical-layer options for different types of cable, but all based on switches and point-to-point linking; different Ethernet types can be interconnected only with switches. Once Ethernet finally abandons physical links that are bi-directional (half-duplex links), it will be collision-free and thus will no longer need a minimum packet size.</p>
+<p>Other wired networks have largely disappeared (or have been renamed “Ethernet”). Wireless networks, however, are here to stay, and for the time being at least have inherited the original Ethernet’s collision-management concerns.</p>
+</div>
+<div class="section" id="exercises">
+<span id="ethernet-exercises"></span><h2>2.9&nbsp;&nbsp;&nbsp;Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<p><em>Exercises are given fractional (floating point) numbers, to allow for interpolation of new exercises. Exercise 2.5 is distinct, for example, from exercises 2.0 and 3.0. Exercises marked with a ♢ have solutions or hints at</em> <a class="reference internal" href="solutions.html#ethernet-solutions"><span class="std std-ref">24.2&nbsp;&nbsp;&nbsp;Solutions for Ethernet</span></a>.</p>
+<p>1.0. Simulate the contention period of five Ethernet stations that all attempt to transmit at T=0 (presumably when some sixth station has finished transmitting), in the style of the diagram in <a class="reference internal" href="#exponential-backoff-algorithm"><span class="std std-ref">2.1.6&nbsp;&nbsp;&nbsp;Exponential Backoff Algorithm</span></a>. Assume that time is measured in slot times, and that exactly one slot time is needed to detect a collision (so that if two stations transmit at T=1 and collide, and one of them chooses a backoff time k=0, then that station will transmit again at T=2). Use coin flips or some other source of randomness.</p>
+<p>2.0. Suppose we have Ethernet switches S1 through S3 arranged as below; each switch uses the learning algorithm of <a class="reference internal" href="#ethernet-switches"><span class="std std-ref">2.4&nbsp;&nbsp;&nbsp;Ethernet Switches</span></a>. All forwarding tables are initially empty.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>S1────────S2────────S3───D
+│         │         │
+A         B         C
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line">(a). If A sends to B, which switches see this packet?</div>
+<div class="line">(b). If B then replies to A, which switches see this packet?</div>
+<div class="line">(c). If C then sends to B, which switches see this packet?</div>
+<div class="line">(d). If C then sends to D, which switches see this packet?</div>
+</div>
+<p>2.7.♢ Suppose we have the Ethernet switches S1 through S4 arranged as below. All forwarding tables are empty; each switch uses the learning algorithm of <a class="reference internal" href="#ethernet-switches"><span class="std std-ref">2.4&nbsp;&nbsp;&nbsp;Ethernet Switches</span></a>.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>              B
+              │
+              S4
+              │
+A───S1────────S2────────S3───C
+              │
+              D
+</pre></div>
+</div>
+<p>Now suppose the following packet transmissions take place:</p>
+<ul class="simple">
+<li>A sends to D</li>
+<li>D sends to A</li>
+<li>A sends to B</li>
+<li>B sends to D</li>
+</ul>
+<p>For each switch S1-S4, list what source addresses (<em>eg</em> A,B,C,D) it has seen (and thus what nodes it has learned the location of).</p>
+<p>3.0. Repeat the previous exercise (2.7), with the same network layout, except that instead the following packet transmissions take place:</p>
+<ul class="simple">
+<li>A sends to B</li>
+<li>B sends to A</li>
+<li>C sends to B</li>
+<li>D sends to A</li>
+</ul>
+<p>For each switch, list what source addresses (<em>eg</em> A,B,C,D) it has seen (and thus what nodes it has learned the location of).</p>
+<p>4.0. In the switched-Ethernet network below, find two packet transmissions so that, when a third transmission A⟶D occurs, the packet <em>is</em> seen by B (that is, it is flooded out all ports by S2), but is <em>not</em> similarly seen by C (because it is forwarded to D, not flooded, by S3). All forwarding tables are initially empty, and each switch uses the learning algorithm of <a class="reference internal" href="#ethernet-switches"><span class="std std-ref">2.4&nbsp;&nbsp;&nbsp;Ethernet Switches</span></a>.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>              B         C
+              │         │
+A───S1────────S2────────S3───D
+</pre></div>
+</div>
+<p>Hint: Destination D must be in S3’s forwarding table, but must not be in S2’s. So there must have been a packet sent by D that was seen by S3 but not by S2.</p>
+<p>5.0. Given the Ethernet network with learning switches below, with (disjoint) unspecified parts represented by ?, explain why it is impossible for a packet sent from A to B to be forwarded by S1 directly to S2, but to be flooded by S2 out all of S2’s other ports.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>    ?         ?
+    |         |
+A───S1────────S2───B
+</pre></div>
+</div>
+<p>6.0. In the diagram below, from <a class="reference internal" href="#ethernet-learning-algorithm"><span class="std std-ref">2.4.1&nbsp;&nbsp;&nbsp;Ethernet Learning Algorithm</span></a>, suppose node D is connected to S5. Now, with the tables as shown by the labels in the diagram (that is, S5 knows about A and C, <em>etc</em>), D sends to B.</p>
+<img alt="_images/learning_bridge_with_d.svg" src="_images/learning_bridge_with_d.svg" /><p>Which switches will see this D→B packet, and thus learn about D? Of these switches, which do <em>not</em> already know where B is and will use fallback-to-flooding?</p>
+<p>7.0. Suppose two Ethernet switches are connected in a loop as follows; S1 and S2 have their interfaces 1 and 2 labeled. These switches do <em>not</em> use the spanning-tree algorithm.</p>
+<img alt="_images/two_switch_exercise.svg" src="_images/two_switch_exercise.svg" /><p>Suppose A attempts to send a packet to destination B, which is unknown. S1 will therefore flood the packet out interfaces 1 and 2. What happens then? How long will A’s packet circulate?</p>
+<p>8.0. The following network is like that of <a class="reference internal" href="#spanning1"><span class="std std-ref">2.5.1&nbsp;&nbsp;&nbsp;Example 1: Switches Only</span></a>, except that the switches are numbered differently. Again, the ID of switch Sn is n, so S1 will be the root. Which links end up “pruned” by the spanning-tree algorithm, and why? Diagram the network formed by the surviving links.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>S1──────S4──────S6
+│       │       │
+│       │       │
+│       │       │
+S3──────S5──────S2
+</pre></div>
+</div>
+<p>8.5. Consider the network below, consisting of just the first two rows from the datacenter diagram in <a class="reference internal" href="#openflow"><span class="std std-ref">2.7.1&nbsp;&nbsp;&nbsp;OpenFlow Switches</span></a>:</p>
+<img alt="_images/of_datacenter_2row.svg" src="_images/of_datacenter_2row.svg" /><div class="line-block">
+<div class="line">(a).♢ Give network of surviving links after application of the spanning-tree algorithm. Assume the ID of switch Sn is n. In this network, what is the path of traffic from S2 to S5?</div>
+<div class="line">(b). Do the same as part (a) except assuming S4 has ID 0, and so will be the root, while the ID for the other Sn remains n. What will be the path of traffic from S1 to S5?</div>
+</div>
+<p>9.0. Suppose you want to develop a new protocol so that Ethernet switches participating in a VLAN all keep track of the VLAN “color” associated with every destination in their forwarding tables. Assume that each switch knows which of its ports (interfaces) connect to other switches and which may connect to hosts, and in the latter case knows the color assigned to that port.</p>
+<div class="line-block">
+<div class="line">(a). Suggest a way by which switches might propagate this destination-color information to other switches.</div>
+<div class="line">(b). What must be done if a port formerly reserved for connection to another switch is now used for a host?</div>
+</div>
+<p>10.0. (This exercise assumes some familiarity with Distance-Vector routing as in <a class="reference internal" href="routing.html#routing-update"><span class="std std-ref">9&nbsp;&nbsp;&nbsp;Routing-Update Algorithms</span></a>.)</p>
+<div class="line-block">
+<div class="line">(a). Suppose switches are able to identify the non-switch hosts that are <strong>directly connected</strong>, that is, reachable without passing through another switch. Explain how the algorithm of <a class="reference internal" href="routing.html#dv-algorithm"><span class="std std-ref">9.1&nbsp;&nbsp;&nbsp;Distance-Vector Routing-Update Algorithm</span></a> could be used to construct optimal Ethernet forwarding tables even if loops were present in the network topology.</div>
+</div>
+<div class="line-block">
+<div class="line">(b). Suppose switches are allowed to “mark” packets; all packets are initially unmarked. Give a mechanism that allows switches to detect which non-switch hosts are directly connected.</div>
+</div>
+<div class="line-block">
+<div class="line">(c). Explain why Ethernet broadcast (and multicast) would still be a problem.</div>
+</div>
+<p>11.0. Consider the scenario from <a class="reference internal" href="#ethernet-learning-algorithm"><span class="std std-ref">2.4.1&nbsp;&nbsp;&nbsp;Ethernet Learning Algorithm</span></a>:</p>
+<img alt="_images/learning_bridge.svg" src="_images/learning_bridge.svg" /><ul class="simple">
+<li><strong>A sends to B</strong></li>
+<li><strong>B sends to A</strong></li>
+<li><strong>C sends to B</strong></li>
+</ul>
+<p>Now suppose that, before each packet transmission above, the sender first sends a <strong>broadcast</strong> packet, and the destination then sends a unicast reply packet (this is roughly the ARP protocol, used to translate from IPv4 addresses to Ethernet physical addresses, <a class="reference internal" href="ipv4.html#arp"><span class="std std-ref">7.9&nbsp;&nbsp;&nbsp;Address Resolution Protocol: ARP</span></a>). After the three transmissions listed above, what destinations do the switches S1-S5 have in their forwarding tables?</p>
+<p>12.0.♢ Consider the following arrangement of three hosts h1, h2, h3 and one OpenFlow switch S with ports 1, 2 and 3 and controller C (not shown)</p>
+<img alt="_images/openflow_ex12.svg" src="_images/openflow_ex12.svg" /><p>Four packets are then transmitted:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">(a). h1→h2</div>
+<div class="line">(b). h2→h1</div>
+<div class="line">(c). h3→h1</div>
+<div class="line">(d). h2→h3</div>
+</div>
+</div></blockquote>
+<p>Assume that S reports to C all packets with <strong>unknown destination</strong>, that is, all packets for which S does not have a forwarding entry for that packet’s destination. Packet reports include the source and destination addresses and the arrival port. On receiving a report, if the source address is previously unknown then C installs on S a forwarding-table entry for that source address. At that point S uses its forwarding table (including any new entries) to forward the packet, if a suitable entry exists. Otherwise S floods the packet as usual.</p>
+<p>For the four packets above, indicate</p>
+<ol class="lowerroman simple">
+<li>whether S reports the packet to C</li>
+<li>if so, any new forwarding entry C installs on S</li>
+<li>whether S is then able to forward the packet using its table, or must fall back to flooding.</li>
+</ol>
+<p>(If S does not report the packet to C then S must have had a forwarding-table entry for that destination, and so S is able to forward the packet normally.)</p>
+<p>12.2. Consider again the arrangement of exercise 12.0 of three hosts h1, h2, h3 and one OpenFlow switch S with ports 1, 2 and 3 and controller C (not shown)</p>
+<img alt="_images/openflow_ex12.svg" src="_images/openflow_ex12.svg" /><p>The same four packets are transmitted:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">(a). h1→h2</div>
+<div class="line">(b). h2→h1</div>
+<div class="line">(c). h3→h1</div>
+<div class="line">(d). h2→h3</div>
+</div>
+</div></blockquote>
+<p>This time, assume that S reports to C all packets with unknown destination <strong>or unknown source</strong> (that is, S does not have a forwarding entry for either the packet’s source or destination address). For the four packets above, indicate</p>
+<ol class="lowerroman simple">
+<li>whether S reports the packet to C</li>
+<li>if so, any new forwarding entry C installs on S</li>
+<li>whether S is then able to forward the packet using its table, or must fall back to flooding.</li>
+</ol>
+<p>As before, packet reports include the source and destination addresses and the arrival port. On receiving a report, if the source address is previously unknown then C installs on S a forwarding-table entry for that source address. At that point S uses its forwarding table (including any new entries) to forward the packet, if a suitable entry exists. Otherwise S floods the packet as usual. Again, if S does not report a packet to C then S must have had a forwarding-table entry for that destination, and so is able to forward the packet normally.</p>
+<p>13.0 Consider the following arrangement of three switches S1-S3, three hosts h1-h3 and one OpenFlow controller C.</p>
+<img alt="_images/openflow_ex13.svg" src="_images/openflow_ex13.svg" /><p>As with exercise 12.0, assume that the switches report packets to C only if they do not already have a forwarding-table entry for the packet’s destination. After each report, C installs a forwarding-table entry on the reporting switch for reaching the packet’s source address via the arrival port. At that point the switch floods the packet (as the destination must not have been known). If a switch can forward a packet without reporting to C, no new forwarding entries are installed.</p>
+<p>Packets are now sent as follows:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">h1→h2</div>
+<div class="line">h2→h1</div>
+<div class="line">h1→h3</div>
+<div class="line">h3→h1</div>
+<div class="line">h2→h3</div>
+<div class="line">h3→h2</div>
+</div>
+</div></blockquote>
+<p>At the end, what are the forwarding tables on S1♢, S2 and S3?</p>
+<p>14.0 Here are the switch rules for the multiple-flow-table example in <a class="reference internal" href="#openflow-learning-switch"><span class="std std-ref">2.7.2&nbsp;&nbsp;&nbsp;Learning Switches in OpenFlow</span></a>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="9%" />
+<col width="19%" />
+<col width="32%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Table</th>
+<th class="head">match field</th>
+<th class="head">match action</th>
+<th class="head">no-match default</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>T<sub>0</sub></td>
+<td>destaddr</td>
+<td>forward and send to T<sub>1</sub></td>
+<td>flood and send to T<sub>1</sub></td>
+</tr>
+<tr class="row-odd"><td>T<sub>1</sub></td>
+<td>srcaddr</td>
+<td>do nothing</td>
+<td>send to controller</td>
+</tr>
+</tbody>
+</table>
+<p>Give a similar table where the matches are <em>reversed</em>; that is, T<sub>0</sub> matches the srcaddr field and T<sub>1</sub> matches the destaddr field.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="otherLANs.html" title="3   Other LANs"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="1   An Overview of Networks"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, edition 1.9.12</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015, Peter L Dordal.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+    </div>
+  </body>
+</html>

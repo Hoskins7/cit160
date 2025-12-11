@@ -1,0 +1,1082 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>25   Network Management and SNMP &#8212; An Introduction to Computer Networks, edition 1.9.12</title>
+    <link rel="stylesheet" href="_static/csbnetbook.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.9.12',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/mobile.js"></script>
+    <script type="text/javascript" src="_static/rightsidebar.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="26   Security" href="security.html" />
+    <link rel="prev" title="24   Network Management and SNMP" href="netmgmta.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="security.html" title="26   Security"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="netmgmta.html" title="24   Network Management and SNMP"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, edition 1.9.12</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">25&nbsp;&nbsp;&nbsp;Network Management and SNMP</a><ul>
+<li><a class="reference internal" href="#snmpv2">25.1&nbsp;&nbsp;&nbsp;SNMPv2</a><ul>
+<li><a class="reference internal" href="#snmpv2-smi-and-data-types">25.1.1&nbsp;&nbsp;&nbsp;SNMPv2 SMI and Data Types</a></li>
+<li><a class="reference internal" href="#snmpv2-get-semantics">25.1.2&nbsp;&nbsp;&nbsp;SNMPv2 Get Semantics</a></li>
+<li><a class="reference internal" href="#snmpv2-getbulk">25.1.3&nbsp;&nbsp;&nbsp;SNMPv2 GetBulk()</a></li>
+<li><a class="reference internal" href="#snmpv2-indexes">25.1.4&nbsp;&nbsp;&nbsp;SNMPv2 Indexes</a></li>
+<li><a class="reference internal" href="#testandincr">25.1.5&nbsp;&nbsp;&nbsp;<code class="docutils literal"><span class="pre">TestAndIncr</span></code></a></li>
+<li><a class="reference internal" href="#table-augmentation">25.1.6&nbsp;&nbsp;&nbsp;Table Augmentation</a></li>
+<li><a class="reference internal" href="#snmpv2-mib-changes">25.1.7&nbsp;&nbsp;&nbsp;SNMPv2 MIB Changes</a></li>
+<li><a class="reference internal" href="#id4">25.1.8&nbsp;&nbsp;&nbsp;<code class="docutils literal"><span class="pre">sysORTable</span></code></a></li>
+<li><a class="reference internal" href="#if-mib-and-ifxtable">25.1.9&nbsp;&nbsp;&nbsp;IF-MIB and <code class="docutils literal"><span class="pre">ifXTable</span></code></a></li>
+<li><a class="reference internal" href="#etherlike-mib">25.1.10&nbsp;&nbsp;&nbsp;ETHERLIKE-MIB</a></li>
+<li><a class="reference internal" href="#bridge-mib">25.1.11&nbsp;&nbsp;&nbsp;BRIDGE-MIB</a></li>
+<li><a class="reference internal" href="#ip-mib-and-ip-forward-mib">25.1.12&nbsp;&nbsp;&nbsp;IP-MIB and IP-Forward MIB</a><ul>
+<li><a class="reference internal" href="#ip-mib">25.1.12.1&nbsp;&nbsp;&nbsp;IP-MIB</a></li>
+<li><a class="reference internal" href="#ip-forward-mib">25.1.12.2&nbsp;&nbsp;&nbsp;IP-Forward MIB</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#tcp-mib">25.1.13&nbsp;&nbsp;&nbsp;TCP-MIB</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#table-row-creation">25.2&nbsp;&nbsp;&nbsp;Table Row Creation</a><ul>
+<li><a class="reference internal" href="#rmon">25.2.1&nbsp;&nbsp;&nbsp;RMON</a><ul>
+<li><a class="reference internal" href="#statistics-and-use-of-entrystatus">25.2.1.1&nbsp;&nbsp;&nbsp;Statistics (and use of EntryStatus)</a></li>
+<li><a class="reference internal" href="#history">25.2.1.2&nbsp;&nbsp;&nbsp;History</a></li>
+<li><a class="reference internal" href="#hosts">25.2.1.3&nbsp;&nbsp;&nbsp;Hosts</a></li>
+<li><a class="reference internal" href="#host-top-n">25.2.1.4&nbsp;&nbsp;&nbsp;Host Top N</a></li>
+<li><a class="reference internal" href="#matrix">25.2.1.5&nbsp;&nbsp;&nbsp;Matrix</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#snmpv2-rowstatus">25.2.2&nbsp;&nbsp;&nbsp;SNMPv2 RowStatus</a></li>
+<li><a class="reference internal" href="#ping-mib">25.2.3&nbsp;&nbsp;&nbsp;PING-MIB</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#snmpv3">25.3&nbsp;&nbsp;&nbsp;SNMPv3</a><ul>
+<li><a class="reference internal" href="#what-could-possibly-go-wrong">25.3.1&nbsp;&nbsp;&nbsp;What Could Possibly Go Wrong?</a></li>
+<li><a class="reference internal" href="#cryptographic-fundamentals">25.3.2&nbsp;&nbsp;&nbsp;Cryptographic Fundamentals</a></li>
+<li><a class="reference internal" href="#snmpv3-engines">25.3.3&nbsp;&nbsp;&nbsp;SNMPv3 Engines</a></li>
+<li><a class="reference internal" href="#message-authentication">25.3.4&nbsp;&nbsp;&nbsp;Message Authentication</a></li>
+<li><a class="reference internal" href="#passwords-and-keys">25.3.5&nbsp;&nbsp;&nbsp;Passwords and Keys</a></li>
+<li><a class="reference internal" href="#message-signing">25.3.6&nbsp;&nbsp;&nbsp;Message Signing</a></li>
+<li><a class="reference internal" href="#key-changes">25.3.7&nbsp;&nbsp;&nbsp;Key Changes</a></li>
+<li><a class="reference internal" href="#creating-additional-users">25.3.8&nbsp;&nbsp;&nbsp;Creating Additional Users</a></li>
+<li><a class="reference internal" href="#vacm-for-snmpv3">25.3.9&nbsp;&nbsp;&nbsp;VACM for SNMPv3</a><ul>
+<li><a class="reference internal" href="#the-usmusertable">25.3.9.1&nbsp;&nbsp;&nbsp;The <code class="docutils literal"><span class="pre">usmUserTable</span></code></a></li>
+<li><a class="reference internal" href="#creating-accounts-in-net-snmp">25.3.9.2&nbsp;&nbsp;&nbsp;Creating Accounts in Net-SNMP</a><ul>
+<li><a class="reference internal" href="#cloning-in-net-snmp">25.3.9.2.1&nbsp;&nbsp;&nbsp;Cloning in Net-SNMP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#exercises">25.4&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="netmgmta.html"
+                        title="previous chapter">24&nbsp;&nbsp;&nbsp;Network Management and SNMP</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="security.html"
+                        title="next chapter">26&nbsp;&nbsp;&nbsp;Security</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="network-management-and-snmp">
+<span id="netmgmtb"></span><h1>25&nbsp;&nbsp;&nbsp;Network Management and SNMP<a class="headerlink" href="#network-management-and-snmp" title="Permalink to this headline">¶</a></h1>
+<p>In this chapter we pick up with SNMPv2, and then SNMPv3. Mixed in between, we describe some useful additional MIBs.</p>
+<div class="section" id="snmpv2">
+<span id="id1"></span><h2>25.1&nbsp;&nbsp;&nbsp;SNMPv2<a class="headerlink" href="#snmpv2" title="Permalink to this headline">¶</a></h2>
+<p>SNMPv2 introduced multiple evolutionary changes: to the SMI, to various MIBs, and to the basic protocol operation. Many new MIBs were added. SNMPv2 also contained a proposal for improved security, but this was not widely adopted. Eventually most of the SNMP community settled on SNMPv2<strong>c</strong>, the version of SNMPv2 that stayed with the community-based security model.</p>
+<p>Most of the specification of SNMPv2c is in <span class="target" id="index-0"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1901.html"><strong>RFC 1901</strong></a> through <span class="target" id="index-1"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1909.html"><strong>RFC 1909</strong></a>.</p>
+<p>Generally SNMPv1 and SNMPv2c agents and managers can interoperate quite easily. Essentially all SNMPv2 agents also support SNMPv1 queries, and answer according to the version of the request received. There is slightly greater confusion between SNMPv1 and SNMPv2 MIB files, but almost all browsers and managers support both.</p>
+<div class="section" id="snmpv2-smi-and-data-types">
+<span id="snmpv2-smi"></span><h3>25.1.1&nbsp;&nbsp;&nbsp;SNMPv2 SMI and Data Types<a class="headerlink" href="#snmpv2-smi-and-data-types" title="Permalink to this headline">¶</a></h3>
+<p id="index-2">SNMPv2 introduced the <code class="docutils literal"><span class="pre">OBJECT-IDENTITY</span></code> macro, which acts like the <code class="docutils literal"><span class="pre">OBJECT-TYPE</span></code> macro except that it leaves out the SYNTAX clause; it serves as a way to define OIDs separately from syntax. In the <code class="docutils literal"><span class="pre">OBJECT-TYPE</span></code> macro, the <code class="docutils literal"><span class="pre">ACCESS</span></code> attribute is renamed <code class="docutils literal"><span class="pre">MAX-ACCESS</span></code>, and a new access option <code class="docutils literal"><span class="pre">read-create</span></code> (for reading plus row creation) is added.</p>
+<p>SNMPv2 also provided new 64-bit versions of some of the basic types, and added some other types. These definitions are in <span class="target" id="index-3"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2578.html"><strong>RFC 2578</strong></a>, originally <span class="target" id="index-4"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1442.html"><strong>RFC 1442</strong></a>. A very practical problem with SNMPv1 is that, for example, the 32-bit <code class="docutils literal"><span class="pre">inOctets</span></code> counter can wrap around in 34 seconds at 1 Gbps.</p>
+<p>The INTEGER type remains, now declared synonymous with Integer32. The SNMPv1 Counter and Gauge types have been replaced with Counter32 and Gauge32, and 64-bit versions of both – Counter64 and Gauge64 – were added (Gauge64 was added somewhat later, in <span class="target" id="index-5"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2856.html"><strong>RFC 2856</strong></a>).</p>
+<p>A BITS type, for representing individual bits in a word, was also added.</p>
+<p>The OBJECT IDENTIFIER type was formally limited to 128 levels.</p>
+<span class="target" id="index-6"></span><p>SNMPv2 also introduced the <code class="docutils literal"><span class="pre">TEXTUAL-CONVENTION</span></code> macro, which is an alternative name for a type (or a primary name for an enumerated type) together with a description of what the type is actually to represent. Examples include <code class="docutils literal"><span class="pre">OwnerString</span></code>, which is an OCTET STRING intended to describe a management station and perhaps its human operator, <code class="docutils literal"><span class="pre">EntryStatus</span></code> which is an enumerated type meant to be used for row additions (<a class="reference internal" href="#rmon"><span class="std std-ref">25.2.1&nbsp;&nbsp;&nbsp;RMON</span></a>), and <code class="docutils literal"><span class="pre">InterfaceIndex</span></code>, which is meant to be the number of an interface appearing in the MIB-2 <code class="docutils literal"><span class="pre">ifTable</span></code>, <a class="reference internal" href="netmgmta.html#interfaces-group"><span class="std std-ref">24.10.2&nbsp;&nbsp;&nbsp;Table definitions and the interfaces Group</span></a>, but used in another table. For casual MIB reading, textual conventions can simply be thought of as types.</p>
+</div>
+<div class="section" id="snmpv2-get-semantics">
+<span id="snmpv2-semantics"></span><span id="index-7"></span><h3>25.1.2&nbsp;&nbsp;&nbsp;SNMPv2 Get Semantics<a class="headerlink" href="#snmpv2-get-semantics" title="Permalink to this headline">¶</a></h3>
+<p>When an SNMPv1 agent receives a list of OIDs as part of a <code class="docutils literal"><span class="pre">Get()</span></code> request, and one or more of them is unavailable, then an error is returned. Under SNMPv2, the agent returns a list containing the appropriate value for each valid OID. For request OIDs for which the agent is not able to return an actual value, the special value <code class="docutils literal"><span class="pre">noSuchInstance</span></code> (for missing table entries with legal column specifications) or <code class="docutils literal"><span class="pre">noSuchObject</span></code> (for other missing values) is substituted.</p>
+<p>The <code class="docutils literal"><span class="pre">Set()</span></code> semantics remain unchanged: an SNMPv2 agent does not update any of the OID values in the request unless it is able to update all of them.</p>
+<span class="target" id="index-8"></span></div>
+<div class="section" id="snmpv2-getbulk">
+<span id="getbulk"></span><h3>25.1.3&nbsp;&nbsp;&nbsp;SNMPv2 GetBulk()<a class="headerlink" href="#snmpv2-getbulk" title="Permalink to this headline">¶</a></h3>
+<p>SNMPv2 introduced the GetBulk operation as an extension of GetNext. A manager includes an integer N in its request and the agent then iterates the action of <code class="docutils literal"><span class="pre">GetNext()</span></code> N times. All N results (which can each represent an entire row) can then be returned in a single operation.</p>
+<p>For example, suppose a table <strong>T</strong> has five rows indexed by 11-15, and three columns with OIDs <strong>T</strong>.1 through <strong>T</strong>.3. The OIDs for the table are as follows:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">&#160;</th>
+<th class="head">&#160;</th>
+<th class="head">&#160;</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><strong>T</strong>.1.11</td>
+<td><strong>T</strong>.2.11</td>
+<td><strong>T</strong>.3.11</td>
+</tr>
+<tr class="row-odd"><td><strong>T</strong>.1.12</td>
+<td><strong>T</strong>.2.12</td>
+<td><strong>T</strong>.3.12</td>
+</tr>
+<tr class="row-even"><td><strong>T</strong>.1.13</td>
+<td><strong>T</strong>.2.13</td>
+<td><strong>T</strong>.3.13</td>
+</tr>
+<tr class="row-odd"><td><strong>T</strong>.1.14</td>
+<td><strong>T</strong>.2.14</td>
+<td><strong>T</strong>.3.14</td>
+</tr>
+<tr class="row-even"><td><strong>T</strong>.1.15</td>
+<td><strong>T</strong>.2.15</td>
+<td><strong>T</strong>.3.15</td>
+</tr>
+</tbody>
+</table>
+<p>Then a GetBulk request for (<strong>T</strong>.1,<strong>T</strong>.2,<strong>T</strong>.3) with a repetition count of 3 will return the first three rows, with the following OIDs:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><strong>T</strong>.1.11  <strong>T</strong>.2.11 <strong>T</strong>.3.11</div>
+<div class="line"><strong>T</strong>.1.12  <strong>T</strong>.2.12 <strong>T</strong>.3.12</div>
+<div class="line"><strong>T</strong>.1.13  <strong>T</strong>.2.13 <strong>T</strong>.3.13</div>
+</div>
+</div></blockquote>
+<p>To continue, the next such request would include OIDs (<strong>T</strong>.1.13, <strong>T</strong>.2.13, <strong>T</strong>.3.13) and the result (again assuming a count of 3) would be of values with these OIDs:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><strong>T</strong>.1.14  <strong>T</strong>.2.14 <strong>T</strong>.3.14</div>
+<div class="line"><strong>T</strong>.1.15  <strong>T</strong>.2.15 <strong>T</strong>.3.15</div>
+<div class="line"><strong>T</strong>.2.11  <strong>T</strong>.3.11 <strong>A</strong></div>
+</div>
+</div></blockquote>
+<p>where <strong>A</strong> is the next leaf OID above and to the right of <strong>T</strong>.</p>
+<p>Note the third row of the second request: the first leaf OID following <strong>T</strong>.1.15 – the last row of column 1 – is <strong>T</strong>.2.11, that is, the first row of column 2. Similarly, <strong>T</strong>.3.11 follows <strong>T</strong>.2.15. As <strong>T</strong>.3.15 is the last leaf OID in the table, its leaf-OID successor (<strong>A</strong>) is outside the table.</p>
+<p>The GetBulk request format actually partitions the list of requested OIDs into two parts: those OIDs that are to be requested only once and those for which the request is repeated. Two additional parameters besides the OID list are included: <code class="docutils literal"><span class="pre">non-repeaters</span></code> indicating the number of OIDs to be requested only once and <code class="docutils literal"><span class="pre">max-repetitions</span></code> indicating the number of times the remaining OIDs are retrieved.</p>
+<p>As with GetNext, it is possible that a request for rows of the table will return ⟨OID,value⟩ pairs outside the table, that is, following the table in the OID-tree order.</p>
+<p>If the total number of OIDs in the request is N ≥ <code class="docutils literal"><span class="pre">non-repeaters</span></code>, then the return packet will contain a list of ⟨OID,value⟩ variable bindings of up to length</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal"><span class="pre">non-repeaters</span></code> + (N − <code class="docutils literal"><span class="pre">non-repeaters</span></code>)×<code class="docutils literal"><span class="pre">max-repetitions</span></code></div>
+</div>
+</div></blockquote>
+<p>GetBulk has considerable potential to return more data than there is room for, so an agent may return fewer repetitions as it sees fit.</p>
+</div>
+<div class="section" id="snmpv2-indexes">
+<span id="id2"></span><h3>25.1.4&nbsp;&nbsp;&nbsp;SNMPv2 Indexes<a class="headerlink" href="#snmpv2-indexes" title="Permalink to this headline">¶</a></h3>
+<p>As we saw in <a class="reference internal" href="netmgmta.html#tables"><span class="std std-ref">24.7&nbsp;&nbsp;&nbsp;SNMP Tables</span></a>, in SNMPv1 the index columns were included in the table. Because every attribute returned by an agent comes paired with the attribute’s OID, and because the OID of a table item encodes the row and thus the index value, index columns are unnecessary except in rare cases (one such case is when <em>all</em> table columns are part of the index, as in <code class="docutils literal"><span class="pre">udpTable</span></code>).</p>
+<p>SNMPv2 deals with this by requiring the usual INDEX clause in the ASN.1 tableEntry definition, but then when the tableIndex attribute is defined with OBJECT-TYPE it is assigned a MAX-ACCESS of <code class="docutils literal"><span class="pre">not-accessible</span></code>. Here is an example from the sysORTable of <a class="reference internal" href="#sysortable"><span class="std std-ref">25.1.7&nbsp;&nbsp;&nbsp;SNMPv2 MIB Changes</span></a>; it is the second “not-accessible” that represents the change.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">sysOREntry</span> <span class="n">OBJECT</span><span class="o">-</span><span class="n">TYPE</span>
+    <span class="n">SYNTAX</span>     <span class="n">SysOREntry</span>
+    <span class="n">MAX</span><span class="o">-</span><span class="n">ACCESS</span> <span class="ow">not</span><span class="o">-</span><span class="n">accessible</span>
+    <span class="n">STATUS</span>     <span class="n">current</span>
+    <span class="n">DESCRIPTION</span>
+            <span class="s2">&quot;An entry (conceptual row) in the sysORTable.&quot;</span>
+    <span class="n">INDEX</span>      <span class="p">{</span> <span class="n">sysORIndex</span> <span class="p">}</span>
+    <span class="p">::</span><span class="o">=</span> <span class="p">{</span> <span class="n">sysORTable</span> <span class="mi">1</span> <span class="p">}</span>
+
+ <span class="o">...</span>
+
+<span class="n">sysORIndex</span> <span class="n">OBJECT</span><span class="o">-</span><span class="n">TYPE</span>
+    <span class="n">SYNTAX</span>     <span class="n">INTEGER</span> <span class="p">(</span><span class="mf">1.</span><span class="o">.</span><span class="mi">2147483647</span><span class="p">)</span>
+    <span class="n">MAX</span><span class="o">-</span><span class="n">ACCESS</span> <span class="ow">not</span><span class="o">-</span><span class="n">accessible</span>
+    <span class="n">STATUS</span>     <span class="n">current</span>
+    <span class="n">DESCRIPTION</span> <span class="o">...</span>
+    <span class="p">::</span><span class="o">=</span> <span class="p">{</span> <span class="n">sysOREntry</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">INDEX</span></code> attribute appears in the declaration of <code class="docutils literal"><span class="pre">sysOREntry</span></code> in the usual way. But it is now classed as an <strong>auxiliary object</strong>, and access to <code class="docutils literal"><span class="pre">sysORIndex</span></code> is <code class="docutils literal"><span class="pre">not-accessible</span></code>; in SNMPv1 it would have been <code class="docutils literal"><span class="pre">read-only</span></code> and thus an ordinary column.</p>
+<p>When direct access to index attributes is suppressed this way, the index data is still available in the accompanying OID, but it is no longer tagged by type as in <a class="reference internal" href="netmgmta.html#snmp-encoding"><span class="std std-ref">24.12&nbsp;&nbsp;&nbsp;SNMP and ASN.1 Encoding</span></a>. The <code class="docutils literal"><span class="pre">sysORIndex</span></code> value above, for example, would appear as a single OID level, but the manager would have to use the MIB to determine that it was meant as an INTEGER and not a TimeTicks or Counter. An IPv4 address used as an index would appear in the OID as four levels, readily recognizable as an IPv4 address <em>provided</em> the manager knew where to look. When STRING values appear in the index, the lack of an index column can be a particular nuisance; for example, the only indication of the username “alice” in the <code class="docutils literal"><span class="pre">usmUserTable</span></code> of <a class="reference internal" href="#usmusertable"><span class="std std-ref">25.3.9.1&nbsp;&nbsp;&nbsp;The usmUserTable</span></a> might be the OID fragment 97.108.105.99.101, representing the ASCII codes for the letters a.l.i.c.e.</p>
+<p>Generally, an SNMPv2 agent will send back the <code class="docutils literal"><span class="pre">noSuchObject</span></code> special value (see <a class="reference internal" href="#snmpv2-semantics"><span class="std std-ref">25.1.2&nbsp;&nbsp;&nbsp;SNMPv2 Get Semantics</span></a>) when asked for a <code class="docutils literal"><span class="pre">not-accessible</span></code> auxiliary object.</p>
+<span class="target" id="index-9"></span></div>
+<div class="section" id="testandincr">
+<span id="id3"></span><h3>25.1.5&nbsp;&nbsp;&nbsp;<code class="docutils literal"><span class="pre">TestAndIncr</span></code><a class="headerlink" href="#testandincr" title="Permalink to this headline">¶</a></h3>
+<p>SNMPv2 introduced the <code class="docutils literal"><span class="pre">TestAndIncr</span></code> textual convention, which introduces something of an aberration to the usual semantics of <code class="docutils literal"><span class="pre">Set()</span></code>. The underlying type is INTEGER, in the range 0..2<sup>31</sup>−1, and <code class="docutils literal"><span class="pre">Get()</span></code> works the usual way. However, if <strong>TI</strong> is the OID name of a <code class="docutils literal"><span class="pre">TestAndIncr</span></code> object, then Set(<strong>TI</strong>,<em>val</em>) never sets the value of <strong>TI</strong> to <em>val</em>. Instead, if the value of the object is <em>already</em> equal to <em>val</em>, then the <code class="docutils literal"><span class="pre">Set()</span></code> succeeds and the value of the object is incremented, that is, set to <em>val</em> + 1. If the value of the object is not equal to <em>val</em>, an error occurs and no change is made.</p>
+<p>A <code class="docutils literal"><span class="pre">TestAndIncr</span></code> object acts like a kind of semaphore, though not exactly as there is no way to decrement the object (though the value does wrap around from 2<sup>31</sup>-1 back to 0). The goal here is to provide a voluntary mechanism to enforce <strong>serialization</strong> when more than one manager may be writing to the same set of attributes.</p>
+<p>As we saw at the example at the end of <a class="reference internal" href="netmgmta.html#set"><span class="std std-ref">24.8.2&nbsp;&nbsp;&nbsp;Set()</span></a>, such serialization is not automatic. But now let us revisit that example using <code class="docutils literal"><span class="pre">TestAndIncr</span></code>. Recall that two managers are updating attributes with OIDs <strong>X</strong> and <strong>Y</strong>; this time, however, they agree also to include a <code class="docutils literal"><span class="pre">TestAndIncr</span></code> object with OID <strong>TI</strong>. Then serialization is assured as long as each manager executes each multi-attribute <code class="docutils literal"><span class="pre">Set()</span></code> in the following form, where <em>val</em> := Get(<strong>TI</strong>) means that the manager uses <code class="docutils literal"><span class="pre">Get()</span></code> to retrieve the value of <strong>TI</strong> and stores it in its own local variable <em>val</em>.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><em>val</em> := Get(<strong>TI</strong>)</div>
+<div class="line">Set((<strong>TI</strong>,<em>val</em>), (<strong>X</strong>,<em>xval</em>), (<strong>Y</strong>,<em>yval</em>))</div>
+</div>
+</div></blockquote>
+<p>To see this, suppose manager B’s Get(<strong>TI</strong>) occurs after manager A’s Set(<strong>TI</strong>,<em>val</em>) has incremented <em>val</em>. Then manager B’s <code class="docutils literal"><span class="pre">Set()</span></code> operations occur even later, after A’s <code class="docutils literal"><span class="pre">Set()</span></code> has completed. The alternative is that both managers <code class="docutils literal"><span class="pre">Get()</span></code> the same value <em>val</em>. Let A be the manager who first succeeds with Set(<strong>TI</strong>,<em>val</em>). Now the other manager – B – will have its Set(<strong>TI</strong>,<em>val</em>) fail, as the value stored at <strong>TI</strong> is now <em>val</em>+1. Thus <em>all</em> of B’s <code class="docutils literal"><span class="pre">Set()</span></code> operations will fail.</p>
+<p>A consequence here is that manager B will have to try again, probably immediately. However, the likelihood of conflict is low, and B can expect to succeed soon.</p>
+<p>Usually only one <code class="docutils literal"><span class="pre">TestAndIncr</span></code> object needs to be provided for an entire table, not one per row. For an actual example, see <a class="reference internal" href="#usmusertable"><span class="std std-ref">25.3.9.1&nbsp;&nbsp;&nbsp;The usmUserTable</span></a>.</p>
+</div>
+<div class="section" id="table-augmentation">
+<span id="augmentation"></span><span id="index-10"></span><h3>25.1.6&nbsp;&nbsp;&nbsp;Table Augmentation<a class="headerlink" href="#table-augmentation" title="Permalink to this headline">¶</a></h3>
+<p>SNMPv2 introduced a mechanism for extending an existing table by adding, in effect, more columns, known as <strong>augmentation</strong>. In the new table-entry definition, instead of an <code class="docutils literal"><span class="pre">INDEX</span></code> clause there is an <code class="docutils literal"><span class="pre">AUGMENTS</span></code> clause; the argument to which is a table-entry name for the existing table to be extended. The new table-entry row will be indexed by whatever attributes indexed the table-entry in the AUGMENTS clause.</p>
+<p>For example, the <code class="docutils literal"><span class="pre">ifXTable</span></code> augments the MIB-2 <code class="docutils literal"><span class="pre">ifTable</span></code>, meaning in essence that the <code class="docutils literal"><span class="pre">ifXTable</span></code> is automatically indexed by <code class="docutils literal"><span class="pre">ifTable</span></code>’s index, <code class="docutils literal"><span class="pre">ifIndex</span></code>. Here is the <code class="docutils literal"><span class="pre">ifXEntry</span></code> definition that establishes that:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ifXEntry</span>        <span class="n">OBJECT</span><span class="o">-</span><span class="n">TYPE</span>
+   <span class="n">SYNTAX</span>      <span class="n">IfXEntry</span>
+   <span class="n">MAX</span><span class="o">-</span><span class="n">ACCESS</span>  <span class="ow">not</span><span class="o">-</span><span class="n">accessible</span>
+   <span class="n">STATUS</span>      <span class="n">current</span>
+   <span class="n">DESCRIPTION</span>
+           <span class="s2">&quot;An entry containing additional management information</span>
+           <span class="n">applicable</span> <span class="n">to</span> <span class="n">a</span> <span class="n">particular</span> <span class="n">interface</span><span class="o">.</span><span class="s2">&quot;</span>
+   <span class="n">AUGMENTS</span>    <span class="p">{</span> <span class="n">ifEntry</span> <span class="p">}</span>
+   <span class="p">::</span><span class="o">=</span> <span class="p">{</span> <span class="n">ifXTable</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The intent here is that every ifTable row is now extended to include the nineteen additional values defined for <code class="docutils literal"><span class="pre">IfXEntry</span></code>; that is, there is a one-to-one correspondence between rows if <code class="docutils literal"><span class="pre">ifTable</span></code> and <code class="docutils literal"><span class="pre">ifXTable</span></code>.</p>
+<p>If, on the other hand, the new table extends only a few rows of the original table, <em>ie</em> is a <strong>sparse</strong> extension, then the new table entry should have an INDEX clause that repeats that of the original table. An example is the EtherLike-MIB of <a class="reference internal" href="#etherlike"><span class="std std-ref">25.1.10&nbsp;&nbsp;&nbsp;ETHERLIKE-MIB</span></a>, in which the <code class="docutils literal"><span class="pre">dot3StatsTable</span></code> extends the MIB-2 <code class="docutils literal"><span class="pre">ifTable</span></code> by providing additional information for those interfaces that behave like Ethernets. The <code class="docutils literal"><span class="pre">dot3StatsEntry</span></code> definition is</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">dot3StatsEntry</span> <span class="n">OBJECT</span><span class="o">-</span><span class="n">TYPE</span>
+    <span class="n">SYNTAX</span>     <span class="n">Dot3StatsEntry</span>
+    <span class="n">MAX</span><span class="o">-</span><span class="n">ACCESS</span> <span class="ow">not</span><span class="o">-</span><span class="n">accessible</span>
+    <span class="n">STATUS</span>     <span class="n">current</span>
+    <span class="n">DESCRIPTION</span> <span class="s2">&quot;Statistics for a particular interface to an ethernet-like medium.&quot;</span>
+    <span class="n">INDEX</span>       <span class="p">{</span> <span class="n">dot3StatsIndex</span> <span class="p">}</span>
+    <span class="p">::</span><span class="o">=</span> <span class="p">{</span> <span class="n">dot3StatsTable</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The INDEX is <code class="docutils literal"><span class="pre">dots3StatsIndex</span></code>, which is then defined as follows; note the statement in the DESCRIPTION (and the REFERENCE) that the dot3StatsIndex is to correspond to <code class="docutils literal"><span class="pre">ifIndex</span></code>.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">dot3StatsIndex</span> <span class="n">OBJECT</span><span class="o">-</span><span class="n">TYPE</span>
+    <span class="n">SYNTAX</span>      <span class="n">InterfaceIndex</span>
+    <span class="n">MAX</span><span class="o">-</span><span class="n">ACCESS</span>  <span class="n">read</span><span class="o">-</span><span class="n">only</span>
+    <span class="n">STATUS</span>      <span class="n">current</span>
+    <span class="n">DESCRIPTION</span> <span class="s2">&quot;An index value that uniquely identifies an interface</span>
+                <span class="n">to</span> <span class="n">an</span> <span class="n">ethernet</span><span class="o">-</span><span class="n">like</span> <span class="n">medium</span><span class="o">.</span>  <span class="n">The</span> <span class="n">interface</span> <span class="n">identified</span>
+                <span class="n">by</span> <span class="n">a</span> <span class="n">particular</span> <span class="n">value</span> <span class="n">of</span> <span class="n">this</span> <span class="n">index</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">same</span> <span class="n">interface</span>
+                <span class="k">as</span> <span class="n">identified</span> <span class="n">by</span> <span class="n">the</span> <span class="n">same</span> <span class="n">value</span> <span class="n">of</span> <span class="n">ifIndex</span><span class="o">.</span><span class="s2">&quot;</span>
+    <span class="n">REFERENCE</span>   <span class="s2">&quot;RFC 2863, ifIndex&quot;</span>
+    <span class="p">::</span><span class="o">=</span> <span class="p">{</span> <span class="n">dot3StatsEntry</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Finally, it is possible that a new table has a many-to-one, or <strong>dense</strong>, correspondence to the rows (or a subset of the rows) of an existing table. In this case, the new table will have an INDEX clause that will include the index attributes of the original table, and one or more additional attributes. An example is the EtherLike-MIB <code class="docutils literal"><span class="pre">dot3CollTable</span></code>, which keeps, for each interface, a set of histogram buckets giving, for each N, a count of the number of packets that experienced exactly N collisions before successful transmission. The <code class="docutils literal"><span class="pre">dot3CollEntry</span></code> definition is as follows:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">dot3CollEntry</span> <span class="n">OBJECT</span><span class="o">-</span><span class="n">TYPE</span>
+    <span class="n">SYNTAX</span>      <span class="n">Dot3CollEntry</span>
+    <span class="n">MAX</span><span class="o">-</span><span class="n">ACCESS</span>  <span class="ow">not</span><span class="o">-</span><span class="n">accessible</span>
+    <span class="n">STATUS</span>      <span class="n">current</span>
+    <span class="n">DESCRIPTION</span> <span class="o">...</span>
+    <span class="n">INDEX</span>       <span class="p">{</span> <span class="n">ifIndex</span><span class="p">,</span> <span class="n">dot3CollCount</span> <span class="p">}</span>
+    <span class="p">::</span><span class="o">=</span> <span class="p">{</span> <span class="n">dot3CollTable</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">ifIndex</span></code> entry in the INDEX represents the original table, as before except that here there is also a second, new INDEX attribute, <code class="docutils literal"><span class="pre">dot3CollCount</span></code>.</p>
+</div>
+<div class="section" id="snmpv2-mib-changes">
+<span id="sysortable"></span><h3>25.1.7&nbsp;&nbsp;&nbsp;SNMPv2 MIB Changes<a class="headerlink" href="#snmpv2-mib-changes" title="Permalink to this headline">¶</a></h3>
+<p>The core MIB for SNMPv2 – essentially the SNMPv2 version of MIB-2 – is <span class="target" id="index-11"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3418.html"><strong>RFC 3418</strong></a>, originally <span class="target" id="index-12"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1450.html"><strong>RFC 1450</strong></a>.</p>
+<p>Some changes appear under the MIB-2 OID prefix: 1.3.6.1.2.1. SNMPv2 also defines a prefix 1.3.6.1.6 specifically for SNMPv2 information.</p>
+<p>This MIB adds the Object Resource table, <code class="docutils literal"><span class="pre">sysORTable</span></code>, to the system group. It also slightly modifies the mib-2.snmp group and provides a new snmp group under the SNMPv2 1.3.6.1.6 prefix.</p>
+</div>
+<div class="section" id="id4">
+<h3>25.1.8&nbsp;&nbsp;&nbsp;<code class="docutils literal"><span class="pre">sysORTable</span></code><a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>The original system group contained the attribute <code class="docutils literal"><span class="pre">sysObjectID</span></code> that identifies the agent and at the same time suggests a private OID tree that could provide additional information about the agent (<a class="reference internal" href="netmgmta.html#system-group"><span class="std std-ref">24.10.1&nbsp;&nbsp;&nbsp;The system Group</span></a>).</p>
+<p>The <code class="docutils literal"><span class="pre">sysORTable</span></code>, 1.3.6.1.2.1.1.9 or mib-2.system.9,  is an attempt to extend this. It consists of a list of OIDs that can be queried for further agent information; each OID also has an associated description string and a <code class="docutils literal"><span class="pre">sysORUpTime</span></code> value indicating the time that OID was added.</p>
+<p>For example, my system lists the following (where snmpModules = 1.3.6.1.6.3 and mib-2 = 1.3.6.1.2.1):</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="42%" />
+<col width="58%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">&#160;</th>
+<th class="head">&#160;</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>snmpModules.11.3.1.1</td>
+<td>Message Processing MIB</td>
+</tr>
+<tr class="row-odd"><td>snmpModules.15.2.1.1</td>
+<td>User-based security MIB</td>
+</tr>
+<tr class="row-even"><td>snmpModules.10.3.1.1</td>
+<td>SNMP management architecture</td>
+</tr>
+<tr class="row-odd"><td>snmpModules.1</td>
+<td>SNMPv2  information</td>
+</tr>
+<tr class="row-even"><td>mib-2.49</td>
+<td>TCP</td>
+</tr>
+<tr class="row-odd"><td>mib-2.4</td>
+<td>IP</td>
+</tr>
+<tr class="row-even"><td>mib-2.50</td>
+<td>UDP</td>
+</tr>
+<tr class="row-odd"><td>snmpModules.16.2.2.1</td>
+<td>VACM</td>
+</tr>
+<tr class="row-even"><td>snmpModules.13.3.1.3</td>
+<td>SNMP notification</td>
+</tr>
+<tr class="row-odd"><td>mib-2.92</td>
+<td>SNMP notification logging</td>
+</tr>
+</tbody>
+</table>
+<p>Each of the above OID prefixes can theoretically then be accessed for further information. Unfortunately, on my system several of them are not configured, and a query returns nothing, but <code class="docutils literal"><span class="pre">sysORTable</span></code> does not know that.</p>
+</div>
+<div class="section" id="if-mib-and-ifxtable">
+<span id="ifxtable"></span><span id="index-13"></span><h3>25.1.9&nbsp;&nbsp;&nbsp;IF-MIB and <code class="docutils literal"><span class="pre">ifXTable</span></code><a class="headerlink" href="#if-mib-and-ifxtable" title="Permalink to this headline">¶</a></h3>
+<p><span class="target" id="index-14"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2863.html"><strong>RFC 2863</strong></a> has addressed the problems with <code class="docutils literal"><span class="pre">ifSpeed</span></code> and the byte counters by introducing a new table, <code class="docutils literal"><span class="pre">ifXTable</span></code> (formerly <code class="docutils literal"><span class="pre">ifExtnsTable</span></code> with OID mib-2.31.1.2. As such, it is still under the aegis of the MIB-2 OID, but outside the traditional interfaces group. It does use the SNMPv2 SMI.</p>
+<p>The <code class="docutils literal"><span class="pre">ifXTable</span></code> table includes definitions for “high capacity” 64-bit counters for in and out octets, in and out unicast packets, in and out multicast packets and in and out broadcast packets. It also includes the <code class="docutils literal"><span class="pre">ifHighSpeed</span></code> attribute for interface speed, still a 32-bit quantity but now measured in units of 1 Mbps.</p>
+<p>The full definition of an <code class="docutils literal"><span class="pre">ifXTable</span></code> row is as follows:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">IfXEntry</span> <span class="p">::</span><span class="o">=</span>
+   <span class="n">SEQUENCE</span> <span class="p">{</span>
+       <span class="n">ifName</span>                  <span class="n">DisplayString</span><span class="p">,</span>
+       <span class="n">ifInMulticastPkts</span>       <span class="n">Counter32</span><span class="p">,</span>
+       <span class="n">ifInBroadcastPkts</span>       <span class="n">Counter32</span><span class="p">,</span>
+       <span class="n">ifOutMulticastPkts</span>      <span class="n">Counter32</span><span class="p">,</span>
+       <span class="n">ifOutBroadcastPkts</span>      <span class="n">Counter32</span><span class="p">,</span>
+       <span class="n">ifHCInOctets</span>            <span class="n">Counter64</span><span class="p">,</span>
+       <span class="n">ifHCInUcastPkts</span>         <span class="n">Counter64</span><span class="p">,</span>
+       <span class="n">ifHCInMulticastPkts</span>     <span class="n">Counter64</span><span class="p">,</span>
+       <span class="n">ifHCInBroadcastPkts</span>     <span class="n">Counter64</span><span class="p">,</span>
+       <span class="n">ifHCOutOctets</span>           <span class="n">Counter64</span><span class="p">,</span>
+       <span class="n">ifHCOutUcastPkts</span>        <span class="n">Counter64</span><span class="p">,</span>
+       <span class="n">ifHCOutMulticastPkts</span>    <span class="n">Counter64</span><span class="p">,</span>
+       <span class="n">ifHCOutBroadcastPkts</span>    <span class="n">Counter64</span><span class="p">,</span>
+       <span class="n">ifLinkUpDownTrapEnable</span>  <span class="n">INTEGER</span><span class="p">,</span>
+       <span class="n">ifHighSpeed</span>             <span class="n">Gauge32</span><span class="p">,</span>
+       <span class="n">ifPromiscuousMode</span>       <span class="n">TruthValue</span><span class="p">,</span>
+       <span class="n">ifConnectorPresent</span>      <span class="n">TruthValue</span><span class="p">,</span>
+       <span class="n">ifAlias</span>                 <span class="n">DisplayString</span><span class="p">,</span>
+       <span class="n">ifCounterDiscontinuityTime</span> <span class="n">TimeStamp</span>
+   <span class="p">}</span>
+</pre></div>
+</div>
+<p>The original MIB-2 interfaces group counted multicast and broadcast packets together, <em>eg</em> in <code class="docutils literal"><span class="pre">ifInNUcastPkts</span></code>.</p>
+</div>
+<div class="section" id="etherlike-mib">
+<span id="etherlike"></span><h3>25.1.10&nbsp;&nbsp;&nbsp;ETHERLIKE-MIB<a class="headerlink" href="#etherlike-mib" title="Permalink to this headline">¶</a></h3>
+<p><span class="target" id="index-15"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3635.html"><strong>RFC 3635</strong></a> (originally <span class="target" id="index-16"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1650.html"><strong>RFC 1650</strong></a>) defines a MIB for “Ethernet-like” interfaces. The primary goal is to enable the collection of statistics on collisions and other Ethernet-specific behaviors. Several new tables are defined.</p>
+<p>The table <code class="docutils literal"><span class="pre">dot3StatsTable</span></code> contains additional per-interface attributes; the name refers to the IEEE designation for Ethernet of 802.3. The table represents a sparse extension of the original <code class="docutils literal"><span class="pre">ifTable</span></code>, in the sense of <a class="reference internal" href="#augmentation"><span class="std std-ref">25.1.6&nbsp;&nbsp;&nbsp;Table Augmentation</span></a> (where this table was used as the example).</p>
+<p>The rows of the table mostly consist of counters for various errors and other noteworthy conditions:</p>
+<ul class="simple">
+<li>Alignment errors: the number of bits in the frame is not divisible by 8</li>
+<li>CRC checksum failure</li>
+<li>Frames that experienced exactly one collision</li>
+<li>Frames that experienced more than one collision</li>
+<li>Signal quality errors. SQE is specific to 10 Mbps Ethernet</li>
+<li>Deferred transmissions; when the station tried to send, the line was not idle</li>
+<li>Late collisions: the only way a collision can occur after the slot time is passed is if the physical Ethernet is too big or if collision-detection is failing. See <a class="reference internal" href="ethernet1.html#the-slot-time-and-collisions"><span class="std std-ref">2.1.5&nbsp;&nbsp;&nbsp;The Slot Time and Collisions</span></a></li>
+<li>Excessive collisions: the frame experienced 16 collisions and the sender gave up</li>
+<li>Other hardware errors (<code class="docutils literal"><span class="pre">dot3StatsInternalMacTransmitErrors</span></code> and <code class="docutils literal"><span class="pre">dot3StatsInternalMacReceiveErrors</span></code>)</li>
+<li>Carrier sense errors (“carrier sense” refers to the collision-detection mechanism; there is no actual carrier)</li>
+<li>Frames longer than 1500 octets</li>
+<li>For Ethernets that encode data as symbols (<em>eg</em> 100 Mbps Ethernet’s 4B/5B), frames arriving with a corrupted symbol</li>
+</ul>
+<p>There is also an attribute to describe the Ethernet chipset.</p>
+<p>The <code class="docutils literal"><span class="pre">dot3HCStatsTable</span></code> is like the <code class="docutils literal"><span class="pre">dot3StatsTable</span></code> except its counters are 64 bits instead of 32 bits.</p>
+<p>The table <code class="docutils literal"><span class="pre">dot3CollTable</span></code> lists, for each N, how many packets experienced exactly N collisions before successful transmission or discard. Ethernet generally allows a maximum N of 16. The table is indexed by the pair ⟨<code class="docutils literal"><span class="pre">ifIndex</span></code>,N⟩. The <code class="docutils literal"><span class="pre">dot3StatsTable</span></code> contains this information for N=0,1,16.</p>
+<p>The table <code class="docutils literal"><span class="pre">dot3ControlTable</span></code> contains information on those Ethernet-like interfaces that also support the so-called MAC Control sublayer; the <code class="docutils literal"><span class="pre">dot3PauseTable</span></code> is similar.</p>
+</div>
+<div class="section" id="bridge-mib">
+<span id="id5"></span><h3>25.1.11&nbsp;&nbsp;&nbsp;BRIDGE-MIB<a class="headerlink" href="#bridge-mib" title="Permalink to this headline">¶</a></h3>
+<p><span class="target" id="index-17"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1286.html"><strong>RFC 1286</strong></a> (now <span class="target" id="index-18"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc4188.html"><strong>RFC 4188</strong></a>) defined basic management information for Ethernet switches; this is often complemented by vendor-specific MIBs.</p>
+<p>This MIB contains basic information about the switch, such as the number of ports. The <code class="docutils literal"><span class="pre">dot1dStp</span></code> section covers information about the spanning-tree protocol (<a class="reference internal" href="ethernet2.html#spanning-tree"><span class="std std-ref">3.1&nbsp;&nbsp;&nbsp;Spanning Tree Algorithm and Redundancy</span></a>). Perhaps the most interesting member of this MIB is the <code class="docutils literal"><span class="pre">dot1dTpFdb</span></code> table, which contains the forwarding table: the map from MAC addresses to ports created by the Ethernet learning algorithm (<a class="reference internal" href="ethernet1.html#ethernet-learning-algorithm"><span class="std std-ref">2.4.1&nbsp;&nbsp;&nbsp;Ethernet Learning Algorithm</span></a>). The name <code class="docutils literal"><span class="pre">dot1dTpFdb</span></code> is an abbreviation of the IEEE 802.1D standard, Transparent bridging protocol, Forwarding database.</p>
+<p>By using this table, a network manager can trace the origin of a packet with a given MAC address. If a switch S1 has seen the packet, the <code class="docutils literal"><span class="pre">dot1dTpFdb</span></code> table reveals the switch port by which the packet arrived. If that port leads to another switch, S2, the process is repeated; if the port represents a non-switch port, then the packet originated wherever the other end of that port’s cable terminates. Typically, this allows determination of the office or apartment unit or hotel room where a device was connected. This tracing is quite hard to evade, short of breaking into the wiring closet or compromising the switch itself.</p>
+<p>This table can also be used to alert network managers whenever a different device is plugged into an office Ethernet jack, although here MAC-address spoofing (changing the new device’s MAC address to match the first device’s MAC address) can be used to avoid detection.</p>
+<p>This strategy for identifying a device’s physical location does not work quite as well for Wi-Fi, though it can be used to identify the access point. Wi-Fi, however, generally requires the presentation of credentials; this gives an alternative approach for tracking users.</p>
+<p>The MIB does <em>not</em> contain information about whether internal switch queues have had to drop packets, though some vendor-specific MIBs can be used instead.</p>
+</div>
+<div class="section" id="ip-mib-and-ip-forward-mib">
+<h3>25.1.12&nbsp;&nbsp;&nbsp;IP-MIB and IP-Forward MIB<a class="headerlink" href="#ip-mib-and-ip-forward-mib" title="Permalink to this headline">¶</a></h3>
+<p>The MIB-2 ip group is really about two separate things: strictly local information about IP packets and delivery, and the forwarding table, which affects a much larger collection of nodes. All nodes have local IP information, but only routers do significant forwarding. It did not take long for these two subgroups to separate.</p>
+<p>The IP-Forward MIB began in <span class="target" id="index-19"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1354.html"><strong>RFC 1354</strong></a>, just over a year after the original MIB-2 in <span class="target" id="index-20"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1312.html"><strong>RFC 1312</strong></a>; this created a new home for forwarding-table information. By the time the first SNMPv2 MIB for the ip group came out in <span class="target" id="index-21"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2011.html"><strong>RFC 2011</strong></a>, the <code class="docutils literal"><span class="pre">ipRouteTable</span></code> once part of that group was declared obsolete.</p>
+<div class="section" id="ip-mib">
+<span id="id6"></span><h4>25.1.12.1&nbsp;&nbsp;&nbsp;IP-MIB<a class="headerlink" href="#ip-mib" title="Permalink to this headline">¶</a></h4>
+<p>The current version of the IP-MIB is <span class="target" id="index-22"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc4293.html"><strong>RFC 4293</strong></a>. It allows enabling or disabling of forwarding (<code class="docutils literal"><span class="pre">ipForwarding</span></code>, setting the default TTL (<code class="docutils literal"><span class="pre">ipDefaultTTL</span></code>), and, for IPv4 only (as it is not a configurable parameter for IPv6) the fragment-reassembly timeout (<code class="docutils literal"><span class="pre">ipReasmTimeout</span></code>).</p>
+<p>When IP addresses appear in these tables, the defining entry is almost always prefaced by an object of type InetAddressType, which can take values ipv4(1) and ipv6(2) (and a few other values for special cases).</p>
+<p>Two tables are devoted to IP statistics: the <code class="docutils literal"><span class="pre">ipSystemStatsTable</span></code> for system-wide IP information and the <code class="docutils literal"><span class="pre">ipIfStatsTable</span></code> for interface-specific information. Each table includes the IP address type (that is the IP version) in its index, meaning that separate statistics are kept for IPv4 and IPv6 traffic. The system table is indexed by the IP address type alone; the interface table is indexed by that and the interface number (the MIB-2 <code class="docutils literal"><span class="pre">ifIndex</span></code>).</p>
+<p>The <code class="docutils literal"><span class="pre">ipIfStatsTable</span></code> contains, for each interface, counts of packets (and octets) in and out for broadcast, multicast and unicast, counts of forwarded, reassembled and fragmented packets, counts of packets with any of several kinds of errors, and related additional counts. An entry for the counter refresh rate is also provided. When appropriate, 64-bit counters are provided; usually the equivalent 32-bit counter is <em>also</em> provided. The <code class="docutils literal"><span class="pre">ipSystemStatsTable</span></code> provides all-interface summaries of these same counts.</p>
+<p>The tables <code class="docutils literal"><span class="pre">ipv4InterfaceTable</span></code> and <code class="docutils literal"><span class="pre">ipv6InterfaceTable</span></code> represent information about what IP addresses are assigned to each interface. These are indexed by the interface index alone, meaning that the tables cannot accurately represent an interface with more than one IP address of the same type.</p>
+<p>Additional IP-address information is contained in the <code class="docutils literal"><span class="pre">ipAddressPrefixTable</span></code> primarily for IPv6 and the <code class="docutils literal"><span class="pre">ipAddressTable</span></code> for both IPv4 and IPv6. These tables contain information about what IP addresses are assigned to what interfaces and where these addresses came from (<em>eg</em> DHCP, <a class="reference internal" href="ipv4companions.html#dhcp"><span class="std std-ref">10.3&nbsp;&nbsp;&nbsp;Dynamic Host Configuration Protocol (DHCP)</span></a>, or Prefix Discovery, <a class="reference internal" href="ipv6a.html#prefix-discovery"><span class="std std-ref">11.6.2&nbsp;&nbsp;&nbsp;Prefix Discovery</span></a>). Indexed by the IP address itself (and also the <code class="docutils literal"><span class="pre">ipAddressAddrType</span></code>), these tables thus support the possibility that one interface has multiple IP addresses (this is particularly common for IPv6).</p>
+<p>The <code class="docutils literal"><span class="pre">ipNetToPhysicalTable</span></code> represents the map from local IP addresses to physical LAN addresses, as created by either ARP for IPv4 or Neighbor Discovery for IPv6. In addition to the interface, the IP address and the physical address, tle table also contains a timestamp indicating when a given entry was last updated or refreshed, an indication of whether the address mapping is dynamic, static or invalid, and, finally, an attribute <code class="docutils literal"><span class="pre">ipNetToPhysicalState</span></code>. The values for this last are <code class="docutils literal"><span class="pre">reachable(1)</span></code>, <code class="docutils literal"><span class="pre">stale(2)</span></code> for expired reachability, <code class="docutils literal"><span class="pre">delay(3)</span></code> and <code class="docutils literal"><span class="pre">probe(4)</span></code> relating to active updates of the reachability, <code class="docutils literal"><span class="pre">invalid(5)</span></code>, <code class="docutils literal"><span class="pre">unknown(6)</span></code> and <code class="docutils literal"><span class="pre">incomplete(7)</span></code> indicating that ARP is in progress. See <a class="reference internal" href="ipv4companions.html#arp-finer-points"><span class="std std-ref">10.2.1&nbsp;&nbsp;&nbsp;ARP Finer Points</span></a>.</p>
+<p>There is also a simple version of the forwarding table known as the Default Router Table. This contains a list of “default”, or, more accurately, “initially configured” routes. While this does represent a genuine forwarding table, it is intended for nodes that do not act as routers and do not engage in routing-update protocols. The table represents a list of “default” routes by IP address and interface, and also contains route-lifetime and route-preference values.</p>
+<p>The <code class="docutils literal"><span class="pre">ipv6RouterAdvertTable</span></code> is used for specifying timers and other attributes of IPv6 router advertisements, <a class="reference internal" href="ipv6a.html#router-advertisement"><span class="std std-ref">11.6.1&nbsp;&nbsp;&nbsp;Router Discovery</span></a>.</p>
+<p>Finally, the IP-MIB contains two tables for ICMP statistics” <code class="docutils literal"><span class="pre">icmpStatsTable</span></code> and <code class="docutils literal"><span class="pre">icmpMsgTable</span></code>. The latter keeps track, for example, of how many pings (<code class="docutils literal"><span class="pre">ICMP</span> <span class="pre">Echo</span></code>) and other ICMP messages were sent out; see <a class="reference internal" href="ipv4companions.html#icmp"><span class="std std-ref">10.4&nbsp;&nbsp;&nbsp;Internet Control Message Protocol</span></a>.</p>
+</div>
+<div class="section" id="ip-forward-mib">
+<span id="id7"></span><h4>25.1.12.2&nbsp;&nbsp;&nbsp;IP-Forward MIB<a class="headerlink" href="#ip-forward-mib" title="Permalink to this headline">¶</a></h4>
+<p>Information specific to a host’s IP-forwarding capability was first split out from the MIB-2 ip group in <span class="target" id="index-23"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1354.html"><strong>RFC 1354</strong></a>; it was updated to SNMPv2 in <span class="target" id="index-24"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2096.html"><strong>RFC 2096</strong></a> and the current version is <span class="target" id="index-25"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc4292.html"><strong>RFC 4292</strong></a>. The original MIB-2 ip group left off at OID mib-2.ip.23; the new IP-Forward MIB begins at mib-2.ip.24.</p>
+<p>There have been three iterations of an SNMP-viewable IP forwarding table since the original <span class="target" id="index-26"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1213.html"><strong>RFC 1213</strong></a> ip group’s <code class="docutils literal"><span class="pre">ipRouteTable</span></code> at mib-2.ip.21. Here are all four:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">ipRouteTable</span></code></li>
+<li><code class="docutils literal"><span class="pre">ipForwardTable</span></code></li>
+<li><code class="docutils literal"><span class="pre">ipCidrRouteTable</span></code></li>
+<li><code class="docutils literal"><span class="pre">inetCidrRouteTable</span></code></li>
+</ul>
+<p>Each new version has formally deprecated its predecessors.</p>
+<p>The first replacement was <code class="docutils literal"><span class="pre">ipForwardTable</span></code>, described in <span class="target" id="index-27"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1354.html"><strong>RFC 1354</strong></a>. It defines the OID <code class="docutils literal"><span class="pre">ipForward</span></code> to be mib-2.ip.24; the new table is at <code class="docutils literal"><span class="pre">ipForward</span></code>.2. This table added several routing attributes, but perhaps more importantly changed the indexing. The index for <code class="docutils literal"><span class="pre">ipRouteTable</span></code> was the IP destination network <code class="docutils literal"><span class="pre">ipRouteDest</span></code>, alone. The new table’s index also includes a quality-of-service attribute <code class="docutils literal"><span class="pre">ipForwardPolicy</span></code>, usually representing the IPv4 Type of Service field (now usually known as the DS field, <a class="reference internal" href="ipv4.html#ipv4-header"><span class="std std-ref">9.1&nbsp;&nbsp;&nbsp;The IPv4 Header</span></a>). This inclusion allows the <code class="docutils literal"><span class="pre">ipForwardTable</span></code> to accurately represent routing based on ⟨dest,QoS⟩, as discussed in <a class="reference internal" href="routing.html#routing-update"><span class="std std-ref">13&nbsp;&nbsp;&nbsp;Routing-Update Algorithms</span></a>. Such routing is sometimes called “multipath” routing, because it allows multiple paths to a given destination based on different QoS values. However, the mask length is <em>not</em> included in the index, making <code class="docutils literal"><span class="pre">ipForwardTable</span></code> inadequate for representing CIDR routing.</p>
+<p>The index also includes the next_hop, which for the actual forwarding table does not make sense – the next_hop is what one is looking up, given the destination – but which works fine for SNMP. See the comments about SNMP indexes with more attributes than expected in <a class="reference internal" href="netmgmta.html#tables"><span class="std std-ref">24.7&nbsp;&nbsp;&nbsp;SNMP Tables</span></a>. The index even includes an attribute <code class="docutils literal"><span class="pre">ipForwardProto</span></code> that represents the routing-update protocol that is the source of the table entry: <code class="docutils literal"><span class="pre">icmp(4)</span></code>, <code class="docutils literal"><span class="pre">rip(8)</span></code> (a common distance-vector implementation), <code class="docutils literal"><span class="pre">is-is(9)</span></code> and <code class="docutils literal"><span class="pre">ospf(13)</span></code>  (two link-state implementations) and <code class="docutils literal"><span class="pre">bgp(14)</span></code>.</p>
+<p>In addition to the next_hop, this table also includes attributes for <code class="docutils literal"><span class="pre">ipForwardType</span></code> (<em>eg</em> local vs remote), <code class="docutils literal"><span class="pre">ipForwardAge</span></code> (the time since the last update), <code class="docutils literal"><span class="pre">ipForwardInfo</span></code>, <code class="docutils literal"><span class="pre">ipForwardNextHopAS</span></code>, and several routing metrics. The purpose of <code class="docutils literal"><span class="pre">ipForwardInfo</span></code> is to provide an OID that can be accessed to provide additional information specific to the routing-update algorithm in use. The <code class="docutils literal"><span class="pre">ipForwardNextHopAS</span></code> allows the specification of the next_hop Autonomous System number, usually relevant only when BGP (<a class="reference internal" href="bgp.html#bgp"><span class="std std-ref">15&nbsp;&nbsp;&nbsp;Border Gateway Protocol (BGP)</span></a>) is involved. (If the AS number is not relevant, it is set to zero.)</p>
+<p>The second iteration of the SNMP-viewable IP forwarding table is <code class="docutils literal"><span class="pre">ipCidrRouteTable</span></code>, appearing in <span class="target" id="index-28"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2096.html"><strong>RFC 2096</strong></a> and located at <code class="docutils literal"><span class="pre">ipForward</span></code>.4 (and returning to the practice of calling it a “route” rather than a “forward” table). This table adds the address mask, <code class="docutils literal"><span class="pre">ipCidrRouteMask</span></code>, to the index, finally allowing distinct routes to 10.38.0.0/16 and 10.38.0.0/24. The quality-of-service field <code class="docutils literal"><span class="pre">ipCidrRouteTos</span></code> remains in the index (as does the destination), and is now firmly identified with the IPv4 Type of Service (DS) field. The routing-update algorithm was dropped from the index.</p>
+<p>This table also adds an attribute <code class="docutils literal"><span class="pre">ipCidrRouteStatus</span></code> of type <code class="docutils literal"><span class="pre">RowStatus</span></code> and used for the creation and deletion of entire rows (that is, forwarding table entries) under the control of SNMP. We will return to this process in <a class="reference internal" href="#adding-rows"><span class="std std-ref">25.2&nbsp;&nbsp;&nbsp;Table Row Creation</span></a>.</p>
+<span class="target" id="index-29"></span><p>The third (and still current) version of the IP forwarding table is <code class="docutils literal"><span class="pre">inetCidrRouteTable</span></code>, introduced in <span class="target" id="index-30"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc4292.html"><strong>RFC 4292</strong></a> and located at <code class="docutils literal"><span class="pre">ipForward</span></code>.7. The main change introduced by this table is the extension to support IPv6: the IP-address columns (<em>eg</em> for destination and next_hop) have companion columns for the address <em>type</em>: <code class="docutils literal"><span class="pre">ipv4(1)</span></code> and <code class="docutils literal"><span class="pre">ipv6(2)</span></code>. See <a class="reference internal" href="#tcp-mib"><span class="std std-ref">25.1.13&nbsp;&nbsp;&nbsp;TCP-MIB</span></a> for further details.</p>
+<p>The next_hop attribute (now two columns, with the addition of the address type) is still part of the index.</p>
+<p>The address <em>mask</em> used in <code class="docutils literal"><span class="pre">ipCidrRouteTable</span></code> is now updated to be a prefix length, <code class="docutils literal"><span class="pre">inetCidrRoutePfxLen</span></code>. The quality-of-service field <code class="docutils literal"><span class="pre">inetCidrRoutePolicy</span></code> is an Object ID, declared to be “an opaque object without any defined semantics”; that is, it is at the implementer’s discretion. The IPv4 ToS/DS field evolved in IPv6 to the Traffic Class field, <a class="reference internal" href="ipv6a.html#ipv6-header"><span class="std std-ref">11.1&nbsp;&nbsp;&nbsp;The IPv6 Header</span></a>.</p>
+<p>Finally, routes are no longer required to list a single associated interface. The table makes use of the <code class="docutils literal"><span class="pre">InterfaceIndexOrZero</span></code> textual convention of <span class="target" id="index-31"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2863.html"><strong>RFC 2863</strong></a>, covering just this situation.</p>
+</div>
+</div>
+<div class="section" id="tcp-mib">
+<span id="id8"></span><h3>25.1.13&nbsp;&nbsp;&nbsp;TCP-MIB<a class="headerlink" href="#tcp-mib" title="Permalink to this headline">¶</a></h3>
+<p><span class="target" id="index-32"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc4022.html"><strong>RFC 4022</strong></a> contains some extensions to MIB-2’s tcp group. The SNMPv2-based MIB embedded in <span class="target" id="index-33"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc4022.html"><strong>RFC 4022</strong></a> repeats the MIB-2 tcp group and then adds new features within the mib-2.tcp (1.3.6.1.2.1.6) tree. <span class="target" id="index-34"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1213.html"><strong>RFC 1213</strong></a> stopped at mib-2.tcp.15; <span class="target" id="index-35"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc4022.html"><strong>RFC 4022</strong></a> defines new objects starting at mib-2.tcp.17.</p>
+<p>The new <code class="docutils literal"><span class="pre">tcpConnectionTable</span></code> is defined at mib-2.tcp.19, versus the original <code class="docutils literal"><span class="pre">tcpConnTable</span></code> at mib-2.tcp.13. The newer table supports IPv6; like the <code class="docutils literal"><span class="pre">inetCidrRouteTable</span></code> above, each IP-address column now also has a companion address-type column, and addresses themselves are represented as OCTET STRINGs preceded by a length byte. This follows the rules for <code class="docutils literal"><span class="pre">InetAddressType</span></code> and <code class="docutils literal"><span class="pre">InetAddress</span></code> of <span class="target" id="index-36"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc4001.html"><strong>RFC 4001</strong></a>, and the OID-suffix-encoding rules of <span class="target" id="index-37"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2851.html"><strong>RFC 2851</strong></a> §4.1. Because the length of an <code class="docutils literal"><span class="pre">InetAddress</span></code> isn’t known in advance, the length must be included.</p>
+<p>For IPv4 users used to the earlier <code class="docutils literal"><span class="pre">tcpConnTable</span></code>, this means that there are extra 1.4.’s prefixing the IPv4 addresses in the index, as in this example of host 10.0.0.5 connecting from port 54321 to web server 147.126.1.230:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">tcpConnectionState.<strong>1</strong>.<strong>4</strong>.10.0.0.5.54321.<strong>1</strong>.<strong>4</strong>.147.126.1.230.80</div>
+</div>
+</div></blockquote>
+<p>The new table also includes a column representing the process ID of the process that has open the local end of the connection.</p>
+<p>This table adheres to the SNMPv2 convention that index columns are not included in the data – the attributes are marked <code class="docutils literal"><span class="pre">not-accessible</span></code>. There are only two accessible columns, <code class="docutils literal"><span class="pre">tcpConnectionState</span></code> and <code class="docutils literal"><span class="pre">tcpConnectionProcess</span></code>.</p>
+<p>TCP-MIB does <em>not</em> make available per-interface TCP statistics, <em>eg</em> the number of TCP bytes sent by <code class="docutils literal"><span class="pre">eth0</span></code>. Nor does it make available per-connection statistics such as packet-loss and retransmission counts or total bytes transmitted each way.</p>
+</div>
+</div>
+<div class="section" id="table-row-creation">
+<span id="row-additions"></span><span id="adding-rows"></span><h2>25.2&nbsp;&nbsp;&nbsp;Table Row Creation<a class="headerlink" href="#table-row-creation" title="Permalink to this headline">¶</a></h2>
+<p>SNMPv2 also refined the mechanisms by which a manager can add a row to an agent’s table. In principle, adding a row to a table is done with the <code class="docutils literal"><span class="pre">Set()</span></code> operation. Imagine a table <strong>T</strong> with three columns <code class="docutils literal"><span class="pre">indexT</span></code>, <code class="docutils literal"><span class="pre">fruitT</span></code> and <code class="docutils literal"><span class="pre">primeT</span></code> corresponding to <strong>T</strong>.1, <strong>T</strong>.2 and <strong>T</strong>.3. Imagine also that, right now, the table has three rows with <code class="docutils literal"><span class="pre">indexT</span></code> values 10, 11 and 12:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="34%" />
+<col width="32%" />
+<col width="34%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><code class="docutils literal"><span class="pre">indexT</span></code></th>
+<th class="head"><code class="docutils literal"><span class="pre">fruitT</span></code></th>
+<th class="head"><code class="docutils literal"><span class="pre">primeT</span></code></th>
+</tr>
+<tr class="row-even"><th class="head"><strong>T</strong>.1</th>
+<th class="head"><strong>T</strong>.2</th>
+<th class="head"><strong>T</strong>.3</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-odd"><td>10</td>
+<td>apple</td>
+<td>37</td>
+</tr>
+<tr class="row-even"><td>11</td>
+<td>blueberry</td>
+<td>59</td>
+</tr>
+<tr class="row-odd"><td>12</td>
+<td>cantaloupe</td>
+<td>67</td>
+</tr>
+</tbody>
+</table>
+<p id="index-38">Then a new row ⟨13,durian,101⟩ might be added with the following multi-attribute <code class="docutils literal"><span class="pre">Set()</span></code> operation. The entries of the new row will have OIDs <strong>T</strong>.1.13, <strong>T</strong>.2.13 and <strong>T</strong>.3.13, and all we have to do to create the row is assign to these. Note that we are assigning to OIDs that, in the agent’s current database, do not yet exist.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">Set((<strong>T</strong>.1.13,13), (<strong>T</strong>.2.13,durian), (<strong>T</strong>.3.13,101))</div>
+</div>
+</div></blockquote>
+<p>Of course, this raises some questions. Will the agent actually allow this? What happens if these <code class="docutils literal"><span class="pre">Set()</span></code> operations are performed individually rather than as a group? Is there any way to <em>delete</em> this newly added row? And, more seriously, what happens if some <em>other</em> manager tries to insert at the same time the row ⟨13,feijoa,103⟩?</p>
+<p>We now turn to the specific row-creation mechanism of RMON.</p>
+<div class="section" id="rmon">
+<span id="index-39"></span><span id="id9"></span><h3>25.2.1&nbsp;&nbsp;&nbsp;RMON<a class="headerlink" href="#rmon" title="Permalink to this headline">¶</a></h3>
+<p>RMON, for Remote MONitoring, was an early attempt (first appearing in <span class="target" id="index-40"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1271.html"><strong>RFC 1271</strong></a> eight months after MIB-2’s <span class="target" id="index-41"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1213.html"><strong>RFC 1213</strong></a>) at having an SNMP agent take on some monitoring responsibilities of its own. The current version is in <span class="target" id="index-42"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2819.html"><strong>RFC 2819</strong></a>. The original RMON, now often called RMON1, only implemented LAN-layer monitoring, but this was later extended to the IP and Transport layers in RMON2, <span class="target" id="index-43"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc4502.html"><strong>RFC 4502</strong></a>. We will here consider only RMON1.</p>
+<p>RMON implements only passive monitoring; there is no capability for the remote agent to send out its own SNMP queries, or even pings (though see <a class="reference internal" href="#ping-mib"><span class="std std-ref">25.2.3&nbsp;&nbsp;&nbsp;PING-MIB</span></a>). Monitoring is implemented by putting the designated interface into promiscuous mode (<a class="reference internal" href="ethernet1.html#classic-ethernet"><span class="std std-ref">2.1&nbsp;&nbsp;&nbsp;10-Mbps Classic Ethernet</span></a>) and capturing all traffic. In modern fully-switched Ethernets, hosts simply do not see traffic not actually addressed to them, and so RMON would need to be implemented on a switch or router to be of much practical use.</p>
+<p>An agent’s RMON activity is controlled by an SNMP manager through the insertion of new rows in various <strong>control tables</strong>. The mechanism for doing this is our primary concern here.</p>
+<p>RMON statistics are divided into ten groups, of which we will consider only the following:</p>
+<ul class="simple">
+<li><strong>statistics</strong>: counts of errors and counts of packets in size ranges 0-64, 65-127, 128-255, 255-511, 512-1023 and 1024-1518 octets.</li>
+<li><strong>history</strong>: The statistics group data, taken at regular intervals</li>
+<li><strong>hosts</strong>: The Ethernet senders and receivers seen by an interface</li>
+<li><strong>host top N</strong>: The top-N senders or receivers</li>
+<li><strong>matrix</strong>: Information on traffic by ⟨sender,receiver⟩ pair</li>
+</ul>
+<div class="section" id="statistics-and-use-of-entrystatus">
+<span id="rmon-statistics"></span><h4>25.2.1.1&nbsp;&nbsp;&nbsp;Statistics (and use of EntryStatus)<a class="headerlink" href="#statistics-and-use-of-entrystatus" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal"><span class="pre">etherStatsTable</span></code> is, by default, empty, and is indexed by <code class="docutils literal"><span class="pre">etherStatsIndex</span></code> which is an opaque INTEGER. The column <code class="docutils literal"><span class="pre">etherStatsDataSource</span></code> represents the OID of a specific interface number as defined by <code class="docutils literal"><span class="pre">ifTable</span></code>; for example, the interface with <code class="docutils literal"><span class="pre">ifNumber</span></code> = 6 would be represented by mib-2.2.2.1.1.6. One column, <code class="docutils literal"><span class="pre">etherStatsStatus</span></code>, has type <code class="docutils literal"><span class="pre">EntryStatus</span></code> as follows:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">valid</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+<span class="n">createRequest</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+<span class="n">underCreation</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+<span class="n">invalid</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The attributes <code class="docutils literal"><span class="pre">etherStatsDataSource</span></code> and <code class="docutils literal"><span class="pre">etherStatsStatus</span></code> were initially <code class="docutils literal"><span class="pre">read-write</span></code>, which was later changed to status <code class="docutils literal"><span class="pre">read-create</span></code> as they can only be written to as part of the creation of a new row. There is one more <code class="docutils literal"><span class="pre">read-create</span></code> attribute, <code class="docutils literal"><span class="pre">etherStatsOwner</span></code>, which is a manager-supplied string identifying that particular manager (perhaps by IP address and hostname and, if a human is involved, appropriate additional identification).</p>
+<p>To enable statistics collection, the SNMP manager creates a row in the agent’s <code class="docutils literal"><span class="pre">etherStatsTable</span></code> by setting the three attributes <code class="docutils literal"><span class="pre">Status</span></code>, <code class="docutils literal"><span class="pre">DataSource</span></code> and <code class="docutils literal"><span class="pre">Owner</span></code> (where we have left off the attribute-name prefix <code class="docutils literal"><span class="pre">etherStats</span></code> for readability). Once this is done and the <code class="docutils literal"><span class="pre">Status</span></code> is set to <code class="docutils literal"><span class="pre">valid</span></code>, the agent begins collecting data about the desired interface. The manager can read the data as it desires, by accessing that particular row. Data collection ends when the manager sets the <code class="docutils literal"><span class="pre">etherStatsStatus</span></code> for the row to <code class="docutils literal"><span class="pre">invalid</span></code>, though it is up to the agent whether the row is actually deleted at that point.</p>
+<p>The <code class="docutils literal"><span class="pre">etherStatsIndex</span></code> column is not actually writable, but the manager must still select a value for the index. One approach is to read the entire table and identify the first unused index value. Other managers, however, may be creating new rows in the agent at the same moment, and so a row index that was available moments before may now be unavailable. We return below to how such conflicts are prevented. One common strategy for reducing the chance of row-creation collisions is to choose a value for the index at random.</p>
+<p>It is often possible for a manager to create the desired row with a single <code class="docutils literal"><span class="pre">Set()</span></code> operation. However, <span class="target" id="index-44"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2819.html"><strong>RFC 2819</strong></a> requires that the the <code class="docutils literal"><span class="pre">Status</span></code> attribute in a request for creation of a new row must be <code class="docutils literal"><span class="pre">createRequest</span></code>, and a second <code class="docutils literal"><span class="pre">Set()</span></code> operation is therefore always required to transition to <code class="docutils literal"><span class="pre">valid</span></code>.</p>
+<p>If <strong>T</strong> is the tree OID <code class="docutils literal"><span class="pre">etherStatsEntry</span></code> and 157 is the manager’s chosen index, and the manager wants to monitor <code class="docutils literal"><span class="pre">ifIndex</span></code> = 6, it could send the following as a single operation.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">Set((<strong>T</strong>.Status.137,createRequest), (<strong>T</strong>.DataSource.137,mib-2.2.2.1.1.6), (<strong>T</strong>.Owner.137,<em>owner</em>))</div>
+</div>
+</div></blockquote>
+<p>at which point the agent will create the row with status <code class="docutils literal"><span class="pre">underCreation</span></code>. The value <code class="docutils literal"><span class="pre">createRequest</span></code> is used only in manager requests and never appears in actual rows on the agent. The manager will then follow with</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">Set(<strong>T</strong>.Status.137,valid)</div>
+</div>
+</div></blockquote>
+<p>If the manager wants or needs to create the entry piecemeal, it can do so as follows:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">Set(<strong>T</strong>.Status.137, createRequest)</div>
+<div class="line">Set(<strong>T</strong>.DataSource.137, mib-2.2.2.1.1.6)</div>
+<div class="line">Set(<strong>T</strong>.Owner.137, <em>owner</em>)</div>
+<div class="line">…</div>
+<div class="line">Set(<strong>T</strong>.Status.137, valid)</div>
+</div>
+</div></blockquote>
+<p>Immediately following the first Set(<strong>T</strong>.Status.137, createRequest) the agent will again create the row and mark it as <code class="docutils literal"><span class="pre">underCreation</span></code>, but this time the new row will be missing several columns.</p>
+<p>The <code class="docutils literal"><span class="pre">Status</span></code> attribute must be specified in the very first <code class="docutils literal"><span class="pre">Set()</span></code> operation for the row.</p>
+<p>Existing rows may not have their <code class="docutils literal"><span class="pre">Status</span></code> set to <code class="docutils literal"><span class="pre">createRequest</span></code>. The primary legal state transitions are as follows:</p>
+<img alt="_images/statediagram1.svg" src="_images/statediagram1.svg" /><p>In some cases, a row can be edited by the manager by changing the status from <code class="docutils literal"><span class="pre">valid</span></code> back to <code class="docutils literal"><span class="pre">underCreation</span></code>. However, many specific row-creation implementations require that no changes can be made after a row is marked <code class="docutils literal"><span class="pre">valid</span></code>. To change an existing row in such a case, the row should be marked <code class="docutils literal"><span class="pre">invalid</span></code> and a new row created.</p>
+<p>These transition rules for <code class="docutils literal"><span class="pre">createRequest</span></code> prevent two managers from simultaneously creating rows with the same index. Suppose, for example, that managers M<sub>A</sub> and M<sub>B</sub> each attempt to create a new row 137 by executing</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">Set(<strong>T</strong>.Status.137, createRequest)</div>
+</div>
+</div></blockquote>
+<p>If M<sub>A</sub>’s Set() request is the first to be acted upon, row 137’s <code class="docutils literal"><span class="pre">Status</span></code> becomes <code class="docutils literal"><span class="pre">underCreation</span></code>. Later, when M<sub>B</sub>’s Set() request is processed, the row will no longer be nonexistent. So, from the diagram above, M<sub>B</sub>’s arriving <code class="docutils literal"><span class="pre">createRequest</span></code> is invalid: there is no <code class="docutils literal"><span class="pre">createRequest</span></code> arc from any node other than <code class="docutils literal"><span class="pre">nonexistent</span></code>. M<sub>B</sub>’s Set() operation above, and therefore any of M<sub>B</sub>’s other Set() operations, will fail.</p>
+<p>This strategy is meant to prevent only accidental row-creation conflict; it will not prevent M<sub>B</sub> from hijacking M<sub>A</sub>’s row, or from marking it as <code class="docutils literal"><span class="pre">invalid</span></code> (and thus effectively deleting it). But this is generally understood as an inconsequential risk; legitimate managers should be trustable.</p>
+<p>Any authorized SNMP manager can read all the <code class="docutils literal"><span class="pre">etherStatsTable</span></code> records; there is no requirement that only the creator of a row can read that row.</p>
+<p>It is quite possible for multiple rows to be created all referring to the same interface, <em>eg</em> by multiple managers. Although it is not forbidden, there is no reason for one manager to create two rows for the same interface.</p>
+<p>The four-state <code class="docutils literal"><span class="pre">EntryStatus</span></code> type appeared in the original SNMPv1 <span class="target" id="index-45"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1271.html"><strong>RFC 1271</strong></a>. Updates to RMON to SNMPv2 have left <code class="docutils literal"><span class="pre">EntryStatus</span></code> alone, but SNMPv2 has also introduced the six-state <code class="docutils literal"><span class="pre">RowStatus</span></code> type which is more likely to be used by new MIBs. We will turn to this in <a class="reference internal" href="#rowstatus"><span class="std std-ref">25.2.2&nbsp;&nbsp;&nbsp;SNMPv2 RowStatus</span></a>.</p>
+</div>
+<div class="section" id="history">
+<span id="index-46"></span><span id="id10"></span><h4>25.2.1.2&nbsp;&nbsp;&nbsp;History<a class="headerlink" href="#history" title="Permalink to this headline">¶</a></h4>
+<p>The history group allows for collection of a series of samples of data from the Statistics group, above, at regular intervals. The group consists of two tables, <code class="docutils literal"><span class="pre">historyControlTable</span></code> where the manager creates rows to manage the process, and <code class="docutils literal"><span class="pre">etherHistoryTable</span></code> containing the actual data.</p>
+<p>The <code class="docutils literal"><span class="pre">historyControlTable</span></code> contains entries for (again omitting the <code class="docutils literal"><span class="pre">historyControl</span></code> prefix from attribute names) <code class="docutils literal"><span class="pre">DataSource</span></code>, representing the interface to be examined, and the <code class="docutils literal"><span class="pre">Status</span></code> and <code class="docutils literal"><span class="pre">Owner</span></code> attributes as above. As with the <code class="docutils literal"><span class="pre">etherStatsTable</span></code>, when the manager creates a new row it specifies a value for the index, with full name <code class="docutils literal"><span class="pre">historyControlIndex</span></code>, again perhaps chosen at random.</p>
+<p>The manager must also specify two additional attributes: <code class="docutils literal"><span class="pre">Interval</span></code> representing the time in seconds between data-collection events, and <code class="docutils literal"><span class="pre">BucketsRequested</span></code> representing the <em>requested</em> maximum number of interface records to be kept by the agent. When the agent reaches the maximum, each new record replaces the oldest previous record.</p>
+<p>The control table contains one agent-created attribute: <code class="docutils literal"><span class="pre">BucketsGranted</span></code> indicating the actual maximum number of interface records to be kept.</p>
+<p>Once the control table row is marked <code class="docutils literal"><span class="pre">valid</span></code>, the agent starts accumulating one statistics record for the specified interface every <code class="docutils literal"><span class="pre">Interval</span></code> seconds. These records are numbered consecutively; the number of a given record is its <code class="docutils literal"><span class="pre">SampleIndex</span></code>. The agent keeps only <code class="docutils literal"><span class="pre">BucketsRequested</span></code> records, so once <code class="docutils literal"><span class="pre">SampleIndex</span></code> reaches that value then, whenever record N is added, record N − <code class="docutils literal"><span class="pre">BucketsRequested</span></code> is deleted.</p>
+<p>All this data collected by the agent is stored in <code class="docutils literal"><span class="pre">etherHistoryTable</span></code>, which contains columns for all the statistics in <code class="docutils literal"><span class="pre">etherStatsTable</span></code> except for the counts of packets in the various size ranges. The table is indexed by the pair of values <code class="docutils literal"><span class="pre">Index</span></code> corresponding to <code class="docutils literal"><span class="pre">etherControlIndex</span></code> and the record number <code class="docutils literal"><span class="pre">SampleIndex</span></code>. As such, this table is the disjoint union of multiple independent series of consecutively numbered records, one series for each <code class="docutils literal"><span class="pre">Index</span></code> value in the control table, that is, one series for each manager request.</p>
+<p>As an example, suppose the manager asked for history statistics to be kept for a given interface at a rate of once a minute, the <code class="docutils literal"><span class="pre">BucketsGranted</span></code> is 70, and the control-index value for this request is 491. After one hour, the table contains records with sample indexes 1-60; the full row-index values are ⟨491,1⟩ through ⟨491,60⟩. After one hour and eleven minutes, record ⟨491,71⟩ replaces record ⟨491,1⟩. After two hours, records with sample indexes of 51-120 are available. The manager might return once an hour and retrieve the most recent 60 records.</p>
+<p>A manager might also create <em>two</em> control-table records, one holding 25 records taken at 1-hour intervals and another holding 60 records taken at 1-minute intervals. If all is well, that manager might download the first table once a day, and entirely ignore the second table. The manager always has available these 1-minute records for the last hour, though, and can access them as needed if a problem arises (perhaps signaled by something else entirely).</p>
+<p>A manager can easily retrieve only its own rows from the <code class="docutils literal"><span class="pre">etherHistoryTable</span></code>. Let <strong>T</strong> be the root of the <code class="docutils literal"><span class="pre">etherHistoryTable</span></code>, which has columns 1-15. Suppose again a manager has created its controlTable row with a value for <code class="docutils literal"><span class="pre">historyControlIndex</span></code> of 491; the manager can then retrieve the first of its data rows with the following; note that each OID contains the column number and <em>part</em> of the row index.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">GetNext(<strong>T</strong>.1.491, <strong>T</strong>.2.491, …, <strong>T</strong>.15.491)</div>
+</div>
+</div></blockquote>
+<p>If the history-table rows associated with 491 have sample-index values ranging from 37 to 66, the above GetNext() will return the row indexed by ⟨491,37⟩; that is, the values paired with the following OIDs:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><strong>T</strong>.1.491.37, <strong>T</strong>.2.491.37, …, <strong>T</strong>.15.491.37</div>
+</div>
+</div></blockquote>
+<p>Subsequent GetNext()s will return the subsequent rows associated with control entry 491: row ⟨491,38⟩, row ⟨491,39⟩, <em>etc</em>. If the <code class="docutils literal"><span class="pre">etherHistoryTable</span></code> had been indexed in the reverse order, with the sample index first and the <code class="docutils literal"><span class="pre">historyControlIndex</span></code> second, a substantial linear search would be necessary to locate the first row with a given value for the control index.</p>
+</div>
+<div class="section" id="hosts">
+<h4>25.2.1.3&nbsp;&nbsp;&nbsp;Hosts<a class="headerlink" href="#hosts" title="Permalink to this headline">¶</a></h4>
+<p>The host group allows an agent to keep track of what other hosts – in RMON1 identified by their Ethernet address – are currently active.</p>
+<p>Like the <code class="docutils literal"><span class="pre">historyControlTable</span></code>, the <code class="docutils literal"><span class="pre">hostControlTable</span></code> allows a manager to specify <code class="docutils literal"><span class="pre">DataSource</span></code>, <code class="docutils literal"><span class="pre">Status</span></code> and <code class="docutils literal"><span class="pre">Owner</span></code>; the manager also specifies <code class="docutils literal"><span class="pre">TableSize</span></code>.</p>
+<p>Once the control-table entry is <code class="docutils literal"><span class="pre">valid</span></code>, the agent starts recording hosts in the <code class="docutils literal"><span class="pre">hostTable</span></code>, which is indexed by the control-table index and the host Ethernet address. The agent also records each new host’s <code class="docutils literal"><span class="pre">CreationOrder</span></code> value, an integer record number starting at 1.</p>
+<p>The <code class="docutils literal"><span class="pre">hostTable</span></code> also maintains counters for the following per-host attributes; these are updated whenever the agent sees another packet to or from that host. We will revisit these in the <code class="docutils literal"><span class="pre">hostTopNTable</span></code>, following.</p>
+<ul class="simple">
+<li>InPackets</li>
+<li>OutPackets</li>
+<li>InOctets</li>
+<li>OutOctets</li>
+<li>OutErrors</li>
+<li>OutBroadcastPkts</li>
+<li>OutMulticastPkts</li>
+</ul>
+<p>When the number of host entries for a particular control-table index value exceeds <code class="docutils literal"><span class="pre">TableSize</span></code> – that is, the new host’s <code class="docutils literal"><span class="pre">CreationOrder</span></code> would exceed <code class="docutils literal"><span class="pre">TableSize</span></code>, old entries are removed <em>and all hosts in the table are given updated</em> <code class="docutils literal"><span class="pre">CreationOrder</span></code> <em>values</em>. That is, if the table of size three contains entries for hosts A, B and C with <code class="docutils literal"><span class="pre">creationOrder</span></code> values of 1, 2 and 3, and host D comes along, then A will be deleted and B, C and D will be given <code class="docutils literal"><span class="pre">creationOrder</span></code> values of 1, 2 and 3 respectively. This is quite different from the record-number assignments in the <code class="docutils literal"><span class="pre">etherHistoryTable</span></code>, where the <code class="docutils literal"><span class="pre">SampleIndex</span></code> record numbers are immutable.</p>
+<p>A consequence of this is that the <code class="docutils literal"><span class="pre">CreationOrder</span></code> values are always contiguous integers starting at 1.</p>
+<p>Entries are deleted based on order of creation, not order of last update. The <code class="docutils literal"><span class="pre">hostTable</span></code> does not even have an attribute representing the time a given host’s entry (or entries) was last updated.</p>
+<p>As a convenience, the data in <code class="docutils literal"><span class="pre">hostTable</span></code> is also made available in <code class="docutils literal"><span class="pre">hostTimeTable</span></code>, but there indexed by the control-table index and the <code class="docutils literal"><span class="pre">CreationOrder</span></code> time. This makes for potentially faster lookup; for example, the manager always knows that the record with <code class="docutils literal"><span class="pre">CreationOrder</span></code> = 1 is the oldest record. More importantly, this alternative index allows the manager to download the most recent entries in a single step.</p>
+<p>Whenever a host is deleted because the table is full, the <code class="docutils literal"><span class="pre">CreationOrder</span></code> values assigned to other hosts all change, and so the indexing to <code class="docutils literal"><span class="pre">hostTimeTable</span></code> changes. Thus, a manager downloading rows from <code class="docutils literal"><span class="pre">hostTimeTable</span></code> one at a time must be prepared for the possibility that what had earlier been row 3 is now row 2, and that a host might be duplicated or skipped. To help managers deal with this, the <em>control</em> table has an entry <code class="docutils literal"><span class="pre">LastDeleteTime</span></code> representing the time – in TimeTicks since startup – of the last deletion and thus <code class="docutils literal"><span class="pre">CreationOrder</span></code> renumbering. If a manager sees that this value changes, it can, for example, start the data request over from the beginning.</p>
+</div>
+<div class="section" id="host-top-n">
+<span id="index-47"></span><span id="id11"></span><h4>25.2.1.4&nbsp;&nbsp;&nbsp;Host Top N<a class="headerlink" href="#host-top-n" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal"><span class="pre">hostTopN</span></code> table is a report prepared by the agent about the top N entries (where N is manager-supplied) in the <code class="docutils literal"><span class="pre">hostTable</span></code>, over an interval of time. The manager specifies in the control table the <code class="docutils literal"><span class="pre">Status</span></code> and <code class="docutils literal"><span class="pre">Owner</span></code> attributes, the <code class="docutils literal"><span class="pre">HostIndex</span></code> control-table index value from <code class="docutils literal"><span class="pre">hostControlTable</span></code>, and also the <code class="docutils literal"><span class="pre">Duration</span></code> (in seconds) and the <code class="docutils literal"><span class="pre">RateBase</span></code> indicating which of the following <code class="docutils literal"><span class="pre">hostTable</span></code> statistics is to be used in the ranking:</p>
+<ul class="simple">
+<li>InPackets</li>
+<li>OutPackets</li>
+<li>InOctets</li>
+<li>OutOctets</li>
+<li>OutErrors</li>
+<li>OutBroadcastPkts</li>
+<li>OutMulticastPkts</li>
+</ul>
+<p>The value of N is in the attribute <code class="docutils literal"><span class="pre">RequestedSize</span></code>; the agent <em>may</em> reduce this and communicates any change (or lack of it) through the attribute <code class="docutils literal"><span class="pre">GrantedSize</span></code>.</p>
+<p>Once the control-table row becomes <code class="docutils literal"><span class="pre">valid</span></code>, the agent then starts maintaining counters for all the entries in the part of <code class="docutils literal"><span class="pre">hostTable</span></code> indexed by <code class="docutils literal"><span class="pre">HostIndex</span></code>, and at the end of the <code class="docutils literal"><span class="pre">Duration</span></code> sorts the data and places its top-N results in the <code class="docutils literal"><span class="pre">hostTopN</span></code> table. If, during the interval, some hosts were removed from the <code class="docutils literal"><span class="pre">hostTable</span></code> because the table was full, the results may be inaccurate.</p>
+<p>All result statistics are <code class="docutils literal"><span class="pre">inaccessible</span></code> until the <code class="docutils literal"><span class="pre">Duration</span></code> has elapsed and the particular <code class="docutils literal"><span class="pre">hostTopN</span></code> report has run its course, at which point the results become <code class="docutils literal"><span class="pre">read-only</span></code>.</p>
+</div>
+<div class="section" id="matrix">
+<span id="index-48"></span><span id="id12"></span><h4>25.2.1.5&nbsp;&nbsp;&nbsp;Matrix<a class="headerlink" href="#matrix" title="Permalink to this headline">¶</a></h4>
+<p>The matrix group allows an agent to collect information on traffic flow indexed by the source and destination addresses. The manager begins the process by supplying attributes for <code class="docutils literal"><span class="pre">Status</span></code>, <code class="docutils literal"><span class="pre">Owner</span></code>, the usual <code class="docutils literal"><span class="pre">Index</span></code>, the interface <code class="docutils literal"><span class="pre">DataSource</span></code>, and the maximum table size.</p>
+<p>Once the row is valid, the agent begins collecting, for every ⟨source,destination⟩ pair, counts of the number of packets, octets and errors. The record for ⟨A,B⟩ counts these things sent by A; the corresponding record for ⟨B,A⟩ counts the reverse direction. The actual <code class="docutils literal"><span class="pre">matrixSDTable</span></code> is indexed by the manager-supplied <code class="docutils literal"><span class="pre">Index</span></code> value and the source and destination Ethernet addresses in that order.</p>
+<p>A companion table (or view) is also maintained called <code class="docutils literal"><span class="pre">matrixDSTable</span></code>, that lists the same information but indexed by destination first and then source. This view is not present to supply information about the reverse direction; that would be obtained by reversing source and destination in the <code class="docutils literal"><span class="pre">matrixSDTable</span></code>. Rather, the <code class="docutils literal"><span class="pre">matrixDSTable</span></code> allows a manager to extract all information about a single <em>destination</em> D in a single SNMP tree-walk operation of the prefix <code class="docutils literal"><span class="pre">matrixDSTable</span></code>.<code class="docutils literal"><span class="pre">Index</span></code>.D. This is similar to the indexing discussion at the end of <a class="reference internal" href="#history"><span class="std std-ref">25.2.1.2&nbsp;&nbsp;&nbsp;History</span></a>. See exercise 9.</p>
+</div>
+</div>
+<div class="section" id="snmpv2-rowstatus">
+<span id="rowstatus"></span><h3>25.2.2&nbsp;&nbsp;&nbsp;SNMPv2 RowStatus<a class="headerlink" href="#snmpv2-rowstatus" title="Permalink to this headline">¶</a></h3>
+<p>RMON made do with four values for its <code class="docutils literal"><span class="pre">EntryStatus</span></code> attribute: <code class="docutils literal"><span class="pre">createRequest</span></code>, <code class="docutils literal"><span class="pre">underCreation</span></code>, <code class="docutils literal"><span class="pre">valid</span></code> and <code class="docutils literal"><span class="pre">invalid</span></code>. SNMPv2 still supports <code class="docutils literal"><span class="pre">EntryStatus</span></code>, but the preferred form is the six-value <code class="docutils literal"><span class="pre">RowStatus</span></code>, <span class="target" id="index-49"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2579.html"><strong>RFC 2579</strong></a>, with options</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">active</span></code>: like <code class="docutils literal"><span class="pre">valid</span></code></li>
+<li><code class="docutils literal"><span class="pre">notReady</span></code>: the agent knows that the row is not complete</li>
+<li><code class="docutils literal"><span class="pre">notInService</span></code>: the row is complete, but has not yet been activated</li>
+<li><code class="docutils literal"><span class="pre">createAndGo</span></code>: like <code class="docutils literal"><span class="pre">createRequest</span></code> followed by <code class="docutils literal"><span class="pre">valid</span></code></li>
+<li><code class="docutils literal"><span class="pre">createAndWait</span></code>: like <code class="docutils literal"><span class="pre">createRequest</span></code></li>
+<li><code class="docutils literal"><span class="pre">destroy</span></code>: like <code class="docutils literal"><span class="pre">invalid</span></code></li>
+</ul>
+<p>The <code class="docutils literal"><span class="pre">createAndGo</span></code> option allows a manager to make a single new-row request to the agent, and, if successful, the agent will immediately set the row status to <code class="docutils literal"><span class="pre">active</span></code>. Using <code class="docutils literal"><span class="pre">EntryStatus</span></code> requires two steps: first to set the new row to <code class="docutils literal"><span class="pre">underCreation</span></code> and then to set it to <code class="docutils literal"><span class="pre">valid</span></code>.</p>
+<p>The manager can ask for any status except <code class="docutils literal"><span class="pre">notReady</span></code>. Every row created will, however, be marked at the agent with one of <code class="docutils literal"><span class="pre">notReady</span></code>, <code class="docutils literal"><span class="pre">notInService</span></code> or <code class="docutils literal"><span class="pre">active</span></code>.</p>
+<p>As with <code class="docutils literal"><span class="pre">EntryStatus</span></code>, the manager must still choose an index value. Pseudorandom selection remains appropriate in many cases, but the agent may also supply, if the MIB file supports it, a <code class="docutils literal"><span class="pre">recommendedNextIndex</span></code> attribute.</p>
+<p>Here is a simplified <code class="docutils literal"><span class="pre">RowStatus</span></code> state-transition diagram. Not all links to <code class="docutils literal"><span class="pre">destroy</span></code>, or from a node back to itself, are shown. See <span class="target" id="index-50"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2579.html"><strong>RFC 2579</strong></a>, p 9, for more details.</p>
+<img alt="_images/statediagram2.svg" src="_images/statediagram2.svg" /><p>After the manager issues a <code class="docutils literal"><span class="pre">createAndWait</span></code>, the agent fills in the attributes provided by the manager, and any other default attributes it has available. The manager, if desired, can now <code class="docutils literal"><span class="pre">Get()</span></code> the entire row, and find out what values are still missing. These values will be reported as <code class="docutils literal"><span class="pre">noSuchInstance</span></code>. Alternatively, the manager may simply know that it has more attributes to <code class="docutils literal"><span class="pre">Set()</span></code>.</p>
+<p>If the agent knows the row is missing attributes necessary for activation, it will set the <code class="docutils literal"><span class="pre">RowStatus</span></code> to <code class="docutils literal"><span class="pre">notReady</span></code>, otherwise to <code class="docutils literal"><span class="pre">notInService</span></code>. A <code class="docutils literal"><span class="pre">notInService</span></code> row can, of course, still have undefined <code class="docutils literal"><span class="pre">read-only</span></code> attributes that the agent will later set after activation. A <code class="docutils literal"><span class="pre">notInService</span></code> row can also still have attributes the manager intends to set before activation, but the agent has given default values in the interim.</p>
+<p>Once the manager has set all the attributes required for activation, it sets the <code class="docutils literal"><span class="pre">RowStatus</span></code> attribute to <code class="docutils literal"><span class="pre">active</span></code>, and agent activity begins.</p>
+<p>As with <code class="docutils literal"><span class="pre">EntryStatus</span></code>, two managers cannot simultaneously create the same row. If they were to try to do so, the second would be attempting to set <code class="docutils literal"><span class="pre">RowStatus</span></code> to <code class="docutils literal"><span class="pre">createAndWait</span></code> or <code class="docutils literal"><span class="pre">createAndGo</span></code> for a row entry that already existed, but from the diagram such a transition is not allowed.</p>
+</div>
+<div class="section" id="ping-mib">
+<span id="id13"></span><h3>25.2.3&nbsp;&nbsp;&nbsp;PING-MIB<a class="headerlink" href="#ping-mib" title="Permalink to this headline">¶</a></h3>
+<p>The idea behind the ping MIB is to allow a manager to ask an agent to repeatedly ping a target, <a class="reference internal" href="ipv4companions.html#ping"><span class="std std-ref">10.4&nbsp;&nbsp;&nbsp;Internet Control Message Protocol</span></a>, and then to report the success rate. Cisco Systems has a ping MIB at <a class="reference external" href="ftp://ftp.cisco.com/pub/mibs/v2/CISCO-PING-MIB.my">ftp://ftp.cisco.com/pub/mibs/v2/CISCO-PING-MIB.my</a>, but we will use the IETF alternative in <span class="target" id="index-51"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2925.html"><strong>RFC 2925</strong></a>/<span class="target" id="index-52"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc4560.html"><strong>RFC 4560</strong></a>. The latter is officially titled DISMAN-PING-MIB (DISMAN is short for DIStributed MANagement). Both ping MIBs make use of the <code class="docutils literal"><span class="pre">RowStatus</span></code> convention of the previous section.</p>
+<p>The manager can ping the target itself, <em>if</em> there are no firewalls in the way, but the result may likely be different from that obtained by the agent.</p>
+<p>The actual MIB supports multiple types of <code class="docutils literal"><span class="pre">ping</span></code> besides the usual ICMP Echo Request, but we will consider only the latter.</p>
+<p>The DISMAN version has control table <code class="docutils literal"><span class="pre">pingCtlTable</span></code> and the results appear in <code class="docutils literal"><span class="pre">pingResultsTable</span></code>; in the Cisco version the same table is used for both control and results. The results include the minimum, maximum and average RTT, the number of pings sent and the number of responses. The results table also has an attribute <code class="docutils literal"><span class="pre">OperStatus</span></code> to indicate whether the test has stopped.</p>
+<p>The <code class="docutils literal"><span class="pre">pingCtlTable</span></code> contains a wide range of options for the actual ping request, including options to specify the outgoing IP address for multihomed agents. The more familiar options, however, include</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">pingCtlTargetAddress</span></code>: and address type, as IPv6 is supported</li>
+<li><code class="docutils literal"><span class="pre">pingCtlDataSize</span></code>: how big each ping packet is</li>
+<li><code class="docutils literal"><span class="pre">pingCtlTimeout</span></code>: how long before the agent gives up on any one ping</li>
+<li><code class="docutils literal"><span class="pre">pingCtlProbeCount</span></code>: the number of pings to be sent</li>
+<li><code class="docutils literal"><span class="pre">pingCtlFrequency</span></code>: the interval between pings</li>
+</ul>
+<p>The table also includes <code class="docutils literal"><span class="pre">pingCtlRowStatus</span></code> of type <code class="docutils literal"><span class="pre">RowStatus</span></code>, above, and <code class="docutils literal"><span class="pre">pingCtlOwnerIndex</span></code> of type <code class="docutils literal"><span class="pre">SnmpAdminString</span></code>, which is a fancier way of identifying the manager than the RMON <code class="docutils literal"><span class="pre">Owner</span></code> attributes, and which can include some SNMPv3 credentials as desired.</p>
+<p>The new row is created, <code class="docutils literal"><span class="pre">RowStatus</span></code> is set to <code class="docutils literal"><span class="pre">active</span></code> (perhaps through <code class="docutils literal"><span class="pre">createAndGo</span></code>), and the test begins.</p>
+<p>By setting the control table’s <code class="docutils literal"><span class="pre">RowStatus</span></code> to <code class="docutils literal"><span class="pre">destroy</span></code>, a manager can attempt to halt a ping series in progress.</p>
+</div>
+</div>
+<div class="section" id="snmpv3">
+<span id="snmpv3-security"></span><h2>25.3&nbsp;&nbsp;&nbsp;SNMPv3<a class="headerlink" href="#snmpv3" title="Permalink to this headline">¶</a></h2>
+<p>SNMP version 3 added authentication and encryption to SNMPv2c, but made relatively few other changes except to nomenclature. The original definitions are in <span class="target" id="index-53"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3410.html"><strong>RFC 3410</strong></a> through <span class="target" id="index-54"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3415.html"><strong>RFC 3415</strong></a>; <span class="target" id="index-55"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3410.html"><strong>RFC 3410</strong></a> first appeared as <span class="target" id="index-56"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2570.html"><strong>RFC 2570</strong></a>.  SNMPv3 introduced the User Security Model, or <strong>USM</strong>, in which agents allow manager access only if the manager has presented an appropriate <strong>key</strong>, derived ultimately from a passphrase. The agent’s response can be either digitally signed or encrypted, as desired.</p>
+<p>SNMPv3 did make several terminology changes. Any SNMP node – either manager or agent – is now known as an SNMP <strong>entity</strong>. An entity is divided into two parts; the first is the SNMP <strong>engine</strong> consisting of the message dispatcher, the message processor, and the security and access-control subsystems. The second part consists of the various SNMP <strong>applications</strong>, consisting, for agents, primarily of the command responder (responding to <code class="docutils literal"><span class="pre">Get()</span></code> and <code class="docutils literal"><span class="pre">GetNext()</span></code>, <em>etc</em>). One goal of this architectural division is to separate the applications from the authentication mechanisms. Another goal, however, is to provide a framework in which future new applications can easily be supported.</p>
+<p>It is the SNMP engine that must implement all the new security provisions.</p>
+<div class="section" id="what-could-possibly-go-wrong">
+<h3>25.3.1&nbsp;&nbsp;&nbsp;What Could Possibly Go Wrong?<a class="headerlink" href="#what-could-possibly-go-wrong" title="Permalink to this headline">¶</a></h3>
+<p><span class="target" id="index-57"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3414.html"><strong>RFC 3414</strong></a> analyzes the the risks of inadequate SNMP security, and identifies two primary and two secondary threats. The primary threats are as follows:</p>
+<ul class="simple">
+<li>Unauthorized <strong>modification</strong> of information in transit: that is, <strong>man-in-the-middle</strong> attacks in which A’s message to B is intercepted and modified by an intermediate node M.</li>
+<li><strong>Masquerade</strong>: unauthorized operations by a manager (or agent) masquerading as an authorized entity. Use of guessed or cracked passwords would fall into this category.</li>
+</ul>
+<p>The secondary threats are these:</p>
+<ul class="simple">
+<li><strong>Message Stream Modification</strong>: This includes re-ordering messages, and, perhaps most importantly, <strong>replay attacks</strong>. For example, even if no keys are ever discovered, an attacker might learn that a certain message causes a certain server to reboot. Retransmitting that message could have serious consequences.</li>
+<li><strong>Disclosure</strong>: reading by an eavesdropper of the management information in transit.</li>
+</ul>
+<p>All but the last, disclosure, can be addressed by appropriate digital signatures and timestamps; encryption is only needed when disclosure is an active concern. Because disclosure is not always a significant concern, and perhaps because when <span class="target" id="index-58"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2574.html"><strong>RFC 2574</strong></a> was written in 1999 the unlicensed export of encryption technology from the United States was illegal, SNMPv3 defines two separate new levels of security:</p>
+<ul class="simple">
+<li>authentication-only, addressing modification, masquerade and replay</li>
+<li>encryption, addressing the above and disclosure</li>
+</ul>
+<p>These correspond to three values for the <code class="docutils literal"><span class="pre">snmpSecurityLevel</span></code> textual convention (in which “priv” abbreviates “privacy”):</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">noAuthNoPriv</span></code>: no authentication</li>
+<li><code class="docutils literal"><span class="pre">authNoPriv</span></code>: authentication, but no encryption</li>
+<li><code class="docutils literal"><span class="pre">authPriv</span></code>: encryption of all messages</li>
+</ul>
+<p>Encryption (privacy) implies authentication; encrypted messages also include the authentication signatures described below.</p>
+</div>
+<div class="section" id="cryptographic-fundamentals">
+<span id="crypto-fun"></span><h3>25.3.2&nbsp;&nbsp;&nbsp;Cryptographic Fundamentals<a class="headerlink" href="#cryptographic-fundamentals" title="Permalink to this headline">¶</a></h3>
+<p>SNMPv3 authentication is based on <strong>cryptographic hash functions</strong>: functions which take a data string of arbitrary length and return a fixed-length hash, in such a way that</p>
+<ul class="simple">
+<li>Knowing the hash value sheds no practical light on the original data</li>
+<li>Given a hash value, there is no feasible way to find a message yielding that hash</li>
+</ul>
+<p>Further details are at <a class="reference internal" href="security.html#secure-hashes"><span class="std std-ref">26.6&nbsp;&nbsp;&nbsp;Secure Hashes</span></a>.</p>
+<p>The Internet checksum of <a class="reference internal" href="packets.html#error-detection"><span class="std std-ref">7.4&nbsp;&nbsp;&nbsp;Error Detection</span></a> fails as a cryptographic hash, for example, because given a message m and a hash value hʹ, one can calculate hash(m) = h and then append to m a two-byte string based on hʹ−h, yielding a message mʹ for which hash(mʹ) = hʹ.</p>
+<p>The two cryptographic hash functions originally supported by SNMPv3 in <span class="target" id="index-59"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3414.html"><strong>RFC 3414</strong></a> are <a class="reference external" href="http://en.wikipedia.org/wiki/MD5">MD5</a>, which produces a 128-bit hash, and <a class="reference external" href="http://en.wikipedia.org/wiki/SHA-1">SHA-1</a>, which produces a 160-bit hash. Since the publication of <span class="target" id="index-60"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3414.html"><strong>RFC 3414</strong></a> in 2002, vulnerabilities in each of these hash functions have been discovered. The SNMP framework in principle allows easy substitution of new hash functions, but <span class="target" id="index-61"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc7860.html"><strong>RFC 7860</strong></a>, standardizing the use of the <a class="reference external" href="http://en.wikipedia.org/wiki/SHA-2">SHA-2</a> family, did not appear even in draft form until 2013.</p>
+<p>If two parties share a secret key k, the basic hash-based way to sign a message m is to append to it the value hash(m⏜k), where m⏜k is the result of appending k to m. An eavesdropper will see m and hash(m⏜k) but this will provide no information about k, and, similarly, an attacker will, given a message m, not be able to generate the value hash(m⏜k) without knowing k. Because some hash functions are vulnerable to the so-called “length-extension attack” when used this way, the actual signature is often slightly more involved (<a class="reference internal" href="#passwords"><span class="std std-ref">25.3.5&nbsp;&nbsp;&nbsp;Passwords and Keys</span></a> and <a class="reference internal" href="security.html#hmac"><span class="std std-ref">26.6.1&nbsp;&nbsp;&nbsp;Secure Hashes and Authentication</span></a>), but hash(m⏜k) is a good example of the basic concept.</p>
+<p>The SNMP encryption mechanism is also based on shared secret keys (<a class="reference internal" href="security.html#encryption"><span class="std std-ref">26.7&nbsp;&nbsp;&nbsp;Shared-Key Encryption</span></a>); that is, public-key encryption is not used. <span class="target" id="index-62"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3414.html"><strong>RFC 3414</strong></a> describes the use of the <a class="reference external" href="http://en.wikipedia.org/wiki/Data_Encryption_Standard">Data Encryption Standard cipher</a>, or DES, which uses 56-bit keys. Later, <span class="target" id="index-63"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3826.html"><strong>RFC 3826</strong></a> introduced the use of the <a class="reference external" href="http://en.wikipedia.org/wiki/Advanced_Encryption_Standard">Advanced Encryption Standard</a> cipher, or AES, which in SNMP users a 128-bit key. (Both DES and AES are discussed briefly in <a class="reference internal" href="security.html#block-cipher"><span class="std std-ref">26.7.2&nbsp;&nbsp;&nbsp;Block Ciphers</span></a>.) DES is, if anything, even more vulnerable than MD5 and SHA-1, due to the limited key length; AES is a much stronger choice.</p>
+<p>Shared-secret encryption is based, abstractly, on an encrypting function E(p,k) that takes a plaintext message p and a key k and returns the encrypted ciphertext. Similarly, there is a decrypting function D(c,k) that takes an encrypted ciphertext message c and the key k and returns the original plaintext.</p>
+</div>
+<div class="section" id="snmpv3-engines">
+<span id="index-64"></span><span id="id14"></span><h3>25.3.3&nbsp;&nbsp;&nbsp;SNMPv3 Engines<a class="headerlink" href="#snmpv3-engines" title="Permalink to this headline">¶</a></h3>
+<p>The SNMPv3 engine is the component of an SNMP entity charged with ensuring security. Each SNMPv3 engine – manager or agent – has an identifier known as the <strong>snmpEngineID</strong>. This is a string that, by default, incorporates the node’s IP or Ethernet address and additional standard information. While it is common to leave this default setting unchanged, it is also possible to replace it using a site-based naming scheme, perhaps including the organization name and a locally assigned serial number; see <span class="target" id="index-65"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3411.html"><strong>RFC 3411</strong></a>.</p>
+<p>In any SNMPv3 exchange, one SNMPv3 engine is designated <strong>authoritative</strong>. For a <code class="docutils literal"><span class="pre">Get()</span></code> or <code class="docutils literal"><span class="pre">Set()</span></code> request, or any other request that requires a response, it is always the agent that is authoritative. It is the job of the authoritative engine to validate the message received from the other engine.</p>
+<p>For either authentication-only or encrypting security levels, the nonauthoritative engine must present a pair consisting of the following:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">userName</span></code>: a human-readable string identifying a person or manager-computer</li>
+<li><code class="docutils literal"><span class="pre">authParameters</span></code>: a string holding data specific to the authentication/encryption mechanism in use that serves to authenticate the user. This might be thought of as a passphrase, except one goal is never to send passphrases in the clear.</li>
+</ul>
+<p>The authoritative engine must keep a table of all the <code class="docutils literal"><span class="pre">userName</span></code> values it recognizes, and, for each, the appropriate key with which to validate the user.</p>
+<p>Any SNMPv3 engine also keeps track of two 32-bit attributes</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">snmpEngineTime</span></code>: the number of seconds since the engine last rebooted</li>
+<li><code class="docutils literal"><span class="pre">snmpEngineBoots</span></code>: the number of times the engine has rebooted</li>
+</ul>
+<p>The pair of these, which we will abbreviate as ⟨Time,Boots⟩, uniquely identifies a point in time for an entity (to the nearest second). They are used to prevent replay attacks; two messages sent more than one second apart will never have the same ⟨Time,Boots⟩ timestamp.</p>
+<p>Note that keeping track of <code class="docutils literal"><span class="pre">snmpEngineBoots</span></code> implies that the entity have some form of persistent storage.</p>
+<p>When a nonauthoritative engine (for our purposes, the manager) wants to send a request to an authoritative engine (the agent), the first step is to find out the agent’s <code class="docutils literal"><span class="pre">snmpEngineID</span></code> and then its current ⟨Time,Boots⟩ value. This is done through an initial two-step discovery process. The first request contains an empty <code class="docutils literal"><span class="pre">varBindList</span></code>, an empty engineID, a username of the empty string and a security level of <code class="docutils literal"><span class="pre">noAuthNoPriv</span></code>. The authoritative side sends a response containing its engineID. The second step is to send a request, again with an empty <code class="docutils literal"><span class="pre">varBindList</span></code> but now containing a valid ⟨username,key⟩ pair. The value for ⟨Time,Boots⟩ is ⟨0,0⟩. The authoritative engine now responds with a message including its actual ⟨Time,Boots⟩.</p>
+</div>
+<div class="section" id="message-authentication">
+<h3>25.3.4&nbsp;&nbsp;&nbsp;Message Authentication<a class="headerlink" href="#message-authentication" title="Permalink to this headline">¶</a></h3>
+<p>After discovering the authoritative engine’s ⟨Time,Boots⟩, the nonauthoritative engine stores the authoritative engine’s <code class="docutils literal"><span class="pre">snmpEngineBoots</span></code> and also the difference between the authoritative engine’s <code class="docutils literal"><span class="pre">snmpEngineTime</span></code> and its own clock time. It can now use this difference to approximate the authoritative engine’s <code class="docutils literal"><span class="pre">snmpEngineTime</span></code> at any point in the future. Every message from the nonauthoritative engine will include its estimate of the authoritative engine’s current ⟨Time,Boots⟩ value. Relative drift between the two engines’ clocks will eventually mean this estimate fails, but, as we shall see, it can be expected to be close enough for quite a while.</p>
+<p>The authoritative engine accepts a non-empty request only if all three of the following hold, where Time and Boots are the values submitted by the nonauthoritative engine and <code class="docutils literal"><span class="pre">snmpEngineTime</span></code> and <code class="docutils literal"><span class="pre">snmpEngineBoots</span></code> are the authoritative engine’s own values:</p>
+<ul class="simple">
+<li>Boots = <code class="docutils literal"><span class="pre">snmpEngineBoots</span></code></li>
+<li><code class="docutils literal"><span class="pre">snmpEngineBoots</span></code> &lt; 2<sup>31</sup> − 1</li>
+<li>Time and <code class="docutils literal"><span class="pre">snmpEngineTime</span></code> differ by less than 150 seconds</li>
+</ul>
+<p>The maximum allowable clock drift, in other words, is 150 seconds. If the two clocks drift by more than that, the nonauthoritative side must again go through the synchronization process outlined at the end of the previous section.</p>
+<p>The actual message signing is based on a shared secret key, <code class="docutils literal"><span class="pre">authKey</span></code>, negotiated previously between user and agent. Because the key is usually specific to the agent, it is sometimes called a <em>local</em> key, <strong>kl</strong>.</p>
+</div>
+<div class="section" id="passwords-and-keys">
+<span id="passwords"></span><h3>25.3.5&nbsp;&nbsp;&nbsp;Passwords and Keys<a class="headerlink" href="#passwords-and-keys" title="Permalink to this headline">¶</a></h3>
+<p>Users are identified by <code class="docutils literal"><span class="pre">userName</span></code> values, and also (usually) have human-readable passwords. These passwords must be converted first into keys, in such a way that each ⟨user,agent⟩ pair has its own unique key. We will start with a mechanism commonly used for authentication-only security; it is similar for both the MD5 and SHA-1 hashes. We will denote the hash function (either MD5 or SHA-1) by <code class="docutils literal"><span class="pre">hash()</span></code>.</p>
+<p>The first step is to create a <strong>digest</strong> based on the password. It would suffice in principle to set the digest to hash(password). In order to make the password→key conversion process relatively slow, however, so as to hamper brute-force attacks, Appendix A of <span class="target" id="index-66"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3414.html"><strong>RFC 3414</strong></a> recommends repeating the password (logically, at least) to fill a buffer 2<sup>20</sup> bytes in length. The <code class="docutils literal"><span class="pre">hash()</span></code> function is then applied to this megabyte string. (For another perspective on intentionally slow password operations, see <a class="reference internal" href="security.html#password-hashes"><span class="std std-ref">26.6.2&nbsp;&nbsp;&nbsp;Password Hashes</span></a>.)</p>
+<p>The next step is to take the engineID of the agent for which the user is generating this particular key and take the hash of the concatenation of the digest, engineID and digest again:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><strong>kl</strong> = hash(digest⏜engineID⏜digest)</div>
+</div>
+</div></blockquote>
+<p>This is now the ⟨user,agent⟩ shared key, or <em>local</em> key. It must be entered (or computed) on the agent, and stored there. For MD5 it is 16 bytes long; for SHA-1 it is 20 bytes long.</p>
+<p>This mechanism is, strictly speaking, optional; an agent does not know how manager keys were generated, and thus cannot enforce any particular mechanism when a manager’s key is later changed as below. Any secure way to generate a unique key <strong>kl</strong> for each user and each agent would be sufficient. The mechanism here, though, has the advantage that any manager node can compute a user’s local key directly from the password and the agent engineID; no keys need be stored by the manager. This allows a manager to use one password for multiple agents; compromise of any one agent and its attendant local key <strong>kl</strong> should not affect the security of other agents or of the original password.</p>
+</div>
+<div class="section" id="message-signing">
+<span id="index-67"></span><h3>25.3.6&nbsp;&nbsp;&nbsp;Message Signing<a class="headerlink" href="#message-signing" title="Permalink to this headline">¶</a></h3>
+<p>An SNMP message <strong>mesg</strong> is now signed by a local key <strong>kl</strong> using the <strong>Hash Message Authentication Code</strong>, or HMAC (<span class="target" id="index-68"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2104.html"><strong>RFC 2104</strong></a>), as follows:</p>
+<ul class="simple">
+<li><strong>kl</strong> is extended to a 64-byte <strong>ek</strong> by padding with zeroes.</li>
+<li>A constant string <strong>ipad</strong> is formed by repeating the octet 0x36 64 times.</li>
+<li>A constant string <strong>opad</strong> is formed by repeating 0x5c 64 times.</li>
+<li>Set <strong>k1</strong> = <strong>ek</strong> XOR <strong>ipad</strong>.</li>
+<li>Set <strong>k2</strong> = <strong>ek</strong> XOR <strong>opad</strong>.</li>
+</ul>
+<p>The <code class="docutils literal"><span class="pre">authParameter</span></code> field – the actual digital signature – is now set to be the first 12 bytes of</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">hash(<strong>k2</strong>⏜hash(<strong>k1</strong>⏜<strong>mesg</strong>))</div>
+</div>
+</div></blockquote>
+<p>This is slightly more complicated than the hash(<strong>mesg</strong>⏜<strong>kl</strong>) mechanism suggested in <a class="reference internal" href="#crypto-fun"><span class="std std-ref">25.3.2&nbsp;&nbsp;&nbsp;Cryptographic Fundamentals</span></a>, in order to make it more resistant to potential vulnerabilities in the hash() function; see <a class="reference internal" href="security.html#hmac"><span class="std std-ref">26.6.1&nbsp;&nbsp;&nbsp;Secure Hashes and Authentication</span></a>.</p>
+<p>The receiver can replicate this <code class="docutils literal"><span class="pre">authParameter</span></code> calculation and verify that it matches the value transmitted in the packet.</p>
+</div>
+<div class="section" id="key-changes">
+<span id="key-change"></span><h3>25.3.7&nbsp;&nbsp;&nbsp;Key Changes<a class="headerlink" href="#key-changes" title="Permalink to this headline">¶</a></h3>
+<p>Suppose a user wants to change his or her password, and thus the key <strong>k</strong>. The manager will need to communicate the new key to the agent in such a way that it is not exposed to eavesdroppers. Here is the mechanism, where, again, <code class="docutils literal"><span class="pre">hash()</span></code> is either MD5 or SHA-1 as appropriate; we will use N to denote the length in bytes of the result of <code class="docutils literal"><span class="pre">hash()</span></code> (either 16 or 20).</p>
+<p>The original key is here denoted <code class="docutils literal"><span class="pre">oldkey</span></code> and the new key is <code class="docutils literal"><span class="pre">newkey</span></code>.</p>
+<p>The manager first chooses a string <code class="docutils literal"><span class="pre">random</span></code> of N bytes chosen as randomly as possible. A second N-byte string <code class="docutils literal"><span class="pre">delta</span></code> is then calculated as follows:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal"><span class="pre">temp</span></code> = <code class="docutils literal"><span class="pre">hash(oldkey⏜random)</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">delta</span></code> = <code class="docutils literal"><span class="pre">temp</span></code> XOR <code class="docutils literal"><span class="pre">newkey</span></code></div>
+</div>
+</div></blockquote>
+<p>At this point, <code class="docutils literal"><span class="pre">random</span></code> and <code class="docutils literal"><span class="pre">delta</span></code> are sent – in the clear – from the manager to the agent. The agent can use <code class="docutils literal"><span class="pre">random</span></code> and <code class="docutils literal"><span class="pre">oldkey</span></code> to compute <code class="docutils literal"><span class="pre">temp</span></code>, and thus <code class="docutils literal"><span class="pre">newkey</span></code> = <code class="docutils literal"><span class="pre">delta</span></code> XOR <code class="docutils literal"><span class="pre">temp</span></code>. An eavesdropper cannot use <code class="docutils literal"><span class="pre">random</span></code> to find out anything about <code class="docutils literal"><span class="pre">temp</span></code> without knowing <code class="docutils literal"><span class="pre">oldkey</span></code>, and cannot get anything useful out of <code class="docutils literal"><span class="pre">delta</span></code> unless either <code class="docutils literal"><span class="pre">newkey</span></code> or <code class="docutils literal"><span class="pre">temp</span></code> is known.</p>
+<p>The actual process is to combine <code class="docutils literal"><span class="pre">random</span></code> and <code class="docutils literal"><span class="pre">delta</span></code> into a single 2N-byte <strong>keyChange</strong> string, written to one of the key-change columns of <code class="docutils literal"><span class="pre">usmUserTable</span></code>, <a class="reference internal" href="#usmusertable"><span class="std std-ref">25.3.9.1&nbsp;&nbsp;&nbsp;The usmUserTable</span></a>.</p>
+<p>Note that if an eavesdropper saves <code class="docutils literal"><span class="pre">random</span></code> and <code class="docutils literal"><span class="pre">delta</span></code>, and later discovers the user’s <code class="docutils literal"><span class="pre">oldkey</span></code>, then <code class="docutils literal"><span class="pre">newkey</span></code> can be calculated easily. Using the language of <a class="reference internal" href="publickey.html#forward-secrecy"><span class="std std-ref">26.2&nbsp;&nbsp;&nbsp;Forward Secrecy</span></a>, forward secrecy fails badly. However, if an eavesdropper later discovers <code class="docutils literal"><span class="pre">newkey</span></code>, there is no obvious way to find <code class="docutils literal"><span class="pre">oldkey</span></code>; see exercise 10.</p>
+<p>To improve forward secrecy, and to simplify mass key generation generally, <span class="target" id="index-69"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2786.html"><strong>RFC 2786</strong></a> outlines an experimental mechanism to use Diffie-Hellman-Merkle key exchange (<a class="reference internal" href="security.html#diffie-hellman"><span class="std std-ref">26.8&nbsp;&nbsp;&nbsp;Diffie-Hellman-Merkle Exchange</span></a>) to create and change keys, instead of the process above.</p>
+</div>
+<div class="section" id="creating-additional-users">
+<h3>25.3.8&nbsp;&nbsp;&nbsp;Creating Additional Users<a class="headerlink" href="#creating-additional-users" title="Permalink to this headline">¶</a></h3>
+<p>Suppose we want to add user “alice” to an agent, together with Alice’s local key <strong>kl</strong>. The problem is that there is no pre-existing shared key, and so no way to transmit <strong>kl</strong> to the agent via SNMP without risk of eavesdropping.</p>
+<p>One solution is to require <strong>out-of-band</strong> account creation, that is, for Alice to log on to the agent via, perhaps, an ssh or direct serial-line connection, and enter there her name and password. This works, but is awkward on a large network.</p>
+<p>The usual way is to create an account for Alice by <strong>cloning</strong> some other account on the agent. We will assume that an initial account has been created as in <a class="reference internal" href="#passwords"><span class="std std-ref">25.3.5&nbsp;&nbsp;&nbsp;Passwords and Keys</span></a> for user “master”. Cloning the account just requires specification of the names “master” and “alice”; no keys need be sent. The second step is to update the password for the new “alice” account, which is done via the key-change mechanism of the previous section. We look at the details of the cloning procedure in the next section.</p>
+</div>
+<div class="section" id="vacm-for-snmpv3">
+<span id="id15"></span><h3>25.3.9&nbsp;&nbsp;&nbsp;VACM for SNMPv3<a class="headerlink" href="#vacm-for-snmpv3" title="Permalink to this headline">¶</a></h3>
+<p>For SNMPv1 and SNMPv2c, VACM created associations between community strings and security groups, an then between security groups and permitted views of the OID tree. For SNMPv3, user names replace community strings.</p>
+<p>There are three primary VACM tables, defined in <span class="target" id="index-70"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3415.html"><strong>RFC 3415</strong></a>. The first is <code class="docutils literal"><span class="pre">vacmSecurityToGroupTable</span></code>, indexed by the “security model” and the “security name”. For SNMPv3 the model is 3 and the security name is the username; the SNMPv3 rows of the table are thus effectively indexed by the username. It is not unreasonable to have a separate security group for each user, <em>eg</em> “grppld” for user “pld”.</p>
+<p>The second table is <code class="docutils literal"><span class="pre">vacmAccessTable</span></code>, indexed by security group, security model (community or SNMPv3) and security level (<em>eg</em> <code class="docutils literal"><span class="pre">authNoPriv</span></code>). The table can be used to look up a named view for each of “read” and “write” privileges (also “trap” privileges, if desired). (This table is also indexed by “contextName”, but often there is only one contextName, the default.)</p>
+<p>Finally, the named views themselves are stored in <code class="docutils literal"><span class="pre">vacmViewTreeFamilyTable</span></code>, indexed by view name and an OID prefix representing an OID subtree. A given view <em>v</em> consists of all the OID prefixes <em>op</em> for which ⟨<em>v</em>,<em>op</em>⟩ appears in the table. Some prefixes may have an associated “mask”, typically to allow access to a designated table <em>row</em>, and some prefixes may represent exclusion of that subtree from the view. Typical view names are “_all_”, “_none_” and “systemonly”; we created a view “mib2+private” in <a class="reference internal" href="netmgmta.html#snmp-community"><span class="std std-ref">24.11&nbsp;&nbsp;&nbsp;SNMPv1 communities and security</span></a>.</p>
+<div class="section" id="the-usmusertable">
+<span id="usmusertable"></span><span id="index-71"></span><h4>25.3.9.1&nbsp;&nbsp;&nbsp;The <code class="docutils literal"><span class="pre">usmUserTable</span></code><a class="headerlink" href="#the-usmusertable" title="Permalink to this headline">¶</a></h4>
+<p>Now it is time to look at the actual table in which agents store user names and their associated authentication credentials, <code class="docutils literal"><span class="pre">usmUserTable</span></code>. It has the attributes below, which should all be prefixed by <code class="docutils literal"><span class="pre">usmUser</span></code>; the index attributes are the first two, <code class="docutils literal"><span class="pre">EngineID</span></code> and <code class="docutils literal"><span class="pre">Name</span></code>. We will consider only those attributes related to authentication-only security.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="24%" />
+<col width="76%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">EngineID</span></code></td>
+<td>usually the agent’s own engineID</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">Name</span></code></td>
+<td><em>eg</em> “alice”</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">SecurityName</span></code></td>
+<td>usually the same as <code class="docutils literal"><span class="pre">Name</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">CloneFrom</span></code></td>
+<td>an indication of the row this entry is cloned from</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">AuthProtocol</span></code></td>
+<td>MD5 or SHA-1</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">AuthKeyChange</span></code></td>
+<td>the ⟨random, delta⟩ keyChange object of <a class="reference internal" href="#key-change"><span class="std std-ref">25.3.7&nbsp;&nbsp;&nbsp;Key Changes</span></a></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">OwnAuthKeyChange</span></code></td>
+<td>the same but with different permissions; see below</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">PrivProtocol</span></code></td>
+<td>used for encryption</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">PrivKeyChange</span></code></td>
+<td>used for encryption</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">OwnPrivKeyChange</span></code></td>
+<td>used for encryption</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">Public</span></code></td>
+<td>used for confirming key changes; see below</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">StorageType</span></code></td>
+<td>hopefully <code class="docutils literal"><span class="pre">permanent</span></code>, meaning values persist between reboots</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">Status</span></code></td>
+<td>of type <code class="docutils literal"><span class="pre">RowStatus</span></code>, for row insertion</td>
+</tr>
+</tbody>
+</table>
+<p>One can think of the table as also having an implicit <code class="docutils literal"><span class="pre">authKey</span></code> column, representing the local key corresponding to <code class="docutils literal"><span class="pre">Name</span></code>, that is never directly readable or writable. <span class="target" id="index-72"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3414.html"><strong>RFC 3414</strong></a> states flatly “the <code class="docutils literal"><span class="pre">authKey</span></code> is not accessible via SNMP.” However, the agent must still keep the <code class="docutils literal"><span class="pre">authKey</span></code> somewhere, tied to the <code class="docutils literal"><span class="pre">Name</span></code>, so it can validate a given user based on the <code class="docutils literal"><span class="pre">Name</span></code> and <code class="docutils literal"><span class="pre">authParameter</span></code> supplied in a request.</p>
+<p>Because <code class="docutils literal"><span class="pre">EngineID</span></code> is usually the agent’s own <code class="docutils literal"><span class="pre">EngineID</span></code>, the table is <em>de facto</em> indexed just by <code class="docutils literal"><span class="pre">Name</span></code>.</p>
+<p>Recall that, as was discussed in <a class="reference internal" href="#snmpv2-indexes"><span class="std std-ref">25.1.4&nbsp;&nbsp;&nbsp;SNMPv2 Indexes</span></a>, the index attributes, <code class="docutils literal"><span class="pre">EngineID</span></code> and <code class="docutils literal"><span class="pre">Name</span></code>, will not be directly accessible, but will be encoded in the OID associated with every other retrieved attribute. The username “alice” will thus be encoded, using the ASCII string encoding, as 97.108.105.99.101, not necessarily easily readable by human managers.</p>
+<p>We are now in a position explain the cloning process and the key-change process as they play out with this table.</p>
+<p>A specific semantic rule for this table is that the use of <code class="docutils literal"><span class="pre">Set()</span></code> to assign a ⟨random, delta⟩ keyChange object to <code class="docutils literal"><span class="pre">AuthKeyChange</span></code> or <code class="docutils literal"><span class="pre">OwnAuthKeyChange</span></code> causes that user’s hidden <code class="docutils literal"><span class="pre">authKey</span></code> to be updated via the process of <a class="reference internal" href="#key-change"><span class="std std-ref">25.3.7&nbsp;&nbsp;&nbsp;Key Changes</span></a>. The user cannot confirm directly that this change succeeded, as a read of these keyChange attributes returns the empty string, so the usual recommended strategy is also to write a random value to the <code class="docutils literal"><span class="pre">Public</span></code> attribute; because <code class="docutils literal"><span class="pre">Set()</span></code> operations are atomic, a change to the latter means the former change succeeded as well.</p>
+<p>Because it is possible for multiple managers to be updating the table simultaneously, a single <code class="docutils literal"><span class="pre">TestAndIncr</span></code> object named <code class="docutils literal"><span class="pre">usmUserSpinLock</span></code> may be used to enforce serialization, as in <a class="reference internal" href="#testandincr"><span class="std std-ref">25.1.5&nbsp;&nbsp;&nbsp;TestAndIncr</span></a>. So the full recommended sequence for updating a key is as follows, where <em>keyChange</em> is the ⟨random, delta⟩ keyChange object and <em>index</em> encodes the <code class="docutils literal"><span class="pre">EngineID</span></code> and the <code class="docutils literal"><span class="pre">Name</span></code>:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><em>rand</em> = <em>random value chosen by the manager</em></div>
+<div class="line"><em>val</em> := Get(usmUserSpinLock)</div>
+<div class="line">Set((<code class="docutils literal"><span class="pre">usmUserSpinLock</span></code>, <em>val</em>), (<code class="docutils literal"><span class="pre">AuthKeyChange</span></code>.<em>index</em>, <em>keyChange</em>), (<code class="docutils literal"><span class="pre">Public</span></code>.<em>index</em>, <em>rand</em>))</div>
+</div>
+</div></blockquote>
+<p>This is repeated as necessary until <code class="docutils literal"><span class="pre">Get(Public)</span></code> returns <em>rand</em>, indicating that the <code class="docutils literal"><span class="pre">Set()</span></code> operations all succeeded.</p>
+<p>The above applies for a key change being done by someone with write privileges to the <code class="docutils literal"><span class="pre">AuthKeyChange</span></code> column of <code class="docutils literal"><span class="pre">usmUserTable</span></code>.</p>
+<p>An alternative to granting ordinary users write access to the <code class="docutils literal"><span class="pre">AuthKeyChange</span></code> column is to have them use the column <code class="docutils literal"><span class="pre">OwnAuthKeyChange</span></code> instead. Any user may attempt to write to this column, but the write will only succeed if the userName by which the request is authenticated is equal to the <code class="docutils literal"><span class="pre">Name</span></code> representing the index for this particular keyChange. In other words, anyone with write access to the <code class="docutils literal"><span class="pre">OwnAuthKeyChange</span></code> column can change his or her <em>own</em> key, and <em>only</em> his or her own key. Write access to this column must still be granted, however. As we will see below in <a class="reference internal" href="#cloning"><span class="std std-ref">25.3.9.2.1&nbsp;&nbsp;&nbsp;Cloning in Net-SNMP</span></a>, this security option is of relatively little practical significance.</p>
+<p>To clone a new user from an existing one, the first step is to choose the row to be cloned, represented by the OID of an index value. Call this <em>cloneRow</em>, and let <em>index</em> again encode the <code class="docutils literal"><span class="pre">EngineID</span></code> and <code class="docutils literal"><span class="pre">Name</span></code>:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><em>val</em> := Get(usmUserSpinLock)</div>
+<div class="line">Set((<code class="docutils literal"><span class="pre">usmUserSpinLock</span></code>, <em>val</em>), (<code class="docutils literal"><span class="pre">CloneFrom</span></code>.<em>index</em>, <em>cloneRow</em>), (<code class="docutils literal"><span class="pre">Status</span></code>.<em>index</em>, <code class="docutils literal"><span class="pre">createAndWait</span></code>))</div>
+</div>
+</div></blockquote>
+<p>Typically the key change is then executed before changing the <code class="docutils literal"><span class="pre">Status</span></code> to <code class="docutils literal"><span class="pre">active</span></code>, though this is not required.</p>
+</div>
+<div class="section" id="creating-accounts-in-net-snmp">
+<span id="index-73"></span><h4>25.3.9.2&nbsp;&nbsp;&nbsp;Creating Accounts in Net-SNMP<a class="headerlink" href="#creating-accounts-in-net-snmp" title="Permalink to this headline">¶</a></h4>
+<p>To create an initial account, the configuration files are used. On the author’s installation of Net-SNMP version 5.7.x (in 2016), the administratively written configuration file is /etc/snmp/snmpd.conf and the system-written configuration file is /var/lib/snmp/snmpd.conf; the latter contains <code class="docutils literal"><span class="pre">snmpEngineBoots</span></code> and other persistent SNMP data. The following line goes in this second file, with SNMP shut down (some earlier versions of Net-SNMP required that it be placed in /var/net-snmp/snmpd.conf). Its effect is to create an SNMPv3 user named “master” with MD5-authentication password “saskatchewan”.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal"><span class="pre">createUser</span> <span class="pre">master</span> <span class="pre">MD5</span> <span class="pre">saskatchewan</span></code></div>
+</div>
+</div></blockquote>
+<p>When SNMP is then started, the line above is replaced by something like the following (on a single line) in /var/lib/snmp/snmpd.conf:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal"><span class="pre">usmUser</span> <span class="pre">1</span> <span class="pre">3</span> <span class="pre">0x80001f8880889cb038b1aca650</span> <span class="pre">&quot;master&quot;</span> <span class="pre">&quot;master&quot;</span> <span class="pre">NULL</span> <span class="pre">\</span></code></div>
+<div class="line-block">
+<div class="line"><code class="docutils literal"><span class="pre">.1.3.6.1.6.3.10.1.1.2</span> <span class="pre">0x7293f49a82fc950f5c344efd94dbb7db</span> <span class="pre">.1.3.6.1.6.3.10.1.2.1</span> <span class="pre">0x</span> <span class="pre">0x</span></code></div>
+</div>
+</div>
+</div></blockquote>
+<p>The new localized key is 0x7293f49a82fc950f5c344efd94dbb7db; the first hex string beginning 0x80001 is the engineID.</p>
+<p>For this new account to be authorized to do anything, we must also add the following permissions entry to /etc/snmp/snmpd.conf:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal"><span class="pre">rwuser</span> <span class="pre">master</span></code></div>
+</div>
+</div></blockquote>
+<p>The effect of this entry is to create an entry (on SNMP restart) in <code class="docutils literal"><span class="pre">vacmSecurityToGroupTable</span></code>  associating user “master” with its own security group (Net-SNMP names it “grpmaster”), and then an entry in the <code class="docutils literal"><span class="pre">vacmAccessTable</span></code> granting this new group SNMPv3 read and write access to the entire OID tree. (In general we could also have used “rouser”, except that we will need “master” to be able to create new users.)</p>
+<p>After permissions (at least read permissions) are enabled, the following snmpget should work</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal"><span class="pre">snmpget</span> <span class="pre">-v</span> <span class="pre">3</span> <span class="pre">-u</span> <span class="pre">master</span> <span class="pre">-l</span> <span class="pre">authNoPriv</span> <span class="pre">-a</span> <span class="pre">MD5</span> <span class="pre">-A</span> <span class="pre">saskatchewan</span> <span class="pre">localhost</span> <span class="pre">1.3.6.1.2.1.1.4.0</span></code></div>
+</div>
+</div></blockquote>
+<p>The hostname is “localhost” if this is being run on the same machine that the Net-SNMP agent is running on; it can also of course be run remotely.</p>
+<p>We can make this a little shorter by editing the Net-SNMP per-user manager configuration file $HOME/.snmp/snmp.conf to add the following lines:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal"><span class="pre">defSecurityName</span> <span class="pre">master</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">defAuthType</span> <span class="pre">MD5</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">defSecurityLevel</span> <span class="pre">authNoPriv</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">defAuthPassphrase</span> <span class="pre">saskatchewan</span></code></div>
+</div>
+</div></blockquote>
+<p>Now the snmpget command can be shortened to</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal"><span class="pre">snmpget</span> <span class="pre">-v</span> <span class="pre">3</span> <span class="pre">localhost</span> <span class="pre">1.3.6.1.2.1.1.4.0</span></code></div>
+</div>
+</div></blockquote>
+<p>If we take the password, “saskatchewan”, and repeat it to 2<sup>20</sup> bytes, the MD5 checksum is 0x3da9dbfc3a78acb675e436746e1f4f8a; this is the “digest” of <a class="reference internal" href="#passwords"><span class="std std-ref">25.3.5&nbsp;&nbsp;&nbsp;Passwords and Keys</span></a>. From the /var/lib/snmp/snmpd.conf file (or from the created usmUser entry above) we find the engineID is 0x80001f8880889cb038b1aca650. If we convert these two strings to binary data, concatenate them as digest⏜engineID⏜digest, and take the MD5 checksum, we indeed get</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">7293f49a82fc950f5c344efd94dbb7db</div>
+</div>
+</div></blockquote>
+<p>which is exactly the key entry in the /var/lib/snmp/snmpd.conf file.</p>
+<div class="section" id="cloning-in-net-snmp">
+<span id="cloning"></span><h5>25.3.9.2.1&nbsp;&nbsp;&nbsp;Cloning in Net-SNMP<a class="headerlink" href="#cloning-in-net-snmp" title="Permalink to this headline">¶</a></h5>
+<p>We can now <strong>clone</strong> this account while SNMP is running, using the <code class="docutils literal"><span class="pre">snmpusm</span></code> command-line utility. The following line creates an account “pld” cloned from “master”, using the master account (and assuming that master is an rwuser and not an rouser); we have abbreviated by <em>auth</em> the full credentials <code class="docutils literal"><span class="pre">-u</span> <span class="pre">master</span> <span class="pre">-l</span> <span class="pre">authNoPriv</span> <span class="pre">-a</span> <span class="pre">MD5</span> <span class="pre">-A</span> <span class="pre">saskatchewan</span></code>. We have switched from “localhost” to <em>HOST</em> to emphasize that this can be run remotely.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal"><span class="pre">snmpusm</span> <span class="pre">-v3</span></code> <em>auth</em> <em>HOST</em> <code class="docutils literal"><span class="pre">create</span> <span class="pre">pld</span> <span class="pre">master</span></code></div>
+</div>
+</div></blockquote>
+<p>We then change the password to “ramblers”, <em>still using the authority of user “master”</em>; the <code class="docutils literal"><span class="pre">-Ca</span></code> option tells snmpusm to change only the authentication key.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal"><span class="pre">snmpusm</span> <span class="pre">-v3</span></code> <em>auth</em> <code class="docutils literal"><span class="pre">-Ca</span></code> <em>HOST</em> <code class="docutils literal"><span class="pre">passwd</span> <span class="pre">saskatchewan</span> <span class="pre">ramblers</span> <span class="pre">pld</span></code></div>
+</div>
+</div></blockquote>
+<p>But before new user pld can do anything, we must grant access. We <em>can</em> again edit /etc/snmp/snmpd.conf on the machine running the Net-SNMP agent, adding the directive <code class="docutils literal"><span class="pre">rouser</span> <span class="pre">pld</span></code> (granting read-only access this time) and then restarting SNMP. We can also, however, manipulate the VACM tables of <a class="reference internal" href="#vacm-for-snmpv3"><span class="std std-ref">25.3.9&nbsp;&nbsp;&nbsp;VACM for SNMPv3</span></a> using the Net-SNMP <code class="docutils literal"><span class="pre">snmpvacm</span></code> command, which works remotely:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal"><span class="pre">snmpvacm</span> <span class="pre">-v3</span></code> <em>auth</em> <em>HOST</em> <code class="docutils literal"><span class="pre">createSec2Group</span> <span class="pre">3</span> <span class="pre">pld</span> <span class="pre">grppld</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">snmpvacm</span> <span class="pre">-v3</span></code> <em>auth</em> <em>HOST</em> <code class="docutils literal"><span class="pre">createAccess</span> <span class="pre">grppld</span> <span class="pre">3</span> <span class="pre">2</span> <span class="pre">0</span> <span class="pre">_all_</span> <span class="pre">_none_</span> <span class="pre">_none_</span></code></div>
+</div>
+</div></blockquote>
+<p>These two commands create entries in the <code class="docutils literal"><span class="pre">vacmSecurityToGroupTable</span></code> and the <code class="docutils literal"><span class="pre">vacmAccessTable</span></code> respectively. The parameters following <code class="docutils literal"><span class="pre">grppld</span></code> in the second command include the USM security model (3), the authNoPriv security level (2), a placeholder (0) for the <code class="docutils literal"><span class="pre">contextmatch</span></code> flag which we are not using, and the views <code class="docutils literal"><span class="pre">_all_</span></code> and <code class="docutils literal"><span class="pre">_none_</span></code> predefined by Net-SNMP. The command here gives <code class="docutils literal"><span class="pre">grppld</span></code> read access to everything, and write access to nothing (the second <code class="docutils literal"><span class="pre">_none_</span></code> denies access for creation of notifications such as traps).</p>
+<p>After all this, user pld can then issue an snmpget using pld’s own credentials with</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal"><span class="pre">snmpget</span> <span class="pre">-v</span> <span class="pre">3</span> <span class="pre">-u</span> <span class="pre">pld</span> <span class="pre">-l</span> <span class="pre">authNoPriv</span> <span class="pre">-a</span> <span class="pre">MD5</span> <span class="pre">-A</span> <span class="pre">ramblers</span></code> <em>HOST</em> <code class="docutils literal"><span class="pre">1.3.6.1.2.1.1.4.0</span></code></div>
+</div>
+</div></blockquote>
+<p>If user pld is to be able to change pld’s password (key), write-access must be granted at least to the <code class="docutils literal"><span class="pre">usmUserAuthKeyChange</span></code> column of <code class="docutils literal"><span class="pre">usmUserTable</span></code>. We do this by adding the appropriate OID to the write view for user pld. Views are maintained in the <code class="docutils literal"><span class="pre">vacmViewTreeFamilyTable</span></code> as an association between the view name and a list of OIDs.</p>
+<p>The first step is to add the <code class="docutils literal"><span class="pre">usmUserAuthKeyChange</span></code> column, 1.3.6.1.6.3.15.1.2.2.1.6, to user pld’s view. The command below can be applied alone, so that the <code class="docutils literal"><span class="pre">usmUserAuthKeyChange</span></code> column is the <em>only</em> object to which user pld can write, or as part of a series of <code class="docutils literal"><span class="pre">createView</span></code> statements adding a series of OID subtrees to <code class="docutils literal"><span class="pre">pldwriteview</span></code>. (An OID can be removed from a view with the <code class="docutils literal"><span class="pre">deleteView</span></code> option.) In the following commands we are still using the initial <code class="docutils literal"><span class="pre">master</span></code> account for <em>auth</em>.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal"><span class="pre">snmpvacm</span> <span class="pre">-v3</span></code> <em>auth</em> <em>HOST</em> <code class="docutils literal"><span class="pre">createView</span> <span class="pre">pldwriteview</span> <span class="pre">1.3.6.1.6.3.15.1.2.2.1.6</span></code></div>
+</div>
+</div></blockquote>
+<p>Now we apply this new view, <code class="docutils literal"><span class="pre">pldwriteview</span></code>, to pld’s group, grppld. We must first clear the previously granted access.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal"><span class="pre">snmpvacm</span> <span class="pre">-v3</span></code> <em>auth</em> <em>HOST</em> <code class="docutils literal"><span class="pre">deleteAccess</span> <span class="pre">grppld</span> <span class="pre">3</span> <span class="pre">2</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">snmpvacm</span> <span class="pre">-v3</span></code> <em>auth</em> <em>HOST</em> <code class="docutils literal"><span class="pre">createAccess</span> <span class="pre">grppld</span> <span class="pre">3</span> <span class="pre">2</span> <span class="pre">0</span> <span class="pre">_all_</span> <span class="pre">pldwriteview</span> <span class="pre">_none_</span></code></div>
+</div>
+</div></blockquote>
+<p>The password can now be changed from “ramblers” to “ignatius” as follows:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal"><span class="pre">snmpusm</span> <span class="pre">-v3</span> <span class="pre">-u</span> <span class="pre">pld</span> <span class="pre">-l</span> <span class="pre">authNoPriv</span> <span class="pre">-a</span> <span class="pre">MD5</span> <span class="pre">-A</span> <span class="pre">ramblers</span> <span class="pre">-Ca</span></code> <em>HOST</em>  <code class="docutils literal"><span class="pre">passwd</span> <span class="pre">ramblers</span> <span class="pre">ignatius</span> <span class="pre">pld</span></code></div>
+</div>
+</div></blockquote>
+<p>We granted pld access here to the entire <code class="docutils literal"><span class="pre">usmUserAuthKeyChange</span></code> column. In principle this might be risky, as it allows user pld to write to the key-changing column for <em>any</em> user. One potential approach here is to grant user pld access only to pld’s own row in <code class="docutils literal"><span class="pre">usmUserAuthKeyChange</span></code>; this has the following rather cumbersome OID (in which the last four levels 3.112.108.100 spell out the three-byte string “pld” in ASCII):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">1.3</span><span class="o">.</span><span class="mf">6.1</span><span class="o">.</span><span class="mf">6.3</span><span class="o">.</span><span class="mf">15.1</span><span class="o">.</span><span class="mf">2.2</span><span class="o">.</span><span class="mf">1.6</span><span class="o">.</span><span class="mf">17.128</span><span class="o">.</span><span class="mf">0.31</span><span class="o">.</span><span class="mf">136.128</span><span class="o">.</span><span class="mf">22.41</span><span class="o">.</span><span class="mf">105.105</span><span class="o">.</span><span class="mf">47.232</span><span class="o">.</span><span class="mf">188.86</span><span class="o">.</span><span class="mf">0.0</span><span class="o">.</span><span class="mf">0.0</span><span class="o">.</span><span class="mf">3.112</span><span class="o">.</span><span class="mf">108.100</span>
+</pre></div>
+</div>
+<p>Another approach might be to grant pld write access to the <code class="docutils literal"><span class="pre">usmUserOwnAuthKeyChange</span></code> column. The semantics of this column, outlined above in <a class="reference internal" href="#usmusertable"><span class="std std-ref">25.3.9.1&nbsp;&nbsp;&nbsp;The usmUserTable</span></a>, are such that key-change requests are accepted only for the user who signed the request. This would prevent user pld from even attempting to change anyone else’s password.</p>
+<p>But the risk of full <code class="docutils literal"><span class="pre">usmUserAuthKeyChange</span></code> access is minimal: a request authenticated by user pld can only change the password of another user, say bob, <em>if bob’s previous password is known to pld</em>, as keychange objects must incorporate the old key/password. But if that password is known, then the password can just as easily be changed by authenticating the request as user bob rather than as user pld. In any event, the Net-SNMP <code class="docutils literal"><span class="pre">snmpusm</span></code> command does not support writing to <code class="docutils literal"><span class="pre">usmUserOwnAuthKeyChange</span></code>.</p>
+<p>The command <code class="docutils literal"><span class="pre">snmpusm</span></code> does not support making general modifications; if a USM entry here is made incorrectly, it may be necessary to delete and re-create it.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="exercises">
+<h2>25.4&nbsp;&nbsp;&nbsp;Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<p>2. Recall that <code class="docutils literal"><span class="pre">GetBulk()</span></code> acts like a repeated <code class="docutils literal"><span class="pre">GetNext()</span></code>. Why is there no <code class="docutils literal"><span class="pre">GetBulk()</span></code> equivalent of <code class="docutils literal"><span class="pre">Get()</span></code>?</p>
+<p>3. What happens if we have a three-row, three-column table and ask, using <code class="docutils literal"><span class="pre">GetBulk()</span></code>, for the first two columns with a repetition count of four? What is retrieved? Assume entries are of the form <strong>T</strong>.col.row, for col and row each ranging from 1 to 3.</p>
+<p>5. Suppose, as in exercise 4 of the previous chapter, you want an SNMP table <code class="docutils literal"><span class="pre">identTable</span></code> to hold ⟨idNum,userName⟩ pairs, where idnum is to be an INTEGER and username an OCTET STRING. The INDEX is idnum. Give ASN.1 definitions for the following:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">identTable</span></code></li>
+<li><code class="docutils literal"><span class="pre">identEntry</span></code></li>
+<li><code class="docutils literal"><span class="pre">IdentEntry</span></code></li>
+<li><code class="docutils literal"><span class="pre">idNum</span></code></li>
+<li><code class="docutils literal"><span class="pre">userName</span></code></li>
+</ul>
+<p>This time, follow the SNMPv2 convention of <em>not</em> including the index column in the actual table data, <a class="reference internal" href="#snmpv2-indexes"><span class="std std-ref">25.1.4&nbsp;&nbsp;&nbsp;SNMPv2 Indexes</span></a>.</p>
+<p>6. (a) What can an SNMP agent do to detect that a manager has created a row in state <code class="docutils literal"><span class="pre">underCreation</span></code> and then crashed, leaving the row abandoned?</p>
+<p>(b). What can an SNMP agent do to detect that a manager has created a <code class="docutils literal"><span class="pre">valid</span></code> row, and has later crashed?</p>
+<p>7. In the RMON <code class="docutils literal"><span class="pre">hostTopN</span></code> table (<a class="reference internal" href="#host-top-n"><span class="std std-ref">25.2.1.4&nbsp;&nbsp;&nbsp;Host Top N</span></a>), the agent does all the report-building work. Would it be possible for the manager to do this? If not, why not? If so, why do you think RMON provides this table?</p>
+<p>8. In the RMON <code class="docutils literal"><span class="pre">matrixSDTable</span></code> (<a class="reference internal" href="#matrix"><span class="std std-ref">25.2.1.5&nbsp;&nbsp;&nbsp;Matrix</span></a>), the table constructed collects data from only a single interface on the agent (that interface specified by <code class="docutils literal"><span class="pre">DataSource</span></code>). Could we get additional Matrix information by considering other interfaces? Why or why not?</p>
+<p>9. The RMON matrix group (<a class="reference internal" href="#matrix"><span class="std std-ref">25.2.1.5&nbsp;&nbsp;&nbsp;Matrix</span></a>) provides two tables with the same information, <code class="docutils literal"><span class="pre">matrixSDTable</span></code> and <code class="docutils literal"><span class="pre">matrixDSTable</span></code>.</p>
+<p>(a). Suppose we want all the table data about a given destination D, and have only the <code class="docutils literal"><span class="pre">matrixSDTable</span></code>. Explain why every row of <code class="docutils literal"><span class="pre">matrixSDTable</span></code> would need to be examined.</p>
+<p>(b). Now suppose we repeat the investigation of (a), but this time the manager has previously downloaded the complete list of all hosts on the LAN by using the RMON hosts tables. If N is the number of hosts on the LAN, explain how to find all hosts that communicated with D using only N retrieval requests.</p>
+<p>(c). Explain how to find all hosts S that sent packets to D even more quickly using the <code class="docutils literal"><span class="pre">matrixDSTable</span></code>. If M≤N is the number of such S, your answer should involve N+1 retrieval requests.</p>
+<p>10. In the keychange operation of <a class="reference internal" href="#key-change"><span class="std std-ref">25.3.7&nbsp;&nbsp;&nbsp;Key Changes</span></a>, suppose the manager simply transmitted <code class="docutils literal"><span class="pre">delta2</span></code> = <code class="docutils literal"><span class="pre">oldkey</span></code> XOR <code class="docutils literal"><span class="pre">newkey</span></code> to the agent.</p>
+<p>(a). Suppose an eavesdropper discovers <code class="docutils literal"><span class="pre">delta2</span></code> and also knows a few bits of <code class="docutils literal"><span class="pre">oldkey</span></code>. What can the eavesdropper learn about <code class="docutils literal"><span class="pre">newkey</span></code>? Would the same vulnerability apply to the mechanism of <a class="reference internal" href="#key-change"><span class="std std-ref">25.3.7&nbsp;&nbsp;&nbsp;Key Changes</span></a>?</p>
+<p>(b). Suppose an eavesdropper later discovers <code class="docutils literal"><span class="pre">newkey</span></code>. Explain how to recover <code class="docutils literal"><span class="pre">oldkey</span></code>, and why this does not work when the mechanism of <a class="reference internal" href="#key-change"><span class="std std-ref">25.3.7&nbsp;&nbsp;&nbsp;Key Changes</span></a> is used.</p>
+<p>11. List the OID prefixes for which a manager would need to be granted write permission if the manager were to be able to modify all settings in .1.3.6.1.2.1 and .1.3.6.1.4.1, and change their own local key, but <em>not</em> have access to columns in <code class="docutils literal"><span class="pre">usmUserTable</span></code> that would allow modification of other manager accounts. (The VACM table has an “exception” option to make this easier).</p>
+<p>12. Suppose a manager has write permission only for the <code class="docutils literal"><span class="pre">usmUserOwnAuthKeyChange</span></code> column in <code class="docutils literal"><span class="pre">usmUserTable</span></code>, which allows change of only that manager’s password. However, the manager has full write access to the VACM tables. Explain how the manager can modify the local keys of other managers.</p>
+<p>13. Use Wireshark to monitor localhost traffic while you use the Net-SNMP <code class="docutils literal"><span class="pre">snmpusm</span></code> command to change a manager’s own local key. Does the command use the <code class="docutils literal"><span class="pre">usmUserAuthKeyChange</span></code> column or the <code class="docutils literal"><span class="pre">usmUserOwnAuthKeyChange</span></code> column?</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="security.html" title="26   Security"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="netmgmta.html" title="24   Network Management and SNMP"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, edition 1.9.12</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015, Peter L Dordal.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+    </div>
+  </body>
+</html>

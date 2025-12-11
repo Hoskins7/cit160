@@ -1,0 +1,1049 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>12   TCP Transport &#8212; An Introduction to Computer Networks, edition 1.9.12</title>
+    <link rel="stylesheet" href="_static/csbnetbook.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.9.12',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/mobile.js"></script>
+    <script type="text/javascript" src="_static/rightsidebar.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="13   TCP Reno and Congestion Management" href="reno.html" />
+    <link rel="prev" title="11   UDP Transport" href="udp.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="reno.html" title="13   TCP Reno and Congestion Management"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="udp.html" title="11   UDP Transport"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, edition 1.9.12</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">12&nbsp;&nbsp;&nbsp;TCP Transport</a><ul>
+<li><a class="reference internal" href="#the-end-to-end-principle">12.1&nbsp;&nbsp;&nbsp;The End-to-End Principle</a></li>
+<li><a class="reference internal" href="#tcp-header">12.2&nbsp;&nbsp;&nbsp;TCP Header</a></li>
+<li><a class="reference internal" href="#tcp-connection-establishment">12.3&nbsp;&nbsp;&nbsp;TCP Connection Establishment</a></li>
+<li><a class="reference internal" href="#tcp-and-wireshark">12.4&nbsp;&nbsp;&nbsp;TCP and WireShark</a></li>
+<li><a class="reference internal" href="#tcp-offloading">12.5&nbsp;&nbsp;&nbsp;TCP Offloading</a></li>
+<li><a class="reference internal" href="#tcp-simplex-talk">12.6&nbsp;&nbsp;&nbsp;TCP simplex-talk</a><ul>
+<li><a class="reference internal" href="#the-tcp-client">12.6.1&nbsp;&nbsp;&nbsp;The TCP Client</a></li>
+<li><a class="reference internal" href="#netcat-again">12.6.2&nbsp;&nbsp;&nbsp;<code class="docutils literal"><span class="pre">netcat</span></code> again</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#tcp-state-diagram">12.7&nbsp;&nbsp;&nbsp;TCP state diagram</a><ul>
+<li><a class="reference internal" href="#closing-a-connection">12.7.1&nbsp;&nbsp;&nbsp;Closing a connection</a></li>
+<li><a class="reference internal" href="#calling-close">12.7.2&nbsp;&nbsp;&nbsp;Calling <code class="docutils literal"><span class="pre">close()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#tcp-old-duplicates">12.8&nbsp;&nbsp;&nbsp;TCP Old Duplicates</a></li>
+<li><a class="reference internal" href="#timewait">12.9&nbsp;&nbsp;&nbsp;TIMEWAIT</a></li>
+<li><a class="reference internal" href="#the-three-way-handshake-revisited">12.10&nbsp;&nbsp;&nbsp;The Three-Way Handshake Revisited</a><ul>
+<li><a class="reference internal" href="#isns-and-spoofing">12.10.1&nbsp;&nbsp;&nbsp;ISNs and spoofing</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#anomalous-tcp-scenarios">12.11&nbsp;&nbsp;&nbsp;Anomalous TCP scenarios</a></li>
+<li><a class="reference internal" href="#tcp-faster-opening">12.12&nbsp;&nbsp;&nbsp;TCP Faster Opening</a></li>
+<li><a class="reference internal" href="#path-mtu-discovery">12.13&nbsp;&nbsp;&nbsp;Path MTU Discovery</a></li>
+<li><a class="reference internal" href="#tcp-sliding-windows">12.14&nbsp;&nbsp;&nbsp;TCP Sliding Windows</a></li>
+<li><a class="reference internal" href="#tcp-delayed-acks">12.15&nbsp;&nbsp;&nbsp;TCP Delayed ACKs</a></li>
+<li><a class="reference internal" href="#nagle-algorithm">12.16&nbsp;&nbsp;&nbsp;Nagle Algorithm</a></li>
+<li><a class="reference internal" href="#tcp-flow-control">12.17&nbsp;&nbsp;&nbsp;TCP Flow Control</a></li>
+<li><a class="reference internal" href="#silly-window-syndrome">12.18&nbsp;&nbsp;&nbsp;Silly Window Syndrome</a></li>
+<li><a class="reference internal" href="#tcp-timeout-and-retransmission">12.19&nbsp;&nbsp;&nbsp;TCP Timeout and Retransmission</a></li>
+<li><a class="reference internal" href="#keepalive">12.20&nbsp;&nbsp;&nbsp;KeepAlive</a></li>
+<li><a class="reference internal" href="#tcp-timers">12.21&nbsp;&nbsp;&nbsp;TCP timers</a></li>
+<li><a class="reference internal" href="#variants-and-alternatives">12.22&nbsp;&nbsp;&nbsp;Variants and Alternatives</a><ul>
+<li><a class="reference internal" href="#mptcp">12.22.1&nbsp;&nbsp;&nbsp;MPTCP</a></li>
+<li><a class="reference internal" href="#sctp">12.22.2&nbsp;&nbsp;&nbsp;SCTP</a></li>
+<li><a class="reference internal" href="#dccp">12.22.3&nbsp;&nbsp;&nbsp;DCCP</a></li>
+<li><a class="reference internal" href="#quic-revisited">12.22.4&nbsp;&nbsp;&nbsp;QUIC Revisited</a><ul>
+<li><a class="reference internal" href="#headers">12.22.4.1&nbsp;&nbsp;&nbsp;Headers</a></li>
+<li><a class="reference internal" href="#frames-and-streams">12.22.4.2&nbsp;&nbsp;&nbsp;Frames and streams</a></li>
+<li><a class="reference internal" href="#acknowledgments">12.22.4.3&nbsp;&nbsp;&nbsp;Acknowledgments</a></li>
+<li><a class="reference internal" href="#connection-handshake-and-tls-encryption">12.22.4.4&nbsp;&nbsp;&nbsp;Connection handshake and TLS encryption</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#epilog">12.23&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li><a class="reference internal" href="#exercises">12.24&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="udp.html"
+                        title="previous chapter">11&nbsp;&nbsp;&nbsp;UDP Transport</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="reno.html"
+                        title="next chapter">13&nbsp;&nbsp;&nbsp;TCP Reno and Congestion Management</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="tcp-transport">
+<span id="tcp"></span><span id="index-0"></span><h1>12&nbsp;&nbsp;&nbsp;TCP Transport<a class="headerlink" href="#tcp-transport" title="Permalink to this headline">¶</a></h1>
+<p>The standard transport protocols riding above the IP layer are <strong>TCP</strong> and <strong>UDP</strong>. As we saw in <a class="reference internal" href="udp.html#udp"><span class="std std-ref">11&nbsp;&nbsp;&nbsp;UDP Transport</span></a>, UDP provides simple datagram delivery to remote sockets, that is, to ⟨host,port⟩ pairs. TCP provides a much richer functionality for sending data to (connected) sockets.</p>
+<p id="index-1">TCP is quite different in several dimensions from UDP. TCP is <strong>stream-oriented</strong>, meaning that the application can write data in very small or very large amounts and the TCP layer will take care of appropriate packetization (and also that TCP transmits a stream of bytes, not messages or records; <em>cf</em> <a class="reference internal" href="#sctp"><span class="std std-ref">12.22.2&nbsp;&nbsp;&nbsp;SCTP</span></a>). TCP is <strong>connection-oriented</strong>, meaning that a connection must be established before the beginning of any data transfer. TCP is <strong>reliable</strong>, in that TCP uses sequence numbers to ensure the correct order of delivery and a timeout/retransmission mechanism to make sure no data is lost short of massive network failure. Finally, TCP automatically uses the <strong>sliding windows</strong> algorithm to achieve throughput relatively close to the maximum available.</p>
+<p id="index-2">These features mean that TCP is very well suited for the transfer of large files. The two endpoints open a connection, the file data is written by one end into the connection and read by the other end, and the features above ensure that the file will be received correctly. TCP also works quite well for interactive applications where each side is sending and receiving streams of small packets. Examples of this include ssh or telnet, where packets are exchanged on each keystroke, and database connections that may carry many queries per second. TCP even works <em>reasonably</em> well for <strong>request/reply</strong> protocols, where one side sends a single message, the other side responds, and the connection is closed. The drawback here, however, is the overhead of setting up a new connection for each request; a better application-protocol design might be to allow multiple request/reply pairs over a single TCP connection.</p>
+<p>Note that the connection-orientation and reliability of TCP represent abstract features built on top of the IP layer, which supports neither of them.</p>
+<p id="index-3">The connection-oriented nature of TCP warrants further explanation.  With UDP, if a server opens a socket (the OS object, with corresponding socket address), then any client on the Internet can send to that socket, via its socket address. Any UDP application, therefore, must be prepared to check the source address of each packet that arrives. With TCP, all data arriving at a <em>connected</em> socket must come from the other endpoint of the connection. When a server S initially opens a socket s, that socket is “unconnected”; it is said to be in the LISTEN state. While it still has a socket address consisting of its host and port, a LISTENing socket will never receive data directly. If a client C somewhere on the Internet wishes to send data to s, it must first establish a connection, which will be defined by the <strong>socketpair</strong> consisting of the socket addresses (that is, the ⟨IP_addr,port⟩ pairs) at both C and S. As part of this connection process, a new <em>connected</em> child socket s<sub>C</sub> will be created; it is s<sub>C</sub> that will receive any data sent from C. Usually, the server will also create a new thread or process to handle communication with s<sub>C</sub>. Typically the server will have multiple connected children of the original socket s, and, for each one, a process attached to it.</p>
+<p>If C1 and C2 both connect to s, two connected sockets at S will be created, s<sub>1</sub> and s<sub>2</sub>, and likely two separate processes. When a packet arrives at S addressed to the socket address of s, the <em>source</em> socket address will also be examined to determine whether the data is part of the C1–S or the C2–S connection, and thus whether a read on s<sub>1</sub> or on s<sub>2</sub>, respectively, will see the data.</p>
+<p>If S is acting as an ssh server, the LISTENing socket listens on port 22, and the connected child sockets correspond to the separate user login connections; the process on each child socket represents the login process of that user, and may run for hours or days.</p>
+<p>In Chapter 1 we likened TCP sockets to telephone connections, with the server like one high-volume phone number 800-BUY-NOWW. The unconnected socket corresponds to the number everyone dials; the connected sockets correspond to the actual calls. (This analogy breaks down, however, if one looks closely at the way such multi-operator phone lines are actually configured: each typically <em>does</em> have its own number.)</p>
+<div class="section" id="the-end-to-end-principle">
+<span id="end2end"></span><span id="index-4"></span><h2>12.1&nbsp;&nbsp;&nbsp;The End-to-End Principle<a class="headerlink" href="#the-end-to-end-principle" title="Permalink to this headline">¶</a></h2>
+<p>The End-to-End Principle is spelled out in <a class="reference internal" href="bibliography.html#src84" id="id1">[SRC84]</a>; it states in effect that transport issues are the responsibility of the endpoints in question and thus should not be delegated to the core network. This idea has been very influential in TCP design.</p>
+<p>Two issues falling under this category are data corruption and congestion. For the first, even though essentially all links on the Internet have link-layer checksums to protect against data corruption, TCP still adds its own checksum (in part because of a history of data errors introduced <em>within</em> routers). For the latter, TCP is today essentially the <em>only</em> layer that addresses congestion management.</p>
+<p>Saltzer, Reed and Clark categorized functions that were subject to the End-to-End principle this way:</p>
+<blockquote>
+<div>The function in question can completely and correctly be implemented only with the knowledge and help of the application standing at the end points of the communication system. Therefore, providing that questioned function as a feature of the communication system itself is not possible. (Sometimes an incomplete version of the function provided by the communication system may be useful as a performance enhancement.)</div></blockquote>
+<p>This does not mean that the backbone Internet should not concern itself with congestion; it means that backbone congestion-management mechanisms should not completely replace end-to-end congestion management.</p>
+</div>
+<div class="section" id="tcp-header">
+<span id="index-5"></span><span id="id2"></span><h2>12.2&nbsp;&nbsp;&nbsp;TCP Header<a class="headerlink" href="#tcp-header" title="Permalink to this headline">¶</a></h2>
+<p>Below is a diagram of the TCP header. As with UDP, source and destination ports are 16 bits. The 4-bit Data Offset field specifies the number of 32-bit words in the header; if no options are present its value is 5.</p>
+<p id="index-6">As with UDP, the checksum covers the TCP header, the TCP data and an IP “pseudo header” that includes the source and destination IP addresses. The checksum must be updated by a NAT router that modifies any header values. (Although the IP and TCP layers are theoretically separate, and <span class="target" id="index-7"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc793.html"><strong>RFC 793</strong></a> in some places appears to suggest that TCP can be run over a non-IP internetwork layer, <span class="target" id="index-8"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc793.html"><strong>RFC 793</strong></a> also explicitly defines 4-byte addresses for the pseudo header. <span class="target" id="index-9"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2460.html"><strong>RFC 2460</strong></a> officially redefined the pseudo header to allow IPv6 addresses.)</p>
+<img alt="_images/tcp_header.svg" src="_images/tcp_header.svg" /><p id="index-10">The <strong>sequence</strong> and <strong>acknowledgment</strong> numbers are for numbering the data, at the byte level. This allows TCP to send 1024-byte blocks of data, incrementing the sequence number by 1024 between successive packets, or to send 1-byte telnet packets, incrementing the sequence number by 1 each time. There is no distinction between DATA and ACK packets; all packets carrying data from A to B also carry the most current acknowledgment of data sent from B to A. Many TCP applications are largely unidirectional, in which case the sender would include essentially the same acknowledgment number in each packet while the receiver would include essentially the same sequence number.</p>
+<p id="index-11">It is traditional to refer to the data portion of TCP packets as <strong>segments</strong>.</p>
+<div class="sidebar">
+<p class="first sidebar-title">TCP History</p>
+<p class="last">The clear-cut division between the IP and TCP headers did not spring forth fully formed. See <a class="reference internal" href="bibliography.html#ck74" id="id3">[CK74]</a> for a discussion of a proto-TCP in which the sequence number (but not the acknowledgment number) appeared in the equivalent of the IP header (perhaps so it could be used for fragment reassembly).</p>
+</div>
+<p>The value of the sequence number, in <em>relative</em> terms, is the position of the first byte of the packet in the data stream, or the position of what would be the first byte in the case that no data was sent. The value of the acknowledgment number, again in relative terms, represents the byte position for the next byte expected. Thus, if a packet contains 1024 bytes of data and the first byte is number 1, then that would be the sequence number. The data bytes would be positions 1-1024, and the ACK returned would have acknowledgment number 1025.</p>
+<p id="index-12">The sequence and acknowledgment numbers, as sent, represent these relative values <em>plus</em> an <strong>Initial Sequence Number</strong>, or ISN, that is fixed for the lifetime of the connection. Each direction of a connection has its own ISN; see below.</p>
+<p>TCP acknowledgments are <strong>cumulative</strong>: when an endpoint sends a packet with an acknowledgment number of N, it is acknowledging receipt of all data bytes numbered less than N. Standard TCP provides no mechanism for acknowledging receipt of packets 1, 2, 3 and 5; the highest cumulative acknowledgment that could be sent in that situation would be to acknowledge packet 3.</p>
+<p>The TCP header defines some important flag bits; the brief definitions here are expanded upon in the sequel:</p>
+<ul class="simple" id="index-13">
+<li><strong>SYN</strong>: for SYNchronize; marks packets that are part of the new-connection handshake</li>
+<li><strong>ACK</strong>: indicates that the header Acknowledgment field is valid; that is, all but the first packet</li>
+<li><strong>FIN</strong>: for FINish; marks packets involved in the connection closing</li>
+<li><strong>PSH</strong>: for PuSH; marks “non-full” packets that should be delivered promptly at the far end</li>
+<li><strong>RST</strong>: for ReSeT; indicates various error conditions</li>
+<li><strong>URG</strong>: for URGent; part of a now-seldom-used mechanism for high-priority data</li>
+<li><strong>CWR</strong> and <strong>ECE</strong>: part of the Explicit Congestion Notification mechanism, <a class="reference internal" href="dynamics.html#ecn"><span class="std std-ref">14.8.3&nbsp;&nbsp;&nbsp;Explicit Congestion Notification (ECN)</span></a></li>
+</ul>
+</div>
+<div class="section" id="tcp-connection-establishment">
+<span id="id4"></span><h2>12.3&nbsp;&nbsp;&nbsp;TCP Connection Establishment<a class="headerlink" href="#tcp-connection-establishment" title="Permalink to this headline">¶</a></h2>
+<p id="index-14">TCP connections are established via an exchange known as the <strong>three-way handshake</strong>. If A is the client and B is the LISTENing server, then the handshake proceeds as follows:</p>
+<ul class="simple">
+<li>A sends B a packet with the SYN bit set (a SYN packet)</li>
+<li>B responds with a SYN packet of its own; the ACK bit is now also set</li>
+<li>A responds to B’s SYN with its own ACK</li>
+</ul>
+<img alt="_images/tcp_3wh.svg" src="_images/tcp_3wh.svg" /><p>Normally, the three-way handshake is triggered by an application’s request to connect; data can be sent only after the handshake completes. This means a one-RTT delay before any data can be sent. The original TCP standard <span class="target" id="index-15"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc793.html"><strong>RFC 793</strong></a> does allow data to be sent with the first SYN packet, as part of the handshake, but such data cannot be released to the remote-endpoint application until the handshake completes. Most traditional TCP programming interfaces offer no support for this early-data option.</p>
+<p>There are recurrent calls for TCP to support data transmission within the handshake itself, so as to achieve request/reply turnaround comparable to that with RPC (<a class="reference internal" href="udp.html#rpc"><span class="std std-ref">11.5&nbsp;&nbsp;&nbsp;Remote Procedure Call (RPC)</span></a>). We return to this in <a class="reference internal" href="#tcp-faster-open"><span class="std std-ref">12.12&nbsp;&nbsp;&nbsp;TCP Faster Opening</span></a>.</p>
+<p id="index-16">The three-way handshake is vulnerable to an attack known as <strong>SYN flooding</strong>. The attacker sends a large number of SYN packets to a server B. For each arriving SYN, B must allocate resources to keep track of what appears to be a legitimate connection request; with enough requests, B’s resources may face exhaustion. SYN flooding is easiest if the SYN packets are simply spoofed, with forged, untraceable source-IP addresses; see spoofing at <a class="reference internal" href="ipv4.html#ipv4-header"><span class="std std-ref">7.1&nbsp;&nbsp;&nbsp;The IPv4 Header</span></a>, and <a class="reference internal" href="#isn-spoofing"><span class="std std-ref">12.10.1&nbsp;&nbsp;&nbsp;ISNs and spoofing</span></a> below. SYN-flood attacks can also take the form of a large number of real connection attempts from a large number of real clients – often compromised and pressed into service by some earlier attack – but this requires considerably more resources on the part of the attacker. See <a class="reference internal" href="#sctp"><span class="std std-ref">12.22.2&nbsp;&nbsp;&nbsp;SCTP</span></a> for an alternative handshake protocol (unfortunately not available to TCP) intended to mitigate SYN-flood attacks, at least from spoofed SYNs.</p>
+<p id="index-17">To <strong>close</strong> the connection, a superficially similar exchange involving FIN packets may occur:</p>
+<ul class="simple">
+<li>A sends B a packet with the FIN bit set (a FIN packet), announcing that it has finished sending data</li>
+<li>B sends A an ACK of the FIN</li>
+<li>B may continue to send additional data to A</li>
+<li>When B is also ready to cease sending, it sends its own FIN to A</li>
+<li>A sends B an ACK of the FIN; this is the final packet in the exchange</li>
+</ul>
+<p>Here’s the ladder diagram for this:</p>
+<img alt="_images/tcp_close1.svg" src="_images/tcp_close1.svg" /><p>The FIN handshake is really more like two separate two-way FIN/ACK handshakes. We will return to TCP connection closing in <a class="reference internal" href="#closing"><span class="std std-ref">12.7.1&nbsp;&nbsp;&nbsp;Closing a connection</span></a>.</p>
+<p>Now let us look at the full exchange of packets in a representative connection, in which A sends strings “abc”, “defg”, and “foobar” (<span class="target" id="index-18"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3092.html"><strong>RFC 3092</strong></a>). B replies with “hello”, and which point A sends “goodbye” and closes the connection. In the following table, <em>relative</em> sequence numbers are used, which is to say that sequence numbers begin with 0 on each side. The SEQ numbers in <strong>bold</strong> on the A side correspond to the ACK numbers in <strong>bold</strong> on the B side; they both count data flowing from A to B.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="5%" />
+<col width="39%" />
+<col width="56%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"></th>
+<th class="head">A sends</th>
+<th class="head">B sends</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1</td>
+<td>SYN, <strong>seq=0</strong></td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td></td>
+<td>SYN+ACK, seq=0, <strong>ack=1</strong> (expecting)</td>
+</tr>
+<tr class="row-even"><td>3</td>
+<td>ACK, <strong>seq=1</strong>, ack=1 (ACK of SYN)</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>4</td>
+<td>“abc”, <strong>seq=1</strong>, ack=1</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>5</td>
+<td></td>
+<td>ACK, seq=1, <strong>ack=4</strong></td>
+</tr>
+<tr class="row-odd"><td>6</td>
+<td>“defg”, <strong>seq=4</strong>, ack=1</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>7</td>
+<td></td>
+<td>seq=1, <strong>ack=8</strong></td>
+</tr>
+<tr class="row-odd"><td>8</td>
+<td>“foobar”, <strong>seq=8</strong>, ack=1</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>9</td>
+<td></td>
+<td>seq=1, <strong>ack=14</strong>, “hello”</td>
+</tr>
+<tr class="row-odd"><td>10</td>
+<td><strong>seq=14</strong>, ack=6, “goodbye”</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>11,12</td>
+<td><strong>seq=21</strong>, ack=6, FIN</td>
+<td>seq=6, <strong>ack=21</strong> ;; ACK of “goodbye”, crossing packets</td>
+</tr>
+<tr class="row-odd"><td>13</td>
+<td></td>
+<td>seq=6, <strong>ack=22</strong> ;; ACK of FIN</td>
+</tr>
+<tr class="row-even"><td>14</td>
+<td></td>
+<td>seq=6, <strong>ack=22</strong>, FIN</td>
+</tr>
+<tr class="row-odd"><td>15</td>
+<td><strong>seq=22</strong>, ack=7 ;; ACK of FIN</td>
+<td>&#160;</td>
+</tr>
+</tbody>
+</table>
+<p>(We will see below that this table is slightly idealized, in that real sequence numbers do <em>not</em> start at 0.)</p>
+<p>Here is the ladder diagram corresponding to this connection:</p>
+<img alt="_images/tcp_ladder_plain.svg" src="_images/tcp_ladder_plain.svg" /><p>In terms of the sequence and acknowledgment numbers, SYNs count as 1 byte, as do FINs. Thus, the SYN counts as sequence number 0, and the first byte of data (the “a” of “abc”) counts as sequence number 1.
+Similarly, the ack=21 sent by the B side is the acknowledgment of “goodbye”, while the ack=22 is the acknowledgment of A’s subsequent FIN.</p>
+<p>Whenever B sends ACN=n, A follows by sending more data with SEQ=n.</p>
+<p id="index-19">TCP does <em>not</em> in fact transport relative sequence numbers, that is, sequence numbers as transmitted do not begin at 0. Instead, each side chooses its <strong>Initial Sequence Number</strong>, or <strong>ISN</strong>, and sends that in its initial SYN. The third ACK of the three-way handshake is an acknowledgment that the server side’s SYN response was received correctly.
+All further sequence numbers sent are the ISN chosen by that side plus the relative sequence number (that is, the sequence number as if numbering did begin at 0). If A chose ISN<sub>A</sub>=1000, we would add 1000 to all the bold entries above: A would send SYN(seq=1000), B would reply with ISN<sub>B</sub> and ack=1001,
+and the last two lines would involve ack=1022 and seq=1022 respectively. Similarly, if B chose ISN<sub>B</sub>=7000, then we would add 7000 to all the <strong>seq</strong> values in the “B sends” column and all the <strong>ack</strong> values in the “A sends” column. The table above up to the point B sends “goodbye”, with actual sequence numbers instead of relative sequence numbers, is below:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="3%" />
+<col width="45%" />
+<col width="51%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"></th>
+<th class="head">A, ISN=<strong>1000</strong></th>
+<th class="head">B, ISN=7000</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1</td>
+<td>SYN, <strong>seq=1000</strong></td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td></td>
+<td>SYN+ACK, seq=7000, <strong>ack=1001</strong></td>
+</tr>
+<tr class="row-even"><td>3</td>
+<td>ACK, <strong>seq=1001</strong>, ack=7001</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>4</td>
+<td>“abc”, <strong>seq=1001</strong>, ack=7001</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>5</td>
+<td></td>
+<td>ACK, seq=7001, <strong>ack=1004</strong></td>
+</tr>
+<tr class="row-odd"><td>6</td>
+<td>“defg”, <strong>seq=1004</strong>, ack=7001</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>7</td>
+<td></td>
+<td>seq=7001, <strong>ack=1008</strong></td>
+</tr>
+<tr class="row-odd"><td>8</td>
+<td>“foobar”, <strong>seq=1008</strong>, ack=7001</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>9</td>
+<td></td>
+<td>seq=7001, <strong>ack=1014</strong>, “hello”</td>
+</tr>
+<tr class="row-odd"><td>10</td>
+<td><strong>seq=1014</strong>, ack=7006, “goodbye”</td>
+<td>&#160;</td>
+</tr>
+</tbody>
+</table>
+<p>If B had not been LISTENing at the port to which A sent its SYN, its response would have been <strong>RST</strong> (“reset”), meaning in this context “connection refused”. Similarly, if A sent data to B before the SYN packet, the response would have been RST.</p>
+<p id="index-20">Finally, a RST can be sent by either side at any time to abort the connection. Sometimes routers along the path send “spoofed” RSTs to tear down TCP connections they are configured to regard as undesired; see <a class="reference internal" href="ipv4.html#middleboxes"><span class="std std-ref">7.7.2&nbsp;&nbsp;&nbsp;Middleboxes</span></a> and <span class="target" id="index-21"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3360.html"><strong>RFC 3360</strong></a>. Worse, sometimes external attackers are able to tear down a TCP connection with a spoofed RST; this requires brute-force guessing the endpoint port numbers and the current SYN value (<span class="target" id="index-22"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc793.html"><strong>RFC 793</strong></a> does not require the RST packet’s ACK value to match). In the days of 4 kB window sizes, guessing a valid SYN was a one-in-a-million chance, but window sizes have steadily increased (<a class="reference internal" href="dynamics.html#high-bandwidth-tcp-problem"><span class="std std-ref">14.9&nbsp;&nbsp;&nbsp;The High-Bandwidth TCP Problem</span></a>); a 4 MB window size makes SYN guessing quite feasible. See also <span class="target" id="index-23"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc4953.html"><strong>RFC 4953</strong></a>, the RST-validation fix proposed in <span class="target" id="index-24"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc5961.html"><strong>RFC 5961</strong></a> §3.2, and exercise 6.5.</p>
+<p>If A sends a series of small packets to B, then B has the option of assembling them into a full-sized I/O buffer before releasing them to the receiving application. However, if A sets the <strong>PSH</strong> bit on each packet, then B should release each packet immediately to the receiving application. In Berkeley Unix and most (if not all) BSD-derived socket-library implementations, there is in fact no way to set the PSH bit; it is set automatically for each write. (But even this is not <em>guaranteed</em> as the sender may leave the bit off or consolidate several PuSHed writes into one packet; this makes using the PSH bit as a record separator difficult. In the program written to generate the WireShark packet trace, below, most of the time the  strings “abc”, “defg”, <em>etc</em> were PuSHed separately but occasionally they were consolidated into one packet.)</p>
+<p>As for the <strong>URG</strong> bit, imagine a telnet (or ssh) connection, in which A has sent a large amount of data to B, which is momentarily stalled processing it. The application at A wishes to abort that processing by sending the interrupt character CNTL-C. Under normal conditions, the application at B would have to finish processing all the pending data before getting to the CNTL-C; however, the use of the URG bit can enable immediate asynchronous delivery of the CNTL-C. The bit is set, and the TCP header’s Urgent Pointer field points to the CNTL-C in the current packet, far ahead in the normal data stream. The receiving application then skips ahead in its processing of the arriving data stream until it reaches the urgent data. For this to work, the receiving application process must have signed up to receive an asynchronous signal when urgent data arrives.</p>
+<p>The urgent data does appear as part of the ordinary TCP data stream, and it is up to the protocol to determine the start of the data that is to be considered urgent, and what to do with the unread, buffered data sent ahead of the urgent data. For the CNTL-C example in the telnet protocol (<span class="target" id="index-25"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc854.html"><strong>RFC 854</strong></a>), the urgent data might consist of the telnet “Interrupt Process” byte, preceded by the “Interpret as Command” escape byte, and the earlier data is simply discarded.</p>
+<p>Officially, the Urgent Pointer value, when the <strong>URG</strong> bit is set, contains the offset from the start of the current packet data to the <em>end</em> of the urgent data; it is meant to tell the receiver “you should read up to this point as soon as you can”. The original intent was for the urgent pointer to mark the last byte of the urgent data, but §3.1 of <span class="target" id="index-26"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc793.html"><strong>RFC 793</strong></a> got this wrong and declared that it pointed to the first byte <em>following</em> the urgent data. This was corrected in <span class="target" id="index-27"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1122.html"><strong>RFC 1122</strong></a>, but most implementations to this day abide by the “incorrect” interpretation. <span class="target" id="index-28"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc6093.html"><strong>RFC 6093</strong></a> discusses this and proposes, first, that the near-universal “incorrect” interpretation be accepted as standard, and, second, that developers avoid the use of the TCP urgent-data feature.</p>
+</div>
+<div class="section" id="tcp-and-wireshark">
+<span id="index-29"></span><span id="id5"></span><h2>12.4&nbsp;&nbsp;&nbsp;TCP and WireShark<a class="headerlink" href="#tcp-and-wireshark" title="Permalink to this headline">¶</a></h2>
+<p>Below is a screenshot of the <a class="reference external" href="http://www.wireshark.org/">WireShark</a> program displaying a tcpdump capture intended to represent the TCP exchange above. Both hosts involved in the packet exchange were Linux systems. Side A uses socket address ⟨10.0.0.3,45815⟩ and side B (the server) uses ⟨10.0.0.1,54321⟩.</p>
+<p>WireShark is displaying <em>relative</em> TCP sequence numbers. The first three packets correspond to the three-way handshake, and packet 4 is the first data packet. Every data packet has the flags [PSH, ACK] displayed. The data in the packet can be inferred from the WireShark Len field, as each of the data strings sent has a different length.</p>
+<img alt="_images/wireshark.png" src="_images/wireshark.png" />
+<p>The packets are numbered the same as in the table above up through packet 8, containing the string “foobar”. At that point the table shows B replying by a combined ACK plus the string “hello”; in fact, TCP sent the ACK alone and then the string “hello”; these are WireShark packets 9 and 10 (note packet 10 has Len=5). Wireshark packet 11 is then a standalone ACK from A to B, acknowledging the “hello”. WireShark packet 12 (the packet highlighted) then corresponds to table packet 10, and contains “goodbye” (Len=7); this string can be seen at the right side of the bottom pane.</p>
+<p>The table view shows A’s FIN (packet 11) crossing with B’s ACK of “goodbye” (packet 12). In the WireShark view, A’s FIN is packet 13, and is sent about 0.01 seconds after “goodbye”; B then ACKs them both with packet 14. That is, the table-view packet 12 does not exist in the WireShark view.</p>
+<p>Packets 11, 13, 14 and 15 in the table and 13, 14, 15 and 16 in the WireShark screen dump correspond to the connection closing. The program that generated the exchange at B’s side had to include a “sleep” delay of 40 ms between detecting the closed connection (that is, reading A’s FIN) and closing its own connection (and sending its own FIN); otherwise the ACK of A’s FIN traveled in the same packet with B’s FIN.</p>
+<p>The ISN for A in this example was 551144795 and B’s ISN was 1366676578. The actual pcap packet-capture file is at <a class="reference external" href="auxiliary_files/wireshark/demo_tcp_connection.pcap">demo_tcp_connection.pcap</a>.</p>
+</div>
+<div class="section" id="tcp-offloading">
+<span id="index-30"></span><span id="id6"></span><h2>12.5&nbsp;&nbsp;&nbsp;TCP Offloading<a class="headerlink" href="#tcp-offloading" title="Permalink to this headline">¶</a></h2>
+<p>In the Wireshark example above, the hardware involved used <strong>TCP checksum offloading</strong>, or TCO, to have the network-interface card do the actual checksum calculations; this permits a modest amount of parallelism. As a result, the checksums for outbound packets are wrong in the capture file. WireShark has an option to disable the reporting of this.</p>
+<p>It is also possible, with many newer network-interface cards, to offload the TCP segmentation process to the LAN hardware; this is most useful when the application is writing data continuously and is known as <strong>TCP segmentation offloading</strong>, or TSO. The use of TSO requires TCO, but not vice-versa.</p>
+<p>TSO can be divided into large send offloading, LSO, for outbound traffic, and large receive offloading, LRO, for inbound. For outbound offloading, the host system transfers to the network card a large buffer of data (perhaps 64 kB), together with information about the headers. The network card then divides the buffer into 1500-byte packets, with proper TCP/IP headers, and sends them off.</p>
+<p>For inbound offloading, the network card accumulates multiple inbound packets that are part of the same TCP connection, and consolidates them in proper sequence to one much larger packet. This means that the network card, upon receiving one packet, must wait to see if there will be more. This wait is very short, however, at most a few milliseconds. Specifically, all consolidated incoming packets must have the same TCP Timestamp value (<a class="reference internal" href="#anomalous-tcp-scenarios"><span class="std std-ref">12.11&nbsp;&nbsp;&nbsp;Anomalous TCP scenarios</span></a>).</p>
+<p>TSO is of particular importance at very high bandwidths. At 10 Gbps, a system can send or receive close to a million packets per second, and offloading some of the packet processing to the network card can be essential to maintaining high throughput. TSO allows a host system to behave as if it were reading or writing very large packets, and yet the actual packet size on the wire remains at the standard 1500 bytes.</p>
+<p>On Linux systems, the status of TCO and TSO can be checked using the command <code class="docutils literal"><span class="pre">ethtool</span> <span class="pre">--show-offload</span></code> &nbsp;<em>interface</em>. TSO can be disabled with <code class="docutils literal"><span class="pre">ethtool</span> <span class="pre">--offload</span></code> &nbsp;<em>interface</em> <code class="docutils literal"><span class="pre">tso</span> <span class="pre">off</span></code>.</p>
+</div>
+<div class="section" id="tcp-simplex-talk">
+<span id="index-31"></span><span id="id7"></span><h2>12.6&nbsp;&nbsp;&nbsp;TCP simplex-talk<a class="headerlink" href="#tcp-simplex-talk" title="Permalink to this headline">¶</a></h2>
+<p>Here is a Java version of the simplex-talk server for TCP. As with the UDP version, we start by setting up the socket, here a <code class="docutils literal"><span class="pre">ServerSocket</span></code> called <code class="docutils literal"><span class="pre">ss</span></code>. This socket remains in the LISTEN state throughout. The main <code class="docutils literal"><span class="pre">while</span></code> loop then begins with the call <code class="docutils literal"><span class="pre">ss.accept()</span></code> at the start; this call blocks until an incoming connection is established, at which point it returns the connected child socket <cite>s</cite>. The <code class="docutils literal"><span class="pre">accept()</span></code> call models the TCP protocol behavior of waiting for three-way handshakes initiated by remote hosts and, for each, setting up a new connection.</p>
+<p id="index-32">Connections will be accepted from <em>all</em> IP addresses of the server host, <em>eg</em> the “normal” IP address, the loopback address 127.0.0.1 and, if the server is multihomed, any additional IP addresses. Unlike the UDP case (<a class="reference internal" href="udp.html#udp-and-ip-addresses"><span class="std std-ref">11.1.3.2&nbsp;&nbsp;&nbsp;UDP and IP addresses</span></a>), <span class="target" id="index-33"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1122.html"><strong>RFC 1122</strong></a> requires (§4.2.3.7) that server response packets always be sent from the same server IP address that the client first used to contact the server. (See exercise 13.0 for an example of non-compliance.)</p>
+<p>A server application can process these connected children either serially or in parallel. The stalk version here can handle both situations, either one connection at a time (<code class="docutils literal"><span class="pre">THREADING</span> <span class="pre">=</span> <span class="pre">false</span></code>), or by creating a new thread for each connection (<code class="docutils literal"><span class="pre">THREADING</span> <span class="pre">=</span> <span class="pre">true</span></code>). Either way, the connected child socket is turned over to <code class="docutils literal"><span class="pre">line_talker()</span></code>, either as a synchronous procedure call or as a new thread. Data is then read from the socket’s associated <code class="docutils literal"><span class="pre">InputStream</span></code> using the ordinary <code class="docutils literal"><span class="pre">read()</span></code> call, versus the <code class="docutils literal"><span class="pre">receive()</span></code> used to read UDP packets. The main loop within <code class="docutils literal"><span class="pre">line_talker()</span></code> does not terminate until the client closes the connection (or there is an error).</p>
+<p>In the serial, non-threading mode, if a second client connection is made while the first is still active, then data can be sent on the second connection but it sits in limbo until the first connection closes, at which point control returns to the <code class="docutils literal"><span class="pre">ss.accept()</span></code> call, the second connection is processed, and the second connection’s data suddenly appears.</p>
+<p>In the threading mode, the main loop spends almost all its time waiting in <code class="docutils literal"><span class="pre">ss.accept()</span></code>; when this returns a child connection we immediately spawn a new thread to handle it, allowing the parent process to go back to <code class="docutils literal"><span class="pre">ss.accept()</span></code>. This allows the program to accept multiple concurrent client connections, like the UDP version.</p>
+<p>The code here serves as a very basic example of the creation of Java threads. The inner class <code class="docutils literal"><span class="pre">Talker</span></code> has a <code class="docutils literal"><span class="pre">run()</span></code> method, needed to implement the <code class="docutils literal"><span class="pre">runnable</span></code> interface. To start a new thread, we create a new <code class="docutils literal"><span class="pre">Talker</span></code> instance; the <code class="docutils literal"><span class="pre">start()</span></code> call then begins <code class="docutils literal"><span class="pre">Talker.run()</span></code>, which runs for as long as the client keeps the connection open.
+The file here is <a class="reference external" href="auxiliary_files/stalk/tcp_stalks.java">tcp_stalks.java</a>.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/*</span> <span class="n">THREADED</span> <span class="n">simplex</span><span class="o">-</span><span class="n">talk</span> <span class="n">TCP</span> <span class="n">server</span> <span class="o">*/</span>
+<span class="o">/*</span> <span class="n">can</span> <span class="n">handle</span> <span class="n">multiple</span> <span class="n">CONCURRENT</span> <span class="n">client</span> <span class="n">connections</span> <span class="o">*/</span>
+<span class="o">/*</span> <span class="n">newline</span> <span class="ow">is</span> <span class="n">to</span> <span class="n">be</span> <span class="n">included</span> <span class="n">at</span> <span class="n">client</span> <span class="n">side</span> <span class="o">*/</span>
+
+<span class="kn">import</span> <span class="nn">java.net.</span><span class="o">*</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">java.io.</span><span class="o">*</span><span class="p">;</span>
+
+<span class="n">public</span> <span class="k">class</span> <span class="nc">tstalks</span> <span class="p">{</span>
+
+    <span class="n">static</span> <span class="n">public</span> <span class="nb">int</span> <span class="n">destport</span> <span class="o">=</span> <span class="mi">5431</span><span class="p">;</span>
+    <span class="n">static</span> <span class="n">public</span> <span class="nb">int</span> <span class="n">bufsize</span> <span class="o">=</span> <span class="mi">512</span><span class="p">;</span>
+    <span class="n">static</span> <span class="n">public</span> <span class="n">boolean</span> <span class="n">THREADING</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span>
+
+    <span class="n">static</span> <span class="n">public</span> <span class="n">void</span> <span class="n">main</span><span class="p">(</span><span class="n">String</span> <span class="n">args</span><span class="p">[])</span> <span class="p">{</span>
+        <span class="n">ServerSocket</span> <span class="n">ss</span><span class="p">;</span>
+        <span class="n">Socket</span> <span class="n">s</span><span class="p">;</span>
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="n">ss</span> <span class="o">=</span> <span class="n">new</span> <span class="n">ServerSocket</span><span class="p">(</span><span class="n">destport</span><span class="p">);</span>
+        <span class="p">}</span> <span class="n">catch</span> <span class="p">(</span><span class="n">IOException</span> <span class="n">ioe</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;can&#39;t create server socket&quot;</span><span class="p">);</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;server starting on port &quot;</span> <span class="o">+</span> <span class="n">ss</span><span class="o">.</span><span class="n">getLocalPort</span><span class="p">());</span>
+
+        <span class="k">while</span><span class="p">(</span><span class="n">true</span><span class="p">)</span> <span class="p">{</span> <span class="o">//</span> <span class="n">accept</span> <span class="n">loop</span>
+            <span class="k">try</span> <span class="p">{</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">ss</span><span class="o">.</span><span class="n">accept</span><span class="p">();</span>
+            <span class="p">}</span> <span class="n">catch</span> <span class="p">(</span><span class="n">IOException</span> <span class="n">ioe</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;Can&#39;t accept&quot;</span><span class="p">);</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="p">}</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">THREADING</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">Talker</span> <span class="n">talk</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Talker</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+                <span class="p">(</span><span class="n">new</span> <span class="n">Thread</span><span class="p">(</span><span class="n">talk</span><span class="p">))</span><span class="o">.</span><span class="n">start</span><span class="p">();</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                <span class="n">line_talker</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span> <span class="o">//</span> <span class="n">accept</span> <span class="n">loop</span>
+    <span class="p">}</span> <span class="o">//</span> <span class="n">end</span> <span class="n">of</span> <span class="n">main</span>
+
+    <span class="n">public</span> <span class="n">static</span> <span class="n">void</span> <span class="n">line_talker</span><span class="p">(</span><span class="n">Socket</span> <span class="n">s</span><span class="p">)</span> <span class="p">{</span>
+       <span class="nb">int</span> <span class="n">port</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">getPort</span><span class="p">();</span>
+        <span class="n">InputStream</span> <span class="n">istr</span><span class="p">;</span>
+        <span class="k">try</span> <span class="p">{</span> <span class="n">istr</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">getInputStream</span><span class="p">();</span> <span class="p">}</span>
+        <span class="n">catch</span> <span class="p">(</span><span class="n">IOException</span> <span class="n">ioe</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;cannot get input stream&quot;</span><span class="p">);</span>        <span class="o">//</span> <span class="n">most</span> <span class="n">likely</span> <span class="n">cause</span><span class="p">:</span> <span class="n">s</span> <span class="n">was</span> <span class="n">closed</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;New connection from &lt;&quot;</span> <span class="o">+</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">getInetAddress</span><span class="p">()</span><span class="o">.</span><span class="n">getHostAddress</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span> <span class="n">s</span><span class="o">.</span><span class="n">getPort</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">);</span>
+        <span class="n">byte</span><span class="p">[]</span> <span class="n">buf</span> <span class="o">=</span> <span class="n">new</span> <span class="n">byte</span><span class="p">[</span><span class="n">bufsize</span><span class="p">];</span>
+        <span class="nb">int</span> <span class="nb">len</span><span class="p">;</span>
+
+        <span class="k">while</span> <span class="p">(</span><span class="n">true</span><span class="p">)</span> <span class="p">{</span>         <span class="o">//</span> <span class="k">while</span> <span class="ow">not</span> <span class="n">done</span> <span class="n">reading</span> <span class="n">the</span> <span class="n">socket</span>
+            <span class="k">try</span> <span class="p">{</span>
+                <span class="nb">len</span> <span class="o">=</span> <span class="n">istr</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">bufsize</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="n">catch</span> <span class="p">(</span><span class="n">SocketTimeoutException</span> <span class="n">ste</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">System</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;socket timeout&quot;</span><span class="p">);</span>
+                <span class="k">continue</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="n">catch</span> <span class="p">(</span><span class="n">IOException</span> <span class="n">ioe</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;bad read&quot;</span><span class="p">);</span>
+                <span class="k">break</span><span class="p">;</span>        <span class="o">//</span> <span class="n">probably</span> <span class="n">a</span> <span class="n">socket</span> <span class="n">ABORT</span><span class="p">;</span> <span class="n">treat</span> <span class="k">as</span> <span class="n">a</span> <span class="n">close</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>              <span class="o">//</span> <span class="n">other</span> <span class="n">end</span> <span class="n">closed</span> <span class="n">gracefully</span>
+            <span class="n">String</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">new</span> <span class="n">String</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">);</span>
+            <span class="n">System</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span> <span class="o">+</span> <span class="n">port</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">);</span>  <span class="o">//</span> <span class="nb">str</span> <span class="n">should</span> <span class="n">contain</span> <span class="n">newline</span>
+        <span class="p">}</span> <span class="o">//</span><span class="k">while</span> <span class="n">reading</span> <span class="kn">from</span> <span class="nn">s</span>
+
+
+        <span class="k">try</span> <span class="p">{</span><span class="n">istr</span><span class="o">.</span><span class="n">close</span><span class="p">();}</span>
+        <span class="n">catch</span> <span class="p">(</span><span class="n">IOException</span> <span class="n">ioe</span><span class="p">)</span> <span class="p">{</span><span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;bad stream close&quot;</span><span class="p">);</span><span class="k">return</span><span class="p">;}</span>
+        <span class="k">try</span> <span class="p">{</span><span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">();}</span>
+        <span class="n">catch</span> <span class="p">(</span><span class="n">IOException</span> <span class="n">ioe</span><span class="p">)</span> <span class="p">{</span><span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;bad socket close&quot;</span><span class="p">);</span><span class="k">return</span><span class="p">;}</span>
+        <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;socket to port &quot;</span> <span class="o">+</span> <span class="n">port</span> <span class="o">+</span> <span class="s2">&quot; closed&quot;</span><span class="p">);</span>
+    <span class="p">}</span> <span class="o">//</span> <span class="n">line_talker</span>
+
+    <span class="n">static</span> <span class="k">class</span> <span class="nc">Talker</span> <span class="n">implements</span> <span class="n">Runnable</span> <span class="p">{</span>
+        <span class="n">private</span> <span class="n">Socket</span> <span class="n">_s</span><span class="p">;</span>
+
+        <span class="n">public</span> <span class="n">Talker</span> <span class="p">(</span><span class="n">Socket</span> <span class="n">s</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">_s</span> <span class="o">=</span> <span class="n">s</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="n">public</span> <span class="n">void</span> <span class="n">run</span><span class="p">()</span> <span class="p">{</span>
+            <span class="n">line_talker</span><span class="p">(</span><span class="n">_s</span><span class="p">);</span>
+        <span class="p">}</span> <span class="o">//</span> <span class="n">run</span>
+    <span class="p">}</span>  <span class="o">//</span> <span class="k">class</span> <span class="nc">Talker</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="section" id="the-tcp-client">
+<span id="tcp-client"></span><span id="index-34"></span><h3>12.6.1&nbsp;&nbsp;&nbsp;The TCP Client<a class="headerlink" href="#the-tcp-client" title="Permalink to this headline">¶</a></h3>
+<p>Here is the corresponding client <a class="reference external" href="auxiliary_files/stalk/tcp_stalkc.java">tcp_stalkc.java</a>. As with the UDP version, the default host to connect to is <code class="docutils literal"><span class="pre">localhost</span></code>. We first call <code class="docutils literal"><span class="pre">InetAddress.getByName()</span></code> to perform the DNS lookup. Part of the construction of the Socket object is the connection to the desired dest and destport. Within the main <code class="docutils literal"><span class="pre">while</span></code> loop, we use an ordinary <code class="docutils literal"><span class="pre">write()</span></code> call to write strings to the socket’s associated <code class="docutils literal"><span class="pre">OutputStream</span></code>.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">TCP</span> <span class="n">simplex</span><span class="o">-</span><span class="n">talk</span> <span class="n">CLIENT</span> <span class="ow">in</span> <span class="n">java</span>
+
+<span class="kn">import</span> <span class="nn">java.net.</span><span class="o">*</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">java.io.</span><span class="o">*</span><span class="p">;</span>
+
+<span class="n">public</span> <span class="k">class</span> <span class="nc">stalkc</span> <span class="p">{</span>
+
+    <span class="n">static</span> <span class="n">public</span> <span class="n">BufferedReader</span> <span class="nb">bin</span><span class="p">;</span>
+    <span class="n">static</span> <span class="n">public</span> <span class="nb">int</span> <span class="n">destport</span> <span class="o">=</span> <span class="mi">5431</span><span class="p">;</span>
+
+    <span class="n">static</span> <span class="n">public</span> <span class="n">void</span> <span class="n">main</span><span class="p">(</span><span class="n">String</span> <span class="n">args</span><span class="p">[])</span> <span class="p">{</span>
+        <span class="n">String</span> <span class="n">desthost</span> <span class="o">=</span> <span class="s2">&quot;localhost&quot;</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">length</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="n">desthost</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+        <span class="nb">bin</span> <span class="o">=</span> <span class="n">new</span> <span class="n">BufferedReader</span><span class="p">(</span><span class="n">new</span> <span class="n">InputStreamReader</span><span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="ow">in</span><span class="p">));</span>
+
+        <span class="n">InetAddress</span> <span class="n">dest</span><span class="p">;</span>
+        <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;Looking up address of &quot;</span> <span class="o">+</span> <span class="n">desthost</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span><span class="p">);</span>
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="n">dest</span> <span class="o">=</span> <span class="n">InetAddress</span><span class="o">.</span><span class="n">getByName</span><span class="p">(</span><span class="n">desthost</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">catch</span> <span class="p">(</span><span class="n">UnknownHostException</span> <span class="n">uhe</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;unknown host: &quot;</span> <span class="o">+</span> <span class="n">desthost</span><span class="p">);</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot; got it!&quot;</span><span class="p">);</span>
+
+        <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;connecting to port &quot;</span> <span class="o">+</span> <span class="n">destport</span><span class="p">);</span>
+        <span class="n">Socket</span> <span class="n">s</span><span class="p">;</span>
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Socket</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">destport</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">catch</span><span class="p">(</span><span class="n">IOException</span> <span class="n">ioe</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;cannot connect to &lt;&quot;</span> <span class="o">+</span> <span class="n">desthost</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span> <span class="n">destport</span> <span class="o">+</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">);</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="n">OutputStream</span> <span class="n">sout</span><span class="p">;</span>
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="n">sout</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">getOutputStream</span><span class="p">();</span>
+        <span class="p">}</span>
+        <span class="n">catch</span> <span class="p">(</span><span class="n">IOException</span> <span class="n">ioe</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;I/O failure!&quot;</span><span class="p">);</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="o">//============================================================</span>
+
+        <span class="k">while</span> <span class="p">(</span><span class="n">true</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">String</span> <span class="n">buf</span><span class="p">;</span>
+            <span class="k">try</span> <span class="p">{</span>
+                <span class="n">buf</span> <span class="o">=</span> <span class="nb">bin</span><span class="o">.</span><span class="n">readLine</span><span class="p">();</span>
+            <span class="p">}</span>
+            <span class="n">catch</span> <span class="p">(</span><span class="n">IOException</span> <span class="n">ioe</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;readLine() failed&quot;</span><span class="p">);</span>
+                <span class="k">return</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">buf</span> <span class="o">==</span> <span class="n">null</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>     <span class="o">//</span> <span class="n">user</span> <span class="n">typed</span> <span class="n">EOF</span> <span class="n">character</span>
+
+            <span class="n">buf</span> <span class="o">=</span> <span class="n">buf</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>          <span class="o">//</span> <span class="n">protocol</span> <span class="n">requires</span> <span class="n">sender</span> <span class="n">includes</span> \<span class="n">n</span>
+            <span class="n">byte</span><span class="p">[]</span> <span class="n">bbuf</span> <span class="o">=</span> <span class="n">buf</span><span class="o">.</span><span class="n">getBytes</span><span class="p">();</span>
+
+            <span class="k">try</span> <span class="p">{</span>
+                <span class="n">sout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">bbuf</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="n">catch</span> <span class="p">(</span><span class="n">IOException</span> <span class="n">ioe</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">System</span><span class="o">.</span><span class="n">err</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="s2">&quot;write() failed&quot;</span><span class="p">);</span>
+                <span class="k">return</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span> <span class="o">//</span> <span class="k">while</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>A Python3 version of the stalk client is available at <a class="reference external" href="auxiliary_files/stalk/tcp_stalkc.py">tcp_stalkc.py</a>.</p>
+<p>Here are some things to try with THREADING=false in the server:</p>
+<ul class="simple">
+<li>start up two clients while the server is running. Type some message lines into both. Then exit the first client.</li>
+<li>start up the client before the server.</li>
+<li>start up the server, and then the client. Kill the server and then type some message lines to the client. What happens to the client? (It may take a couple message lines.)</li>
+<li>start the server, then the client. Kill the server and restart it. Now what happens to the client?</li>
+</ul>
+<p>With THREADING=true, try connecting multiple clients simultaneously to the server. How does this behave differently from the first example above?</p>
+<p>See also exercise 14.0.</p>
+</div>
+<div class="section" id="netcat-again">
+<span id="netcat-tcp"></span><span id="index-35"></span><h3>12.6.2&nbsp;&nbsp;&nbsp;<code class="docutils literal"><span class="pre">netcat</span></code> again<a class="headerlink" href="#netcat-again" title="Permalink to this headline">¶</a></h3>
+<p>As with UDP (<a class="reference internal" href="udp.html#netcat-udp"><span class="std std-ref">11.1.4&nbsp;&nbsp;&nbsp;netcat</span></a>), we can use the <code class="docutils literal"><span class="pre">netcat</span></code> utility to act as either end of the TCP simplex-talk connection. As the client we can use</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">netcat</span> <span class="n">localhost</span> <span class="mi">5431</span>
+</pre></div>
+</div>
+<p>while as the server we can use</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">netcat</span> <span class="o">-</span><span class="n">l</span> <span class="o">-</span><span class="n">k</span> <span class="mi">5431</span>
+</pre></div>
+</div>
+<p>Here (but not with UDP) the <code class="docutils literal"><span class="pre">-k</span></code> option causes the server to accept multiple connections in sequence. The connections are handled one at a time, as is the case in the stalk server above with <code class="docutils literal"><span class="pre">THREADING=false</span></code>.</p>
+<p id="index-36">We can also use <code class="docutils literal"><span class="pre">netcat</span></code> to download web pages, using the <a class="reference external" href="https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol">HTTP</a> protocol. The command below sends an HTTP GET request (version 1.1; <span class="target" id="index-37"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2616.html"><strong>RFC 2616</strong></a> and updates) to retrieve part of the website for this book; it has been broken over two lines for convenience.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">echo</span> <span class="o">-</span><span class="n">e</span> <span class="s1">&#39;GET /index.html HTTP/1.1</span><span class="se">\r\n</span><span class="s1">HOST: intronetworks.cs.luc.edu</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="o">|</span>
+<span class="n">netcat</span> <span class="n">intronetworks</span><span class="o">.</span><span class="n">cs</span><span class="o">.</span><span class="n">luc</span><span class="o">.</span><span class="n">edu</span> <span class="mi">80</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">\r\n</span></code> represents the officially mandatory carriage-return/newline line-ending sequence, though <code class="docutils literal"><span class="pre">\n</span></code> will often work. The <code class="docutils literal"><span class="pre">index.html</span></code> identifies the file being requested; as <code class="docutils literal"><span class="pre">index.html</span></code> is the default it is often omitted, though the preceding <code class="docutils literal"><span class="pre">/</span></code> is still required. The webserver may support other websites as well via virtual hosting (<a class="reference internal" href="ipv4.html#nslookup1"><span class="std std-ref">7.8.2&nbsp;&nbsp;&nbsp;nslookup and dig</span></a>); the <code class="docutils literal"><span class="pre">HOST:</span></code> specification identifies to the server the specific site we are looking for. Version 2 of HTTP is described in <span class="target" id="index-38"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc7540.html"><strong>RFC 7540</strong></a>; its primary format is binary. (For production command-line retrieval of web pages, <a class="reference external" href="https://curl.haxx.se/">cURL</a> and <a class="reference external" href="https://www.gnu.org/software/wget/">wget</a> are standard choices.)</p>
+</div>
+</div>
+<div class="section" id="tcp-state-diagram">
+<span id="index-39"></span><span id="id8"></span><h2>12.7&nbsp;&nbsp;&nbsp;TCP state diagram<a class="headerlink" href="#tcp-state-diagram" title="Permalink to this headline">¶</a></h2>
+<p>A formal definition of TCP involves the <strong>state diagram</strong>, with conditions for transferring from one state to another, and responses to all packets from each state. The state diagram originally appeared in <span class="target" id="index-40"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc793.html"><strong>RFC 793</strong></a>; the following interpretation of the state diagram came from <a class="reference external" href="http://commons.wikimedia.org/wiki/File:Tcp_state_diagram_fixed.svg">http://commons.wikimedia.org/wiki/File:Tcp_state_diagram_fixed.svg</a> and was authored by Wikipedia users Sergiodc2, Marty Pauley, and DnetSvg. The blue arrows indicate the sequence of state transitions typically followed by the server; the brown arrows represent the client. Arrows are labeled with <strong>event / action</strong>; that is, we move from LISTEN to SYN_RECD upon receipt of a SYN packet; the action is to respond with SYN+ACK.</p>
+<img alt="_images/tcp_state_diagram_fixed2_scaled.svg" src="_images/tcp_state_diagram_fixed2_scaled.svg" /><p>In general, this state-machine approach to protocol specification has proven very effective, and is used for most protocols. It makes it very clear to the implementer how the system should respond to each packet arrival. It is also a useful model for the implementation itself.</p>
+<p id="index-41">It is visually impractical to list every possible transition within the state diagram, full details are usually left to the accompanying text. For example, although this does not appear in the state diagram above, the per-state response rules of TCP require that in the ESTABLISHED state, if the receiver sends an ACK outside the current sliding window, then the correct response is to reply with one’s own current ACK. This includes the case where the receiver <em>acknowledges data not yet sent</em>.</p>
+<p id="index-42">The ESTABLISHED state and the states below it are sometimes called the <strong>synchronized</strong> states, as in these states both sides have confirmed one another’s ISN values.</p>
+<p>Here is the ladder diagram for the 14-packet connection described above, this time labeled with TCP states.</p>
+<img alt="_images/tcp_ladder_states.svg" src="_images/tcp_ladder_states.svg" /><p id="index-43">Although it essentially never occurs in practice, it is possible for each side to send the other a SYN, requesting a connection, <strong>simultaneously</strong> (that is, the SYNs cross on the wire). The telephony analogue occurs when each party dials the other simultaneously. On traditional land-lines, each party then gets a busy signal. On cell phones, your mileage may vary. With TCP, a single connection is created. With OSI TP4, two connections are created. The OSI approach is not possible in TCP, as a connection is determined only by the socketpair involved; if there is only one socketpair then there can be only one connection.</p>
+<p id="index-44">It is possible to view connection states under either Linux or Windows with <code class="docutils literal"><span class="pre">netstat</span> <span class="pre">-a</span></code>. Most states are ephemeral, exceptions being LISTEN, ESTABLISHED, TIMEWAIT, and CLOSE_WAIT. One sometimes sees large numbers of connections in CLOSE_WAIT, meaning that the remote endpoint has closed the connection and sent its FIN, but the process at your end has not executed <code class="docutils literal"><span class="pre">close()</span></code> on its socket. Often this represents a programming error; alternatively, the process at the local end is still working on something. Given a local port number p in state CLOSE_WAIT on a Linux system, the (privileged) command <code class="docutils literal"><span class="pre">lsof</span> <span class="pre">-i</span> <span class="pre">:</span></code><em>p</em> will identify the process using port p.</p>
+<p>The reader who is implementing TCP is encouraged to consult <span class="target" id="index-45"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc793.html"><strong>RFC 793</strong></a> and updates. For the rest of us, below are a few general observations about closing connections.</p>
+<div class="section" id="closing-a-connection">
+<span id="closing"></span><h3>12.7.1&nbsp;&nbsp;&nbsp;Closing a connection<a class="headerlink" href="#closing-a-connection" title="Permalink to this headline">¶</a></h3>
+<p>The “normal” TCP close sequence is as follows:</p>
+<img alt="_images/tcp_close2.svg" src="_images/tcp_close2.svg" /><p>A’s FIN is, in effect, a promise to B not to <em>send</em> any more. However, A must still be prepared to receive data from B, hence the optional data shown in the diagram. A good example of this occurs when A is sending a stream of data to B to be sorted; A sends FIN to indicate that it is done sending, and only then does B sort the data and begin sending it back to A. This can be generated with the command, on A, <code class="docutils literal"><span class="pre">cat</span> <span class="pre">thefile</span> <span class="pre">|</span> <span class="pre">ssh</span> <span class="pre">B</span> <span class="pre">sort</span></code>. That said, the presence of the optional B-to-A data above following A’s FIN is relatively less common.</p>
+<p>In the diagram above, A sends a FIN to B and receives an ACK, and then, later, B sends a FIN to A and receives an ACK. This essentially amounts to two separate two-way closure handshakes.</p>
+<p id="index-46">Either side may elect to close the connection, just as either party to a telephone call may elect to hang up. The first side to send a FIN – A in the diagram above – takes the <strong>Active CLOSE</strong> path; the other side takes the <strong>Passive CLOSE</strong> path. In the diagram, active-closer A moves from state ESTABLISHED to FIN_WAIT_1 to FIN_WAIT_2 (upon receipt of B’s ACK of A’s FIN), and then to TIMEWAIT and finally to CLOSED. Passive-closer B moves from ESTABLISHED to CLOSE_WAIT to LAST_ACK to CLOSED.</p>
+<p>A <strong>simultaneous close</strong> – having both sides send each other FINs before receiving the other side’s FIN – is a little more likely than a simultaneous open, earlier above, though still not very. Each side would send its FIN and move to state FIN_WAIT_1. Then, upon receiving each other’s FIN packets, each side would send its final ACK and move to CLOSING. See exercises 4.0 and 4.5.</p>
+<p id="index-47">A TCP endpoint is <strong>half-closed</strong> if it has sent its FIN (thus promising not to send any more data) and is waiting for the other side’s FIN; this corresponds to A in the diagram above in states FIN_WAIT_1 and FIN_WAIT_2. With the BSD socket library, an application can half-close its connection with the appropriate call to <code class="docutils literal"><span class="pre">shutdown()</span></code>.</p>
+<p id="index-48">Unrelatedly, A TCP endpoint is <strong>half-open</strong> if it is in the ESTABLISHED state, but during a lull in the exchange of packets the other side has rebooted; this has nothing to do with the close protocol. As soon as the ESTABLISHED side sends a packet, the rebooted side will respond with RST and the connection will be fully closed.</p>
+<p>In the absence of the optional data from B to A after A sends its FIN, the closing sequence reduces to the left-hand diagram below:</p>
+<img alt="_images/tcp_closes.svg" src="_images/tcp_closes.svg" /><p>If B is ready to close immediately, it is possible for B’s ACK and FIN to be combined, as in the right-hand diagram above, in which case the resultant diagram superficially resembles the connection-opening three-way handshake. In this case, A moves directly from FIN_WAIT_1 to TIMEWAIT, following the state-diagram link labeled “FIN + ACK-of-FIN”. In theory this is rare, as the ACK of A’s FIN is generated by the kernel but B’s FIN cannot be sent until B’s process is scheduled to run on the CPU. If the TCP layer adopts a policy of <em>immediately</em> sending ACKs upon receipt of any packet, this will never happen, as the ACK will be sent well before B’s process can be scheduled to do anything. However, if B <em>delays</em> its ACKs slightly (and if it has no more data to send), then it is possible – and in fact not uncommon – for B’s ACK and FIN to be sent together. Delayed ACKs, are, as we shall see below, a common strategy (<a class="reference internal" href="#delayed-acks"><span class="std std-ref">12.15&nbsp;&nbsp;&nbsp;TCP Delayed ACKs</span></a>). To create the scenario of <a class="reference internal" href="#tcp-and-wireshark"><span class="std std-ref">12.4&nbsp;&nbsp;&nbsp;TCP and WireShark</span></a>, it was necessary to introduce an artificial delay to prevent the simultaneous transmission of B’s ACK and FIN.</p>
+</div>
+<div class="section" id="calling-close">
+<span id="index-49"></span><span id="id9"></span><h3>12.7.2&nbsp;&nbsp;&nbsp;Calling <code class="docutils literal"><span class="pre">close()</span></code><a class="headerlink" href="#calling-close" title="Permalink to this headline">¶</a></h3>
+<p>Most network programming interfaces provide a <code class="docutils literal"><span class="pre">close()</span></code> method for ending a connection, based on the close operation for files. However, it usually closes bidirectionally and so models the TCP closure protocol rather imperfectly.</p>
+<p>As we have seen in the previous section, the TCP close sequence is is followed more naturally if the active-closing endpoint  calls <code class="docutils literal"><span class="pre">shutdown()</span></code> – promising not to send more, but allowing for continued receiving – before the final <code class="docutils literal"><span class="pre">close()</span></code>. Here is what <em>should</em> happen at the application layer if endpoint A of a TCP connection wishes to initiate the closing of its connection with endpoint B:</p>
+<ul class="simple">
+<li>A’s application calls <code class="docutils literal"><span class="pre">shutdown()</span></code>, thereby promising not to send any more data. A’s FIN is sent to B. A’s application is expected to continue reading, however.</li>
+<li>The connection is now half-closed. On receipt of A’s FIN, B’s TCP layer knows this. If B’s application attempts to read more data, it will receive an end-of-file indication (this is typically a <code class="docutils literal"><span class="pre">read()</span></code> or <code class="docutils literal"><span class="pre">recv()</span></code> operation that returns immediately with 0 bytes received).</li>
+<li>B’s application is now done reading data, but it may or may not have more data to send. When B’s application is done sending, it calls <code class="docutils literal"><span class="pre">close()</span></code>, at which point B’s FIN is sent to A. Because the connection is already half-closed, B’s <code class="docutils literal"><span class="pre">close()</span></code> is really a second half-close, ending further transmission by B.</li>
+<li>A’s application keeps reading until it too receives an end-of-file indication, corresponding to B’s FIN.</li>
+<li>The connection is now fully closed. No data has been lost.</li>
+</ul>
+<p>It is sometimes the case that it is evident to A from the application protocol that B will not send more data. In such cases, A might simply call <code class="docutils literal"><span class="pre">close()</span></code> instead of <code class="docutils literal"><span class="pre">shutdown()</span></code>. This is risky, however, unless the protocol is crystal clear: if A calls <code class="docutils literal"><span class="pre">close()</span></code> and B later does send a little more data after all, or if B has already sent some data but A has not actually read it, A’s TCP layer may send RST to B to indicate that not all B’s data was received properly. <span class="target" id="index-50"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1122.html"><strong>RFC 1122</strong></a> puts it this way:</p>
+<blockquote>
+<div>If such a host issues a CLOSE call while received data is still pending in TCP, or if new data is received after CLOSE is called, its TCP SHOULD send a RST to show that data was lost.</div></blockquote>
+<p>If A’s RST arrives at B before all of A’s sent data has been processed by B’s application, it is entirely possible that data sent by A will be lost, that is, will never be read by B.</p>
+<p id="index-51">In the BSD socket library, A can set the <code class="docutils literal"><span class="pre">SO_LINGER</span></code> option, which causes A’s <code class="docutils literal"><span class="pre">close()</span></code> to block until A’s data has been delivered to B (or until the <code class="docutils literal"><span class="pre">SO_LINGER</span></code> timeout has expired). However, <code class="docutils literal"><span class="pre">SO_LINGER</span></code> has no bearing on the issue above; post-close data from B to A will still cause A to send a RST.</p>
+<p>In the simplex-talk program at <a class="reference internal" href="#tcp-simplex-talk"><span class="std std-ref">12.6&nbsp;&nbsp;&nbsp;TCP simplex-talk</span></a>, the client does not call <code class="docutils literal"><span class="pre">shutdown()</span></code> (it implicitly calls <code class="docutils literal"><span class="pre">close()</span></code> when it exits). When the client is done, the server calls <code class="docutils literal"><span class="pre">s.close()</span></code>. However, the fact that there is no data at all sent from the server to the client prevents the problem discussed above.</p>
+<p>See exercises 14.0 and 15.0.</p>
+</div>
+</div>
+<div class="section" id="tcp-old-duplicates">
+<span id="index-52"></span><span id="id10"></span><h2>12.8&nbsp;&nbsp;&nbsp;TCP Old Duplicates<a class="headerlink" href="#tcp-old-duplicates" title="Permalink to this headline">¶</a></h2>
+<p>Conceptually, perhaps the most serious threat facing the integrity of TCP data is external old duplicates (<a class="reference internal" href="udp.html#canonical-transport-issues"><span class="std std-ref">11.3&nbsp;&nbsp;&nbsp;Fundamental Transport Issues</span></a>), that is, very late packets from a previous instance of the connection. Suppose a TCP connection is opened between A and B. One packet from A to B is duplicated and unduly delayed, with sequence number N. The connection is closed, and then another instance is reopened, that is, a connection is created using the same ports. At some point in the second connection, when an arriving packet with seq=N would be acceptable at B, the old duplicate shows up. Later, of course, B is likely to receive a seq=N packet from the new instance of the connection, but that packet will be seen by B as a duplicate (even though the data does not match), and (we will assume) be ignored.</p>
+<img alt="_images/old_duplicates.svg" src="_images/old_duplicates.svg" /><p>For TCP, it is the actual sequence numbers, rather than the relative sequence numbers, that would have to match up. The diagram above ignores that.</p>
+<p>As with TFTP, coming up with a possible scenario accounting for the generation of such a late packet is not easy. Nonetheless, many of the design details of TCP represent attempts to minimize this risk.</p>
+<p>Solutions to the old-duplicates problem generally involve setting an upper bound on the lifetime of any packet, the MSL, as we shall see in the next section. T/TCP (<a class="reference internal" href="#t-tcp"><span class="std std-ref">12.12&nbsp;&nbsp;&nbsp;TCP Faster Opening</span></a>) introduced a connection-count field for this.</p>
+<p>TCP is also vulnerable to sequence-number wraparound: arrival of an old duplicates from the <em>same</em> instance of the connection. However, if we take the MSL to be 60 seconds, sequence-number wrap requires sending 2<sup>32</sup> bytes in 60 seconds, which requires a data-transfer rate in excess of 500 Mbps. TCP offers a fix for this (Protection Against Wrapped Segments, or PAWS), but it was introduced relatively late; we return to this in <a class="reference internal" href="#anomalous-tcp-scenarios"><span class="std std-ref">12.11&nbsp;&nbsp;&nbsp;Anomalous TCP scenarios</span></a>.</p>
+</div>
+<div class="section" id="timewait">
+<span id="index-53"></span><span id="id11"></span><h2>12.9&nbsp;&nbsp;&nbsp;TIMEWAIT<a class="headerlink" href="#timewait" title="Permalink to this headline">¶</a></h2>
+<p>The TIMEWAIT state is entered by whichever side initiates the connection close; in the event of a simultaneous close, both sides enter TIMEWAIT. It is to last for a time 2×MSL, where MSL = Maximum Segment Lifetime is an agreed-upon value for the maximum lifetime on the Internet of an IP packet. Traditionally MSL was taken to be 60 seconds, but more modern implementations often assume 30 seconds (for a TIMEWAIT period of 60 seconds).</p>
+<p id="index-54">One function of TIMEWAIT is to solve the external-old-duplicates problem. TIMEWAIT requires that between closing and reopening a connection, a long enough interval must pass that any packets from the first instance will disappear. After the expiration of the TIMEWAIT interval, an old duplicate cannot arrive.</p>
+<p>A second function of TIMEWAIT is to address the lost-final-ACK problem (<a class="reference internal" href="udp.html#canonical-transport-issues"><span class="std std-ref">11.3&nbsp;&nbsp;&nbsp;Fundamental Transport Issues</span></a>). If host A sends its final ACK to host B and this is lost, then B will eventually retransmit <em>its</em> final packet, which will be its FIN. As long as A remains in state TIMEWAIT, it can appropriately reply to a retransmitted FIN from B with a duplicate final ACK. As with TFTP, it is possible (though unlikely) for the final ACK to be lost as well as all the retransmitted final FINs sent during the TIMEWAIT period; should this happen, one side thinks the connection closed normally while the other side thinks it did not. See exercise 12.0.</p>
+<p>TIMEWAIT only blocks reconnections for which both sides reuse the same port they used before. If A connects to B and closes the connection, A is free to connect again to B using a different port at A’s end.</p>
+<p>Conceptually, a host may have many old connections to the same port simultaneously in TIMEWAIT; the host must thus maintain for each of its ports a list of all the remote ⟨IP_address,port⟩ sockets currently in TIMEWAIT for that port. If a host is connecting as a client, this list likely will amount to a list of recently used ports; no port is likely to have been used twice within the TIMEWAIT interval. If a host is a server, however, accepting connections on a standardized port, and happens to be the side that initiates the active close and thus later goes into TIMEWAIT, then its TIMEWAIT list for that port can grow quite long.</p>
+<p id="index-55">Generally, busy servers prefer to be free from these bookkeeping requirements of TIMEWAIT, so many protocols are designed so that it is the client that initiates the active close. In the original HTTP protocol, version 1.0, the server sent back the data stream requested by the http GET message (<a class="reference internal" href="#netcat-tcp"><span class="std std-ref">12.6.2&nbsp;&nbsp;&nbsp;netcat again</span></a>), and indicated the end of this stream by closing the connection. In HTTP 1.1 this was fixed so that the client initiated the close; this required a new mechanism by which the server could indicate “I am done sending this file”. HTTP 1.1 also used this new mechanism to allow the server to send back multiple files over one connection.</p>
+<p id="index-56">In an environment in which many short-lived connections are made from host A to the same port on server B, port exhaustion – having all ports tied up in TIMEWAIT – is a theoretical possibility. If A makes 1000 connections per second, then after 60 seconds it has gone through 60,000 available ports, and there are essentially none left. While this rate is high, early Berkeley-Unix TCP implementations often made only about 4,000 ports available to clients; with a 120-second TIMEWAIT interval, port exhaustion would occur with only 33 connections per second.</p>
+<p>If you use ssh to connect to a server and then issue the <code class="docutils literal"><span class="pre">netstat</span> <span class="pre">-a</span></code> command on your own host (or, more conveniently, <code class="docutils literal"><span class="pre">netstat</span> <span class="pre">-a</span> <span class="pre">|grep</span> <span class="pre">-i</span> <span class="pre">tcp</span></code>), you should see your connection in ESTABLISHED state. If you close your connection and check again, your connection should be in TIMEWAIT.</p>
+</div>
+<div class="section" id="the-three-way-handshake-revisited">
+<span id="index-57"></span><h2>12.10&nbsp;&nbsp;&nbsp;The Three-Way Handshake Revisited<a class="headerlink" href="#the-three-way-handshake-revisited" title="Permalink to this headline">¶</a></h2>
+<p>As stated earlier in <a class="reference internal" href="#tcp-connection-establishment"><span class="std std-ref">12.3&nbsp;&nbsp;&nbsp;TCP Connection Establishment</span></a>, both sides choose an ISN; actual sequence numbers are the sum of the sender’s ISN and the relative sequence number. There are two original reasons for this mechanism, and one later one (<a class="reference internal" href="#isn-spoofing"><span class="std std-ref">12.10.1&nbsp;&nbsp;&nbsp;ISNs and spoofing</span></a>). The original TCP specification, as clarified in <span class="target" id="index-58"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1122.html"><strong>RFC 1122</strong></a>, called for the ISN to be determined by a special <strong>clock</strong>, incremented by 1 every 4 microseconds.</p>
+<p>The most basic reason for using ISNs is to detect duplicate SYNs. Suppose A initiates a connection to B by sending a SYN packet. B replies with SYN+ACK, but this is lost. A then times out and retransmits its SYN. B now receives A’s second SYN while in state SYN_RECEIVED. Does this represent an entirely new request (perhaps A has suddenly restarted), or is it a duplicate? If A uses the clock-driven ISN strategy, B can tell (<em>almost</em> certainly) whether A’s second SYN is new or a duplicate: only in the latter case will the ISN values in the two SYNs match.</p>
+<p>While there is no danger to data integrity if A sends a SYN, restarts, and sends the SYN again as part of a reopening the same connection, the arrival of a second SYN with a new ISN means that the original connection cannot proceed, because that ISN is now wrong. The receiver of the duplicate SYN should drop any connection state it has recorded so far, and restart processing the second SYN from scratch.</p>
+<p>The clock-driven ISN also originally added a second layer of protection against external old duplicates. Suppose that A opens a connection to B, and chooses a clock-based ISN N<sub>1</sub>. A then transfers M bytes of data, closed the connection, and reopens it with ISN N<sub>2</sub>. If N<sub>1</sub> + M &lt; N<sub>2</sub>, then the old-duplicates problem <em>cannot occur</em>: all of the absolute sequence numbers used in the first instance of the connection are less than or equal to N<sub>1</sub> + M, and all of the absolute sequence numbers used in the second instance will be greater than N<sub>2</sub>. In fact, early Berkeley-Unix implementations of the socket library often allowed a second connection meeting this ISN requirement to be reopened <em>before</em> TIMEWAIT would have expired; this potentially addressed the problem of port exhaustion. Of course, if the first instance of the connection transferred data faster than the ISN clock rate, that is at more than 250,000 bytes/sec, then N<sub>1</sub> + M would be greater than N<sub>2</sub>, and TIMEWAIT would have to be enforced. But in the era in which TCP was first developed, sustained transfers exceeding 250,000 bytes/sec were not common.</p>
+<p>The three-way handshake was extensively analyzed by Dalal and Sunshine in <a class="reference internal" href="bibliography.html#ds78" id="id12">[DS78]</a>. The authors noted that with a two-way handshake, the second side receives no confirmation that its ISN was correctly received. The authors also observed that a four-way handshake – in which the ACK of ISN<sub>A</sub> is sent separately from ISN<sub>B</sub>, as in the diagram below – could fail if one side restarted.</p>
+<img alt="_images/tcp_4wh.svg" src="_images/tcp_4wh.svg" /><p>For this failure to occur, assume that after sending the SYN in line 1, with ISN<sub>A1</sub>, A restarts. The ACK in line 2 is either ignored or not received. B now sends its SYN in line 3, but A interprets this as a new connection request; it will respond after line 4 by sending a fifth, SYN packet containing a different ISN<sub>A2</sub>. For B the connection is now ESTABLISHED, and if B acknowledges this fifth packet but fails to update its record of A’s ISN, the connection will fail as A and B would have different notions of ISN<sub>A</sub>.</p>
+<div class="section" id="isns-and-spoofing">
+<span id="isn-spoofing"></span><h3>12.10.1&nbsp;&nbsp;&nbsp;ISNs and spoofing<a class="headerlink" href="#isns-and-spoofing" title="Permalink to this headline">¶</a></h3>
+<p>The clock-based ISN proved to have a significant weakness: it often allowed an attacker to guess the ISN a remote host might use. It did not help any that an early version of Berkeley Unix, instead of incrementing the ISN 250,000 times a second, incremented it once a second, by 250,000 (plus something for each connection). By guessing the ISN a remote host would choose, an attacker might be able to mimic a local, trusted host, and thus gain privileged access.</p>
+<p>Specifically, suppose host A trusts its neighbor B, and executes with privileged status commands sent by B; this situation was typical in the era of the <code class="docutils literal"><span class="pre">rhost</span></code> command. A authenticates these commands because the connection comes from B’s IP address. The bad guy, M, wants to send packets to A so as to <em>pretend</em> to be B, and thus get a privileged command invoked. The connection only needs to be <em>started</em>; if the ruse is discovered after the command is executed, it is too late. M can easily send a SYN packet to A with B’s IP address in the source-IP field; M can probably temporarily disable B too, so that A’s SYN-ACK response, which is sent to B, goes unnoticed. What is harder is for M to figure out how to guess how to ACK ISN<sub>A</sub>. But if A generates ISNs with a slowly incrementing clock, M can guess the pattern of the clock with previous connection attempts, and can thus guess ISN<sub>A</sub> with a considerable degree of accuracy. So M sends SYN to A with B as source, A sends SYN-ACK to B containing ISN<sub>A</sub>, and M <em>guesses</em> this value and sends ACK(ISN<sub>A</sub>+1) to A, again with B listed in the IP header as source, followed by a single-packet command.</p>
+<p id="index-59">This TCP-layer IP-spoofing technique was first described by Robert T Morris in <a class="reference internal" href="bibliography.html#rtm85" id="id13">[RTM85]</a>; Morris went on to launch the <a class="reference external" href="https://en.wikipedia.org/wiki/Morris_worm">Internet Worm of 1988</a> using unrelated attacks. The IP-spoofing technique was used in the 1994 Christmas Day attack against UCSD, launched from Loyola’s own apollo.it.luc.edu; the attack was associated with <a class="reference external" href="http://en.wikipedia.org/wiki/Kevin_Mitnick">Kevin Mitnick</a> though apparently not actually carried out by him. Mitnick was arrested a few months later.</p>
+<p><span class="target" id="index-60"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1948.html"><strong>RFC 1948</strong></a>, in May 1996, introduced a technique for introducing a degree of randomization in ISN selection, while still ensuring that the same ISN would not be used twice in a row for the same connection. The ISN is to be the sum of the 4-µs clock, C(t), and a secure hash of the connection information as follows:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">ISN = C(t) + hash(local_addr, local_port, remote_addr, remote_port, key)</div>
+</div>
+</div></blockquote>
+<p>The <code class="docutils literal"><span class="pre">key</span></code> value is a random value chosen by the host on startup. While M, above, can poll A for its current ISN, and can probably guess the hash function and the first four parameters above, without knowing the key it cannot determine (or easily guess) the ISN value A would have sent to B. Legitimate connections between A and B, on the other hand, see the ISN increasing at the 4-µs rate.</p>
+<p><span class="target" id="index-61"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc5925.html"><strong>RFC 5925</strong></a> addresses spoofing and related attacks by introducing an optional TCP authentication mechanism: the TCP header includes an option containing a secure hash (<a class="reference internal" href="security.html#secure-hashes"><span class="std std-ref">22.6&nbsp;&nbsp;&nbsp;Secure Hashes</span></a>) of the rest of the TCP header and a shared secret key. The need for key management limits when this mechanism can be used; the classic use case is BGP connections between routers (<a class="reference internal" href="bigrouting.html#bgp"><span class="std std-ref">10.6&nbsp;&nbsp;&nbsp;Border Gateway Protocol, BGP</span></a>).</p>
+<p>Another approach to the prevention of spoofing attacks is to ask sites and ISPs to refuse to forward outwards any IP packets with a source address not from within that site or ISP. If an attacker’s ISP implements this, the attacker will be unable to launch spoofing attacks against the outside world. A concrete proposal can be found in <span class="target" id="index-62"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2827.html"><strong>RFC 2827</strong></a>. Unfortunately, it has been (as of 2015) almost entirely ignored.</p>
+<p>See also the discussion of SYN flooding at <a class="reference internal" href="#tcp-connection-establishment"><span class="std std-ref">12.3&nbsp;&nbsp;&nbsp;TCP Connection Establishment</span></a>, although that attack does not involve ISN manipulation.</p>
+</div>
+</div>
+<div class="section" id="anomalous-tcp-scenarios">
+<span id="id14"></span><h2>12.11&nbsp;&nbsp;&nbsp;Anomalous TCP scenarios<a class="headerlink" href="#anomalous-tcp-scenarios" title="Permalink to this headline">¶</a></h2>
+<p>TCP, like any transport protocol, must address the transport issues in <a class="reference internal" href="udp.html#canonical-transport-issues"><span class="std std-ref">11.3&nbsp;&nbsp;&nbsp;Fundamental Transport Issues</span></a>.</p>
+<p>As we saw above, TCP addresses the Duplicate Connection Request (Duplicate SYN) issue by noting whether the ISN has changed. This is handled at the kernel level by TCP, versus TFTP’s application-level (and rather desultory) approach to handing Duplicate RRQs.</p>
+<p>TCP addresses Loss of Final ACK through TIMEWAIT: as long as the TIMEWAIT period has not expired, if the final ACK is lost and the other side resends its final FIN, TCP will still be able to reissue that final ACK. TIMEWAIT in this sense serves a similar function to TFTP’s DALLY state.</p>
+<p>External Old Duplicates, arriving as part of a previous instance of the connection, are prevented by TIMEWAIT, and may also be prevented by the use of a clock-driven ISN.</p>
+<p id="index-63">Internal Old Duplicates, from the <em>same</em> instance of the connection, that is, sequence number wraparound, is only an issue for bandwidths exceeding 500 Mbps: only at bandwidths above that can 4 GB be sent in one 60-second MSL. TCP implementations now address this with PAWS: Protection Against Wrapped Segments (<span class="target" id="index-64"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1323.html"><strong>RFC 1323</strong></a>). PAWS adds a 32-bit “timestamp option” to the TCP header. The granularity of the timestamp clock is left unspecified; one tick must be small enough that sequence numbers cannot wrap in that interval (<em>eg</em> less than 3 seconds for 10,000 Mbps), and large enough that the timestamps cannot wrap in time MSL. On Linux systems the timestamp clock granularity is typically 1 to 10 ms; measurements on the author’s systems have been 4 ms. With timestamps, an old duplicate due to sequence-number wraparound can now easily be detected.</p>
+<p>The PAWS mechanism also requires ACK packets to echo back the sender’s timestamp, in addition to including their own. This allows senders to accurately measure round-trip times.</p>
+<p id="index-65">Reboots are a potential problem as the host presumably has no record of what aborted connections need to remain in TIMEWAIT. TCP addresses this on paper by requiring hosts to implement Quiet Time on Startup: no new connections are to be accepted for 1*MSL. No known implementations actually do this; instead, they assume that the restarting process itself will take at least one MSL. This is no longer as certain as it once was, but serious consequences have not ensued.</p>
+</div>
+<div class="section" id="tcp-faster-opening">
+<span id="tcp-faster-open"></span><span id="t-tcp"></span><h2>12.12&nbsp;&nbsp;&nbsp;TCP Faster Opening<a class="headerlink" href="#tcp-faster-opening" title="Permalink to this headline">¶</a></h2>
+<p>If a client wants to connect to a server, send a request and receive an immediate reply, TCP mandates one full RTT for the three-way handshake before data can be delivered. This makes TCP one RTT slower than UDP-based request-reply protocols. There have been periodic calls to allow TCP clients to include data with the first SYN packet and have it be delivered immediately upon arrival – this is known as <strong>accelerated open</strong>.</p>
+<p>If there will be a series of requests and replies, the simplest fix is to <strong>pipeline</strong> all the requests and replies over one persistent connection; the one-RTT delay then applies only to the first request. If the pipeline connection is idle for a long-enough interval, it may be closed, and then reopened later if necessary.</p>
+<p id="index-66">An early accelerated-open proposal was <strong>T/TCP</strong>, or TCP for Transactions, specified in <span class="target" id="index-67"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1644.html"><strong>RFC 1644</strong></a>. T/TCP introduced a <strong>connection count</strong> TCP option, called CC; each participant would include a 32-bit CC value in its SYN; each participant’s own CC values were to be monotonically increasing. Accelerated open was allowed if the server side had the client’s previous CC in a cache, and the new CC value was strictly greater than this cached value. This ensured that the new SYN was not a duplicate of an older SYN.</p>
+<p>Unfortunately, this also bypasses the modest authentication of the client’s IP address provided by the full three-way handshake, worsening the spoofing problem of <a class="reference internal" href="#isn-spoofing"><span class="std std-ref">12.10.1&nbsp;&nbsp;&nbsp;ISNs and spoofing</span></a>. If malicious host M wants to pretend to be B when sending a privileged request to A, all M has to do is send a single SYN+Data packet with an extremely large value for CC. Generally, the accelerated open succeeded as long as the CC value presented was larger that the value A had cached for B; it did not have to be larger by exactly 1.</p>
+<p id="index-68">The recent <strong>TCP Fast Open</strong> proposal, described in <span class="target" id="index-69"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc7413.html"><strong>RFC 7413</strong></a>, involves a secure “cookie” sent by the client as a TCP option; if a SYN+Data packet has a valid cookie, then the client has proven its identity and the data may be released immediately to the receiving application. Cookies are cryptographically secure, and are requested ahead of time from the server.</p>
+<p>Because cookies have an expiration date and must be requested ahead of time, TCP Fast Open is not fundamentally faster from the connection-pipeline option, except that holding a TCP connection open uses more resources than simply storing a cookie. The likely application for TCP Fast Open is in accessing web servers. Web clients and servers already keep a persistent connection open for a while, but often “a while” here amounts only to several seconds; TCP Fast Open cookies could remain active for much longer.</p>
+<p>One serious practical problem with TCP Fast Open is that some middleboxes (<a class="reference internal" href="ipv4.html#middleboxes"><span class="std std-ref">7.7.2&nbsp;&nbsp;&nbsp;Middleboxes</span></a>) remove TCP options they do not understand, or even block the connection attempt entirely.</p>
+</div>
+<div class="section" id="path-mtu-discovery">
+<span id="index-70"></span><span id="id15"></span><h2>12.13&nbsp;&nbsp;&nbsp;Path MTU Discovery<a class="headerlink" href="#path-mtu-discovery" title="Permalink to this headline">¶</a></h2>
+<p>TCP connections are more efficient if they can keep large packets flowing between the endpoints. Once upon a time, TCP endpoints included just 512 bytes of data in each packet that was not destined for local delivery, to avoid fragmentation. TCP endpoints now typically engage in <strong>Path MTU Discovery</strong> which almost always allows them to send larger packets; backbone ISPs are now usually able to carry 1500-byte packets. The <strong>Path MTU</strong> is the largest packet size that can be sent along a path without fragmentation.</p>
+<p>The IPv4 strategy is to send an initial data packet with the IPv4 <code class="docutils literal"><span class="pre">DONT_FRAG</span></code> bit set. If the ICMP message <code class="docutils literal"><span class="pre">Frag_Required/DONT_FRAG_Set</span></code> comes back, or if the packet times out, the sender tries a smaller size. If the sender receives a TCP ACK for the packet, on the other hand, indicating that it made it through to the other end, it might try a larger size. Usually, the size range of 512-1500 bytes is covered by less than a dozen discrete values; the point is not to find the exact Path MTU but to determine a reasonable approximation rapidly.</p>
+<p>IPv6 has no DONT_FRAG bit. Path MTU Discovery over IPv6 involves the periodic sending of larger packets; if the ICMPv6 message <code class="docutils literal"><span class="pre">Packet</span> <span class="pre">Too</span> <span class="pre">Big</span></code> is received, a smaller packet size must be used. <span class="target" id="index-71"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1981.html"><strong>RFC 1981</strong></a> has details.</p>
+</div>
+<div class="section" id="tcp-sliding-windows">
+<span id="index-72"></span><span id="id16"></span><h2>12.14&nbsp;&nbsp;&nbsp;TCP Sliding Windows<a class="headerlink" href="#tcp-sliding-windows" title="Permalink to this headline">¶</a></h2>
+<p>TCP implements sliding windows, in order to improve throughput. Window sizes are measured in terms of bytes rather than packets; this leaves TCP free to packetize the data in whatever segment size it elects. In the initial three-way handshake, each side specifies the maximum window size it is willing to accept, in the <strong>Window Size</strong> field of the TCP header. This 16-bit field can only go to 64 kB, and a 1 Gbps × 100 ms bandwidth×delay product is 12 MB; as a result, there is a TCP <strong>Window Scale</strong> option that can also be negotiated in the opening handshake. The scale option specifies a power of 2 that is to be multiplied by the actual Window Size value. In the WireShark example above, the client specified a Window Size field of 5888 (= 4 × 1472) in the third packet, but with a Window Scale value of 2<sup>6</sup> = 64 in the first packet, for an effective window size of 64 × 5888 = 256 segments of 1472 bytes. The server side specified a window size of 5792 and a scaling factor of 2<sup>5</sup> = 32.</p>
+<p>TCP may either transmit a bulk stream of data, using sliding windows fully, or it may send slowly generated interactive data; in the latter case, TCP may never have even one full segment outstanding.</p>
+<p id="index-73">In the following chapter we will see that a sender frequently reduces the actual TCP window size, in order to avoid congestion; the window size included in the TCP header is known as the <strong>Advertised</strong> Window Size. On startup, TCP does not send a full window all at once; it uses a mechanism called “slow start”.</p>
+</div>
+<div class="section" id="tcp-delayed-acks">
+<span id="delayed-acks"></span><span id="index-74"></span><h2>12.15&nbsp;&nbsp;&nbsp;TCP Delayed ACKs<a class="headerlink" href="#tcp-delayed-acks" title="Permalink to this headline">¶</a></h2>
+<p>TCP receivers are allowed briefly to delay their ACK responses to new data. This offers perhaps the most benefit for interactive applications that exchange small packets, such as ssh and telnet. If A sends a data packet to B and expects an immediate response, delaying B’s ACK allows the receiving <em>application</em> on B time to wake up and generate that application-level response, which can then be sent together with B’s ACK. Without delayed ACKs, the kernel layer on B may send its ACK before the receiving application on B has even been scheduled to run. If response packets are small, that doubles the total traffic. The maximum ACK delay is 500 ms, according to <span class="target" id="index-75"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1122.html"><strong>RFC 1122</strong></a> and <span class="target" id="index-76"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2581.html"><strong>RFC 2581</strong></a>.</p>
+<p>For bulk traffic, delayed ACKs simply mean that the ACK traffic volume is reduced. Because ACKs are cumulative, one ACK from the receiver can in principle acknowledge multiple data packets from the sender. Unfortunately, acknowledging too many data packets with one ACK can interfere with the self-clocking aspect of sliding windows; the arrival of that ACK will then trigger a burst of additional data packets, which would otherwise have been transmitted at regular intervals. Because of this, the RFCs above specify that an ACK be sent, at a minimum, for every other data packet. For a discussion of how the sender should respond to delayed ACKs, see <a class="reference internal" href="reno.html#per-ack-responses"><span class="std std-ref">13.2.1&nbsp;&nbsp;&nbsp;TCP Reno Per-ACK Responses</span></a>.</p>
+<div class="sidebar">
+<p class="first sidebar-title">Bandwidth Conservation</p>
+<p class="last">Delayed ACKs and the Nagle algorithm both originated in a bygone era, when bandwidth was in much shorter supply than it is today. In <span class="target" id="index-77"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc896.html"><strong>RFC 896</strong></a>, John Nagle writes (in 1984, well before TCP Reno, <a class="reference internal" href="reno.html#congestion-avoidance"><span class="std std-ref">13&nbsp;&nbsp;&nbsp;TCP Reno and Congestion Management</span></a>) “In general, we have not been able to afford  the  luxury of excess long-haul bandwidth that the ARPANET possesses, and our long-haul links are heavily loaded during peak periods.   Transit times of several seconds are thus common in our network.” Today, it is unlikely that extra small packets would cause detectable, let alone significant, problems.</p>
+</div>
+<p id="index-78">The TCP ACK-delay time can usually be adjusted globally as a system parameter. Linux offers a <code class="docutils literal"><span class="pre">TCP_QUICKACK</span></code> option, as a flag to <code class="docutils literal"><span class="pre">setsockopt()</span></code>, to disable delayed ACKs on a per-connection basis, but only until the next TCP system call. It must be invoked immediately after every receive operation to disable delayed ACKs entirely. This option is also not very portable.</p>
+<p>The TSO option of <a class="reference internal" href="#tcp-offloading"><span class="std std-ref">12.5&nbsp;&nbsp;&nbsp;TCP Offloading</span></a>, used at the receiver, can also reduce the number of ACKs sent. If every two arriving data packets are consolidated via TSO into a single packet, then the receiver will appear to the sender to be acknowledging every other data packet. The ACK delay introduced by TSO is, however, usually quite small.</p>
+</div>
+<div class="section" id="nagle-algorithm">
+<span id="index-79"></span><span id="id17"></span><h2>12.16&nbsp;&nbsp;&nbsp;Nagle Algorithm<a class="headerlink" href="#nagle-algorithm" title="Permalink to this headline">¶</a></h2>
+<p>Like delayed ACKs, the Nagle algorithm (<span class="target" id="index-80"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc896.html"><strong>RFC 896</strong></a>) also attempts to improve the behavior of interactive small-packet applications. It specifies that a TCP endpoint generating small data segments should queue them until either it accumulates a full segment’s worth or receives an ACK for the previous batch of small segments. If the full-segment threshold is not reached, this means that only one (consolidated) segment will be sent per RTT.</p>
+<p>As an example, suppose A wishes to send to B packets containing consecutive letters, starting with “a”. The application on A generates these every 100 ms, but the RTT is 501 ms. At T=0, A transmits “a”. The application on A continues to generate “b”, “c”, “d”, “e” and “f” at times 100 ms through 500 ms, but A does not send them immediately. At T=501 ms, ACK(“a”) arrives; at this point A transmits its backlogged “bcdef”. The ACK for this arrives at T=1002, by which point A has queued “ghijk”. The end result is that A sends a fifth as many packets as it would without the Nagle algorithm. If these letters are generated by a user typing them with telnet, and the ACKs also include the echoed responses, then if the user pauses the echoed responses will very soon catch up.</p>
+<p id="index-81">The Nagle algorithm does not always interact well with delayed ACKs, or with user expectations; see exercises 10.0 and 10.5. It can usually be disabled on a per-connection basis, in the BSD socket library by calling <code class="docutils literal"><span class="pre">setsockopt()</span></code> with the <code class="docutils literal"><span class="pre">TCP_NODELAY</span></code> flag.</p>
+</div>
+<div class="section" id="tcp-flow-control">
+<span id="index-82"></span><span id="id18"></span><h2>12.17&nbsp;&nbsp;&nbsp;TCP Flow Control<a class="headerlink" href="#tcp-flow-control" title="Permalink to this headline">¶</a></h2>
+<p>It is possible for a TCP sender to send data faster than the receiver can process it. When this happens, a TCP receiver may reduce the advertised Window Size value of an open connection, thus informing the sender to switch to a smaller window size. This provides support for <strong>flow control</strong>.</p>
+<p>The window-size reduction appears in the ACKs sent back by the receiver. A given ACK is not supposed to reduce the window size by so much that the upper end of the window gets smaller. A window might shrink from the byte range [20,000..28,000] to [22,000..28,000] but never to [20,000..26,000].</p>
+<p>If a TCP receiver uses this technique to shrink the advertised window size to 0, this means that the sender may not send data. The receiver has thus informed the sender that, yes, the data was received, but that, no, more may not yet be sent. This corresponds to the ACK<sub>WAIT</sub> suggested in <a class="reference internal" href="slidingwindows.html#sw-flow-control"><span class="std std-ref">6.1.3&nbsp;&nbsp;&nbsp;Flow Control</span></a>. Eventually, when the receiver is ready to receive data, it will send an ACK increasing the advertised window size again.</p>
+<p id="index-83">If the TCP sender has its window size reduced to 0, and the ACK from the receiver increasing the window is lost, then the connection would be deadlocked. TCP has a special feature specifically to avoid this: if the window size is reduced to zero, the sender sends dataless packets to the receiver, at regular intervals. Each of these “polling” packets elicits the receiver’s current ACK; the end result is that the sender will receive the eventual window-enlargement announcement reliably. These “polling” packets are regulated by the so-called <strong>persist</strong> timer.</p>
+</div>
+<div class="section" id="silly-window-syndrome">
+<span id="silly"></span><span id="index-84"></span><h2>12.18&nbsp;&nbsp;&nbsp;Silly Window Syndrome<a class="headerlink" href="#silly-window-syndrome" title="Permalink to this headline">¶</a></h2>
+<p>The silly-window syndrome is a term for a scenario in which TCP transfers only small amounts of data at a time. Because TCP/IP packets have a minimum fixed header size of 40 bytes, sending small packets uses the network inefficiently. The silly-window syndrome can occur when either by the receiving application consuming data slowly or when the sending application generating data slowly.</p>
+<p>As an example involving a slow-consuming receiver, suppose a TCP connection has a window size of 1000 bytes, but the receiving application consumes data only 10 bytes at a time, at intervals about equal to the RTT. The following can then happen:</p>
+<ul class="simple">
+<li>The sender sends bytes 1-1000. The receiving application consumes 10 bytes, numbered 1-10. The receiving TCP buffers the remaining 990 bytes and sends an ACK reducing the window size to 10, per <a class="reference internal" href="#tcp-flow-control"><span class="std std-ref">12.17&nbsp;&nbsp;&nbsp;TCP Flow Control</span></a>.</li>
+<li>Upon receipt of the ACK, the sender sends 10 bytes numbered 1001-1010, the most it is permitted. In the meantime, the receiving application has consumed bytes 11-20. The window size therefore remains at 10 in the next ACK.</li>
+<li>the sender sends bytes 1011-1020 while the application consumes bytes 21-30. The window size remains at 10.</li>
+</ul>
+<p>The sender may end up sending 10 bytes at a time indefinitely. This is of no benefit to either side; the sender might as well send larger packets less often. The standard fix, set forth in <span class="target" id="index-85"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1122.html"><strong>RFC 1122</strong></a>, is for the receiver to use its ACKs to keep the window at 0 until it has consumed one full packet’s worth (or half the window, for small window sizes). At that point the sender is invited – by an appropriate window-size advertisement in the next ACK – to send another full packet of data.</p>
+<p>The silly-window syndrome can also occur if the sender is <em>generating</em> data slowly, say 10 bytes at a time. The Nagle algorithm, above, can be used to prevent this, though for interactive applications sending small amounts of data in separate but closely spaced packets may actually be useful.</p>
+</div>
+<div class="section" id="tcp-timeout-and-retransmission">
+<span id="tcp-rto"></span><span id="index-86"></span><h2>12.19&nbsp;&nbsp;&nbsp;TCP Timeout and Retransmission<a class="headerlink" href="#tcp-timeout-and-retransmission" title="Permalink to this headline">¶</a></h2>
+<p>When TCP sends a packet containing user data (this excludes ACK-only packets), it sets a timeout. If that timeout expires before the packet data is acknowledged, it is retransmitted. Acknowledgments are sent for every arriving data packet (unless Delayed ACKs are implemented, <a class="reference internal" href="#delayed-acks"><span class="std std-ref">12.15&nbsp;&nbsp;&nbsp;TCP Delayed ACKs</span></a>); this amounts to receiver-side retransmit-on-duplicate of <a class="reference internal" href="slidingwindows.html#packet-loss"><span class="std std-ref">6.1.1&nbsp;&nbsp;&nbsp;Packet Loss</span></a>. Because ACKs are cumulative, and so a later ACK can replace an earlier one, lost ACKs are seldom a problem.</p>
+<p>For TCP to work well for both intra-server-room and trans-global connections, with RTTs ranging from well under 1 ms to close to 1 second, the length of the timeout interval must <em>adapt</em>. TCP manages this by maintaining a running estimate of the RTT, EstRTT. In the original version, TCP then set TimeOut = 2×EstRTT (in the literature, the TCP TimeOut value is often known as RTO, for Retransmission TimeOut). EstRTT itself was a running average of periodically measured SampleRTT values, according to</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">EstRTT = 𝛼×EstRTT + (1-𝛼)×SampleRTT</div>
+</div>
+</div></blockquote>
+<p>for a fixed 𝛼, 0&lt;𝛼&lt;1. Typical values of 𝛼 might be 𝛼=1/2 or 𝛼=7/8.
+For 𝛼 close to 1 this is “conservative” in that EstRTT is slow to change. For 𝛼 closer to 0, EstRTT is more volatile.</p>
+<p id="index-87">There is a potential RTT measurement ambiguity: if a packet is sent twice, the ACK received could be in response to the first transmission or the second.
+The Karn/Partridge algorithm resolves this: on packet loss (and retransmission), the sender</p>
+<ul class="simple">
+<li>Doubles Timeout</li>
+<li>Stops recording SampleRTT</li>
+<li>Uses the doubled Timeout as EstRTT when things resume</li>
+</ul>
+<p>Setting TimeOut = 2×EstRTT proved too short during congestion periods and too long other times. Jacobson and Karels (<a class="reference internal" href="bibliography.html#jk88" id="id19">[JK88]</a>) introduced a way of calculating the TimeOut value based on the statistical variability of EstRTT. After each SampleRTT value was collected, the sender would also update EstDeviation according to</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">SampleDev = | SampleRTT − EstRTT |</div>
+<div class="line">EstDeviation = 𝛽×EstDeviation + (1-𝛽)×SampleDev</div>
+</div>
+</div></blockquote>
+<p>for a fixed 𝛽, 0&lt;𝛽&lt;1. Timeout was then set to EstRTT + 4×EstDeviation. EstDeviation is an estimate of the so-called <em>mean deviation</em>; 4 mean deviations corresponds (for normally distributed data) to about 5 <em>standard</em> deviations. If the SampleRTT values were normally distributed (which they are not), this would mean that the chance that a non-lost packet would arrive outside the TimeOut period is vanishingly small.</p>
+<p>For further details, see <a class="reference internal" href="bibliography.html#jk88" id="id20">[JK88]</a> and <a class="reference internal" href="bibliography.html#ap99" id="id21">[AP99]</a>.</p>
+<p>Keeping track of when packets time out is usually handled by putting a record  for each packet sent into a <strong>timer list</strong>. Each record contains the packet’s timeout time, and the list is kept sorted by these times. Periodically, <em>eg</em> every 100 ms, the list is inspected and all packets with expired timeout are then retransmitted. When an ACK arrives, the corresponding packet timeout record is removed from the list. Note that this approach means that a packet’s timeout processing may be slightly late.</p>
+</div>
+<div class="section" id="keepalive">
+<span id="index-88"></span><h2>12.20&nbsp;&nbsp;&nbsp;KeepAlive<a class="headerlink" href="#keepalive" title="Permalink to this headline">¶</a></h2>
+<p>There is no reason that a TCP connection should not be idle for a long period of time; ssh/telnet connections, for example, might go unused for days. However, there is the turned-off-at-night problem: a workstation might telnet into a server, and then be shut off (not shut down gracefully) at the end of the day. The connection would now be half-open, but the server would not generate any traffic and so might never detect this; the connection itself would continue to tie up resources.</p>
+<div class="sidebar">
+<p class="first sidebar-title">KeepAlive in action</p>
+<p>One evening long ago, when dialed up (yes, that long ago) into the Internet, my phone line disconnected while I was typing an email message in an ssh window. I dutifully reconnected, expecting to find my message in the file “dead.letter”, which is what would have happened had I been disconnected while using the even-older tty dialup. Alas, nothing was there. I reconstructed my email as best I could and logged off.</p>
+<p class="last">The next morning, there was my lost email in a file “dead.letter”, dated two hours after the initial crash! What had happened, apparently, was that the original ssh connection on the server side just hung there, half-open. Then, after two hours, KeepAlive kicked in, and aborted the connection. At that point ssh sent my mail program the HangUp signal, and the mail program wrote out what it had in “dead.letter”.</p>
+</div>
+<p>To avoid this, TCP supports an optional <strong>KeepAlive</strong> mechanism: each side “polls” the other with a dataless packet. The original <span class="target" id="index-89"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1122.html"><strong>RFC 1122</strong></a> KeepAlive timeout was 2 hours, but this could be reduced to 15 minutes.
+If a connection failed the KeepAlive test, it would be closed.</p>
+<p>Supposedly, some TCP implementations are not exactly <span class="target" id="index-90"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1122.html"><strong>RFC 1122</strong></a>-compliant: either KeepAlives are enabled by default, or the KeepAlive interval is much smaller than called for in the specification.</p>
+</div>
+<div class="section" id="tcp-timers">
+<h2>12.21&nbsp;&nbsp;&nbsp;TCP timers<a class="headerlink" href="#tcp-timers" title="Permalink to this headline">¶</a></h2>
+<p>To summarize, TCP maintains the following four kinds of timers. All of them can be maintained by a single timer list, above.</p>
+<ul class="simple">
+<li><strong>TimeOut</strong>: a per-segment timer; TimeOut values vary widely</li>
+<li>2×MSL <strong>TIMEWAIT</strong>: a per-connection timer</li>
+<li><strong>Persist</strong>: the timer used to poll the receiving end when winsize = 0</li>
+<li><strong>KeepAlive</strong>, above</li>
+</ul>
+</div>
+<div class="section" id="variants-and-alternatives">
+<h2>12.22&nbsp;&nbsp;&nbsp;Variants and Alternatives<a class="headerlink" href="#variants-and-alternatives" title="Permalink to this headline">¶</a></h2>
+<p>One alternative to TCP is UDP with programmer-implemented timout and retransmission; many RPC implementations (<a class="reference internal" href="udp.html#rpc"><span class="std std-ref">11.5&nbsp;&nbsp;&nbsp;Remote Procedure Call (RPC)</span></a>) do exactly this, with reasonable results. Within a LAN a static timeout of around half a second usually works quite well (unless the LAN has some tunneled links), and implementation of a simple timeout-retransmission mechanism is quite straightforward. Implementing adaptive timeouts as in <a class="reference internal" href="#tcp-rto"><span class="std std-ref">12.19&nbsp;&nbsp;&nbsp;TCP Timeout and Retransmission</span></a> can, however, be a bit trickier. QUIC (<a class="reference internal" href="udp.html#quic"><span class="std std-ref">11.1.1&nbsp;&nbsp;&nbsp;QUIC</span></a>) is an example of this strategy.</p>
+<p>We here consider four other protocols. The first, MPTCP, is based on TCP itself. The second, SCTP, is a message-oriented alternative to TCP that is an entirely separate protocol. The last two, DCCP and QUIC, are attempts to create a TCP-like transport layer on top of UDP.</p>
+<div class="section" id="mptcp">
+<span id="index-91"></span><span id="id22"></span><h3>12.22.1&nbsp;&nbsp;&nbsp;MPTCP<a class="headerlink" href="#mptcp" title="Permalink to this headline">¶</a></h3>
+<p>Multipath TCP, or MPTCP, allows connections to use multiple network interfaces on a host, either sequentially or simultaneously. MPTCP architectural principles are outlined in <span class="target" id="index-92"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc6182.html"><strong>RFC 6182</strong></a>; implementation details are in <span class="target" id="index-93"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc6824.html"><strong>RFC 6824</strong></a>.</p>
+<p>To carry the actual traffic, MPTCP arranges for the creation of multiple standard-TCP <strong>subflows</strong> between the sending and receiving hosts; these subflows typically connect between different pairs of IP addresses on the respective hosts.</p>
+<p>For example, a connection to a server can start using the client’s wired Ethernet interface, and continue via Wi-Fi after the user has unplugged. If the client then moves out of Wi-Fi range, the connection might continue via a mobile network. Alternatively, MPTCP allows the parallel use of multiple Ethernet interfaces on both client and server for higher throughput.</p>
+<p>MPTCP officially forbids the creation of multiple TCP connections between a single pair of interfaces in order to simulate Highspeed TCP (<a class="reference internal" href="newtcps.html#highspeed-tcp"><span class="std std-ref">15.5&nbsp;&nbsp;&nbsp;Highspeed TCP</span></a>); <span class="target" id="index-94"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc6356.html"><strong>RFC 6356</strong></a> spells out an MWTCP congestion-control algorithm to enforce this.</p>
+<p>Suppose host A, with two interfaces with IP addresses A<sub>1</sub> and A<sub>2</sub>, wishes to connect to host B with IP addresses B<sub>1</sub> and B<sub>2</sub>.  Connection establishment proceeds via the ordinary TCP three-way handshake, between one of A’s IP addresses, say A<sub>1</sub>, and one of B’s, B<sub>1</sub>. The SYN packets must each carry the <code class="docutils literal"><span class="pre">MP_CAPABLE</span></code> TCP option, to signal one another that MPTCP is supported. As part of the <code class="docutils literal"><span class="pre">MP_CAPABLE</span></code> option, A and B also exchange pseudorandom 64-bit connection keys, sent unencrypted; these will be used to sign later messages as in <a class="reference internal" href="security.html#hmac"><span class="std std-ref">22.6.1&nbsp;&nbsp;&nbsp;Secure Hashes and Authentication</span></a>. This first connection is the initial subflow.</p>
+<p>Once the MPTCP initial subflow has been established, additional subflow connections can be made. Usually these will be initiated from the client side, here A, though the B side can also do this. At this point, however, A does not know of B’s address B<sub>2</sub>, so the only possible second subflow will be from  A<sub>2</sub> to B<sub>1</sub>. New subflows will carry the <code class="docutils literal"><span class="pre">MP_JOIN</span></code> option with their initial SYN packets, along with digital signatures signed by the original connection keys verifying that the new subflow is indeed part of this MPTCP connection.</p>
+<p>At this point A and B can send data to one another using both connections simultaneously. To keep track of data, each side maintains a 64-bit data sequence number, DSN, for the data it sends; each side also maintains a mapping between the DSN and the subflow sequence numbers. For example, A might send 1000-byte blocks of data alternating between the A<sub>1</sub> and A<sub>2</sub> connections; the blocks might have DSN values 10000, 11000, 12000, 13000, …. The A<sub>1</sub> subflow would then carry blocks 10000, 12000, <em>etc</em>, numbering these consecutively (perhaps 20000, 21000, …) with its own sequence numbers. The sides exchange DSN mapping information with a <code class="docutils literal"><span class="pre">DSS</span></code> TCP option. This mechanism means that all data transmitted over the MWTCP connection can be delivered in the proper order, and that if one subflow fails, its data can be retransmitted on another subflow.</p>
+<p>B can inform A of its second IP address, B<sub>2</sub>, using the <code class="docutils literal"><span class="pre">ADD_ADDR</span></code> option. Of course, it is possible that B<sub>2</sub> is not directly reachable by A; for example, it might be behind a NAT router. But if B<sub>2</sub> <em>is</em> reachable, A can now open two more subflows A<sub>1</sub>──B<sub>2</sub> and A<sub>2</sub>──B<sub>2</sub>.</p>
+<p>All the above works equally well if either or both of A’s addresses is behind a NAT router, simply because the NAT router is able to properly forward the subflow TCP connections. Addresses sent from one host to another, such as B’s transmission of its address B<sub>2</sub>, may be rendered invalid by NAT, but in this case A’s attempt to open a connection to B<sub>2</sub> simply fails.</p>
+<p>Generally, hosts can be configured to use multiple subflows in parallel, or to use one interface only as a backup, when the primary interface is unplugged or out of range. APIs have been proposed that allow an control over MPTCP behavior on a per-connection basis.</p>
+</div>
+<div class="section" id="sctp">
+<span id="index-95"></span><span id="id23"></span><h3>12.22.2&nbsp;&nbsp;&nbsp;SCTP<a class="headerlink" href="#sctp" title="Permalink to this headline">¶</a></h3>
+<p>The Stream Control Transmission Protocol, SCTP, is an entirely separate protocol from TCP, running directly above IP. It is, in effect, a message-oriented alternative to TCP: an application writes a sequence of messages and SCTP delivers each one as a unit, fragmenting and reassembling it as necessary. Like TCP, SCTP is connection-oriented and reliable. SCTP uses a form of sliding windows, and, like TCP, adjusts the window size to manage congestion.</p>
+<p>An SCTP connection can support multiple <strong>message streams</strong>; the exact number is negotiated at startup. A retransmission delay in one stream never blocks delivery in other streams. Within each stream, SCTP messages are sequentially numbered, and are normally delivered in order of message number. A receiver can request, however, to receive messages immediately upon successful delivery, that is, potentially out of order. Either way, the data within each message is guaranteed to be delivered in order and without loss.</p>
+<p>Internally, message data is divided into SCTP <strong>chunks</strong> for inclusion in packets. One SCTP packet can contain data chunks from different messages and different streams; packets can also contain control chunks.</p>
+<p>Messages themselves can be quite large; there is no set limit. Very large messages may need to be received in multiple system calls (<em>eg</em> calls to <code class="docutils literal"><span class="pre">recvmsg()</span></code>).</p>
+<p>SCTP supports an MPTCP-like feature by which each endpoint can use multiple network interfaces.</p>
+<p>SCTP connections are set up using a four-way handshake, versus TCP’s three-way handshake. The extra packet provides some protection against so-called SYN flooding (<a class="reference internal" href="#tcp-connection-establishment"><span class="std std-ref">12.3&nbsp;&nbsp;&nbsp;TCP Connection Establishment</span></a>). The central idea is that if client A initiates a connection request with server B, then B allocates no resources to the connection until after B has received a response to its own message to A. This means that, at a minimum, A is a real host with a real IP address.</p>
+<p>The full four-way handshake between client A and server B is, in brief, as follows:</p>
+<ul class="simple">
+<li>A sends B an INIT chunk (corresponding to SYN), along with a pseudorandom Tag<sub>A</sub>.</li>
+<li>B sends A an <code class="docutils literal"><span class="pre">INIT</span> <span class="pre">ACK</span></code>, with Tag<sub>B</sub> and a <strong>state cookie</strong>. The state cookie contains all the information B needs to allocate resources to the connection, and is digitally signed (<a class="reference internal" href="security.html#hmac"><span class="std std-ref">22.6.1&nbsp;&nbsp;&nbsp;Secure Hashes and Authentication</span></a>) with a key known only to B. Crucially, B does <strong>not</strong> at this point allocate any resources to the incipient connection.</li>
+<li>A returns the state cookie to B in a <code class="docutils literal"><span class="pre">COOKIE</span> <span class="pre">ECHO</span></code> packet.</li>
+<li>B enters the ESTABLISHED state and sends a <code class="docutils literal"><span class="pre">COOKIE</span> <span class="pre">ACK</span></code> to A. Upon receipt, A enters the ESTABLISHED state.</li>
+</ul>
+<p>When B receives the <code class="docutils literal"><span class="pre">COOKIE</span> <span class="pre">ECHO</span></code>, it verifies the signature. At this point B knows that it sent the cookie to A and received a response, so A must exist. Only then does B allocate memory resources to the connection. Spoofed INITs in the first step cost B essentially nothing.</p>
+<p>The Tag<sub>A</sub> and Tag<sub>B</sub> in the first two packets are called <strong>verification tags</strong>. From this point on, B will include Tag<sub>A</sub> in every packet it sends to A, and vice-versa. Although these tags are sent unencrypted, they nonetheless make it much harder for an attacker to inject data into the connection.</p>
+<p>Data can be included in the third and fourth packets above; <em>ie</em> A can begin sending data after one RTT.</p>
+<p>Unfortunately for potential SCTP applications, few if any NAT routers recognize SCTP; this limits the use of SCTP to Internet paths along which NAT is not used. In principle SCTP could simplify delivery of web pages, transmitting one page component per message, but lack of NAT support makes this infeasible. SCTP is also blocked by some middleboxes (<a class="reference internal" href="ipv4.html#middleboxes"><span class="std std-ref">7.7.2&nbsp;&nbsp;&nbsp;Middleboxes</span></a>) on the grounds that it is an unknown protocol, and therefore suspect. While this is not quite as common as the NAT problem, it is common enough to prevent by itself the widespread adoption of SCTP in the general Internet. SCTP <em>is</em> widely used for telecommunications signaling, both within and between providers, where NAT and recalcitrant middleboxes can be banished.</p>
+</div>
+<div class="section" id="dccp">
+<span id="dccp2"></span><span id="index-96"></span><h3>12.22.3&nbsp;&nbsp;&nbsp;DCCP<a class="headerlink" href="#dccp" title="Permalink to this headline">¶</a></h3>
+<p>As we saw in <a class="reference internal" href="udp.html#dccp1"><span class="std std-ref">11.1.2&nbsp;&nbsp;&nbsp;DCCP</span></a>, DCCP is a UDP-based transport protocol that supports, among other things, connection establishment. While it is used much less often than TCP, it provides an alternative example of how transport can be done.</p>
+<p>DCCP defines a set of distinct packet types, rather than TCP’s independent packet flags; this disallows unforeseen combinations such as TCP SYN+RST. Connection establishment involves Request and Respond; data transmission involves Data, ACK and DataACK, and teardown involves CloseReq, Close and Reset. While one cannot have, for example, a Respond+ACK, Respond packets do carry an acknowledgment field.</p>
+<p>Like TCP, DCCP uses a three-way handshake to open a connection; here is a diagram:</p>
+<img alt="_images/dccp_3wh.svg" src="_images/dccp_3wh.svg" /><p>The OPEN state corresponds to TCP’s ESTABLISHED state. Like TCP, each side chooses an ISN (not shown in the diagram). Because packet delivery is not reliable, and because ACKs are not cumulative, the client remains in PARTOPEN state until it has confirmed that the server has received its ACK of the server’s Response. While in state PARTOPEN, the client can send ACK and DataACK but not ACK-less Data packets.</p>
+<p>Packets are numbered sequentially. The numbering includes all packets, not just Data packets, and is by packet rather than by byte.</p>
+<p>The DCCP state diagram is shown below. It is simpler than the TCP state diagram because DCCP does not support simultaneous opens.</p>
+<img alt="_images/dccp_statediag2.svg" src="_images/dccp_statediag2.svg" /><p>To close a connection, one side sends Close and the other responds with Reset. Reset is used for normal close as well as for exceptional conditions. Because whoever sends the Close is then stuck with TIMEWAIT, the server side may send CloseReq to ask the client to send Close.</p>
+<p>There are also two special packet formats, Sync and SyncAck, for resynchronizing sequence numbers after a burst of lost packets.</p>
+<p>The other major TCP-like feature supported by DCCP is congestion control; see <a class="reference internal" href="dynamics.html#dccp3"><span class="std std-ref">14.6.3&nbsp;&nbsp;&nbsp;DCCP Congestion Control</span></a>.</p>
+<span class="target" id="index-97"></span></div>
+<div class="section" id="quic-revisited">
+<span id="quic2"></span><h3>12.22.4&nbsp;&nbsp;&nbsp;QUIC Revisited<a class="headerlink" href="#quic-revisited" title="Permalink to this headline">¶</a></h3>
+<p>Like DCCP, QUIC is also a UDP-based transport protocol, aimed rather squarely at HTTP plus TLS (<a class="reference internal" href="security.html#tls"><span class="std std-ref">22.10.2&nbsp;&nbsp;&nbsp;TLS</span></a>). The fundamental goal of QUIC is to provide TLS encryption protection with as little overhead as possible, in a manner that competes fairly with TCP in the presence of congestion. Opening a QUIC connection, encryption included, takes a single RTT. QUIC can also be seen, however, as a complete rewrite of TCP from the ground up; a reading of specific features sheds quite a bit of light on how the corresponding TCP features have fared over the past thirty-odd years. QUIC is currently (2018) documented in a set of Internet Drafts:</p>
+<ul class="simple">
+<li>Transport basics: <a class="reference external" href="https://tools.ietf.org/html/draft-ietf-quic-transport">draft-ietf-quic-transport</a></li>
+<li>Loss and congestion management: <a class="reference external" href="https://tools.ietf.org/html/draft-ietf-quic-recovery">draft-ietf-quic-recovery</a></li>
+<li>TLS encryption over QUIC: <a class="reference external" href="https://tools.ietf.org/html/draft-ietf-quic-tls">draft-ietf-quic-tls</a></li>
+<li>HTTP over QUIC: <a class="reference external" href="https://tools.ietf.org/html/draft-ietf-quic-http">draft-ietf-quic-http</a></li>
+</ul>
+<p>The last Internet Draft above was retitled in November 2018 as <a class="reference external" href="https://quicwg.org/base-drafts/draft-ietf-quic-http.html">Hypertext Transfer Protocol Version 3 (HTTP/3)</a>; that is, it proposes that QUIC should become HTTP version 3. If and when this happens, it may represent the beginning of the end for TCP, given that most Internet connections are for HTTP or HTTPS. Still, many TCP design issues (<a class="reference internal" href="reno.html#congestion-avoidance"><span class="std std-ref">13&nbsp;&nbsp;&nbsp;TCP Reno and Congestion Management</span></a>, <a class="reference internal" href="dynamics.html#dynamics-of-tcp"><span class="std std-ref">14&nbsp;&nbsp;&nbsp;Dynamics of TCP</span></a>, <a class="reference internal" href="newtcps.html#newtcps"><span class="std std-ref">15&nbsp;&nbsp;&nbsp;Newer TCP Implementations</span></a>) carry over very naturally to QUIC; a shift from TCP to QUIC should best be viewed as evolutionary.</p>
+<p>The design of QUIC was influenced by the fate of SCTP above; the latter, as a new protocol above IP, was often blocked by overly security-conscious middleboxes (<a class="reference internal" href="ipv4.html#middleboxes"><span class="std std-ref">7.7.2&nbsp;&nbsp;&nbsp;Middleboxes</span></a>).</p>
+<p>The fact that the QUIC layer resides within an application (or within a library) rather than within the kernel has meant that QUIC is able to evolve much faster than TCP. The long-term consequences of having the transport layer live outside the kernel are not yet completely clear, however; it may, for example, make it easier for users to install unfair congestion-management schemes.</p>
+<div class="section" id="headers">
+<h4>12.22.4.1&nbsp;&nbsp;&nbsp;Headers<a class="headerlink" href="#headers" title="Permalink to this headline">¶</a></h4>
+<p>We will start with the QUIC header. While there are some alternative forms, the basic header is diagrammed below, with a 1-byte <code class="docutils literal"><span class="pre">Type</span></code> field, an 8-byte <code class="docutils literal"><span class="pre">Connection</span> <span class="pre">ID</span></code>, and 4-byte <code class="docutils literal"><span class="pre">Version</span></code> and <code class="docutils literal"><span class="pre">Packet</span> <span class="pre">Number</span></code> fields.</p>
+<img alt="_images/quic_header.svg" src="_images/quic_header.svg" /><p>Perhaps the most striking thing about this header is that 4-byte alignment – used consistently in the IPv4, IPv6, UDP and TCP headers – has been completely abandoned. On most contemporary processors, the performance advantages of alignment are negligible; see the last paragraph at <a class="reference internal" href="ipv4.html#ipv4-header"><span class="std std-ref">7.1&nbsp;&nbsp;&nbsp;The IPv4 Header</span></a>.</p>
+<p>IP packets are identified as such by the Ethernet type field, and TCP and UDP packets are identified as such by the IPv4-header Protocol field. But QUIC packets are <em>not</em> identified as such by any flag in the preceding IP or UDP headers; there is in fact no place in those headers for a QUIC marker to go. QUIC appears to an observer as just another form of UDP traffic. This acts as a form of middlebox defense; QUIC packets cannot be identified as such in isolation. WireShark, sidebar below, identifies QUIC packets by looking at the whole history of the connection, and even then must make some (educated) guesses. Middleboxes could do that too, but it would take work.</p>
+<p>The initial <code class="docutils literal"><span class="pre">Connection</span> <span class="pre">ID</span></code> consists of 64 random bits chosen by the client. The server, upon accepting the connection, may change the <code class="docutils literal"><span class="pre">Connection</span> <span class="pre">ID</span></code>; at that point the <code class="docutils literal"><span class="pre">Connection</span> <span class="pre">ID</span></code> is fixed for the lifetime of the connection. The <code class="docutils literal"><span class="pre">Connection</span> <span class="pre">ID</span></code> may be omitted for packets whose connection can be determined from the associated IP address and port values; this is signaled by the <code class="docutils literal"><span class="pre">Type</span></code> field. The <code class="docutils literal"><span class="pre">Connection</span> <span class="pre">ID</span></code> can also be used to migrate a connection to a different IP address and port, as might happen if a mobile device moves out of range of Wi-Fi and the mobile-data plan continues the communication. This may also happen if a connection passes through a NAT router. The NAT forwarding entry may time out (see the comment on UDP and inactivity at <a class="reference internal" href="ipv4.html#nat"><span class="std std-ref">7.7&nbsp;&nbsp;&nbsp;Network Address Translation</span></a>), and the connection may be assigned a different outbound UDP port if it later resumes. QUIC uses the <code class="docutils literal"><span class="pre">Connection</span> <span class="pre">ID</span></code> to recognize that the reassigned connection is still the same one as before.</p>
+<p>The <code class="docutils literal"><span class="pre">Version</span></code> field gets dropped as soon as the version is negotiated. As part of the version negotiation, a packet might have multiple version fields. Such packets put a <em>random</em> value into the low-order seven bits of the <code class="docutils literal"><span class="pre">Type</span></code> field, as a prevention against middleboxes’ blocking unknown types. This way, aggressive middlebox behavior should be discovered early, before it becomes widespread.</p>
+<div class="sidebar" id="index-98">
+<p class="first sidebar-title">QUIC-watching</p>
+<p class="last">QUIC packets can be observed in <a class="reference external" href="https://www.wireshark.org/">WireShark</a> by using the filter string “quic”. To generate QUIC traffic, use a <a class="reference external" href="https://en.wikipedia.org/wiki/Chromium_(web_browser)">Chromium-based browser</a> and go to a Google-operated site, say, <a class="reference external" href="https://google.com">google.com</a>. Often the only non-encrypted fields are the <code class="docutils literal"><span class="pre">Type</span></code> field and the packet number. It may be necessary to enable QUIC in the browser, done in Chrome via chrome://flags; see also chrome://net-internals.</p>
+</div>
+<p>The packet number can be reduced to one or two bytes once the connection is established; this is signaled by the <code class="docutils literal"><span class="pre">Type</span></code> field. Internally, QUIC uses packet numbers in the range 0 to 2<sup>62</sup>; these internal numbers are not allowed to wrap around. The low-order 32 bits (or 16 bits or 8 bits) of the internal number are what is transmitted in the packet header. A packet receiver infers the high-order bits from the most recent acknowledgment.</p>
+<p>The initial packet number is to be chosen randomly in the range 0 to 2<sup>32</sup>−1025. This corresponds to TCP’s use of Initial Sequence Numbers.</p>
+<p>Use of 16-bit or 8-bit transmitted packet numbers is restricted to cases where there can be no ambiguity. At a minimum, this means that the number of outstanding packets (the QUIC winsize) cannot exceed 2<sup>7</sup>−1 for 8-bit packet numbering or 2<sup>15</sup>−1 for 16-bit packet numbering. These maximum winsizes represent the ideal case where there is no packet reordering; smaller values are likely to be used in practice. (See <a class="reference internal" href="slidingwindows.html#sliding-windows-exercises"><span class="std std-ref">6.5&nbsp;&nbsp;&nbsp;Exercises</span></a>, exercise 9.0.)</p>
+</div>
+<div class="section" id="frames-and-streams">
+<span id="index-99"></span><h4>12.22.4.2&nbsp;&nbsp;&nbsp;Frames and streams<a class="headerlink" href="#frames-and-streams" title="Permalink to this headline">¶</a></h4>
+<p>Data in a QUIC packet is partitioned into one or more <strong>frames</strong>. Each frame’s data is prefixed by a simple frame header indicating its length and type. Some frames contain management information; frames containing higher-layer data are called STREAM frames. Each frame must be fully contained in one packet.</p>
+<p>The application’s data can be divided into multiple <strong>streams</strong>, depending on the application requirements. This is particularly useful with HTTP, as a client may request a large number of different resources (html, images, javascript, <em>etc</em>) simultaneously. Stream data is contained in STREAM frames. Streams are numbered, with Stream 0 reserved for the TLS cryptographic handshake. The HTTP/2 protocol has introduced its own notion of streams; these map neatly onto QUIC streams.</p>
+<p>The two low-order bits of each stream number indicate whether the stream was initiated by the client or by the server, and whether it is bi- or uni-directional. This design decision means that either side can create a stream and send data on it immediately, <em>without negotiation</em>; this is important for reducing unnecessary RTTs.</p>
+<p>Each individual stream is guaranteed in-order delivery, but there are no ordering guarantees between different streams. Within a packet, the data for a particular stream is contained in a frame for that stream.</p>
+<p>One packet can contain stream frames for multiple streams. However, if a packet is lost, streams that have frames contained in that packet are blocked until retransmission. Other streams can continue without interruption. This creates an incentive for keeping separate streams in separate packets.</p>
+<p>Stream frames contain the byte offset of the frame’s block of stream data (starting from 0), to enable in-order stream reassembly. TCP, as we have seen, uses this byte-numbering approach exclusively, though starting with the Initial Sequence Number rather than zero. QUIC’s stream-level numbering by byte is unrelated to its top-level numbering by packet.</p>
+<p id="index-100">In addition to stream frames, there are a large number of management frames. Here are a few of them:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">RST_STREAM</span></code>: like TCP RST, but for one stream only.</li>
+<li><code class="docutils literal"><span class="pre">MAX_DATA</span></code>: this corresponds to the TCP advertised window size. As with TCP, it can be reduced to zero to pause the flow of data and thereby implement flow control. There is also a similar <code class="docutils literal"><span class="pre">MAX_STREAM_DATA</span></code>, applying per stream.</li>
+<li><code class="docutils literal"><span class="pre">PING</span></code> and <code class="docutils literal"><span class="pre">PONG</span></code>: to verify that the other endpoint is still responding. These serve as the equivalent of TCP KEEPALIVEs, among other things.</li>
+<li><code class="docutils literal"><span class="pre">CONNECTION_CLOSE</span></code> and <code class="docutils literal"><span class="pre">APPLICATION_CLOSE</span></code>: these initiate termination of the connection; they differ only in that a <code class="docutils literal"><span class="pre">CONNECTION_CLOSE</span></code> might be accompanied by a QUIC-layer error or explanation message while an <code class="docutils literal"><span class="pre">APPLICATION_CLOSE</span></code> might be accompanied by, say, an HTTP error/explanation messge.</li>
+<li><code class="docutils literal"><span class="pre">PAD</span></code>: to pad out the packet to a larger size.</li>
+<li><code class="docutils literal"><span class="pre">ACK</span></code>: for acknowledgments, below.</li>
+</ul>
+</div>
+<div class="section" id="acknowledgments">
+<span id="quicacks"></span><span id="index-101"></span><h4>12.22.4.3&nbsp;&nbsp;&nbsp;Acknowledgments<a class="headerlink" href="#acknowledgments" title="Permalink to this headline">¶</a></h4>
+<p>QUIC assigns a new, sequential packet number (the <code class="docutils literal"><span class="pre">Packet</span> <span class="pre">ID</span></code>) to every packet, including retransmissions. TCP, by comparison, assigns sequence numbers to each byte. (QUIC stream frames do number data by byte, as noted above.)</p>
+<p>Lost QUIC packets are retransmitted, but with a new packet number. This makes it impossible for a receiver to send cumulative acknowledgments, as lost packets will never be acknowledged. The receiver handles this as below. At the sender side, the sender maintains a list of packets it has sent that are both unacknowledged and also not known to be lost. These represent the packets <strong>in flight</strong>. When a packet is retransmitted, its old packet number is removed from this list, as lost, and the new packet number replaces it.</p>
+<p>To the extent possible given this retransmission-renumbering policy, QUIC follows the spirit of sliding windows. It maintains a state variable <code class="docutils literal"><span class="pre">bytes_in_flight</span></code>, corresponding to TCP’s winsize, listing the total size of all the packets in flight. As with TCP, new acknowledgments allow new transmissions.</p>
+<p>Acknowledgments themselves are sent in special acknowledgment frames. These begin with the number of the highest packet received. This is followed by a list of pairs, as long as will fit into the frame, consisting of the length of the next block of contiguous packets received followed by the length of the intervening gap of packets <em>not</em> received. The TCP Selective ACK (<a class="reference internal" href="reno.html#sack"><span class="std std-ref">13.6&nbsp;&nbsp;&nbsp;Selective Acknowledgments (SACK)</span></a>) option is similar, but is limited to three blocks of received packets. It is quite possible that some of the gaps in a QUIC ACK frame refer to lost packets that were long since retransmitted with new packet numbers, but this does not matter.</p>
+<p>The sender is allowed to skip packet numbers occasionally, to prevent the receiver from trying to increase throughput by acknowledging packets not yet received. Unlike with TCP, acknowledging an unsent packet is considered to be a fatal error, and the connection is terminated.</p>
+<p>As with TCP, there is a delayed-ACK timer, but, while TCP’s is typically 250 ms, QUIC’s is 25 ms. QUIC also includes in each ACK frame the receiver’s best estimate of the elapsed time between arrival of the most recent packet and the sending of the ACK it triggered; this allows the sender to better estimate the RTT. The primary advantage of the design decision not to reuse packet IDs is that there is never any ambiguity as to a retransmitted packet’s RTT, as there is in TCP (<a class="reference internal" href="#tcp-rto"><span class="std std-ref">12.19&nbsp;&nbsp;&nbsp;TCP Timeout and Retransmission</span></a>). Note, however, that because QUIC runs in a user process and not the kernel, it may not be able to respond immediately to an arriving packet, and so the time-delay estimate may be slightly short.</p>
+<p>ACK frames are not themselves acknowledged. This means that, in a one-way data flow, the receiver may have no idea if its ACKs are getting through (a TCP receiver may be in the same situation). The QUIC receiver may send a PING frame to the sender, which will respond not only with a matching PONG frame but also an ACK frame acknowledging the receiver’s recent acknowledgment packets.</p>
+<p>QUIC adjusts its <code class="docutils literal"><span class="pre">bytes_in_flight</span></code> value to manage congestion, much as TCP manages its winsize (or more properly its <code class="docutils literal"><span class="pre">cwnd</span></code>, <a class="reference internal" href="reno.html#congestion-avoidance"><span class="std std-ref">13&nbsp;&nbsp;&nbsp;TCP Reno and Congestion Management</span></a>) for the same purpose. Specifically, QUIC attempts to mimic the congestion response of TCP Cubic, <a class="reference internal" href="newtcps.html#tcp-cubic"><span class="std std-ref">15.15&nbsp;&nbsp;&nbsp;TCP CUBIC</span></a>, and so should in theory compete fairly with TCP Cubic connections. However, it is straightforward to arrange for QUIC to model the behavior of any other flavor of TCP (<a class="reference internal" href="newtcps.html#newtcps"><span class="std std-ref">15&nbsp;&nbsp;&nbsp;Newer TCP Implementations</span></a>).</p>
+</div>
+<div class="section" id="connection-handshake-and-tls-encryption">
+<span id="quicshake"></span><span id="index-102"></span><h4>12.22.4.4&nbsp;&nbsp;&nbsp;Connection handshake and TLS encryption<a class="headerlink" href="#connection-handshake-and-tls-encryption" title="Permalink to this headline">¶</a></h4>
+<p>The opening of a QUIC connection makes use of the TLS handshake, <a class="reference internal" href="security.html#tls"><span class="std std-ref">22.10.2&nbsp;&nbsp;&nbsp;TLS</span></a>, specifically TLS v1.3, <a class="reference internal" href="security.html#tls-v1-3"><span class="std std-ref">22.10.2.4.3&nbsp;&nbsp;&nbsp;TLS version 1.3</span></a>. A client wishing to connect sends a QUIC <code class="docutils literal"><span class="pre">Initial</span></code> packet, containing the TLS <code class="docutils literal"><span class="pre">ClientHello</span></code> message. The server responds (with a <code class="docutils literal"><span class="pre">ServerHello</span></code>) in a QUIC <code class="docutils literal"><span class="pre">Handshake</span></code> packet. (There is also a <code class="docutils literal"><span class="pre">Retry</span></code> packet, for special situations.) The TLS negotiation is contained in QUIC’s Stream 0. While the TLS and QUIC handshake rules are rather precise, there is as yet no formal state-diagram description of connection opening.</p>
+<p>The <code class="docutils literal"><span class="pre">Initial</span></code> packet also contains a set of QUIC <strong>transport parameters</strong> declared unilaterally by the client; the server makes a similar declaration in its response. These parameters include, among other things, the maximum packet size, the connection’s idle timeout, and initial value for <code class="docutils literal"><span class="pre">MAX_DATA</span></code>, above.</p>
+<p id="index-103">An important feature of TLS v1.3 is that, if the client has connected to the server previously and still has the key negotiated in that earlier session, it can use that old key to send an encrypted application-layer request (in a STREAM frame) immediately following the <code class="docutils literal"><span class="pre">Initial</span></code> packet. This is called <strong>0-RTT</strong> protection (or encryption). The advantage of this is that the client may receive an answer from the server within a single RTT, versus four RTTs for traditional TCP (one for the TCP three-way handshake, two for TLS negotiation, and one for the application request/reply). As discussed at <a class="reference internal" href="security.html#rtt-mode"><span class="std std-ref">22.10.2.4.4&nbsp;&nbsp;&nbsp;TLS v1.3 0-RTT mode</span></a>, requests submitted with 0-RTT protection must be idempotent, to prevent replay attacks.</p>
+<p>Once the server’s first <code class="docutils literal"><span class="pre">Handshake</span></code> packet makes it back to the client, the client is in possession of the key negotiated by the new session, and will encrypt everything using that going forward. This is known as the <strong>1-RTT</strong> key, and all further data is said to be 1-RTT protected. The negotiated key is initially calculated by the TLS layer, which then exports it to QUIC. The QUIC layer then encrypts the entire data portion of its packets, using the format of <span class="target" id="index-104"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc5116.html"><strong>RFC 5116</strong></a>.</p>
+<p>The QUIC header is not encrypted, but is still covered by an authentication checksum, making it impossible for middleboxes to rewrite anything. Such rewriting has been observed for TCP, and has sometimes complicated TCP evolution.</p>
+<p>The type field of a QUIC packet contains a special code to mark 0-RTT data, ensuring that the receiver will know what level of protection is in effect.</p>
+<p id="index-105">When a QUIC server receives the <code class="docutils literal"><span class="pre">ClientHello</span></code> and sends off its <code class="docutils literal"><span class="pre">ServerHello</span></code>, it has not yet received any evidence that the client “owns” the IP address it claims to have; that is, that the client is not spoofing its IP address (<a class="reference internal" href="#isn-spoofing"><span class="std std-ref">12.10.1&nbsp;&nbsp;&nbsp;ISNs and spoofing</span></a>). Because of the idempotency restriction on responses to 0-RTT data, the server cannot give away privileges if spoofed in this way by a client. The server may, however, be an unwitting participant in a <strong>traffic-amplification</strong> attack, if the real client can trigger the sending by the server to a spoofed client of a larger response than the real client sends directly. The solution here is to require that the QUIC <code class="docutils literal"><span class="pre">Initial</span></code> packet, containing the <code class="docutils literal"><span class="pre">ClientHello</span></code>, be at least 1200 bytes. The server’s <code class="docutils literal"><span class="pre">Handshake</span></code> response is likely to be smaller, and so represents no amplification of traffic.</p>
+<p>To close the connection, one side sends a <code class="docutils literal"><span class="pre">CONNECTION_CLOSE</span></code> or <code class="docutils literal"><span class="pre">APPLICATION_CLOSE</span></code>. It may continue to send these in response to packets from the other side. When the other side receives the <code class="docutils literal"><span class="pre">CLOSE</span></code> packet, it should send its own, and then enter the so-called <strong>draining</strong> state. When the initiator of the close receives the other side’s echoed <code class="docutils literal"><span class="pre">CLOSE</span></code>, it too will enter the draining state. Once in this state, an endpoint may not send any packets. The draining state corresponds to TCP’s TIMEWAIT (<a class="reference internal" href="#timewait"><span class="std std-ref">12.9&nbsp;&nbsp;&nbsp;TIMEWAIT</span></a>), for the purpose of any lost final ACKs; it should last three RTT’s. There is no need of a TIMEWAIT analog to prevent old duplicates, as a second QUIC connection will select a new <code class="docutils literal"><span class="pre">Connection</span> <span class="pre">ID</span></code>.</p>
+<p>QUIC connection closing has no analog of TCP’s feature in which one side sends FIN and the other continues to send data indefinitely, <a class="reference internal" href="#closing"><span class="std std-ref">12.7.1&nbsp;&nbsp;&nbsp;Closing a connection</span></a>. This use of FIN, however, is allowed in bidirectional streams; the per-stream (and per-direction) FIN bit lives in the stream header. Alternatively, one side can send its request and close its stream, and the other side can then answer on a different stream.</p>
+</div>
+</div>
+</div>
+<div class="section" id="epilog">
+<h2>12.23&nbsp;&nbsp;&nbsp;Epilog<a class="headerlink" href="#epilog" title="Permalink to this headline">¶</a></h2>
+<p>At this point we have covered the basic mechanics of TCP, but have one important topic remaining: how TCP manages its window size so as to limit congestion, while maintaining fairness. This turns out to be complex, and will be the focus of the next three chapters.</p>
+</div>
+<div class="section" id="exercises">
+<span id="tcp-exercises"></span><h2>12.24&nbsp;&nbsp;&nbsp;Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<p><em>Exercises are given fractional (floating point) numbers, to allow for interpolation of new exercises. Exercise 4.5 is distinct, for example, from exercises 4.0 and 5.0.</em></p>
+<p>1.0. Experiment with the TCP version of simplex-talk. How does the server respond differently with threading enabled and without, if two simultaneous attempts to connect are made, from two different client instances?</p>
+<p>2.0. Trace the states visited if nodes A and B attempt to create a TCP connection by <em>simultaneously</em> sending each other SYN packets, that then cross in the network. Draw the ladder diagram, and label the states on each side. Hint: there should be two pairs of crossing packets. A SYN+ACK counts, in the state diagram, as an ACK.</p>
+<p>2.5. Suppose nodes A and B are each behind their own NAT firewall (<a class="reference internal" href="ipv4.html#nat"><span class="std std-ref">7.7&nbsp;&nbsp;&nbsp;Network Address Translation</span></a>).</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>A ──── NAT_A ──── Internet ──── NAT_B ──── B
+</pre></div>
+</div>
+<p>A and B attempt to connect to one another simultaneously, using TCP. A sends to the public IPv4 address of NAT_B, and vice-versa for B. Assume that neither NAT_A nor NAT_B changes the port numbers in outgoing packets, at least for the packets involved in this connection attempt. Show that the connection succeeds.</p>
+<p>3.0. When two nodes A and B simultaneously attempt to connect to one another using the OSI TP4 protocol, two bidirectional network connections are created (rather than one, as with TCP). If TCP had instead chosen the TP4 semantics here, what would have to be added to the TCP header?
+Hint: if a packet from ⟨A,port1⟩ arrives at ⟨B,port2⟩, how would the receiver tell to which of the two possible connections it belongs?</p>
+<p>4.0. Simultaneous connection initiations are rare, but simultaneous connection termination is relatively common. How do two TCP nodes negotiate the simultaneous sending of FIN packets to one another? Draw the ladder diagram, and label the states on each side. Which node goes into TIMEWAIT state? Hint: there should be two pairs of crossing packets.</p>
+<p>4.5. The state diagram at <a class="reference internal" href="#tcp-state-diagram"><span class="std std-ref">12.7&nbsp;&nbsp;&nbsp;TCP state diagram</span></a> shows a dashed path from FIN_WAIT_1 to TIMEWAIT on receipt of FIN+ACK. All FIN packets contain a valid ACK field, but that is not what is meant here. Under what circumstances is this direct arc from FIN_WAIT_1 to TIMEWAIT taken? Explain why this arc can never be used during simultaneous close. Hint: consider the ladder diagram of a “normal” close.</p>
+<p>5.0. (a) Suppose you see multiple connections on your workstation in state FIN_WAIT_1. What is likely going on? Whose fault is it?</p>
+<p>(b). What might be going on if you see connections languishing in state FIN_WAIT_2?</p>
+<p>6.0. Suppose that, after downloading a file, the client host is unplugged from the network, so it can send no further packets. The server’s connection is still in the ESTABLISHED state. In each case below, use the TCP state diagram to list all states that are reachable by the server.</p>
+<div class="line-block">
+<div class="line">(a). Before being unplugged, the client was in state ESTABLISHED; <em>ie</em> it had <em>not</em> sent the first FIN.</div>
+<div class="line">(b). Before being unplugged the client had sent its FIN, and moved to FIN_WAIT_1.</div>
+</div>
+<p>Eventually, the server connection here would in fact transition to CLOSED due to repeated timeouts. For this exercise, though, assume only transitions explicitly shown in the state diagram are allowed.</p>
+<p>6.5. In <a class="reference internal" href="#tcp-connection-establishment"><span class="std std-ref">12.3&nbsp;&nbsp;&nbsp;TCP Connection Establishment</span></a> we noted that RST packets had to have a valid SYN value, but that “<span class="target" id="index-106"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc793.html"><strong>RFC 793</strong></a> does not require the RST packet’s ACK value to match”. There is an exception for RST packets arriving at state SYN-SENT: “the RST is acceptable if the ACK field acknowledges the SYN”.  Explain the reasoning behind this exception. (This is the one RST transition shown in the state diagram at <a class="reference internal" href="#tcp-state-diagram"><span class="std std-ref">12.7&nbsp;&nbsp;&nbsp;TCP state diagram</span></a>.)</p>
+<p>7.0. Suppose A and B create a TCP connection with ISN<sub>A</sub>=20,000 and ISN<sub>B</sub>=5,000. A sends three 1000-byte packets (Data1, Data2 and Data3 below), and B ACKs each. Then B sends a 1000-byte packet DataB to A and terminates the connection with a FIN. In the table below, fill in the SEQ and ACK fields for each packet shown.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="48%" />
+<col width="52%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">A sends</th>
+<th class="head">B sends</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>SYN, ISN<sub>A</sub>=20,000</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td></td>
+<td>SYN, ISN<sub>B</sub>=5,000, ACK=______</td>
+</tr>
+<tr class="row-even"><td>ACK, SEQ=______, ACK=______</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>Data1, SEQ=______, ACK=______</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td></td>
+<td>ACK, SEQ=______, ACK=______</td>
+</tr>
+<tr class="row-odd"><td>Data2, SEQ=______, ACK=______</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td></td>
+<td>ACK, SEQ=______, ACK=______</td>
+</tr>
+<tr class="row-odd"><td>Data3, SEQ=______, ACK=______</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td></td>
+<td>ACK, SEQ=______, ACK=______</td>
+</tr>
+<tr class="row-odd"><td></td>
+<td>DataB, SEQ=______, ACK=______</td>
+</tr>
+<tr class="row-even"><td>ACK, SEQ=_____, ACK=______</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td></td>
+<td>FIN, SEQ=______, ACK=______</td>
+</tr>
+</tbody>
+</table>
+<p>8.0. Suppose you are downloading a large file, and there is a progress bar showing how much of the file has been downloaded. For definiteness, assume the progress bar moves 1 mm per MB, the throughput averages 0.5 MB per second (so the progress bar advances at a rate of 0.5 mm/sec), and the winsize is 5 MB.</p>
+<p>A packet is now lost, and is retransmitted after a timeout. What will happen to the progress bar? If someone measured the progress bar at two times 1 second apart, just before and just after the lost packet arrived, what value would they calculate for the throughput?</p>
+<p>9.0. Suppose you are creating software for a streaming-video site. You want to limit the video read-ahead – the gap between how much has been downloaded and how much the viewer has actually watched – to approximately 1 MB; the server should pause in sending when necessary to enforce this. On the other hand, you do want the receiver to be able to read ahead by up to this much. You should assume that the TCP connection throughput will be higher than the actual video-data-consumption rate.</p>
+<div class="line-block">
+<div class="line">(a). Suppose the TCP window size happens to be exactly 1 MB. If the receiver simply reads each video frame from the TCP connection, displays it, and then pauses briefly before reading the next frame in accordance with the frame rate, explain how the flow-control mechanism of <a class="reference internal" href="#tcp-flow-control"><span class="std std-ref">12.17&nbsp;&nbsp;&nbsp;TCP Flow Control</span></a> will achieve the desired effect.</div>
+</div>
+<div class="line-block">
+<div class="line">(b). Applications, however, cannot control their TCP window size. Suppose the receiver application reads 1 MB ahead of what is being displayed, and then stops reading, until more can be displayed. Again, explain how the TCP flow-control mechanism will soon cause the sender to stop sending. (Specifically, the sender would never send more than winsize+1MB ahead of what was necessary.)</div>
+</div>
+<p>(It is also possible to implement sender pauses via an application-layer protocol.)</p>
+<p>10.0. A user moves the computer mouse and sees the mouse-cursor’s position updated on the screen. Suppose the mouse-position updates are being transmitted over a TCP connection with a relatively long RTT. The user attempts to move the cursor to a specific point. How will the user perceive the mouse’s motion</p>
+<div class="line-block">
+<div class="line">(a). with the Nagle algorithm</div>
+<div class="line">(b). without the Nagle algorithm</div>
+</div>
+<p>10.5. Host A sends two single-byte packets, one containing “x” and the other containing “y”, to host B. A implements the Nagle algorithm and B implements delayed ACKs, with a 500 ms maximum delay. The RTT is negligible. How long does the transmission take? Draw a ladder diagram.</p>
+<p>11.0. Suppose you have fallen in with a group that wants to add to TCP a feature so that, if A and B1 are connected, then B1 can <strong>hand off</strong> its connection to a different host B2; the end result is that A and B2 are connected and A has received an uninterrupted stream of data. Either A or B1 can initiate the handoff.</p>
+<div class="line-block">
+<div class="line">(a). Suppose B1 is the host to send the final FIN (or HANDOFF) packet to A. How would you handle appropriate analogues of the TIMEWAIT state for host B1? Does the fact that A is continuing the connection, just not with B1, matter?</div>
+<div class="line">(b). Now suppose A is the party to send the final FIN/HANDOFF, to B1. What changes to TIMEWAIT would have to be made at A’s end? Note that A may potentially hand off the connection again and again, <em>eg</em> to B3, B4 and then B5.</div>
+</div>
+<p>12.0. Suppose A connects to B via TCP, and sends the message “Attack at noon”, followed by FIN. Upon receiving this, B is sure it has received the entire message.</p>
+<div class="line-block">
+<div class="line">(a). What can A be sure of upon receiving B’s own FIN+ACK?</div>
+<div class="line">(b). What can B be sure of upon receiving A’s final ACK?</div>
+<div class="line">(c). What is A not absolutely sure of after sending its final ACK?</div>
+</div>
+<p>13.0. Host A connects to the Internet via Wi-Fi, receiving IPv4 address 10.0.0.2, and then opens a TCP connection <em>conn1</em> to remote host B. After <em>conn1</em> is established, A’s Ethernet cable is plugged in. A’s Ethernet interface receives IP address 10.0.0.3, and A automatically selects this new Ethernet connection as its default route. <strong>Assume</strong> that A now starts using 10.0.0.3 as the source address of packets it sends as part of <em>conn1</em> (contrary to <span class="target" id="index-107"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1122.html"><strong>RFC 1122</strong></a>).</p>
+<p><strong>Assume also</strong> that A’s TCP implementation is such that when a packet arrives from ⟨B<sub>IP</sub>, B<sub>port</sub>⟩ to ⟨A<sub>IP</sub>, A<sub>port</sub>⟩ and this socketpair is to be matched to an existing TCP connection, the field A<sub>IP</sub> is allowed to be any of A’s IP addresses (that is, either 10.0.0.2 or 10.0.0.3); it does not have to match the IP address with which the connection was originally negotiated.</p>
+<div class="line-block">
+<div class="line">(a). Explain why <em>conn1</em> will now fail, as soon as any packet is sent from A. Hint: the packet will be sent from 10.0.0.3. What will B send in response? In light of the second assumption, how will A react to B’s response packet?</div>
+</div>
+<p>(The author regularly sees connections appear to fail this way. Perhaps some justification for this behavior is that, at the time of establishment of <em>conn1</em>, A was not yet multihomed.)</p>
+<div class="line-block">
+<div class="line">(b). Now suppose all four fields of the socketpair (⟨B<sub>IP</sub>, B<sub>port</sub>⟩, ⟨A<sub>IP</sub>, A<sub>port</sub>⟩) are used to match an incoming packet to its corresponding TCP connection. The connection <em>conn1</em> still fails, though not as immediately. Explain what happens.</div>
+</div>
+<p>See also <a class="reference internal" href="ipv4.html#arp-flux"><span class="std std-ref">7.9.5&nbsp;&nbsp;&nbsp;ARP and multihomed hosts</span></a>,  <a class="reference internal" href="ipv4.html#ipv4"><span class="std std-ref">7&nbsp;&nbsp;&nbsp;IP version 4</span></a> exercise 11.0, and <a class="reference internal" href="routing.html#routing-update"><span class="std std-ref">9&nbsp;&nbsp;&nbsp;Routing-Update Algorithms</span></a> exercise 13.0.</p>
+<p>14.0. Modify the simplex-talk server of <a class="reference internal" href="#tcp-simplex-talk"><span class="std std-ref">12.6&nbsp;&nbsp;&nbsp;TCP simplex-talk</span></a> so that <code class="docutils literal"><span class="pre">line_talker()</span></code> breaks out of the <code class="docutils literal"><span class="pre">while</span></code> loop as soon as it has printed the first string received (or simply remove the while loop). Once out of the <code class="docutils literal"><span class="pre">while</span></code> loop, the existing code calls <code class="docutils literal"><span class="pre">s.close()</span></code>.</p>
+<div class="line-block">
+<div class="line">(a). Start up the modified server, and connect to it with a client. Send a single message line, and use <code class="docutils literal"><span class="pre">netstat</span></code> to examine the TCP states of the client and server. What are these states?</div>
+</div>
+<div class="line-block">
+<div class="line">(b). Send two message lines to the server. What are the TCP states of the client and server?</div>
+</div>
+<div class="line-block">
+<div class="line">(c). Send three message lines to the server. Is there an error message at the client?</div>
+</div>
+<div class="line-block">
+<div class="line">(d). Send two message lines to the server, while monitoring packets with <a class="reference external" href="http://www.wireshark.org/">WireShark</a>. The WireShark filter expression <code class="docutils literal"><span class="pre">tcp.port</span> <span class="pre">==</span> <span class="pre">5431</span></code> may be useful for eliminating irrelevant traffic. What FIN packets do you see? Do you see a RST packet?</div>
+</div>
+<p>15.0. Outline a scenario in which TCP endpoint A sends data to B and then calls <code class="docutils literal"><span class="pre">close()</span></code> on its socket, and after the connection terminates B has not received all the data, even though the network has not failed. In the style of <a class="reference internal" href="#tcp-client"><span class="std std-ref">12.6.1&nbsp;&nbsp;&nbsp;The TCP Client</span></a>, A’s code might look like this:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">s</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Socket</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">destport</span><span class="p">);</span>
+<span class="n">sout</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">getOutputStream</span><span class="p">();</span>
+<span class="n">sout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">large_buffer</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Hint: see <a class="reference internal" href="#calling-close"><span class="std std-ref">12.7.2&nbsp;&nbsp;&nbsp;Calling close()</span></a>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="reno.html" title="13   TCP Reno and Congestion Management"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="udp.html" title="11   UDP Transport"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, edition 1.9.12</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015, Peter L Dordal.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+    </div>
+  </body>
+</html>

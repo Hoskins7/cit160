@@ -1,0 +1,984 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>26   Security &#8212; An Introduction to Computer Networks, edition 1.9.12</title>
+    <link rel="stylesheet" href="_static/csbnetbook.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.9.12',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/mobile.js"></script>
+    <script type="text/javascript" src="_static/rightsidebar.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="26   Public-Key Encryption" href="sec_crypto.html" />
+    <link rel="prev" title="25   Network Management and SNMP" href="netmgmtb.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="sec_crypto.html" title="26   Public-Key Encryption"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="netmgmtb.html" title="25   Network Management and SNMP"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, edition 1.9.12</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">26&nbsp;&nbsp;&nbsp;Security</a><ul>
+<li><a class="reference internal" href="#code-execution-intrusion">26.1&nbsp;&nbsp;&nbsp;Code-Execution Intrusion</a><ul>
+<li><a class="reference internal" href="#the-morris-worm">26.1.1&nbsp;&nbsp;&nbsp;The Morris Worm</a></li>
+<li><a class="reference internal" href="#christmas-day-attack">26.1.2&nbsp;&nbsp;&nbsp;Christmas Day Attack</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#stack-buffer-overflow">26.2&nbsp;&nbsp;&nbsp;Stack Buffer Overflow</a><ul>
+<li><a class="reference internal" href="#return-to-libc">26.2.1&nbsp;&nbsp;&nbsp;Return to libc</a></li>
+<li><a class="reference internal" href="#an-actual-stack-overflow-example">26.2.2&nbsp;&nbsp;&nbsp;An Actual Stack-Overflow Example</a><ul>
+<li><a class="reference internal" href="#the-server">26.2.2.1&nbsp;&nbsp;&nbsp;The server</a></li>
+<li><a class="reference internal" href="#the-shellcode">26.2.2.2&nbsp;&nbsp;&nbsp;The shellcode</a></li>
+<li><a class="reference internal" href="#the-exploit">26.2.2.3&nbsp;&nbsp;&nbsp;The exploit</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#defenses-against-buffer-overflows">26.2.3&nbsp;&nbsp;&nbsp;Defenses Against Buffer Overflows</a><ul>
+<li><a class="reference internal" href="#stack-canary">26.2.3.1&nbsp;&nbsp;&nbsp;Stack canary</a></li>
+<li><a class="reference internal" href="#aslr">26.2.3.2&nbsp;&nbsp;&nbsp;ASLR</a></li>
+<li><a class="reference internal" href="#making-the-stack-non-executable">26.2.3.3&nbsp;&nbsp;&nbsp;Making the stack non-executable</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#heap-buffer-overflow">26.3&nbsp;&nbsp;&nbsp;Heap Buffer Overflow</a><ul>
+<li><a class="reference internal" href="#a-linux-heap-vulnerability">26.3.1&nbsp;&nbsp;&nbsp;A Linux heap vulnerability</a></li>
+<li><a class="reference internal" href="#a-jpeg-heap-vulnerability">26.3.2&nbsp;&nbsp;&nbsp;A JPEG heap vulnerability</a></li>
+<li><a class="reference internal" href="#cross-site-scripting-xss">26.3.3&nbsp;&nbsp;&nbsp;Cross-Site Scripting (XSS)</a></li>
+<li><a class="reference internal" href="#sql-injection">26.3.4&nbsp;&nbsp;&nbsp;SQL Injection</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#network-intrusion-detection">26.4&nbsp;&nbsp;&nbsp;Network Intrusion Detection</a><ul>
+<li><a class="reference internal" href="#evasion">26.4.1&nbsp;&nbsp;&nbsp;Evasion</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cryptographic-goals">26.5&nbsp;&nbsp;&nbsp;Cryptographic Goals</a><ul>
+<li><a class="reference internal" href="#alice-and-bob">26.5.1&nbsp;&nbsp;&nbsp;Alice and Bob</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#secure-hashes">26.6&nbsp;&nbsp;&nbsp;Secure Hashes</a><ul>
+<li><a class="reference internal" href="#secure-hashes-and-authentication">26.6.1&nbsp;&nbsp;&nbsp;Secure Hashes and Authentication</a></li>
+<li><a class="reference internal" href="#password-hashes">26.6.2&nbsp;&nbsp;&nbsp;Password Hashes</a></li>
+<li><a class="reference internal" href="#chap">26.6.3&nbsp;&nbsp;&nbsp;CHAP</a></li>
+<li><a class="reference internal" href="#scram">26.6.4&nbsp;&nbsp;&nbsp;SCRAM</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#shared-key-encryption">26.7&nbsp;&nbsp;&nbsp;Shared-Key Encryption</a><ul>
+<li><a class="reference internal" href="#session-keys">26.7.1&nbsp;&nbsp;&nbsp;Session Keys</a></li>
+<li><a class="reference internal" href="#block-ciphers">26.7.2&nbsp;&nbsp;&nbsp;Block Ciphers</a></li>
+<li><a class="reference internal" href="#cipher-modes">26.7.3&nbsp;&nbsp;&nbsp;Cipher Modes</a></li>
+<li><a class="reference internal" href="#stream-ciphers">26.7.4&nbsp;&nbsp;&nbsp;Stream Ciphers</a><ul>
+<li><a class="reference internal" href="#rc4">26.7.4.1&nbsp;&nbsp;&nbsp;RC4</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#block-cipher-based-stream-ciphers">26.7.5&nbsp;&nbsp;&nbsp;Block-cipher-based stream ciphers</a></li>
+<li><a class="reference internal" href="#encryption-and-authentication">26.7.6&nbsp;&nbsp;&nbsp;Encryption and Authentication</a></li>
+<li><a class="reference internal" href="#wi-fi-wep-encryption-failure">26.7.7&nbsp;&nbsp;&nbsp;Wi-Fi WEP Encryption Failure</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#diffie-hellman-merkle-exchange">26.8&nbsp;&nbsp;&nbsp;Diffie-Hellman-Merkle Exchange</a><ul>
+<li><a class="reference internal" href="#fast-arithmetic">26.8.1&nbsp;&nbsp;&nbsp;Fast Arithmetic</a></li>
+<li><a class="reference internal" href="#simultaneous-authentication-of-equals">26.8.2&nbsp;&nbsp;&nbsp;Simultaneous Authentication of Equals</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#exercises">26.9&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="netmgmtb.html"
+                        title="previous chapter">25&nbsp;&nbsp;&nbsp;Network Management and SNMP</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="sec_crypto.html"
+                        title="next chapter">26&nbsp;&nbsp;&nbsp;Public-Key Encryption</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="security">
+<span id="security-hash"></span><span id="index-0"></span><h1>26&nbsp;&nbsp;&nbsp;Security<a class="headerlink" href="#security" title="Permalink to this headline">¶</a></h1>
+<p>How do we keep intruders out of our computers? How do we keep them from impersonating us, or from listening in to our conversations or downloading our data? Computer security problems are in the news on almost a daily basis. In this chapter and the next we take a look at just a few of the issues involved in building secure networks. This chapter focuses on general principles and on <em>secure hashing</em> (<a class="reference internal" href="#secure-hashes"><span class="std std-ref">26.6&nbsp;&nbsp;&nbsp;Secure Hashes</span></a>) and “secret-key” encryption; the next addresses public-key encryption.</p>
+<p>For our limited overview here, we will divide attacks into three categories:</p>
+<ol class="arabic simple">
+<li>Attacks that execute the intruder’s code on the target computer</li>
+<li>Attacks that extract data from the target, without code injection</li>
+<li>Eavesdropping on or interfering with computer-to-computer communications</li>
+</ol>
+<p>The first category is arguably the most serious; this usually amounts to a complete takeover, though occasionally the attacker’s code is limited by operating-system privileges. A computer taken over this way is sometimes said to have been “owned”. We discuss these attacks below in <a class="reference internal" href="#code-execution"><span class="std std-ref">26.1&nbsp;&nbsp;&nbsp;Code-Execution Intrusion</span></a>. Perhaps the simplest form of such an attack is through stolen or guessed passwords to a system that offers remote login to command-shell accounts. More technical forms of attack may involve a virus, a buffer overflow (<a class="reference internal" href="#stack-buffer-overflow"><span class="std std-ref">26.2&nbsp;&nbsp;&nbsp;Stack Buffer Overflow</span></a> and <a class="reference internal" href="#heap-buffer-overflow"><span class="std std-ref">26.3&nbsp;&nbsp;&nbsp;Heap Buffer Overflow</span></a>), a protocol flaw (<a class="reference internal" href="#xmas"><span class="std std-ref">26.1.2&nbsp;&nbsp;&nbsp;Christmas Day Attack</span></a>), or some other software flaw (<a class="reference internal" href="#morris-worm"><span class="std std-ref">26.1.1&nbsp;&nbsp;&nbsp;The Morris Worm</span></a>).</p>
+<p>In the second category are intrusions that do not involve remote code execution; a server application may be manipulated to give up data in ways that its designers did not foresee.</p>
+<p>For example, in 2008 David Kernell gained access to the <a class="reference external" href="http://yahoo.com">Yahoo</a> email account of then-vice-presidential candidate Sarah Palin, by guessing or looking up the answers to the forgotten-password security questions for the account. One question was Palin’s birthdate. Another was “where did you meet your spouse?”, which, after some research and trial-and-error, Kernell was able to guess was “Wasilla High”; Palin grew up in and was at one point mayor of Wasilla, Alaska. Much has been made since of the idea that the answers to many security questions can be found on social-networking sites.</p>
+<p>As a second example in this category, in 2010 Andrew “weev” Auernheimer and Daniel Spitler were charged in the “AT&amp;T iPad hack”. IPad owners who signed up for network service with AT&amp;T had their iPad’s <a class="reference external" href="http://en.wikipedia.org/wiki/Subscriber_identity_module#ICCID">ICC-ID</a> recorded along with their other information. If one of these owners later revisited the AT&amp;T website, the site would automatically request the iPad’s ICC-ID and then populate the web form with the user’s information. If a randomly selected ICC-ID were presented to the AT&amp;T site that happened to match a real account, that user’s name, phone number and email address would be returned. ICC-ID strings contain 20 decimal digits, but the individual-device portion of the identifier is much smaller and this brute-force attack yielded 114,000 accounts.</p>
+<p>This attack is somewhat like a password intrusion, except that there was no support for running commands via the “compromised” accounts.</p>
+<p>Auernheimer was convicted for this “intrusion” in November 2012, but his sentence was set aside on appeal in April 2014. Auernheimer’s conviction remains controversial as the AT&amp;T site never requested a password in the usual sense, though the site certainly released information not intended by its designers.</p>
+<p>Finally, the third category here includes any form of eavesdropping. If the password for a login-shell account is obtained this way, a first-category attack may follow. The usual approach to prevention is the use of <strong>encryption</strong>. Encryption is closely related to <strong>secure authentication</strong>; encryption and authentication are addressed below in <a class="reference internal" href="#secure-hashes"><span class="std std-ref">26.6&nbsp;&nbsp;&nbsp;Secure Hashes</span></a> through <span class="xref std std-ref">ssh and tls</span>.</p>
+<p id="index-1">Encryption does not always work as desired. In 2006 intruders made off with 40 million credit-card records from <strong>TJX Corp</strong> by breaking the WEP Wi-Fi encryption (<a class="reference internal" href="#wep-failure"><span class="std std-ref">26.7.7&nbsp;&nbsp;&nbsp;Wi-Fi WEP Encryption Failure</span></a>) used by the company, and thus gaining access to account credentials and to file servers. Albert Gonzalez pleaded guilty to this intrusion in 2009. This was the largest retail credit-card breach until the Target hack of late 2013.</p>
+<div class="section" id="code-execution-intrusion">
+<span id="code-execution"></span><h2>26.1&nbsp;&nbsp;&nbsp;Code-Execution Intrusion<a class="headerlink" href="#code-execution-intrusion" title="Permalink to this headline">¶</a></h2>
+<p>The most serious intrusions are usually those in which a vulnerability allows the attacker to run executable code on the target system.</p>
+<p>The classic <strong>computer virus</strong> is broadly of this form, though usually without a network vulnerability: the user is tricked – often involving some form of social engineering – into running the attacker’s program on the target computer; the program then makes itself at home more or less permanently. In one form of this attack, the user receives a file <code class="docutils literal"><span class="pre">interesting_picture.jpg.exe</span></code> or <code class="docutils literal"><span class="pre">IRS_deficiency_notice.pdf.exe</span></code>. The attack is made slightly easier by the default setting in Windows of not displaying the final file extension <code class="docutils literal"><span class="pre">.exe</span></code>.</p>
+<p>Early viruses had to be completely self-contained, but, for networked targets, once an attacker is able to run some small initial executable then that program can in turn download additional malware. The target can also be further controlled via the network.</p>
+<p>The reach of an executable-code intrusion may be limited by privileges on the target operating system; if I am operating a browser on my computer as user “pld” and an intruder takes advantage of a flaw in that browser, then the intruder’s code will also run as “pld” and not as “root” or “Administrator”. This may prevent the intruder from rewriting my kernel, though that is small comfort to me if my files are encrypted and held for ransom.</p>
+<p>On servers, it is standard practice to run network services with the minimum privileges practical, though see <a class="reference internal" href="#stack-defenses"><span class="std std-ref">26.2.3&nbsp;&nbsp;&nbsp;Defenses Against Buffer Overflows</span></a>.</p>
+<p>Exactly what is “executable code” is surprisingly hard to state. Scripting languages usually qualify. In 2000, the ILOVEYOU virus began spreading on Windows systems; users received a file <code class="docutils literal"><span class="pre">LOVE-LETTER.TXT.vbs</span></code> (often with an enticing Subject: line such as “love letter for you”). The <code class="docutils literal"><span class="pre">.vbs</span></code> extension, again not displayed by default, meant that when the file was opened it was automatically run as a <strong>v</strong>isual <strong>b</strong>asic <strong>s</strong>cript. The ILOVEYOU virus was later attributed to Reonel Ramones and Onel de Guzman of the Philippines, though they were never prosecuted. The year before, the Melissa virus spread as an emailed Microsoft Word attachment; the executable component was a Word macro.</p>
+<p>Under Windows, a number of configuration-file formats are effectively executable; among these are the program-information-file format <a class="reference external" href="http://en.wikipedia.org/wiki/Program_information_file">.PIF</a> and the screen-saver format <a class="reference external" href="http://en.wikipedia.org/wiki/Screensaver#Microsoft_Windows_2">.SCR</a>.</p>
+<div class="section" id="the-morris-worm">
+<span id="morris-worm"></span><h3>26.1.1&nbsp;&nbsp;&nbsp;The Morris Worm<a class="headerlink" href="#the-morris-worm" title="Permalink to this headline">¶</a></h3>
+<p>The classic Morris Worm was launched on the infant Internet in 1988 by <a class="reference external" href="http://en.wikipedia.org/wiki/Robert_Tappan_Morris">Robert Tappan Morris</a>. Once one machine was infected, it would launch attacks against other machines, either on the same LAN or far away. The worm used a number of techniques, including taking advantage of <strong>implementation flaws</strong> via stack buffer overflows (<a class="reference internal" href="#stack-buffer-overflow"><span class="std std-ref">26.2&nbsp;&nbsp;&nbsp;Stack Buffer Overflow</span></a>). Two of the worm’s techniques, however, had nothing to do with code injection. One worm module contained a dictionary of popular passwords that were used to try against various likely system accounts. Another module relied on a different kind of implementation vulnerability: a (broken) diagnostic feature of the <code class="docutils literal"><span class="pre">sendmail</span></code> email server. Someone could connect to the <code class="docutils literal"><span class="pre">sendmail</span></code> TCP port 25 and send the command <code class="docutils literal"><span class="pre">WIZ</span> <span class="pre">&lt;password&gt;</span></code>; that person would then get a shell and be able to execute arbitrary commands. It was the intent to require a legitimate <code class="docutils literal"><span class="pre">sendmail</span></code>-specific password, but an error in <code class="docutils literal"><span class="pre">sendmail</span></code>’s frozen-configuration-file processing meant that an empty password often worked.</p>
+</div>
+<div class="section" id="christmas-day-attack">
+<span id="xmas"></span><h3>26.1.2&nbsp;&nbsp;&nbsp;Christmas Day Attack<a class="headerlink" href="#christmas-day-attack" title="Permalink to this headline">¶</a></h3>
+<p>The 1994 “Christmas day attack” (<a class="reference internal" href="tcpB.html#isn-spoofing"><span class="std std-ref">18.3.1&nbsp;&nbsp;&nbsp;ISNs and spoofing</span></a>) used a TCP <strong>protocol weakness</strong> combined with a common computer-trust arrangement to gain privileged login access to several computers at UCSD. Implementations can be fixed immediately, once the problem is understood, but protocol changes require considerable negotiation and review.</p>
+<p>The so-called “rlogin” trust arrangement meant that computer A might be configured to trust requests for remote-command execution from computer B, often on the same subnet. But the ISN-spoofing attack meant that an attacker M could send a command request to A that would <em>appear</em> to come from the trusted peer B, at least until it was too late. The command might be as simple as “open up a shell connection to M”. At some point the spoofed connection would fail, but by then the harmful command would have been executed. The only fix is to stop using rlogin. (Ironically, the ISN spoofing attack was discovered by Morris but was not used in the Morris worm above; see <a class="reference internal" href="bibliography.html#rtm85" id="id1">[RTM85]</a>.)</p>
+<p>Note that, as with the sendmail WIZ attack of the Morris worm, this attack did not involve network delivery of an executable fragment (a “shellcode”).</p>
+</div>
+</div>
+<div class="section" id="stack-buffer-overflow">
+<span id="id2"></span><h2>26.2&nbsp;&nbsp;&nbsp;Stack Buffer Overflow<a class="headerlink" href="#stack-buffer-overflow" title="Permalink to this headline">¶</a></h2>
+<p>The stack buffer overflow is perhaps the classic way for an attacker to execute a short piece of machine code on a remote machine, thus compromising it. Such attacks are always due to an implementation flaw. A server application reads attacker-supplied data into a buffer, <code class="docutils literal"><span class="pre">buf</span></code>, of length <code class="docutils literal"><span class="pre">buflen</span></code>. Due to the flaw, however, the server reads more than <code class="docutils literal"><span class="pre">buflen</span></code> bytes of data, and the additional data is written into memory past the end of <code class="docutils literal"><span class="pre">buf</span></code>, corrupting memory. In the C language, there is no bounds checking with native arrays, and so such an overflow is not detected at the time it occurs. See <a class="reference internal" href="bibliography.html#ao96" id="id3">[AO96]</a> for early examples.</p>
+<p>In most memory layouts, the stack grows downwards; that is, a function call creates a new stack frame with a numerically lower address. Array indexing, however, grows upwards: <code class="docutils literal"><span class="pre">buf[i+1]</span></code> is at a higher address than <code class="docutils literal"><span class="pre">buf[i]</span></code>. As a consequence, overwriting the buffer allows rewriting the most recent return address on the stack. A common goal for the attacker is to supply an overflowing buffer that does two things:</p>
+<ol class="arabic simple">
+<li>it includes a <strong>shellcode</strong> - a small snippet of machine code that, when executed, does something bad (traditionally but not necessarily by starting a shell with which the attacker can invoke arbitrary commands).</li>
+<li>it overwrites the stack return address so that, when the current function exits, control is returned not to the caller but to the supplied shellcode.</li>
+</ol>
+<p>In the diagram below, the left side shows the normal layout: the current stack frame has a buffer into which the attacker’s message is read. When the current function exits, control is returned to the address stored in <code class="docutils literal"><span class="pre">return_address</span></code>.</p>
+<img alt="_images/basic_stack_overflow.svg" src="_images/basic_stack_overflow.svg" /><p>The right side shows the result after the attacker has written shellcode to the buffer, and, by overflow, has also overwritten the <code class="docutils literal"><span class="pre">return_address</span></code> field on the stack so that it now points to the shellcode. When the function exits, control will be passed to the code at <code class="docutils literal"><span class="pre">return_address</span></code>, that is, to the shellcode rather than to the original caller. The shellcode is here shown below <code class="docutils literal"><span class="pre">return_address</span></code> in memory, but it can also be above it.</p>
+<div class="section" id="return-to-libc">
+<span id="index-2"></span><span id="id4"></span><h3>26.2.1&nbsp;&nbsp;&nbsp;Return to libc<a class="headerlink" href="#return-to-libc" title="Permalink to this headline">¶</a></h3>
+<p>A variant attack is for the attacker to skip the shellcode, but instead to overwrite the stack return address with the address of a known library procedure. The libc library is popular here, making this known as the <strong>return-to-libc</strong> approach. The goal of the attacker is to identify a library procedure that, in the current context of the server process being attacked, will do something that the attacker finds useful.</p>
+<p>One version of this attack is to overwrite the stack address with the address of the <code class="docutils literal"><span class="pre">system()</span></code> call, and to place on the stack just above this return address a pointer to the string “/bin/sh” (often present in the environment strings of the attacked process). When the current function exits, control branches to <code class="docutils literal"><span class="pre">system()</span></code>, which now thinks it has been called with parameter <code class="docutils literal"><span class="pre">/bin/sh</span></code>. A shell is launched.</p>
+<p>Return-to-libc attacks often involve no shellcode at all. The attack of <a class="reference internal" href="#sp1"><span class="std std-ref">26.3.2&nbsp;&nbsp;&nbsp;A JPEG heap vulnerability</span></a> uses some return-to-libc elements but also does involve injected shellcode.</p>
+<p>A practical problem with any form of the stack-overflow attack is knowing enough about the memory layout of the target machine so that the attacker can determine exactly where the shellcode is loaded. This is made simpler by standardized versions of Windows in which many library routines are at fixed, well-known addresses.</p>
+</div>
+<div class="section" id="an-actual-stack-overflow-example">
+<span id="stack-overflow-example"></span><h3>26.2.2&nbsp;&nbsp;&nbsp;An Actual Stack-Overflow Example<a class="headerlink" href="#an-actual-stack-overflow-example" title="Permalink to this headline">¶</a></h3>
+<div class="sidebar">
+<p class="first sidebar-title">Why the code here?</p>
+<p class="last">In many accounts of computer vulnerabilities, there is an understandable reluctance to explain the actual mechanics, lest some attacker learn how to exploit the flaw. This secrecy, however, sometimes has the unfortunate side-effect of making vulnerabilities seem almost magical. The goal in presenting this twenty-year-old example in detail is simply to strip away the aura of mystery surrounding many exploits.</p>
+</div>
+<p>To put together an actual example, we modify a version of TCP simplex-talk (<a class="reference internal" href="tcpA.html#tcp-simplex-talk"><span class="std std-ref">17.6&nbsp;&nbsp;&nbsp;TCP simplex-talk</span></a>) written in the C language. On the server side, all we have to do is read the input with the infamous <code class="docutils literal"><span class="pre">gets(char</span> <span class="pre">*</span> <span class="pre">buf)</span></code>, which reads in data up to a newline (or NUL) character into the array <code class="docutils literal"><span class="pre">buf</span></code>, with no size restrictions. To be able to use <code class="docutils literal"><span class="pre">gets()</span></code> this way, we must arrange for the standard-input stream of the reading process to be the network connection. There is a version of <code class="docutils literal"><span class="pre">gets()</span></code> that reads from an arbitrary input stream, namely <code class="docutils literal"><span class="pre">fgets(char</span> <span class="pre">*</span> <span class="pre">buf,</span> <span class="pre">int</span> <span class="pre">bufsize,</span> <span class="pre">FILE</span> <span class="pre">*stream)</span></code>, but <code class="docutils literal"><span class="pre">fgets()</span></code> is not as vulnerable as <code class="docutils literal"><span class="pre">gets()</span></code> as it will not read more than <code class="docutils literal"><span class="pre">bufsize</span></code> characters into <code class="docutils literal"><span class="pre">buf</span></code>. (It is possible, of course, for a programmer to supply a value of <code class="docutils literal"><span class="pre">bufsize</span></code> much larger than the actual size of <code class="docutils literal"><span class="pre">buf[]</span></code>.)</p>
+<p>One drawback of using <code class="docutils literal"><span class="pre">gets()</span></code> is that the shellcode string must not have any NULL (zero) bytes. Sometimes this takes some subterfuge; in the example below, the shellcode includes the string <code class="docutils literal"><span class="pre">&quot;/bin/shNAAAABBBB&quot;</span></code>; the <code class="docutils literal"><span class="pre">N</span></code> and the <code class="docutils literal"><span class="pre">BBBB</span></code> will be replaced with zeroes by the injected code itself, after it is read.</p>
+<p>Alternatively, we can also have the server read its the data with the call</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">recv</span><span class="p">(</span><span class="nb">int</span> <span class="n">socket</span><span class="p">,</span> <span class="n">char</span> <span class="o">*</span> <span class="n">buf</span><span class="p">,</span> <span class="nb">int</span> <span class="n">bufsize</span><span class="p">,</span> <span class="nb">int</span> <span class="n">flags</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>but supply an <em>incorrect</em> (and much too large) value for the parameter <code class="docutils literal"><span class="pre">bufsize</span></code>. This approach has the practical advantage of allowing the attacker to supply a buffer with NUL characters (zero bytes) and with additional embedded newline characters.</p>
+<p>On the client side – the attacker’s side – we need to come up with a suitable shellcode and create a too-large buffer containing, in the correct place, the address of the start of the shellcode. Guessing this address used to be easy, in the days when every process always started with the same virtual-memory address. It is now much harder precisely to make this kind of buffer-overflow attack more difficult; we will cheat and have our server print out an address on startup that we can then supply to the client.</p>
+<p>An attack like this depends on knowing the target operating system, the target cpu architecture (so as to provide an executable shellcode), the target memory layout, and something about the target server implementation (so the attacker knows what overflow to present, and when). Alas, all but the last of these are readily guessable. Once upon a time vulnerabilities in server implementations were discovered by reading source code, but it has long been possible to search for overflow opportunities making use only of the binary executable code.</p>
+<p>The shellcode presented here assumes that the server system is running 32-bit code. 64-bit Linux systems can be configured to run 32-bit code as well, though a simpler alternative is often to create a 32-bit virtual machine to run the server side. It would also be possible to migrate the shellcode to 64-bit format.</p>
+<div class="section" id="the-server">
+<span id="the-exploited-server"></span><h4>26.2.2.1&nbsp;&nbsp;&nbsp;The server<a class="headerlink" href="#the-server" title="Permalink to this headline">¶</a></h4>
+<p>The overflow-vulnerable server, <a class="reference external" href="auxiliary_files/overflow/oserver.c">oserver.c</a>, is more-or-less a C implementation of the tcp simplex-talk server of <a class="reference internal" href="tcpA.html#tcp-simplex-talk"><span class="std std-ref">17.6&nbsp;&nbsp;&nbsp;TCP simplex-talk</span></a>. For the 32-bit shellcode below to work, the server must be run as a 32-bit program.</p>
+<p>The server contains an explicit call to <code class="docutils literal"><span class="pre">bind()</span></code> which was handled implicitly by the <code class="docutils literal"><span class="pre">ServerSocket()</span></code> constructor in the Java version.</p>
+<p>For each new connection, a new process to handle it is created with <code class="docutils literal"><span class="pre">fork()</span></code>; that new process then calls <code class="docutils literal"><span class="pre">process_connection()</span></code>. The <code class="docutils literal"><span class="pre">process_connection()</span></code> function then reads a line at a time from the client into a buffer <code class="docutils literal"><span class="pre">pcbuf</span></code> of 80 bytes. Unfortunately for the server, it may read well more than 80 bytes into <code class="docutils literal"><span class="pre">pcbuf</span></code>.</p>
+<p>For the stack overflow to work, it is essential that the function that reads too much data into the buffer – thus corrupting the stack – must return. Therefore the protocol has been modified so that <code class="docutils literal"><span class="pre">process_connection()</span></code> returns if the arriving string begins with “quit”.</p>
+<p>We must also be careful that the stack overflow does not so badly corrupt any local variables that the code fails afterwards to continue running, even before returning. All local variables in <code class="docutils literal"><span class="pre">process_connection()</span></code> are overwritten by the overflow, so we save the socket itself in the global variable <code class="docutils literal"><span class="pre">gsock</span></code>.</p>
+<p>We also call <code class="docutils literal"><span class="pre">setstdinout(gsock)</span></code> so that the standard input and standard output within <code class="docutils literal"><span class="pre">process_connection()</span></code> is the network connection. This allows the use of the notoriously vulnerable <code class="docutils literal"><span class="pre">gets()</span></code>, which reads from the standard input (alternatively, <code class="docutils literal"><span class="pre">recv()</span></code> or <code class="docutils literal"><span class="pre">fgets()</span></code> with an incorrect value for <code class="docutils literal"><span class="pre">bufsize</span></code> may be used). The call to <code class="docutils literal"><span class="pre">setstdinout()</span></code> also means that the shell launched by the shellcode will have its standard input and output correctly set up. We could, of course, make the appropriate <code class="docutils literal"><span class="pre">dup()</span></code>/<code class="docutils literal"><span class="pre">fcntl()</span></code> calls from the shellcode, but that would increase its complexity and size.</p>
+<p>Because the server’s standard output is now the TCP connection, it prints incoming strings to the terminal via the standard-error stream.</p>
+<p>On startup, the server prints an address (that of <code class="docutils literal"><span class="pre">mbuf[]</span></code>) within its stack frame; we will refer to this as <strong>mbuf_addr</strong>. The attacking client must know this value. No real server is so accommodating as to print its internal addresses, but in the days before address randomization, <a class="reference internal" href="#aslr"><span class="std std-ref">26.2.3.2&nbsp;&nbsp;&nbsp;ASLR</span></a>, the server’s stack address was typically easy to guess.</p>
+<p>Whenever a connection is made, the server here also prints out the distance, in bytes, between the start of <code class="docutils literal"><span class="pre">mbuf[]</span></code> in <code class="docutils literal"><span class="pre">main()</span></code> and the start of <code class="docutils literal"><span class="pre">pcbuf</span></code> – the buffer that receives the overflow – in <code class="docutils literal"><span class="pre">process_connection()</span></code>. This latter number, which we will call <strong>addr_diff</strong>, is constant, and must be compiled into the exploit program (it does change if new variables are added to the server’s <code class="docutils literal"><span class="pre">main()</span></code> or <code class="docutils literal"><span class="pre">process_connection()</span></code>). The actual address of <code class="docutils literal"><span class="pre">pcbuf[]</span></code> is thus mbuf_addr − addr_diff. This will be the address where the shellcode is located, and so is the address with which we want to overwrite the stack. We return to this below in <a class="reference internal" href="#the-exploit"><span class="std std-ref">26.2.2.3&nbsp;&nbsp;&nbsp;The exploit</span></a>, where we introduce a “NOPslide” so that the attacker does not have to get the address of <code class="docutils literal"><span class="pre">pcbuf[]</span></code> exactly right.</p>
+<p>Linux provides some protection against overflow attacks (<a class="reference internal" href="#stack-defenses"><span class="std std-ref">26.2.3&nbsp;&nbsp;&nbsp;Defenses Against Buffer Overflows</span></a>), so the server must disable these. As mentioned above, one protection, address randomization, we defeat by having the server print a stack address. The server must also be compiled with the <code class="docutils literal"><span class="pre">-fno-stack-protector</span></code> option to disable the stack canary of <a class="reference internal" href="#stack-canary"><span class="std std-ref">26.2.3.1&nbsp;&nbsp;&nbsp;Stack canary</span></a>, and the <code class="docutils literal"><span class="pre">-z</span> <span class="pre">execstack</span></code> option to disable making the stack (and other data areas) non-executable, <a class="reference internal" href="#nx"><span class="std std-ref">26.2.3.3&nbsp;&nbsp;&nbsp;Making the stack non-executable</span></a>.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">gcc</span> <span class="o">-</span><span class="n">fno</span><span class="o">-</span><span class="n">stack</span><span class="o">-</span><span class="n">protector</span> <span class="o">-</span><span class="n">z</span> <span class="n">execstack</span> <span class="o">-</span><span class="n">o</span> <span class="n">oserver</span> <span class="n">oserver</span><span class="o">.</span><span class="n">c</span>
+</pre></div>
+</div>
+<p>Even then we are dutifully warned by both the compiler and the linker:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">warning</span><span class="p">:</span> <span class="s1">&#39;gets&#39;</span> <span class="ow">is</span> <span class="n">deprecated</span> <span class="o">....</span>
+<span class="n">warning</span><span class="p">:</span> <span class="n">the</span> <span class="s1">&#39;gets&#39;</span> <span class="n">function</span> <span class="ow">is</span> <span class="n">dangerous</span> <span class="ow">and</span> <span class="n">should</span> <span class="ow">not</span> <span class="n">be</span> <span class="n">used</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>In other words, getting this vulnerability still to work in 2014 takes a bit of effort.</p>
+<p>The server here does work with the simplex-talk client of <a class="reference internal" href="tcpA.html#tcp-simplex-talk"><span class="std std-ref">17.6&nbsp;&nbsp;&nbsp;TCP simplex-talk</span></a>, but with the <code class="docutils literal"><span class="pre">#USE_GETS</span></code> option enabled it does not handle a client exit gracefully, unless the client sends “quit”.</p>
+</div>
+<div class="section" id="the-shellcode">
+<span id="index-3"></span><span id="id5"></span><h4>26.2.2.2&nbsp;&nbsp;&nbsp;The shellcode<a class="headerlink" href="#the-shellcode" title="Permalink to this headline">¶</a></h4>
+<p>The shellcode must be matched to the operating system and to the cpu architecture; we will assume Linux running on a 32-bit Intel x86. Our goal is to create a shellcode that launches <code class="docutils literal"><span class="pre">/bin/sh</span></code>. The approach here is taken from <a class="reference internal" href="bibliography.html#sh04" id="id6">[SH04]</a>.</p>
+<p>The shellcode must be a string of machine instructions that is completely self-contained; data references cannot depend on the linker for address resolution. Not only must the code be position-independent, but the code together with its data must be position-independent.</p>
+<p>So-called “Intel syntax” is used here, in which the destination operand comes first, <em>eg</em> <code class="docutils literal"><span class="pre">mov</span> <span class="pre">eax,37</span></code>. The <a class="reference external" href="http://www.nasm.us/">nasm</a> assembler is one of many that supports this format.</p>
+<p>Direct system calls in Linux are made using interrupts, using the <code class="docutils literal"><span class="pre">int</span> <span class="pre">0x80</span></code> opcode and parameter. The x86 architecture has four general-purpose registers <code class="docutils literal"><span class="pre">eax</span></code>, <code class="docutils literal"><span class="pre">ebx</span></code>, <code class="docutils literal"><span class="pre">ecx</span></code> and <code class="docutils literal"><span class="pre">edx</span></code>; when invoking a system call via an interrupt, the first of these holds a code for the particular system routine to be invoked and the others hold up to three parameters. (Below, in <a class="reference internal" href="#jpeg-heap"><span class="std std-ref">26.3.2&nbsp;&nbsp;&nbsp;A JPEG heap vulnerability</span></a>, we will also make use of register <code class="docutils literal"><span class="pre">edi</span></code>.) The system call we want to make is</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">execve</span><span class="p">(</span><span class="n">char</span> <span class="o">*</span> <span class="n">filename</span><span class="p">,</span> <span class="n">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[],</span> <span class="n">char</span> <span class="o">*</span><span class="n">envp</span><span class="p">[])</span>
+</pre></div>
+</div>
+<p>We need <code class="docutils literal"><span class="pre">eax</span></code> to contain the numeric value 11, the 32-bit-Linux syscall value corresponding to <code class="docutils literal"><span class="pre">execve</span></code> (perhaps defined in <code class="docutils literal"><span class="pre">/usr/include/i386-linux-gnu/asm/unistd_32.h</span></code>). (64-bit Linux uses 59 as the syscall value for <code class="docutils literal"><span class="pre">execve</span></code>.) We load this with <code class="docutils literal"><span class="pre">mov</span> <span class="pre">al</span> <span class="pre">11</span></code>; <code class="docutils literal"><span class="pre">al</span></code> is a shorthand for the low-order byte of register <code class="docutils literal"><span class="pre">eax</span></code>. We first zero <code class="docutils literal"><span class="pre">eax</span></code> by subtracting it from itself. We can also, of course, use <code class="docutils literal"><span class="pre">mov</span> <span class="pre">eax</span> <span class="pre">11</span></code>, but then the 11 expands into four bytes 0x0b000000, and we want to avoid including NUL bytes in the code.</p>
+<p>We also need <code class="docutils literal"><span class="pre">ebx</span></code> to point to the NUL-terminated string <code class="docutils literal"><span class="pre">/bin/sh</span></code>. The register <code class="docutils literal"><span class="pre">ecx</span></code> should point to an array of pointers [“/bin/sh”, 0] in memory (the null-terminated <code class="docutils literal"><span class="pre">argv[]</span></code>), and <code class="docutils literal"><span class="pre">edx</span></code> should point to a null word in memory (the null-terminated <code class="docutils literal"><span class="pre">envp[]</span></code>). We include in the shellcode the string “/bin/shNAAAABBBB”, and have the shellcode insert a NUL byte to replace the N and a zero word to replace the “BBBB”, as the shellcode must contain no NUL bytes at the time it is read in by <code class="docutils literal"><span class="pre">gets()</span></code>. The shellcode will also replace the “AAAA” with the address of “/bin/sh”. We then load <code class="docutils literal"><span class="pre">ecx</span></code> with the address of “AAAA” (now containing the address of “/bin/sh” followed by a zero word) and <code class="docutils literal"><span class="pre">edx</span></code> with the address of “BBBB” (now just a zero word).</p>
+<p>Loading the address of a string is tricky in the x86 architecture. We want to calculate this address relative to the current instruction pointer IP, but no direct access is provided to IP. The workaround in the code below is to jump to <code class="docutils literal"><span class="pre">shellstring</span></code> near the end, but then invoke <code class="docutils literal"><span class="pre">call</span> <span class="pre">start</span></code>, where <code class="docutils literal"><span class="pre">start:</span></code> is the label for our main code up at the top. The action of <code class="docutils literal"><span class="pre">call</span> <span class="pre">start</span></code> is to push the address of the byte following <code class="docutils literal"><span class="pre">call</span> <span class="pre">start</span></code> onto the stack; this happens to be the address of <code class="docutils literal"><span class="pre">shellstring:</span></code>. Back up at <code class="docutils literal"><span class="pre">start:</span></code>, the <code class="docutils literal"><span class="pre">pop</span> <span class="pre">ebx</span></code> pops this address off the stack and leaves it in <code class="docutils literal"><span class="pre">ebx</span></code>, where we want it.</p>
+<p>Our complete shellcode is as follows (the actual code is in <a class="reference external" href="auxiliary_files/overflow/shellcode.s">shellcode.s</a>):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>jmp short shellstring
+start:
+pop ebx                 ;get the address of the string in ebx
+sub eax, eax            ;zero eax by subtracting it from itself
+mov [ebx+7 ], al        ;put a NUL byte where the N is in the string
+mov [ebx+8 ], ebx       ;put the address of the string where the AAAA is
+mov [ebx+12], eax       ;put a zero (NULL) word into where the BBBB is
+mov al, 11              ;execve is syscall 11
+lea ecx, [ebx+8]        ;load the address of where the AAAA was
+lea edx, [ebx+12]       ;load the address of where the BBBB was, now NULL
+int 0x80                ;call the kernel. WE HAVE A SHELL!
+shellstring:
+call start              ;pushes address of string below and jumps to start:
+db &#39;/bin/shNAAAABBBB&#39;   ;the string. AAAA and BBBB get filled in as above
+</pre></div>
+</div>
+<p>We run this through the commands</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">nasm</span> <span class="o">-</span><span class="n">f</span> <span class="n">elf</span> <span class="n">shellcode</span><span class="o">.</span><span class="n">s</span>
+<span class="n">ld</span> <span class="o">-</span><span class="n">o</span> <span class="n">shellcode</span> <span class="n">shellcode</span><span class="o">.</span><span class="n">o</span>
+<span class="n">objdump</span> <span class="o">-</span><span class="n">d</span> <span class="n">shellcode</span>
+</pre></div>
+</div>
+<p>and then, creating a string with the bytes produced, come up with the following:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">char</span> <span class="n">shellcode</span><span class="p">[]</span> <span class="o">=</span>
+       <span class="s2">&quot;</span><span class="se">\xeb\x16\x5b\x29\xc0\x88\x43\x07\x89\x5b\x08\x89</span><span class="s2">&quot;</span>
+       <span class="s2">&quot;</span><span class="se">\x43\x0c\xb0\x0b\x8d\x4b\x08\x8d\x53\x0c\xcd\x80</span><span class="s2">&quot;</span>
+       <span class="s2">&quot;</span><span class="se">\xe8\xe5\xff\xff\xff</span><span class="s2">/bin/sh/NAAAABBBB&quot;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>We can test this (on a 32-bit system) with a simple C program defining the above and including</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">main</span><span class="p">(</span><span class="nb">int</span> <span class="n">argc</span><span class="p">,</span> <span class="n">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">void</span> <span class="p">(</span><span class="o">*</span><span class="n">func</span><span class="p">)()</span> <span class="o">=</span> <span class="p">(</span><span class="n">void</span> <span class="p">(</span><span class="o">*</span><span class="p">)())</span> <span class="n">shellcode</span><span class="p">;</span>
+    <span class="n">func</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>We can verify that the resulting shell has not inherited the parent environment with the <code class="docutils literal"><span class="pre">env</span></code> and <code class="docutils literal"><span class="pre">set</span></code> commands.</p>
+<p>Additional shellcode examples can be found in <a class="reference internal" href="bibliography.html#ahlr07" id="id7">[AHLR07]</a>.</p>
+</div>
+<div class="section" id="the-exploit">
+<span id="id8"></span><h4>26.2.2.3&nbsp;&nbsp;&nbsp;The exploit<a class="headerlink" href="#the-exploit" title="Permalink to this headline">¶</a></h4>
+<p>Now we can assemble the actual attack. We start with a C implementation of the simplex-talk client, and add a feature so that when the input string is “doit”, the client</p>
+<ul class="simple">
+<li>sends the oversized buffer containing the shellcode, terminated with a newline to make <code class="docutils literal"><span class="pre">gets()</span></code> happy</li>
+<li>also sends “quit”, terminated with a newline, to force the server’s <code class="docutils literal"><span class="pre">process_connection()</span></code> to return, and thus to transfer control to the code pointed to by the now-overwritten <code class="docutils literal"><span class="pre">return_address</span></code> field of the stack</li>
+<li>begins a loop – <code class="docutils literal"><span class="pre">copylines()</span></code> – to copy the local terminal’s standard input to the network connection (hopefully now with a shell at the other end), and to copy the network connection to the local terminal’s standard output</li>
+</ul>
+<p>On startup, the client accepts a command-line parameter representing the address (in hex) of a variable close to the start of the server’s <code class="docutils literal"><span class="pre">main()</span></code> stack frame. When the server starts, it prints this address out; we simply copy that when starting the client. A second command-line parameter is the server hostname.</p>
+<p>The full client code is in <a class="reference external" href="auxiliary_files/overflow/netsploit.c">netsploit.c</a>.</p>
+<p>All that remains is to describe the layout of the malicious oversized buffer, created by <code class="docutils literal"><span class="pre">buildbadbuf()</span></code>. We first compute our guess for the address of the start of the vulnerable buffer <code class="docutils literal"><span class="pre">pcbuf</span></code> in the server’s <code class="docutils literal"><span class="pre">process_connection()</span></code> function: we take the address passed in on the command line, which is actually the address of <code class="docutils literal"><span class="pre">mbuf</span></code> in the server’s <code class="docutils literal"><span class="pre">main()</span></code>, and add to it the known constant (<code class="docutils literal"><span class="pre">pcbuf</span></code> - <code class="docutils literal"><span class="pre">mbuf</span></code>). This latter value, 147 in the version tested by the author, is stored in netsploit.c’s <code class="docutils literal"><span class="pre">BUF_OFFSET</span></code>.</p>
+<p id="index-4">This calculation of the address of the server’s <code class="docutils literal"><span class="pre">pcbuf</span></code> <em>should</em> be spot-on; if we now store our shellcode at the start of <code class="docutils literal"><span class="pre">pcbuf</span></code> and arrange for the server to jump to our calculated address, the shellcode should run. Real life, however, is not always so accommodating, so we introduce a <strong>NOP slide</strong>: we precede our shellcode with a run of NOP instructions. A jump anywhere into the NOPslide should lead right into the shellcode. In our example here, we make the NOPslide 20 bytes long, and add a fudge factor of between 0 and 20 to our calculated address (<code class="docutils literal"><span class="pre">FUDGE</span></code> is 10 in the actual code).</p>
+<p>We need the attack buffer to be large enough that it overwrites the stack return-address field, but small enough that the server does not incur a segmentation fault when overfilling its buffer. We settle on a <code class="docutils literal"><span class="pre">BADBUFSIZE</span></code> of 161 (160 plus 1 byte for a final newline character); it should be comparable to but perhaps slightly larger than the <code class="docutils literal"><span class="pre">BUF_OFFSET</span></code> value of, in our case, 147).</p>
+<p>The attack buffer is now</p>
+<ul class="simple">
+<li>25 bytes of NOPs</li>
+<li>shellcode (46 bytes in the version above)</li>
+<li>90 bytes worth of the repeated calculated address (<code class="docutils literal"><span class="pre">baseaddr-BUF_OFFSET+FUDGE</span></code> in the code</li>
+<li>1 byte newline, as the server’s <code class="docutils literal"><span class="pre">gets()</span></code> expects a newline-terminated string</li>
+</ul>
+<p>Here is a diagram like the one above, but labeled for this particular attack. Not all memory regions are drawn to scale, and there are more addresses between the two stack frames than just <code class="docutils literal"><span class="pre">return</span> <span class="pre">address</span></code>.</p>
+<img alt="_images/specific_stack_overflow.svg" src="_images/specific_stack_overflow.svg" /><p>We double-check the bad buffer to make sure it contains no NUL bytes and no other newline characters.</p>
+<p>If we wanted a longer NOPslide, we would have to hope there was room <em>above</em> the stack’s return-address field. In that case, the attack buffer would consist of a bunch of repeated address guesses, then the NOPslide, and finally the shellcode.</p>
+<p>After the command “doit”, the netsploit client prompt changes to <code class="docutils literal"><span class="pre">1&gt;</span></code>. We can then type <code class="docutils literal"><span class="pre">ls</span></code>, and, if the shellcode has successfully started, we get back a list of files on the server. As earlier, we can also type <code class="docutils literal"><span class="pre">env</span></code> and <code class="docutils literal"><span class="pre">set</span></code> to verify that the shell did not inherit its environment from any “normal” shell. Note that any shell commands that need to write to the stderr stream will fail, as this stream was not set up; this includes any mistyped commands.</p>
+</div>
+</div>
+<div class="section" id="defenses-against-buffer-overflows">
+<span id="stack-defenses"></span><h3>26.2.3&nbsp;&nbsp;&nbsp;Defenses Against Buffer Overflows<a class="headerlink" href="#defenses-against-buffer-overflows" title="Permalink to this headline">¶</a></h3>
+<p>How to prevent this sort of attack? The most basic approach is to make sure that <strong>array bounds</strong> are never violated (and also that similar rules for the use of dynamically allocated memory, such as not using a block after it has been freed, are never violated). Some languages enforce this automatically through “memory-safe” semantics; while this is not a guarantee that programs are safe, it does eliminate an important class of vulnerabilities. In C, memory- and overflow-related bugs can be eliminated through careful programming, but the task is notoriously error-prone.</p>
+<p>Another basic approach, applicable to almost all remote-code-execution attacks, is to make sure that the server runs with the minimum <strong>permissions</strong> possible. The server may not have write permission to anything of substance, and may in fact be run in a so-called “chroot” environment in which any access to the bulk of the server’s filesystem is disabled.</p>
+<p>One issue with this approach is that a server process on a unix-derived system that wants to listen on a port less than 1024 needs special privileges to open that port. Traditionally, the process would start with root privileges and, once the socket was opened, would downgrade its privileges with calls to <code class="docutils literal"><span class="pre">setgid()</span></code> and <code class="docutils literal"><span class="pre">setuid()</span></code>. This is safe in principle, but requires careful attention to the <code class="docutils literal"><span class="pre">man</span></code> pages; use of <code class="docutils literal"><span class="pre">seteuid()</span></code>, for example, allows the shellcode to recover the original privileges. Linux systems now support assigning to an unprivileged process any of several “capabilities” (see <code class="docutils literal"><span class="pre">man</span> <span class="pre">capabilities</span></code>). The one most relevant here is <code class="docutils literal"><span class="pre">CAP_NET_BIND_SERVICE</span></code>, which, if set, allows a process to open privileged ports. Still, to assign these capabilities still requires some privileged intervention when the process is started.</p>
+<div class="section" id="stack-canary">
+<span id="index-5"></span><span id="id9"></span><h4>26.2.3.1&nbsp;&nbsp;&nbsp;Stack canary<a class="headerlink" href="#stack-canary" title="Permalink to this headline">¶</a></h4>
+<p>The underlying system can also provide some defenses. One of these, typically implemented within the compiler, is the <strong>stack canary</strong>: an additional word on the stack near the return address that is set to a pseudorandom value. A copy of this word is saved elsewhere. When the function calls <code class="docutils literal"><span class="pre">return</span></code> (either explicitly or implicitly), this word is checked to make sure the stack copy still agrees with the saved-elsewhere copy; a discrepancy indicates that the stack was overwritten.</p>
+<p>In the <code class="docutils literal"><span class="pre">gcc</span></code> compiler, a stack canary can be enabled with the compiler option <code class="docutils literal"><span class="pre">-fstack-protector</span></code>. To compile the stack exploit in <a class="reference internal" href="#the-exploit"><span class="std std-ref">26.2.2.3&nbsp;&nbsp;&nbsp;The exploit</span></a>, we needed to add <code class="docutils literal"><span class="pre">-fno-stack-protector</span></code>.</p>
+</div>
+<div class="section" id="aslr">
+<span id="address-randomization"></span><span id="index-6"></span><span id="id10"></span><h4>26.2.3.2&nbsp;&nbsp;&nbsp;ASLR<a class="headerlink" href="#aslr" title="Permalink to this headline">¶</a></h4>
+<p>Another operating-system-based defense is <strong>Address-Space Layout Randomization</strong>, or ASLR. In its simplest form, this means that each time the server process is restarted, the stack will have a different starting address. For example, restarting the oserver program above five times yields addresses (in hex) of bf8d22b7, bf84ed87, bf977d87, bfcc5cb7 and bfa302d7. There are at least four hex digits (16 bits) of entropy here; if the server did not print its stack address it might take 2<sup>16</sup> guesses for the attacker to succeed.</p>
+<p>Still, 2<sup>16</sup> guesses might take an attacker well under an hour. Worse, the attacker might simply create a stack-buffer-overflow attack with a very long NOPslide; the longer the NOPslide the more room for error in guessing the shellcode address. With a NOPslide of length 2<sup>10</sup> = 1024 bits, guessing the correct stack address will take only 2<sup>6</sup> = 64 tries. (Some implementations squeeze out 19 bits of address-space entropy, meaning that guessing the correct address increases to 2<sup>9</sup> = 512 tries.)</p>
+<p>For 64-bit systems, however, ASLR is much more effective. Brute-force guessing of the stack address takes a prohibitively long time.</p>
+<p>ALSR also changes the heap layout and the location of libraries each time the server process is restarted. This is to prevent return-to-libc attacks, <a class="reference internal" href="#return-to-libc"><span class="std std-ref">26.2.1&nbsp;&nbsp;&nbsp;Return to libc</span></a>. For a concrete example of an attacker’s use of non-randomized library addresses, see <a class="reference internal" href="#sp1"><span class="std std-ref">26.3.2&nbsp;&nbsp;&nbsp;A JPEG heap vulnerability</span></a>.</p>
+<p>On Linux systems, ASLR can be disabled by writing a 0 to /proc/sys/kernel/randomize_va_space; values 1 and 2 correspond to partial and full randomization.</p>
+<p>Windows systems since Vista (2007) have had ASLR support, though earlier versions of the linker required the developer to request ASLR with the <code class="docutils literal"><span class="pre">/DYNAMICBASE</span></code> switch.</p>
+</div>
+<div class="section" id="making-the-stack-non-executable">
+<span id="nx"></span><span id="index-7"></span><h4>26.2.3.3&nbsp;&nbsp;&nbsp;Making the stack non-executable<a class="headerlink" href="#making-the-stack-non-executable" title="Permalink to this headline">¶</a></h4>
+<p>A more sophisticated idea, if the virtual-memory hardware supports it, is to mark those pages of memory allocated to the stack as <em>non-executable</em>, meaning that if the processor’s instruction register is loaded with an address on those pages (due to branching to stack-based shellcode), a hardware-level exception will immediately occur. This immediately prevents attacks that place a shellcode on the stack, though return-to-libc attacks (<a class="reference internal" href="#return-to-libc"><span class="std std-ref">26.2.1&nbsp;&nbsp;&nbsp;Return to libc</span></a>) are still possible.</p>
+<p>In the x86 world, AMD introduced the per-page NX bit, for No eXecute, in their x86-64 architecture; CPUs with this architecture began appearing in 2003. Intel followed with its XD, for eXecute Disabled, bit. Essentially all x86-64 CPUs now provide hardware NX/XD support; support on 32-bit CPUs generally requires so-called Physical Address Extension mode.</p>
+<p>The NX idea applies to all memory pages, not just stack pages. This sometimes causes problems with applications such as just-in-time compilation, where the code page is written and then immediately executed. As a result, it is common to support NX-bit disabling in software. On Linux systems, the compiler option <code class="docutils literal"><span class="pre">-z</span> <span class="pre">execstack</span></code> disables NX-bit protection; this was used above in <a class="reference internal" href="#the-exploited-server"><span class="std std-ref">26.2.2.1&nbsp;&nbsp;&nbsp;The server</span></a>. Windows has a similar <code class="docutils literal"><span class="pre">/NXCOMPAT</span></code> option for requesting NX-bit protection.</p>
+<p id="index-8">While a non-executable stack prevents the stack-overflow attack described above, injecting shellcode onto the heap is still potentially possible. The <a class="reference external" href="http://en.wikipedia.org/wiki/OpenBSD">OpenBSD</a> operating system introduced <strong>write or execute</strong> in 2003; this is abbreviated <strong>W^X</strong> after the use of “^” as the XOR operator in C. A memory page may be writable or executable, but not both. This is strong protection against virtually all shellcode-injection attacks, but may still be vulnerable to some return-to-libc attacks (<a class="reference internal" href="#return-to-libc"><span class="std std-ref">26.2.1&nbsp;&nbsp;&nbsp;Return to libc</span></a>).</p>
+<p>See [AHLR07], chapter 14, for some potential attack strategies against systems with non-executable pages.</p>
+</div>
+</div>
+</div>
+<div class="section" id="heap-buffer-overflow">
+<span id="index-9"></span><span id="id11"></span><h2>26.3&nbsp;&nbsp;&nbsp;Heap Buffer Overflow<a class="headerlink" href="#heap-buffer-overflow" title="Permalink to this headline">¶</a></h2>
+<p>As with stack overflows, heap overflows all rely on some software flaw that allows data to be written beyond the confines of the designated buffer. A buffer on the heap is subject to the same software-failure overflow prospects as a buffer on the stack. An important difference, however, is that buffers on the heap are not in clear proximity to an obvious return address. Despite that difference, heap overflows can also be used to enable remote-code-execution attacks.</p>
+<p>Perhaps the simplest heap overflow is to take advantage of the fact that some heap pages contain executable code, representing application-loaded library pages. If the page with the overflowable buffer is pointed to by <code class="docutils literal"><span class="pre">p</span></code>, and the following page in memory pointed to by <code class="docutils literal"><span class="pre">q</span></code> contains code, then all an attacker has to do is to have the overflow fill the <code class="docutils literal"><span class="pre">q</span></code> page with a long NOPslide and a shellcode. When at some point a call is made to the code pointed to by <code class="docutils literal"><span class="pre">q</span></code>, the shellcode is executed instead. A drawback to this attack is that the layout of heap pages like this is seldom known. On the other hand, the fact that heap pages do sometimes legitimately contain executable code means that uniformly marking the heap as non-executable, as is commonly done with the stack, may not be an option.</p>
+<div class="section" id="a-linux-heap-vulnerability">
+<span id="heap-vuln"></span><span id="index-10"></span><h3>26.3.1&nbsp;&nbsp;&nbsp;A Linux heap vulnerability<a class="headerlink" href="#a-linux-heap-vulnerability" title="Permalink to this headline">¶</a></h3>
+<p>We now describe an actual Linux heap vulnerability from 2003, following <a class="reference internal" href="bibliography.html#ab03" id="id12">[AB03]</a>, based on version 2.2.4 of the glibc library. The vulnerable server code is simply the following:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">char</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="mi">1024</span><span class="p">);</span>
+<span class="n">char</span> <span class="o">*</span><span class="n">q</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="mi">1024</span><span class="p">);</span>
+<span class="n">gets</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>                <span class="o">//</span> <span class="n">read</span> <span class="n">the</span> <span class="n">attacker</span><span class="s1">&#39;s input</span>
+<span class="n">free</span><span class="p">(</span><span class="n">q</span><span class="p">);</span>                <span class="o">//</span> <span class="n">block</span> <span class="n">q</span> <span class="ow">is</span> <span class="n">last</span> <span class="n">allocated</span> <span class="ow">and</span> <span class="n">first</span> <span class="n">freed</span>
+<span class="n">free</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>As with the stack-overflow example, the <code class="docutils literal"><span class="pre">gets(p)</span></code> results in an overflow from block p into block q, overwriting not just the data in block q but also the block headers maintained by <code class="docutils literal"><span class="pre">malloc()</span></code>. While there is no guarantee in general that block <code class="docutils literal"><span class="pre">q</span></code> will immediately follow block <code class="docutils literal"><span class="pre">p</span></code> in memory, in practice this usually happens unless there has been a great deal of previous allocate/free activity.</p>
+<p>The vulnerability here relies on some features of the 2003-era (glibc-2.2.4) <code class="docutils literal"><span class="pre">malloc()</span></code>. All blocks are either allocated to the user or are free; free blocks are kept on a doubly linked list. We will assume the data portion of each block is always a power of 2; there is a separate free-block list for each block size. When two adjacent blocks are both free, <code class="docutils literal"><span class="pre">malloc()</span></code> coalesces them and moves the joined block to the free-block list of the next size up.</p>
+<p>All blocks are prefixed by a four-byte field containing the size, which we will assume here is the actual size 1032 including the header and alignment rather than the user-available size of 1024. As the three low-order bits of the size are always zero, one of these bits is used as a flag to indicate whether the block is allocated or free. Crucially, another bit is used to indicate whether the <em>previous</em> block is allocated or free.</p>
+<p>In addition to the size-plus-flags field, the first two 32-bit words of a free block are the forward and backward pointers linking the block into the doubly linked free-block list; the size-plus-flag field is also replicated as the last word of the block:</p>
+<img alt="_images/allocated_and_free.svg" src="_images/allocated_and_free.svg" /><p>The strategy of the attacker, in brief, is to overwrite the <code class="docutils literal"><span class="pre">p</span></code> block in such a way that, when block <code class="docutils literal"><span class="pre">q</span></code> is freed, <code class="docutils literal"><span class="pre">malloc()</span></code> thinks block <code class="docutils literal"><span class="pre">p</span></code> is also free, and so attempts to coalesce them, in the process unlinking block <code class="docutils literal"><span class="pre">p</span></code>. But <code class="docutils literal"><span class="pre">p</span></code> was not in fact free, and the <code class="docutils literal"><span class="pre">forward</span></code> and <code class="docutils literal"><span class="pre">backward</span></code> pointers manipulated by <code class="docutils literal"><span class="pre">malloc()</span></code> as part of the unlinking process are in fact provided by the attacker. As we shall see, this allows writing two attacker-designated 32-bit words to two attacker-designated memory locations; if one of the locations holds a return address and is updated so as to point to attacker-supplied shellcode also in block <code class="docutils literal"><span class="pre">p</span></code>, the system has been compromised.</p>
+<p>The normal operation of <code class="docutils literal"><span class="pre">free(q)</span></code>, for an arbitrary block <code class="docutils literal"><span class="pre">q</span></code>, includes the following:</p>
+<ul class="simple">
+<li>Get the block size (<code class="docutils literal"><span class="pre">size</span></code>) and flags at address <code class="docutils literal"><span class="pre">q-4</span></code></li>
+<li>Check the following block at address <code class="docutils literal"><span class="pre">p+size</span></code> to see if it is free; if so, merge (we are not interested in this case)</li>
+<li>Check the flags to see if the <em>preceding</em> block is free; if so, load its size <code class="docutils literal"><span class="pre">prev_size</span></code> from address <code class="docutils literal"><span class="pre">q-8</span></code>, the address of the <code class="docutils literal"><span class="pre">copy</span> <span class="pre">of</span> <span class="pre">size</span></code> field in the diagram above; from that calculate a pointer to the previous block as <code class="docutils literal"><span class="pre">p</span> <span class="pre">=</span> <span class="pre">q</span> <span class="pre">-</span> <span class="pre">prev_size</span></code>; then unlink block <code class="docutils literal"><span class="pre">p</span></code> (as the coalesced block will go on a different free-block list).</li>
+</ul>
+<p>For our specific block <code class="docutils literal"><span class="pre">q</span></code>, however, the attacker can overwrite the final <code class="docutils literal"><span class="pre">size</span></code> field of block <code class="docutils literal"><span class="pre">p</span></code>, <code class="docutils literal"><span class="pre">prev_size</span></code> above, and can also overwrite the flag at address <code class="docutils literal"><span class="pre">q-4</span></code> indicating whether or not block <code class="docutils literal"><span class="pre">p</span></code> is free. The attacker can <em>not</em> overwrite the header of block <code class="docutils literal"><span class="pre">p</span></code> that would properly indicate that block <code class="docutils literal"><span class="pre">p</span></code> was still in use, but the <code class="docutils literal"><span class="pre">free()</span></code> code did not double-check that.</p>
+<p>We will suppose that the attacker has overwritten block <code class="docutils literal"><span class="pre">p</span></code> to include the following:</p>
+<ul class="simple">
+<li>setting the previous-block-is-free flag in the header of block <code class="docutils literal"><span class="pre">q</span></code> to true</li>
+<li>setting the final <code class="docutils literal"><span class="pre">size</span></code> field of block <code class="docutils literal"><span class="pre">p</span></code> to a desired value, <code class="docutils literal"><span class="pre">badsize</span></code></li>
+<li>placing value <code class="docutils literal"><span class="pre">ADDR_F</span></code> at address <code class="docutils literal"><span class="pre">q-badsize</span></code>; this is where <code class="docutils literal"><span class="pre">free()</span></code> will believe the previous block’s forward pointer is located</li>
+<li>placing the value <code class="docutils literal"><span class="pre">ADDR_B</span></code> at address <code class="docutils literal"><span class="pre">q-badsize+4</span></code>; this is where <code class="docutils literal"><span class="pre">free()</span></code> will believe the previous block’s backward pointer is located</li>
+</ul>
+<p>When the <code class="docutils literal"><span class="pre">free(q)</span></code> operation is now executed, the system will calculate the previous block as at address <code class="docutils literal"><span class="pre">p1</span> <span class="pre">=</span> <span class="pre">q-badsize</span></code> and attempt to unlink the false “block” <code class="docutils literal"><span class="pre">p1</span></code>. The normal unlink is</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">backward</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">forward</span>  <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">forward</span><span class="p">;</span>
+<span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">forward</span><span class="p">)</span>  <span class="o">-&gt;</span> <span class="n">backward</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">backward</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Alas, when unlinking <code class="docutils literal"><span class="pre">p1</span></code> the result is</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">*</span><span class="n">ADDR_B</span>       <span class="o">=</span> <span class="n">ADDR_F</span>
+<span class="o">*</span><span class="p">(</span><span class="n">ADDR_F</span> <span class="o">+</span> <span class="mi">4</span><span class="p">)</span> <span class="o">=</span> <span class="n">ADDR_B</span>
+</pre></div>
+</div>
+<p>where, for the pointer increment in the second line, we take the type of <code class="docutils literal"><span class="pre">ADDR_F</span></code> to be <code class="docutils literal"><span class="pre">char</span> <span class="pre">*</span></code> or <code class="docutils literal"><span class="pre">void</span> <span class="pre">*</span></code>.</p>
+<p>At this point the jig is pretty much up. If we take <code class="docutils literal"><span class="pre">ADDR_B</span></code> to be the location of a return address on the stack, and <code class="docutils literal"><span class="pre">ADDR_F</span></code> to be the location of our shellcode, then the shellcode will be executed when the current stack frame returns. Extending this to a working example still requires a fair bit of attention to details; see <a class="reference internal" href="bibliography.html#ab03" id="id13">[AB03]</a>.</p>
+<p>One important detail is that the data we use to overwrite block <code class="docutils literal"><span class="pre">p</span></code> generally cannot contain NUL bytes, and yet a small positive number for <code class="docutils literal"><span class="pre">badsize</span></code> will have several NUL bytes. One workaround is to have <code class="docutils literal"><span class="pre">badsize</span></code> be a small <em>negative</em> number, meaning that the false previous-block pointer <code class="docutils literal"><span class="pre">p1</span></code> will actually come after <code class="docutils literal"><span class="pre">q</span></code> in memory.</p>
+</div>
+<div class="section" id="a-jpeg-heap-vulnerability">
+<span id="sp1"></span><span id="jpeg-heap"></span><span id="index-11"></span><h3>26.3.2&nbsp;&nbsp;&nbsp;A JPEG heap vulnerability<a class="headerlink" href="#a-jpeg-heap-vulnerability" title="Permalink to this headline">¶</a></h3>
+<p>In 2004 Microsoft released vulnerability notice <a class="reference external" href="http://support.microsoft.com/kb/833987">MS04-028</a> (and patch), relating to a <strong>heap buffer overflow</strong> in <strong>Windows XP SP1</strong>. Microsoft had earlier provided a standard library for displaying <a class="reference external" href="http://en.wikipedia.org/wiki/JPEG">JPEG</a> images, known as GDI for Graphics Device Interface. If a specially formed JPEG image were opened via the GDI library, an overflow on the heap would occur that would launch a shellcode. While most browsers had their own, unaffected, JPEG-rendering subroutines, it was often not difficult to convince users to open a JPEG file supplied as an email attachment or via an html download link.</p>
+<p>The problem occurred in the processing of the JPEG “comment” section, normally invisible to the user. The section begins with the flag 0xFFFE, followed by a two-byte length field (in network byte order) that was to include its own two bytes in the total length. During the image-file loading, 2 was subtracted from the length to get the calculated length of the actual data. If the length field had contained 1, for example, the calculated length would be -1, which would be interpreted as the unsigned value 2<sup>32</sup> - 1. The library, thinking it had that amount of space, would then blithely attempt to write that many bytes of comment into the next heap page, overflowing it. These bytes in fact would come from the image portion of the JPEG file; the attacker would place here a NOPslide, some shellcode, and, as we shall see, a few other carefully constructed values.</p>
+<p>As with the Linux heap described above in <a class="reference internal" href="#heap-vuln"><span class="std std-ref">26.3.1&nbsp;&nbsp;&nbsp;A Linux heap vulnerability</span></a>, blocks on the WinXP heap formed a doubly-linked list, with forward and backward pointers known as <code class="docutils literal"><span class="pre">flink</span></code> and <code class="docutils literal"><span class="pre">blink</span></code>. As before, the allocator will attempt to unlink a block via</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">blink</span> <span class="o">-&gt;</span> <span class="n">forward</span>  <span class="o">=</span> <span class="n">flink</span><span class="p">;</span>
+<span class="n">flink</span> <span class="o">-&gt;</span> <span class="n">backward</span> <span class="o">=</span> <span class="n">blink</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The first of these simplifies to <code class="docutils literal"><span class="pre">*blink</span> <span class="pre">=</span> <span class="pre">flink</span></code>, as the offset to field <code class="docutils literal"><span class="pre">forward</span></code> is 0; this action allows the attacker to write any word of memory (at address <code class="docutils literal"><span class="pre">blink</span></code>) with any desired value.</p>
+<p>The JPEG-comment-overflow operation eventually runs out of heap and results in a segmentation fault, at which point the heap manager attempts to allocate more blocks. However, the free list has already been overwritten, and so, as above, this block-allocation attempt instead executes <code class="docutils literal"><span class="pre">*blink</span> <span class="pre">=</span> <span class="pre">flink</span></code>.</p>
+<p>The attacker’s conceptual goal is to have <code class="docutils literal"><span class="pre">flink</span></code> hold an instruction that branches to the shellcode, and <code class="docutils literal"><span class="pre">blink</span></code> hold the address of an instruction that will soon be executed, or, equivalently, to have <code class="docutils literal"><span class="pre">flink</span></code> hold the address of the shellcode and <code class="docutils literal"><span class="pre">blink</span></code> represent a location soon to be loaded and used as the target of a branch. The catch is that the attacker doesn’t exactly know where the heap is, so a variant of the return-to-libc approach described in <a class="reference internal" href="#return-to-libc"><span class="std std-ref">26.2.1&nbsp;&nbsp;&nbsp;Return to libc</span></a> is necessary. The strategy described in the remainder of this section, described in <a class="reference internal" href="bibliography.html#ja05" id="id14">[JA05]</a>, is one of several possible approaches.</p>
+<p>In Windows XP SP1, location <code class="docutils literal"><span class="pre">0x77ed73b4</span></code> holds a pointer to the entry point of the <em>Undefined Exception Filter</em> handler; if an otherwise-unhandled program exception occurs, Windows creates an <code class="docutils literal"><span class="pre">EXCEPTION_POINTERS</span></code> structure and branches to the address stored here. It is this address, which we will refer to as <strong>UEF</strong>, the attack will overwrite, by setting <code class="docutils literal"><span class="pre">blink</span> <span class="pre">=</span> <span class="pre">UEF</span></code>. A call to the Undefined Exception Filter will be triggered by a suitable subsequent program crash.</p>
+<p>When the exception occurs (typically by the second operation above, <code class="docutils literal"><span class="pre">flink</span> <span class="pre">-&gt;</span> <span class="pre">backward</span> <span class="pre">=</span> <span class="pre">blink</span></code>), before the branch to the address loaded from UEF, the <code class="docutils literal"><span class="pre">EXCEPTION_POINTERS</span></code> structure is created on the heap, overwriting part of the JPEG comment buffer. The address of this structure is stored in register <code class="docutils literal"><span class="pre">edi</span></code>.</p>
+<p>It turns out that, scattered among some standard libraries, there are half a dozen instructions at known addresses of the form <code class="docutils literal"><span class="pre">call</span> <span class="pre">DWORD</span> <span class="pre">[edi+0x74]</span></code>, that is, “call the subroutine at 32-bit address <code class="docutils literal"><span class="pre">edi</span></code> + 0x74” (<a class="reference internal" href="bibliography.html#ahlr07" id="id15">[AHLR07]</a>, p 186). All these <code class="docutils literal"><span class="pre">call</span></code> instructions are intended for contexts in which register <code class="docutils literal"><span class="pre">edi</span></code> has been set up by immediately preceding instructions to point to something appropriate. In our attacker’s context, however, <code class="docutils literal"><span class="pre">edi</span></code> points to the <code class="docutils literal"><span class="pre">EXCEPTION_POINTERS</span></code> structure; 0x74 bytes past <code class="docutils literal"><span class="pre">edi</span></code> is part of the attacker’s overflowed JPEG buffer that is safely past this structure and will not have been overwritten by it. One such call instruction happens to be at address <code class="docutils literal"><span class="pre">0x77d92a34</span></code>, in <code class="docutils literal"><span class="pre">user32.dll</span></code>. This address is the value the attacker will put in <code class="docutils literal"><span class="pre">flink</span></code>.</p>
+<p>So now, when the exception comes, control branches to the address stored in UEF. This address now points to the above <code class="docutils literal"><span class="pre">call</span> <span class="pre">DWORD</span> <span class="pre">[edi+0x74]</span></code>, so control branches again, this time into the attacker-controlled buffer. At this point, the processor lands on the NOPslide and ends up executing the shellcode (sometimes one more short jump instruction is needed, depending on layout).</p>
+<p>This attack depends on the fact that a specific instruction, <code class="docutils literal"><span class="pre">call</span> <span class="pre">DWORD</span> <span class="pre">[edi+0x74]</span></code>, can be found at a specific, fixed address, <code class="docutils literal"><span class="pre">0x77d92a34</span></code>. Address-space layout randomization (<a class="reference internal" href="#aslr"><span class="std std-ref">26.2.3.2&nbsp;&nbsp;&nbsp;ASLR</span></a>) would have prevented this; it was introduced by Microsoft in Windows Vista in 2007.</p>
+</div>
+<div class="section" id="cross-site-scripting-xss">
+<span id="xss"></span><span id="index-12"></span><h3>26.3.3&nbsp;&nbsp;&nbsp;Cross-Site Scripting (XSS)<a class="headerlink" href="#cross-site-scripting-xss" title="Permalink to this headline">¶</a></h3>
+<p id="index-13">In its simplest form, cross-site scripting involves the attacker posting malicious <a class="reference external" href="http://en.wikipedia.org/wiki/JavaScript">javascript</a> on a third-party website that allows user-posted content; this javascript is then executed by the target computer when the victim visits that website. The attacker might leave a comment on the website of the following form:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">I</span> <span class="n">agree</span> <span class="k">with</span> <span class="n">the</span> <span class="n">previous</span> <span class="n">poster</span> <span class="n">completely</span>
+<span class="o">&lt;</span><span class="n">script</span><span class="o">&gt;</span> <span class="n">do_something_bad</span><span class="p">()</span> <span class="o">&lt;/</span><span class="n">script</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>Unless the website in question does careful html filtering of what users upload, any other site visitor who so much as <em>views</em> this comment will have the <code class="docutils literal"><span class="pre">do_something_bad()</span></code> script executed by his or her browser. The script might email information about the target user to the attacker, or might attempt to exploit a browser vulnerability on the target system in order to take it over completely. The script and its enclosing tags will not appear in what the victim actually sees on the screen.</p>
+<p>The <code class="docutils literal"><span class="pre">do_something_bad()</span></code> code block will usually include javascript function definitions as well as function calls.</p>
+<p>In general, the attacker can achieve the same effect if the victim visits the attacker’s website. However, the popularity (and apparent safety) of the third-party website is usually important in practice; it is also common for the attack to involve obtaining private information from the victim’s account on that website.</p>
+</div>
+<div class="section" id="sql-injection">
+<span id="index-14"></span><span id="id16"></span><h3>26.3.4&nbsp;&nbsp;&nbsp;SQL Injection<a class="headerlink" href="#sql-injection" title="Permalink to this headline">¶</a></h3>
+<p>SQL is the close-to-universal query language for databases; in a SQL-injection attack the attacker places a carefully chosen SQL fragment into a website form, in such a way that it gets executed. Websites typically construct SQL queries based on form data; the attacker’s goal is to have his or her data treated as additional SQL. This is <em>supposed</em> to be prevented by careful quoting, but quoting often ends up not quite careful <em>enough</em>. A successful attacker has managed to run SQL code on the server that gives him or her unintended privileges or information.</p>
+<p>As an example, suppose that the form has two fields, <code class="docutils literal"><span class="pre">username</span></code> and <code class="docutils literal"><span class="pre">password</span></code>. The system then runs the following sub-query that returns an empty set of records if the ⟨username,password⟩ pair is not found; otherwise the user is considered to be authenticated:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">select * from PASSWORDS p</div>
+<div class="line">where p.user = <code class="docutils literal"><span class="pre">'</span></code><em>username</em><code class="docutils literal"><span class="pre">'</span></code> and p.password = <code class="docutils literal"><span class="pre">'</span></code><em>password</em><code class="docutils literal"><span class="pre">'</span></code>;</div>
+</div>
+</div></blockquote>
+<p>The strings <em>username</em> and <em>password</em> are taken from the web form and spliced in; note that each is enclosed in single quotation marks <em>supplied by the server</em>. The attacker’s goal is to supply username/password values so that a nonempty set of records will be returned, thus authenticating the attacker. The following values are successful here, where the quotation marks in <em>username</em> are supplied by the attacker:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><em>username</em>: <code class="docutils literal"><span class="pre">'</span> <span class="pre">OR</span> <span class="pre">1=1</span> <span class="pre">OR</span> <span class="pre">'x'='y</span></code></div>
+<div class="line"><em>password</em>: <code class="docutils literal"><span class="pre">foo</span></code></div>
+</div>
+</div></blockquote>
+<p>The spliced-together query built by the server is now</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">select * from PASSWORDS p</div>
+<div class="line"><code class="docutils literal"><span class="pre">where</span> <span class="pre">p.user</span> <span class="pre">=</span> <span class="pre">''</span> <span class="pre">OR</span> <span class="pre">1=1</span> <span class="pre">OR</span> <span class="pre">'x'='y'</span> <span class="pre">and</span> <span class="pre">p.password</span> <span class="pre">=</span> <span class="pre">'foo';</span></code></div>
+</div>
+</div></blockquote>
+<p>Note that of the eight single-quote marks in the where-clause, four (the first, sixth, seventh and eighth) came from the server, and four (the second through fifth) came from the attacker.</p>
+<p>The where-clause here appears to SQL to be the disjunction of three OR clauses (the last of which is <code class="docutils literal"><span class="pre">'x'='y'</span> <span class="pre">and</span> <span class="pre">p.password</span> <span class="pre">=</span> <span class="pre">'foo'</span></code>). The middle OR clause is <code class="docutils literal"><span class="pre">1=1</span></code> which is always true. Therefore, the login succeeds.</p>
+<p>For this attack to work, the attacker must have a pretty good idea what query the server builds from the user input. There are two things working in the attacker’s favor here: first, these queries are often relatively standard, and second, the attacker can often discover a great deal from the error messages returned for malformed entries. In many cases, these error messages even reveal the table names used.</p>
+<p id="index-15">See also <a class="reference external" href="http://xkcd.com/327">xkcd.com/327</a>.</p>
+</div>
+</div>
+<div class="section" id="network-intrusion-detection">
+<span id="intrusion-detection"></span><span id="index-16"></span><h2>26.4&nbsp;&nbsp;&nbsp;Network Intrusion Detection<a class="headerlink" href="#network-intrusion-detection" title="Permalink to this headline">¶</a></h2>
+<p>The idea behind <strong>network intrusion detection</strong> is to monitor one’s network for signs of attack. Many newer network intrusion-detection systems (NIDS) also attempt to halt the attack, but the importance of simple monitoring and reporting should not be underestimated. Many attacks (such as password guessing, or buffer overflows in the presence of ASLR) take multiple (thousands or millions) of tries to succeed, and a NIDS can give fair warning.</p>
+<p>There are also host-based intrusion-detection systems (HIDS) that run on and monitor a specific host; we will not consider these further.</p>
+<p id="index-17">Most NIDS detect intrusions based either on <strong>traffic anomalies</strong> or on pattern-based <strong>signatures</strong>. As an example of the former, a few pings (<a class="reference internal" href="ipv4companions.html#ping"><span class="std std-ref">10.4&nbsp;&nbsp;&nbsp;Internet Control Message Protocol</span></a>) might be acceptable but a large number, or a modest number addressed to nonexistent hosts, might be cause for concern.</p>
+<p>As for signatures, the attack in <a class="reference internal" href="#jpeg-heap"><span class="std std-ref">26.3.2&nbsp;&nbsp;&nbsp;A JPEG heap vulnerability</span></a> can be identified by the hex strings 0xFFFE0000 or 0xFFFE0001. What about the attack in <a class="reference internal" href="#the-exploit"><span class="std std-ref">26.2.2.3&nbsp;&nbsp;&nbsp;The exploit</span></a>? Using the shellcode itself as signature tends to be ineffective as shellcode is easy to vary. The NOPslide, too, can be replaced with a wide variety of other instructions that just happen to do nothing in the present context, such as <code class="docutils literal"><span class="pre">sub</span> <span class="pre">eax,eax</span></code>. One of the most common signatures used by NIDSs for overflow attacks is simply the presence of overly long strings; the false-positive rate is relatively low. In general, however, coming up with sufficiently specific signatures can be nontrivial. An attack that keeps changing in relatively trivial ways to avoid signature-based detection is sometimes said to be <strong>polymorphic</strong>.</p>
+<div class="section" id="evasion">
+<span id="index-18"></span><span id="id17"></span><h3>26.4.1&nbsp;&nbsp;&nbsp;Evasion<a class="headerlink" href="#evasion" title="Permalink to this headline">¶</a></h3>
+<p>The NIDS will have to reassemble TCP streams (and sometimes sequences of UDP packets) in order to match signatures. This raises the possibility of <strong>evasion</strong>: the attacker might arrange the packets so that the NIDS reassembles them one way and the target another way. The possibilities for evasion are explored in great detail in <a class="reference internal" href="bibliography.html#pn98" id="id18">[PN98]</a>; see also <a class="reference internal" href="bibliography.html#sp03" id="id19">[SP03]</a>.</p>
+<p>One simple way to do this is with overlapping TCP segments. What happens if one packet contains bytes 1-6 of a TCP connection as “help” and a second packet contains bytes 2-7 as “armful”?</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">h</span>  <span class="n">e</span>  <span class="n">l</span>  <span class="n">p</span>
+   <span class="n">a</span>  <span class="n">r</span>  <span class="n">m</span>  <span class="n">f</span>  <span class="n">u</span>  <span class="n">l</span>
+</pre></div>
+</div>
+<p>These can be reassembled as either “helpful” or “harmful”; the TCP specification does not say which is preferred and different operating systems routinely reassemble these in different ways. If the NIDS reassembles the packets one way, and the target the other, the attack goes undetected. If the attack is spread over multiple packets, there may be many more than two ways that reassembly can occur, increasing the probability that the NIDS and the target will differ.</p>
+<p>Another possibility is that one of the overlapping segments has a header irregularity (in either the IP or TCP header) that causes it to be rejected by the target but not by the NIDS, or vice-versa. If the packets are</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">h</span>  <span class="n">e</span>  <span class="n">l</span>  <span class="n">p</span>
+<span class="n">h</span>  <span class="n">a</span>  <span class="n">r</span>  <span class="n">m</span>  <span class="n">f</span>  <span class="n">u</span>  <span class="n">l</span>
+</pre></div>
+</div>
+<p>and both systems normally prefer data from the first segment received, then both would reassemble as “helpful”. But if the first packet is rejected by the target due to a header flaw, then the target receives “harmful”. If the flaw is not recognized by the NIDS, the NIDS does not detect the problem.</p>
+<p>A very similar problem occurs with IPv4 fragment reassembly, although IPv4 fragments are at this point intrinsically suspicious.</p>
+<p>One approach to preventing evasion is to configure the NIDS with information about how the actual target does its reassembly, so the NIDS can match it. An even safer approach is to have the NIDS reassemble any overlapping packets and then forward the result on to the potential target.</p>
+</div>
+</div>
+<div class="section" id="cryptographic-goals">
+<span id="id20"></span><h2>26.5&nbsp;&nbsp;&nbsp;Cryptographic Goals<a class="headerlink" href="#cryptographic-goals" title="Permalink to this headline">¶</a></h2>
+<p>For the remainder of this chapter we turn to the use of cryptographic techniques in networking, to protect packet contents. Different techniques address different issues; three classic goals are the following:</p>
+<ol class="arabic simple">
+<li>Message <strong>confidentiality</strong>: eavesdroppers should not be able to read the contents.</li>
+<li>Message <strong>integrity</strong>: the recipient should be able to verify that the message was received correctly, even in the face of a determined adversary along the way.</li>
+<li>Sender <strong>authentication</strong>: the recipient should be able to verify the identity of the sender.</li>
+</ol>
+<p>Briefly, confidentiality is addressed through encryption (<a class="reference internal" href="#encryption"><span class="std std-ref">26.7&nbsp;&nbsp;&nbsp;Shared-Key Encryption</span></a> and <a class="reference internal" href="sec_crypto.html#public-key"><span class="std std-ref">26&nbsp;&nbsp;&nbsp;Public-Key Encryption</span></a>), integrity is addressed through secure hashes (<a class="reference internal" href="#secure-hashes"><span class="std std-ref">26.6&nbsp;&nbsp;&nbsp;Secure Hashes</span></a>), and authentication is addressed through secure hashes and public-key signatures.</p>
+<p>Encryption by itself does not ensure message integrity. In <a class="reference internal" href="#stream-ciphers"><span class="std std-ref">26.7.4&nbsp;&nbsp;&nbsp;Stream Ciphers</span></a> we give an example using the message “Transfer $ <strong>02</strong>000 to Mallory”. It is encrypted by XORing with the corresponding number of bytes of the keystream (<a class="reference internal" href="#encryption"><span class="std std-ref">26.7&nbsp;&nbsp;&nbsp;Shared-Key Encryption</span></a>), and decrypted by XORing again. If the attacker XORs the two bytes in bold with the byte (‘0’ XOR ‘2’), the message becomes “Transfer $ <strong>20</strong>000 to Mallory”; if the attacker XORs those bytes in the encrypted message with (‘0’ XOR ‘2’) then the result will decrypt to the $20,000 transfer.</p>
+<p>Similarly, integrity does not automatically ensure authentication. Two parties can negotiate a temporary key to guarantee message integrity without ever establishing each other’s identities as is necessary for authentication. For example, if Alice connects to a website using SSL/TLS, but the site never purchased an SSL certificate (<a class="reference internal" href="sec_crypto.html#tls"><span class="std std-ref">26.6&nbsp;&nbsp;&nbsp;TLS</span></a> and <a class="reference internal" href="sec_crypto.html#ca"><span class="std std-ref">26.6.1&nbsp;&nbsp;&nbsp;Certificate Authorities</span></a>), or Alice does not trust the site’s certificate authority (<a class="reference internal" href="sec_crypto.html#ca"><span class="std std-ref">26.6.1&nbsp;&nbsp;&nbsp;Certificate Authorities</span></a>), then Alice has message integrity for her session, but not authentication.</p>
+<p>To the above list we might add resistance to message <strong>replay</strong>. Consider messages such as the following:</p>
+<ol class="arabic simple">
+<li>“I, Alice, authorize the payment to Bob of $1000 from my account”</li>
+<li>My facebook.com authentication cookie is Zg8yPCDwbzJ-59Hc-DvHt67qrS</li>
+</ol>
+<p>Alice does not want the first message to be executed by her bank more than once, though doing so would violate none of the three rules above. The owner of the second message might be happy to replay it multiple times, but would not want someone <em>else</em> to be able to do so. One straightforward way to prevent replay attacks is to introduce a message timestamp or count.</p>
+<p>We might also desire resistance to <strong>denial-of-service attacks</strong>. Such attacks are generally related to implementation failures. Attacks in which SSL users end up negotiating a very early version of the protocol, and thus a much less secure encryption mechanism, are arguably of this type; see the POODLE sidebar at <span class="xref std std-ref">ssh and tls</span>.</p>
+<p id="index-19">Finally, one sometimes sees <em>message non-repudiation</em> as a goal. However, in the technical – as opposed to legal – realm we can never hope to prove Alice herself signed a message; the best we can do is to prove that Alice’s <em>key</em> was used to sign the message. At this point non-repudiation is, for our purposes here, quite similar to authentication. See, however, the final example of <a class="reference internal" href="#hmac"><span class="std std-ref">26.6.1&nbsp;&nbsp;&nbsp;Secure Hashes and Authentication</span></a>.</p>
+<div class="section" id="alice-and-bob">
+<span id="index-20"></span><span id="id21"></span><h3>26.5.1&nbsp;&nbsp;&nbsp;Alice and Bob<a class="headerlink" href="#alice-and-bob" title="Permalink to this headline">¶</a></h3>
+<p>Cryptographers usually use Alice and Bob, instead of A and B, as the names of the parties sending each other encrypted messages. This tradition dates back at least to <a class="reference internal" href="bibliography.html#rsa78" id="id22">[RSA78]</a>. Other parties sometimes include Eve the eavesdropper and Mallory the active attacker (and launcher of man-in-the-middle attacks). (In <a class="reference external" href="http://www.maa.org/external_archive/columns/colm/cardcolm200502.html">this article</a> the names Aodh and Bea are introduced, though not specifically for cryptography; the Irish name Aodh is pronounced, roughly, as “Eh”.)</p>
+</div>
+</div>
+<div class="section" id="secure-hashes">
+<span id="index-21"></span><span id="id23"></span><h2>26.6&nbsp;&nbsp;&nbsp;Secure Hashes<a class="headerlink" href="#secure-hashes" title="Permalink to this headline">¶</a></h2>
+<p>How can we tell if a file has been changed? One way is to create a record of the file’s checksum, using, for the sake of argument, the Internet checksum of <a class="reference internal" href="packets.html#error-detection"><span class="std std-ref">7.4&nbsp;&nbsp;&nbsp;Error Detection</span></a>. If the potential file corruption is random, this will fail to detect a modified file with probability only 1 in 2<sup>16</sup>.</p>
+<p>Alas, if the modification is <em>intentional</em>, it is trivial to modify the file so that it has the same checksum as the original. If the original file has checksum c<sub>1</sub>, and after the initial modification the checksum is now c<sub>2</sub>, then all we have to do to create a file with checksum c<sub>1</sub> is to append the 16-bit quantity c<sub>2</sub> − c<sub>1</sub> (where the subtraction is done using ones-complement; we need to modify this slightly if the number of bytes in the first-draft modified file is odd). The CRC family of checksums is almost as easily tricked.</p>
+<p>The goal of a <strong>cryptographically secure hash</strong> is to provide a hash function – we will not call it a “checksum” as hashes based on simple sums all share the insecurity above – for which this trick is well-nigh impossible. Specifically, we want a hash function such that:</p>
+<ul class="simple">
+<li>Knowing the hash value should shed no practical light on the message</li>
+<li>Given a hash value, there should be no feasible way to find a message yielding that hash</li>
+</ul>
+<p>A slightly simpler problem than the second one above is to find two messages that have the same hash; this is sometimes called the <strong>collision problem</strong>. When the collision problem for a hash function has been solved, it is (high) time to abandon it as potentially no longer secure.</p>
+<p>If a single bit of the input is changed, the secure-hash-function output is usually entirely different.</p>
+<p id="index-22">Hashes popular in the 1990s were the 128-bit MD5 (<span class="target" id="index-23"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1321.html"><strong>RFC 1321</strong></a>, based on MD4, <a class="reference internal" href="bibliography.html#rr91" id="id24">[RR91]</a>) and the 160-bit SHA-1 (developed by the <a class="reference external" href="https://www.nsa.gov/">NSA</a>); SNMPv3 (<a class="reference internal" href="netmgmtb.html#snmpv3-security"><span class="std std-ref">25.3&nbsp;&nbsp;&nbsp;SNMPv3</span></a>) originally supported both of these (<a class="reference internal" href="netmgmtb.html#crypto-fun"><span class="std std-ref">25.3.2&nbsp;&nbsp;&nbsp;Cryptographic Fundamentals</span></a>). MD5 collisions (two messages hashing to the same value) were reported in 2004, and collisions where both messages were meaningful were reported in 2005; such <strong>collision attacks</strong> mean it can no longer be trusted for security purposes.</p>
+<p id="index-24">Hash functions currently (2014) believed secure include the SHA-2 family, which includes variants ranging from 224 bits to 512 bits (and known individually as SHA-224 through SHA-512).</p>
+<p id="index-25">A common framework for constructing n-bit secure-hash functions is the Merkle-Dåmgard construction (<a class="reference internal" href="bibliography.html#rm88" id="id25">[RM88]</a>, <a class="reference internal" href="bibliography.html#id89" id="id26">[ID89]</a>); it is used by MD5, SHA-1 and SHA-2. The initial n-bit state is specified. To this is then applied a set of transformations H<sub>i</sub>(x,y) that each take an n-bit block x and some additional bits y and return an updated n-bit block. These transformations are usually similar to the <strong>rounds functions</strong> of a block cipher; see <a class="reference internal" href="#block-cipher"><span class="std std-ref">26.7.2&nbsp;&nbsp;&nbsp;Block Ciphers</span></a> for a typical example. In encryption, the parameter y would be used to hold the key, or a substring of the key; in secure-hash functions, the parameter y holds a substring of the input message. The set of transformations is applied repeatedly as the process iterates over the entire input message; the result of the hash is the final n-bit state.</p>
+<p>In the MD5 hash function, the input is processed in blocks of 64 bytes. Each block is divided into sixteen 32-bit words. One such block of input results in 64 iterations from a set of sixteen rounds-functions H<sub>i</sub>, each applied four times in all. Each 32-bit input word is used as the “key” parameter to one of the H<sub>i</sub> four times. If the total input length is not a multiple of 512 bits, it is padded; the padding includes a length attribute so two messages differing only by the amount of padding should not hash to the same value.</p>
+<p id="index-26">While this framework in general is believed secure, and is also used by the SHA-2 family, it does suffer from what is sometimes called the <strong>length-extension</strong> vulnerability. If h = hash(m), then the value h is simply the final state after the above mechanism has processed message m. An attacker knowing only h can then initialize the above algorithm with h, and continue it to find the hash hʹ = hash(m⏜mʹ), for an arbitrary message mʹ concatenated to the end of m, <em>without knowing m</em>. If the original message m was padded to message m<sub>p</sub>, then the attacker will find hʹ = hash(m<sub>p</sub>⏜mʹ), but that is often enough. This vulnerability must be considered when using secure-hash functions for message authentication, below.</p>
+<p>The SHA-3 family of hash functions does not use the Merkle-Dåmgard construction and is believed not vulnerable to length-extension attacks.</p>
+<div class="section" id="secure-hashes-and-authentication">
+<span id="hmac"></span><span id="index-27"></span><h3>26.6.1&nbsp;&nbsp;&nbsp;Secure Hashes and Authentication<a class="headerlink" href="#secure-hashes-and-authentication" title="Permalink to this headline">¶</a></h3>
+<p>Secure hash functions can be used to implement message authentication. Suppose the sender and receiver share a secret, pre-arranged “key”, K, a random string of length comparable to the output of the hash. Then, in principle, the sender can append to the message m the value h = hash(K⏜m). The receiver, knowing K, can recalculate this value and verify that the h appended to the message is correct. In theory, only someone who knew K could calculate h.</p>
+<p>This <em>particular</em> hash(K⏜m) implementation is undermined by the length-extension vulnerability of the previous section. If the hash function exhibits this vulnerability and the sender transmits message m together with hash(K⏜m), then an attacker can modify this to message m⏜mʹ together with hash(K⏜m⏜mʹ), <em>without knowing K</em>.</p>
+<p>This problem can be defeated by reversing the order and using hash(m⏜K), but this now introduces potential collision vulnerabilities: if the hash function has the length-extension vulnerability and two messages m<sub>1</sub> and m<sub>2</sub> hash to the same value, then so will m<sub>1</sub>⏜K and m<sub>2</sub>⏜K.</p>
+<p id="index-28">Taking these vulnerabilities into account, <span class="target" id="index-29"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2104.html"><strong>RFC 2104</strong></a> defines the <strong>Hash Message Authentication Code</strong>, or HMAC, as follows; it can be used with any secure-hash function whether or not it has the length-extension vulnerability. The 64-byte length here comes from the typical input-block length of many secure-hash functions; it may be increased as necessary. (SHA-512, of the SHA-2 family, has a 128-byte input-block length and would be a candidate for such an increase.)</p>
+<ul class="simple">
+<li>The shared key K is extended to 64 bytes by padding with zeroes.</li>
+<li>A constant string <strong>ipad</strong> is formed by repeating the octet 0x36 (0011 0110) 64 times.</li>
+<li>A constant string <strong>opad</strong> is formed by repeating 0x5c (0101 1100) 64 times.</li>
+<li>We set <strong>K1</strong> = K XOR <strong>ipad</strong>.</li>
+<li>We set <strong>K2</strong> = K XOR <strong>opad</strong>.</li>
+</ul>
+<p>Finally, the HMAC value is</p>
+<div class="line-block">
+<div class="line">HMAC = hash(<strong>K2</strong> ⏜ hash(<strong>K1</strong>⏜<strong>mesg</strong>))</div>
+</div>
+<p>The values 0x36 (0011 0110) and 0x5c (0101 1100) are not critical, but the XOR of them has, by intent, a reasonable number of both 0-bits and 1-bits; see <a class="reference internal" href="bibliography.html#bck96" id="id27">[BCK96]</a>.</p>
+<p>The HMAC algorithm is, somewhat surprisingly, believed to be secure even when the underlying hash function is vulnerable to some kinds of collision attacks; see <a class="reference internal" href="bibliography.html#mb06" id="id28">[MB06]</a> and <span class="target" id="index-30"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc6151.html"><strong>RFC 6151</strong></a>. That said, a hash function vulnerable to collision attacks may have other vulnerabilities as well, and so HMAC-MD5 should still be phased out.</p>
+<p>Negotiating the pre-arranged key K can be a significant obstacle, just as it can be for ciphers using pre-arranged keys (<a class="reference internal" href="#encryption"><span class="std std-ref">26.7&nbsp;&nbsp;&nbsp;Shared-Key Encryption</span></a>). If Alice and Bob meet in person to negotiate the key K, then Alice can use HMAC for authentication of Bob, as long as K is not compromised: if Alice receives a message signed with K, she knows it must have come from Bob.</p>
+<p>Sometimes, however, K is negotiated on a per-session basis, without definitive “personal” authentication of the other party. This is akin to Alice and someone claiming to be “Bob” selecting an encryption key using the Diffie-Hellman-Merkle mechanism (<a class="reference internal" href="#diffie-hellman"><span class="std std-ref">26.8&nbsp;&nbsp;&nbsp;Diffie-Hellman-Merkle Exchange</span></a>); such key selection is secure and does not require that Alice or Bob have any prior knowledge of one another. In the HMAC setting, Alice can be confident that any HMAC-signed message was sent by the same “Bob” that negotiated the key, and not by a third party (assuming neither side has leaked the key K). This is true even if Alice is not sure “Bob” is the real Bob, or has no idea who “Bob” might be. The signature guarantees the message <em>integrity</em>, but also serves as <em>authentication</em> that the sender is the same entity who sent the previous messages in the series.</p>
+<p id="index-31">Finally, if Alice receives a message from Bob signed with HMAC using a pre-arranged secret key K (<a class="reference internal" href="#hmac"><span class="std std-ref">26.6.1&nbsp;&nbsp;&nbsp;Secure Hashes and Authentication</span></a>), Alice may herself trust the signature, but she cannot prove to anyone else that K was used to sign the message without divulging K. She also cannot prove to anyone else that Bob is the only other party who knows K. Therefore this signature mechanism provides authentication but not non-repudiation.</p>
+</div>
+<div class="section" id="password-hashes">
+<span id="index-32"></span><span id="id29"></span><h3>26.6.2&nbsp;&nbsp;&nbsp;Password Hashes<a class="headerlink" href="#password-hashes" title="Permalink to this headline">¶</a></h3>
+<p>A site generally does not store user passwords directly; instead, a hash of the password, h(p), is stored. The cryptographic hash functions above, <em>eg</em> MD5 and SHA-n, work well as long as the password file itself is not compromised. However, these functions all execute very quickly – by design – and so an attacker who succeeds in obtaining the password file can usually extract passwords simply by calculating the hash of every possible password. There are about 2<sup>14</sup> six-letter English words, and so there are about 2<sup>38</sup> passwords consisting of two such words and three digits. Such passwords are usually considered rather strong, but brute-force calculation of h(p) for 2<sup>38</sup> possible values of p is quite feasible for the hashes considered so far. Checking 10<sup>8</sup> MD5-hashed passwords per second is quite feasible; this means 2<sup>38</sup> = 256 × 2<sup>30</sup> ≃ 256 × 10<sup>9</sup> passwords can be checked in under 45 minutes. Use of a <a class="reference external" href="http://en.wikipedia.org/wiki/Graphics_processing_unit">GPU</a> increases the speed at least 10-fold.</p>
+<p id="index-33">Special hashes have been developed to address this. Two well-known ones are scrypt (<a class="reference internal" href="bibliography.html#cp09" id="id30">[CP09]</a> and this <a class="reference external" href="https://tools.ietf.org/html/draft-josefsson-scrypt-kdf-00">Internet Draft</a>) and <a class="reference external" href="http://en.wikipedia.org/wiki/Bcrypt">bcrypt</a>. A newer entrant is <a class="reference external" href="https://en.wikipedia.org/wiki/Argon2">Argon2</a>, while <a class="reference external" href="https://en.wikipedia.org/wiki/PBKDF2">PBKDF2</a> is an old stalwart. The goal here is to develop a hash that takes – ideally – the better part of a second to calculate even once, and which cannot easily be sped up by large precomputed tables. Typically these are something like a thousand to a million times slower than conventional hash functions like MD5 and the SHA-2 family; a millionfold-slower hash function is the equivalent of making the passwords longer by 20 random bits (10<sup>6</sup> ≃ 2<sup>20</sup>). See <a class="reference internal" href="bibliography.html#acprt16" id="id31">[ACPRT16]</a> for a theoretical analysis of the effectiveness of scrypt in this context. See also <span class="target" id="index-34"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2898.html"><strong>RFC 2898</strong></a>, section 4.2, though the proposal there is only a thousandfold slower.</p>
+<p id="index-35">(Good password tables also incorporate a <em>salt</em>, or <em>nonce</em>: a random string s is chosen and appended to the password before hashing; the password record is stored as the pair ⟨s,h(p⏜s)⟩. This means that cracking the password for one user will not expose a second user who has chosen exactly the same password, so long as the second user has a different salt s. Salting, however, does not change the scenarios outlined above.)</p>
+</div>
+<div class="section" id="chap">
+<span id="index-36"></span><span id="id32"></span><h3>26.6.3&nbsp;&nbsp;&nbsp;CHAP<a class="headerlink" href="#chap" title="Permalink to this headline">¶</a></h3>
+<p>Secure hashes can also be used to provide secure password-based login authentication in the presence of eavesdropping. Specific implementations include CHAP, the Challenge-Handshake Authentication Protocol (<span class="target" id="index-37"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc1994.html"><strong>RFC 1994</strong></a>) and Microsoft’s MS-CHAP (version 1 in <span class="target" id="index-38"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2433.html"><strong>RFC 2433</strong></a> and version 2 in <span class="target" id="index-39"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2759.html"><strong>RFC 2759</strong></a>). The general idea is that the server sends a random string (the “challenge”) and the client then creates a response consisting of a secure hash of the challenge string concatenated with the user’s password (and possibly other information). Assuming the secure hash is actually secure, only someone in possession of the user password could have created this response. By the same token, an eavesdropper cannot figure out the password from the response.</p>
+<p>While such protocols can be quite secure in terms of verifying to the server that the client knows the password, the CHAP strategy has a fundamental vulnerability: the server must store the plaintext password rather than a secure hash of it (as in the previous section). An attacker who makes off with the server’s password file then has everything; no brute-force password cracking is needed. For this reason, newer authentication protocols often will create an encrypted channel first (<em>eg</em> using TLS, <a class="reference internal" href="sec_crypto.html#tls"><span class="std std-ref">26.6&nbsp;&nbsp;&nbsp;TLS</span></a>), and then use that secure channel to exchange credentials. This may involve transmission of the <em>plaintext</em> password, which clearly allows the server to store only hashed passwords. However, as the next example shows, it <em>is</em> possible to authenticate without having the server store plaintext passwords and without having the plaintext password transmitted at all.</p>
+</div>
+<div class="section" id="scram">
+<span id="index-40"></span><h3>26.6.4&nbsp;&nbsp;&nbsp;SCRAM<a class="headerlink" href="#scram" title="Permalink to this headline">¶</a></h3>
+<p>SCRAM (Salted Challenge-Response Authentication Mechanism), <span class="target" id="index-41"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc5802.html"><strong>RFC 5802</strong></a>, is an authentication protocol with the following features:</p>
+<ul class="simple">
+<li>The client password is not transmitted in the clear</li>
+<li>The server does not store the plaintext client password</li>
+<li>If the server’s hashed credentials are compromised, an attacker still cannot authenticate</li>
+</ul>
+<p>We outline a very stripped-down version of the protocol: password salting has been removed for clarity, and the exchange itself has been greatly simplified. The <strong>ClientKey</strong> is a hashed version of the password; what the server stores is a secure hash of the ClientKey called <strong>StoredKey</strong>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">StoredKey</span> <span class="o">=</span> <span class="nb">hash</span><span class="p">(</span><span class="n">ClientKey</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The exchange begins with the server sending a random <strong>nonce</strong> string to the client. The client now calculates the <strong>ClientSignature</strong> as follows:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ClientSignature</span> <span class="o">=</span> <span class="nb">hash</span><span class="p">(</span><span class="n">StoredKey</span><span class="p">,</span> <span class="n">nonce</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Only an attacker who has eavesdropped on this exchange can replicate the ClientSignature, but the server can compute it. The client then sends the following to the server:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ClientKey</span> <span class="n">XOR</span> <span class="n">ClientSignature</span>
+</pre></div>
+</div>
+<p>Because the server can calculate ClientSignature, it can extract ClientKey, and verify that h(ClientKey) = StoredKey. An attacker who has obtained StoredKey from the server can generate ClientSignature, but cannot generate ClientKey.</p>
+<p>However, an attacker who has <em>both</em> exfiltrated StoredKey from the server <em>and</em> eavesdropped on a client-server exchange is able to generate the ClientSignature and thus extract the ClientKey. The attacker can then authenticate at a later time using ClientKey. For this reason, a secure tunnel is still needed for the authentication. Given the presence of such a tunnel, the SCRAM approach appears to offer a relatively modest security improvement over sending the password as plaintext. Note, though, that with SCRAM the server does not see the password at all, so if the client mistakenly connects to the wrong server, the password is not revealed.</p>
+<p>See below at <a class="reference internal" href="#sae"><span class="std std-ref">26.8.2&nbsp;&nbsp;&nbsp;Simultaneous Authentication of Equals</span></a> for another, mutual, form of password authentication.</p>
+</div>
+</div>
+<div class="section" id="shared-key-encryption">
+<span id="encryption"></span><span id="index-42"></span><h2>26.7&nbsp;&nbsp;&nbsp;Shared-Key Encryption<a class="headerlink" href="#shared-key-encryption" title="Permalink to this headline">¶</a></h2>
+<p>Secure hashes can provide authentication, but to prevent eavesdropping we need encryption. While <strong>public-key</strong> encryption (<a class="reference internal" href="sec_crypto.html#public-key"><span class="std std-ref">26&nbsp;&nbsp;&nbsp;Public-Key Encryption</span></a>) is perhaps more glamorous, the workhorse of the encryption world is the <strong>shared-key cipher</strong>, or <strong>shared-secret</strong> or <strong>symmetric</strong> cipher, in which each party has possession of a key K, used for both encryption and decryption.</p>
+<p>Shared-key ciphers are often quite fast; public-key encryption is generally slower by several orders of magnitude. As a result, if two parties without a shared key wish to communicate, they will almost always used public-key encryption only to exchange a key for a shared-key cipher, which will then be used for the actual message encryption.</p>
+<p>Typical key lengths for shared-key ciphers believed secure range from 128 bits to 256 bits. For most shared-key ciphers there are no known attacks that are much faster than brute force, and 2<sup>256</sup> ≃ 10<sup>77</sup> is quite a large number.</p>
+<p>Shared-key ciphers can be either <strong>block ciphers</strong>, encrypting data in units of blocks that might typically be 8 bytes long, or <strong>stream</strong> ciphers, which generate a pseudorandom <strong>keystream</strong>. Each byte (or even bit) of the message is then encrypted by (typically) XORing it with the corresponding byte of the keystream.</p>
+<div class="section" id="session-keys">
+<span id="index-43"></span><span id="id33"></span><h3>26.7.1&nbsp;&nbsp;&nbsp;Session Keys<a class="headerlink" href="#session-keys" title="Permalink to this headline">¶</a></h3>
+<p>The more messages a key is used to encrypt, the more information a potential eavesdropper may have with which to launch a codebreaking attack. If Alice and Bob have a pre-arranged shared secret key K, is therefore quite common for them to encrypt the bulk of their correspondence with temporary <strong>session keys</strong>, each one used for a time period that may range from minutes to days. The secret key K might then be used only to exchange new session keys and to forestall man-in-the-middle attacks (<a class="reference internal" href="sec_crypto.html#man-in-the-middle"><span class="std std-ref">26.3&nbsp;&nbsp;&nbsp;Trust and the Man in the Middle</span></a>) by signing important messages (<a class="reference internal" href="#hmac"><span class="std std-ref">26.6.1&nbsp;&nbsp;&nbsp;Secure Hashes and Authentication</span></a>). If Diffie-Hellman-Merkle key exchange (ref:<cite>diffie-hellman</cite>) is used, K might be reserved <em>only</em> for message signing.</p>
+<p>Sometimes session keys are entirely different keys, chosen randomly; if such a key is discovered, the attacker learns nothing about the secret key K. Other times, the session key is a mash-up of K and some additional information (such as an initialization vector, <a class="reference internal" href="#cipher-modes"><span class="std std-ref">26.7.3&nbsp;&nbsp;&nbsp;Cipher Modes</span></a>), that is transmitted in the clear. The session key might then be the concatenation of K and the initialization vector, or the XOR of the two. Either approach means that an eavesdropper who figures out the session key also has the secret key K, but the use of such session keys still may make any codebreaking attempt much more difficult.</p>
+<p>In <a class="reference internal" href="sec_crypto.html#forward-secrecy"><span class="std std-ref">26.2&nbsp;&nbsp;&nbsp;Forward Secrecy</span></a> we consider the reverse problem of how Alice and Bob might keep a session key private even if the secret key is compromised.</p>
+</div>
+<div class="section" id="block-ciphers">
+<span id="block-cipher"></span><h3>26.7.2&nbsp;&nbsp;&nbsp;Block Ciphers<a class="headerlink" href="#block-ciphers" title="Permalink to this headline">¶</a></h3>
+<p>As mentioned, a block cipher encrypts data one block at a time, typically with a key length rather longer than the block size. A typical block cipher proceeds by the iterated application of a sequence of <strong>round functions</strong>, each updating the block and using some round-dependent substring of the key as auxiliary input. If we start with a block of plaintext P and apply all the round functions in turn, the result is the ciphertext block C = E(P,K) = E<sub>K</sub>(P). The process can be reversed so that P = D(C,K) = D<sub>K</sub>(C).</p>
+<p id="index-44">A common framework is that of the <strong>Feistel network</strong>. In such an arrangement, the block is divided into two or more words sized for the machine architecture; an 8-byte block is typically divided into two 32-bit words which we can call L and H for Low and High. A typical round function is now of the following form, where K is the key and F(x,K) takes a word x and the key K and returns a new word:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">⟨L,H⟩ ⟶ ⟨H, L XOR F(H,K)⟩</div>
+</div>
+</div></blockquote>
+<p>Visually, this is often diagrammed as</p>
+<img alt="_images/feistel.svg" src="_images/feistel.svg" /><p>One round here scrambles only half the block, but the other half gets scrambled in the next round (sometimes the operation above is called a half-round for that reason). The total number of rounds is typically somewhere between 10 and 50. Much of the art of designing high-quality block ciphers is to come up with round functions that result in overall very fast execution, without introducing vulnerabilities. The more rounds, the slower.</p>
+<p>The internal function F, often different for each round, may look at only a designated subset of the bits of the key K. Note that the operation above is invertible – that is, can be decrypted – regardless of F; given the right-hand side the receiver can compute F(H,K) and thus, by XORing this with L XOR F(H,K), can recover L. This remains true if, as is sometimes the case, the XOR operation is replaced with ordinary addition.</p>
+<div class="sidebar" id="index-45">
+<p class="first sidebar-title">Crypto Law</p>
+<p class="last">The Salsa20 cipher mentioned here is a member of Daniel Bernstein’s “snuffle” family of ciphers based on secure-hash functions. In the previous century, the US government banned the export of ciphers but not secure-hash functions. They also at one point banned the export (and thus publication) of one of Bernstein’s papers; he sued. In 1999, the US Court of Appeals for the Ninth Circuit found in his favor. The decision, <a class="reference external" href="http://epic.org/crypto/export_controls/bernstein_decision_9_cir.html">176 F.3d 1132</a>, is the only appellate decision of which the author is aware that contains (in the footnotes) not only samples of C code, but also of Lisp.</p>
+</div>
+<p id="index-46">A simple F might return the result of XORing H and a subset of the bits of K. This is usually a little <em>too</em> simple, however. Ordinary modulo-32 addition of H and a subset of K often works well; the interaction of addition and XORing introduces considerable bit-shuffling (or <em>diffusion</em> in the language of cryptography). Other operations used in F(H,K) include Boolean AND and OR operations. 32-bit multiplication introduces considerable bit-shuffling, but is often computationally more expensive. The <strong>Salsa20</strong> cipher of <a class="reference internal" href="bibliography.html#db08" id="id34">[DB08]</a> uses only XOR and addition, for speed.</p>
+<p>It is not uncommon for the round function also to incorporate “bit rotation” of one or both of L and H; the result of bit-rotation of 1000 <strong>111</strong>0 two places to the left is 00<strong>11</strong> <strong>1</strong>010.</p>
+<p>If a larger blocksize is desired, say 128 bits, but we still want to avail ourselves of the efficiency of 32-bit operations, the block can be divided into ⟨A,B,C,D⟩. The round function might then become</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">⟨A,B,C,D⟩ ⟶ ⟨B,C,D, (A XOR F(B,C,D,K)) ⟩</div>
+</div>
+</div></blockquote>
+<p>As mentioned above, many secure-hash functions use block-cipher round functions that then use successive chunks of the message being hashed in place of the key. In the MD5 algorithm, block A above is transformed into the 32-bit sum of input-message fragment M, a constant K, and G(B,C,D) which can be any of several Boolean combinations of B, C and D.</p>
+<p>An alternative to the Feistel-network framework for block ciphers is the use of so-called <a class="reference external" href="https://en.wikipedia.org/wiki/Substitution-permutation_network">substitution-permutation networks</a>.</p>
+<p>The first block cipher in widespread use was the federally sanctioned Data Encryption Standard, or <strong>DES</strong> (commonly pronounced “dez”). It was developed at IBM by 1974 and then selected by the US National Bureau of Standards (NBS) as a US standard after some alterations recommended by the National Security Agency (<a class="reference external" href="https://www.nsa.gov/">NSA</a>). One of the NSA’s recommendations was that a key size of 56 bits was sufficient; this was in an era when the US government was very concerned about the spread of strong encryption. For years, many people assumed the NSA had intentionally introduced other weaknesses in DES to facilitate government eavesdropping, but after forty years no such vulnerability has been discovered and this no longer seems so likely. The suspicion that the NSA had in the 1970’s the resources to launch brute-force attacks against DES, however, has greater credence.</p>
+<p>In 1997 an academic team launched a successful brute-force attack on DES. The following year the Electronic Frontier Foundation (EFF) built a hardware DES cracker for about US$250,000 that could break DES in a few days.</p>
+<p id="index-48">In an attempt to improve the security of DES, triple-DES or <strong>3DES</strong> was introduced. It did not become an official standard until the late 1990’s, but a two-key form was proposed in 1978. 3DES involves three applications of DES with keys ⟨K1,K2,K3⟩; encrypting a plaintext P to ciphertext C is done by C = E<sub>K3</sub>(D<sub>K2</sub>(E<sub>K1</sub>(P))). The middle deciphering option D<sub>K2</sub> means the algorithm reduces to DES when K1 = K2 = K3; it also reduces exposure to a particular vulnerability known as “meet in the middle” (no relation to “man in the middle”). In <a class="reference internal" href="bibliography.html#mh81" id="id36">[MH81]</a> it is estimated that 3DES with three distinct keys has a strength roughly equivalent to 2×56 = 112 bits. That same paper also uses the meet-in-the-middle attack to show that straightforward “double-DES” encryption C = E<sub>K2</sub>(E<sub>K1</sub>(P)) has an effective keystrength of only 56 bits – no better than single DES – if sufficient quantities of plaintext and corresponding ciphertext are known.</p>
+<p id="index-49">As concerns about the security of DES continued to mount, the US National Institute of Standards and Technology (NIST, the new name for the NBS) began a search for a replacement. The result was the Advanced Encryption Standard, <strong>AES</strong>, officially approved in 2001. AES works with key lengths of 128, 192 and 256 bits. The algorithm is described in <a class="reference internal" href="bibliography.html#dr02" id="id37">[DR02]</a>, and is based on the Rijndael family of ciphers; the name Rijndael (“rain-dahl”) is a combination of the authors’ names.</p>
+<p id="index-50">Earlier non-DES ciphers include <strong>IDEA</strong>, the International Data Encryption Algorithm, described in <a class="reference internal" href="bibliography.html#lm91" id="id38">[LM91]</a>, and <strong>Blowfish</strong>, described in <a class="reference internal" href="bibliography.html#bs93" id="id39">[BS93]</a>. Both use 128-bit keys. The IDEA algorithm was patented; Blowfish was intentionally not patented. A successor to Blowfish is Twofish.</p>
+</div>
+<div class="section" id="cipher-modes">
+<span id="index-51"></span><span id="id40"></span><h3>26.7.3&nbsp;&nbsp;&nbsp;Cipher Modes<a class="headerlink" href="#cipher-modes" title="Permalink to this headline">¶</a></h3>
+<p>The simplest encryption “mode” for a block cipher is to encrypt each input block independently. That is, if P<sub>i</sub> is the ith plaintext block, then the ith ciphertext block C<sub>i</sub> is E(P<sub>i</sub>,K). This is known as electronic codebook or <strong>ECB</strong> mode.</p>
+<p>ECB is vulnerable to known-plaintext attacks. Suppose the attacker knows that the message is of the following form, where the vertical lines are the block boundaries:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>Bank Transfer  |  to MALLORY  |  Amount $1000
+</pre></div>
+</div>
+<p>If the attacker also knows the ciphertext for “Amount $100,000”, and is in a position to rewrite the message (or to inject a new message), then the attacker can combine the first two blocks above with the third $100,000 block to create a rather different message, without knowing the key. At <a class="reference external" href="http://en.wikipedia.org/wiki/Block_cipher_mode_of_operation">http://en.wikipedia.org/wiki/Block_cipher_mode_of_operation</a> there is a remarkable example of the failure of ECB to fail to effectively conceal an encrypted image.</p>
+<p id="index-52">As a result, ECB is seldom used. A common alternative is cipher block chaining or <strong>CBC</strong> mode. In this mode, each plaintext block is XORed with the previous ciphertext block before encrypting:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">C<sub>i</sub> = E(K,C<sub>i-1</sub> XOR P<sub>i</sub>)</div>
+</div>
+</div></blockquote>
+<p>To decrypt, we use</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">P<sub>i</sub> = D(K,C<sub>i</sub>) XOR C<sub>i-1</sub></div>
+</div>
+</div></blockquote>
+<p id="index-53">If we stop here, this means that if two messages begin with several identical plaintext blocks, the encrypted messages will also begin with identical blocks. To prevent this, the first ciphertext block C<sub>0</sub> is a random string, known as the <strong>initialization vector</strong>, or IV. The plaintext is then taken to start with block P<sub>1</sub>. The IV is sent in the clear, but contains no private information.</p>
+<p>CBC works well when encrypting reliable streams of data, such as are delivered by TCP. But CBC is more difficult if some packets might be lost, as may occur with UDP transport. If one cipher block is lost, say C<sub>i-1</sub>, then we cannot decrypt C<sub>i</sub>, because we need to XOR the lost block into the final mix. We <em>can</em> decrypt C<sub>i+1</sub>, and subsequent cipher blocks, but if C<sub>i</sub> starts a packet, then that packet is effectively lost, and so the nondelivery of one packet leads to the effective loss of two.</p>
+<p>See exercise 5.0.</p>
+</div>
+<div class="section" id="stream-ciphers">
+<span id="index-54"></span><span id="id41"></span><h3>26.7.4&nbsp;&nbsp;&nbsp;Stream Ciphers<a class="headerlink" href="#stream-ciphers" title="Permalink to this headline">¶</a></h3>
+<p>Conceptually, a stream cipher encodes one byte at a time. The cipher generates a pseudorandom <strong>keystream</strong>. If K<sub>i</sub> is the ith byte of the keystream, then the ith plaintext byte P<sub>i</sub> is encrypted as C<sub>i</sub> = P<sub>i</sub> XOR K<sub>i</sub>. A stream cipher can be viewed as a special form of pseudorandom number generator or PRNG, though PRNGs used for numeric methods and simulations are seldom secure enough for cryptography.</p>
+<p id="index-55">Simple XORing of the plaintext with the keystream may not seem secure, but if the keystream is in fact truly random then this cipher is unbreakable: to an attacker, all possible plaintexts are equally likely. A truly random keystream means that the entire keystream must be shared ahead of time, and no portion may ever be reused; this cipher is known as the <strong>one-time pad</strong>.</p>
+<p>Stream ciphers do not, by themselves, provide authenticity. An attacker can XOR something with the encrypted message to change it. For example, if the message is known to be</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>Transfer $ 02000 to Mallory
+           ^^
+</pre></div>
+</div>
+<p>then the attacker can XOR the two bytes over the “^” with ‘0’ XOR ‘2’, changing the character ‘0’ to a ‘2’ and the ‘2’ to a ‘0’. The attacker does this to the encrypted stream, but the decrypted plaintext stream retains the change. Appending an authentication code such as HMAC, <a class="reference internal" href="#hmac"><span class="std std-ref">26.6.1&nbsp;&nbsp;&nbsp;Secure Hashes and Authentication</span></a>, prevents this.</p>
+<p>Stream ciphers are, in theory, well suited to the encryption of data sent a single byte at a time, such as data from a telnet session. The ssh protocol (<a class="reference internal" href="sec_crypto.html#ssh"><span class="std std-ref">26.5&nbsp;&nbsp;&nbsp;SSH</span></a>), however, generally uses block ciphers; when it has to send a single byte it pads the block with random data.</p>
+<div class="section" id="rc4">
+<span id="index-56"></span><span id="id42"></span><h4>26.7.4.1&nbsp;&nbsp;&nbsp;RC4<a class="headerlink" href="#rc4" title="Permalink to this headline">¶</a></h4>
+<p>The RC4 stream cipher was quite widely used. It was developed by Ron Rivest at RSA Security in 1987, but never formally published. The code was leaked, however, and so the internal details are widely available. “Unofficial” implementations are sometimes called <strong>ARC4</strong> or ARCFOUR, the “A” for “Alleged”.</p>
+<p>RC4 was designed for very fast implementation in software; to this end, all operations are on whole bytes. RC4 generates a keystream of pseudorandom bytes, each of which is XORed with the corresponding plaintext byte. The keystream is completely independent of the plaintext.</p>
+<p>The key length can range from 5 up to 256 bytes. The unofficial protocol contains no explicit mechanism for incorporating an initialization vector, but an IV is well-nigh essential for stream ciphers; otherwise an identical keystream is generated each time. One simple approach is to create a session key by concatenating the IV and the secret RC4 key; alternatively (and perhaps more safely) the IV and the RC4 key can be XORed together.</p>
+<p>RC4 was the basis for the ill-fated WEP Wi-Fi encryption, <a class="reference internal" href="#wep-failure"><span class="std std-ref">26.7.7&nbsp;&nbsp;&nbsp;Wi-Fi WEP Encryption Failure</span></a>, due in part to WEP’s requirement that the 3-byte IV precede the 5-byte RC4 key. The flaw there did not affect other applications of RC4, but newer attacks have suggested that RC4 be phased out.</p>
+<p>Internally, an RC4 implementation maintains the following state variables:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">An array S[] representing a permutation i→S[i] of all bytes</div>
+<div class="line">two 8-bit integer indexes to S[], i and j</div>
+</div>
+</div></blockquote>
+<p>S[] is guaranteed to represent a permutation (<em>ie</em> is guaranteed to be a 1-1 map) because it is initialized to the identity and then all updates are transpositions (involving swapping S[i] and S[j]).</p>
+<p id="index-57">Initially, we set S[i] = i for all i, and then introduce 256 transpositions. This is known as the <strong>key-scheduling algorithm</strong>. In the following, <code class="docutils literal"><span class="pre">keylength</span></code> is the length of the key <code class="docutils literal"><span class="pre">key[]</span></code> in bytes.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">J</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+<span class="k">for</span> <span class="n">I</span><span class="o">=</span><span class="mi">0</span> <span class="n">to</span> <span class="mi">255</span><span class="p">:</span>
+    <span class="n">J</span> <span class="o">=</span> <span class="n">J</span> <span class="o">+</span> <span class="n">S</span><span class="p">[</span><span class="n">I</span><span class="p">]</span> <span class="o">+</span> <span class="n">key</span><span class="p">[</span><span class="n">I</span> <span class="n">mod</span> <span class="n">keylength</span><span class="p">];</span>
+    <span class="n">swap</span> <span class="n">S</span><span class="p">[</span><span class="n">I</span><span class="p">]</span> <span class="ow">and</span> <span class="n">S</span><span class="p">[</span><span class="n">J</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>As we will see in <a class="reference internal" href="#wep-failure"><span class="std std-ref">26.7.7&nbsp;&nbsp;&nbsp;Wi-Fi WEP Encryption Failure</span></a>, 256 transpositions is apparently not enough.</p>
+<p>After initialization, <code class="docutils literal"><span class="pre">I</span></code> and <code class="docutils literal"><span class="pre">J</span></code> are reset to 0. Then, for each keystream byte needed, the following is executed, where <code class="docutils literal"><span class="pre">I</span></code> and <code class="docutils literal"><span class="pre">J</span></code> retain their values between calls:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">I</span> <span class="o">=</span> <span class="p">(</span><span class="n">I</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="n">mod</span> <span class="mi">256</span>
+<span class="n">J</span> <span class="o">=</span> <span class="n">J</span> <span class="o">+</span> <span class="n">S</span><span class="p">[</span><span class="n">I</span><span class="p">]</span> <span class="n">mod</span> <span class="mi">256</span>
+<span class="n">swap</span> <span class="n">S</span><span class="p">[</span><span class="n">I</span><span class="p">]</span> <span class="ow">and</span> <span class="n">S</span><span class="p">[</span><span class="n">J</span><span class="p">]</span>
+<span class="k">return</span> <span class="n">S</span><span class="p">[</span> <span class="n">S</span><span class="p">[</span><span class="n">I</span><span class="p">]</span> <span class="o">+</span> <span class="n">S</span><span class="p">[</span><span class="n">J</span><span class="p">]</span> <span class="n">mod</span> <span class="mi">256</span> <span class="p">]</span>
+</pre></div>
+</div>
+<p>For <code class="docutils literal"><span class="pre">I</span></code> = 1, the first byte returned is <code class="docutils literal"><span class="pre">S[</span> <span class="pre">S[1]</span> <span class="pre">+</span> <span class="pre">S[S[1]]</span> <span class="pre">]</span></code>.</p>
+</div>
+</div>
+<div class="section" id="block-cipher-based-stream-ciphers">
+<span id="block-stream"></span><h3>26.7.5&nbsp;&nbsp;&nbsp;Block-cipher-based stream ciphers<a class="headerlink" href="#block-cipher-based-stream-ciphers" title="Permalink to this headline">¶</a></h3>
+<p id="index-58">It is possible to create a stream cipher out of a block cipher. The first technique we will consider is <strong>counter mode</strong>, or <strong>CTR</strong> mode. The sender and receiver agree on an initial block, B, very similar to an initialization vector. The first block of the keystream, K<sub>0</sub>, is simply the encrypted block E(B,K). The ith keystream block, for i&gt;0, is K<sub>i</sub> = E(B+i,K), where “B+i” is the result of treating B as a long number and performing ordinary arithmetic.</p>
+<p>Going from B+1 to B+(i+1) typically changes only one or two bits before encryption, but no significant vulnerability based on this has ever been found, and this form of counter mode is now widely believed to be as secure as the underlying block cipher.</p>
+<p>Note that the E(B+i), for different i, can also be computed in parallel; CBC encryption, by comparison, cannot be parallelized. Similarly, if cipher block j never arrives, then E(B+j) need never be computed.</p>
+<p>A related technique is to generate the keystream by starting with a secret key K and taking a secure hash of each of the successive concatenations K⏜1, K⏜2, <em>etc</em>. The drawback to this approach is that many secure-hash functions have not been developed with this use in mind, and unforeseen vulnerabilities may exist.</p>
+<p>Stream ciphers in general face an error-recovery problem, if the underlying transport is unreliable and so blocks may be lost. However, resynchronization after lost packets becomes trivial if each packet contains the block number i of the first cipher block of the packet; in some arrangements it is sufficient to include the packet number. The receiver can then easily compute E(B+i,K), <em>etc</em>, and decrypt the packet.</p>
+<p id="index-59">This technique is used in WPA2 encryption used by Wi-Fi. Individual Wi-Fi packets are, of course, frequently lost, but each packet contains a 6-byte packet number that enables decryption in the absence of previous packets. The packet numbers do not help eavesdroppers, as in the absence of losses they can be determined simply by keeping track of the packet count.</p>
+<p id="index-60">The keystream calculated by counter mode is completely independent of the plaintext. This is not always the case. In <strong>cipher feedback</strong> mode, or CFB, we initialize C<sub>0</sub> to the initialization vector, and then define the keystream blocks K<sub>i</sub> for i&gt;0 as follows:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">K<sub>i</sub> = E<sub>K</sub>(C<sub>i-1</sub>)</div>
+</div>
+</div></blockquote>
+<p>As usual, C<sub>i</sub> = P<sub>i</sub> XOR K<sub>i</sub> for i&gt;0, so the right-hand side above is E<sub>K</sub>(P<sub>i-1</sub> XOR K<sub>i-1</sub>). The evolution of the keystream thus depends on earlier plaintext. However, if a cipher block is lost, the receiver now faces resynchronization problems.</p>
+</div>
+<div class="section" id="encryption-and-authentication">
+<span id="id43"></span><h3>26.7.6&nbsp;&nbsp;&nbsp;Encryption and Authentication<a class="headerlink" href="#encryption-and-authentication" title="Permalink to this headline">¶</a></h3>
+<p>If the ciphertext is modified in transit, most decryption algorithms will happily “decrypt” it anyway, though perhaps to gibberish; encryption provides no implicit validity check. Worse, it is sometimes possible for an attacker to modify the ciphertext so as to produce a meaningful, intentional change in the resultant plaintext. Examples of this appear above in <a class="reference internal" href="#stream-ciphers"><span class="std std-ref">26.7.4&nbsp;&nbsp;&nbsp;Stream Ciphers</span></a> and <a class="reference internal" href="#cipher-modes"><span class="std std-ref">26.7.3&nbsp;&nbsp;&nbsp;Cipher Modes</span></a>; for CBC block ciphers see exercise 5.0.</p>
+<p>It is therefore common practice to include HMAC authentication signatures (<a class="reference internal" href="#hmac"><span class="std std-ref">26.6.1&nbsp;&nbsp;&nbsp;Secure Hashes and Authentication</span></a>) with each encrypted message; the use of HMAC rather than a simple checksum ensures that an attacker cannot modify messages and have them still appear to be valid. HMAC may not identify the sender as positively as public-key digital signatures, <a class="reference internal" href="sec_crypto.html#rsa-signatures"><span class="std std-ref">26.1.1&nbsp;&nbsp;&nbsp;RSA and Digital Signatures</span></a>, but it <em>does</em> positively identify the sender as the same entity with whom the receiver negotiated the key. This is all that is needed.</p>
+<p>Appending an HMAC signature does more than prevent garbled messages; there are attacks that, in the absence of such signatures, allow full decryption of messages (particularly if the attacker can create multiple ciphertexts and find out which ones the recipient was able to decrypt successfully). See <a class="reference internal" href="bibliography.html#sv02" id="id44">[SV02]</a> for an example.</p>
+<p id="index-61">There are three options for combining encryption with HMAC; for consistency with the literature we replace HMAC with the more general MAC (for Message Authentication Code):</p>
+<ul class="simple">
+<li>MAC-then-encrypt: calculate the MAC signature on the plaintext, append it, and encrypt the whole</li>
+<li>encrypt-and-MAC: calculate the MAC signature on the plaintext, encrypt the message, and append to that the MAC</li>
+<li>encrypt-then-MAC: encrypt the plaintext and calculate the MAC of the ciphertext; append the MAC to the ciphertext</li>
+</ul>
+<p>These are analyzed in <a class="reference internal" href="bibliography.html#bn00" id="id45">[BN00]</a>, in which it is proven that <strong>encrypt-then-MAC</strong> in general satisfies some stronger cryptographic properties than the others, although these properties may hold for the others in special cases. Encrypt-then-MAC means that no decryption is attempted of a forged or spoofed message.</p>
+</div>
+<div class="section" id="wi-fi-wep-encryption-failure">
+<span id="wep-failure"></span><h3>26.7.7&nbsp;&nbsp;&nbsp;Wi-Fi WEP Encryption Failure<a class="headerlink" href="#wi-fi-wep-encryption-failure" title="Permalink to this headline">¶</a></h3>
+<p>The WEP (Wired-Equivalent Privacy) mechanism was the first Wi-Fi encryption option, introduced in 1999; see <a class="reference internal" href="wireless.html#wifi-security"><span class="std std-ref">4.2.5&nbsp;&nbsp;&nbsp;Wi-Fi Security</span></a>. It used RC4 encryption with either a 5-byte or 13-byte secret key; this was always appended to a 3-byte initialization vector that, of necessity, was sent in the clear. The RC4 session key was thus either 8 or 16 bytes; the shorter key was more common.</p>
+<p>There is nothing inherently wrong with that strategy, but the designers of WEP made some design choices that were, in retrospect, infelicitous:</p>
+<ul class="simple">
+<li>the secret key was appended to the IV (rather than, say, XORed with it)</li>
+<li>the IV was only three bytes long</li>
+<li>a new RC4 keystream and new IV was used for each packet</li>
+</ul>
+<p>The third choice above was perhaps the more serious mistake. One justification for this choice, however, was that otherwise lost packets (which are common in Wi-Fi) would represent gaps in the received stream, and the receiver might have trouble figuring out the size of the gap and thus how to decrypt the later arrivals.</p>
+<p>A contributing issue is that the first byte of the plaintext – a header byte from the Wi-Fi packet – is essentially known. This first byte is generally from the Logical Link Control header, and contains the same value as the Ethernet Type field (see <a class="reference internal" href="wireless.html#wifi-configurations"><span class="std std-ref">4.2.4&nbsp;&nbsp;&nbsp;Access Points</span></a>). All IP packets share the same value. Thus, by looking at the first byte of the encrypted packet, an attacker knows the first byte of the keystream.</p>
+<p>A theoretical WEP vulnerability was published in [FMS01] that proved all-too-practical in the real world. We will let K[] denote the 8-byte key, with K[0],K[1],K[2] representing the three-byte initialization vector and K[i] for 3≤i&lt;8 representing the <em>secret</em> key. The attacker monitors the airwaves for IVs of a particular form; after about 60 of these are collected, the attacker can make an excellent guess at K[3]. Now a slightly different group of IVs is collected, allowing a guess at K[4] and so on. The bytes of the secret key thus fail sequentially. The attack requires about the same (modest) time for each key byte discovered, so a 16-byte total key length does not add much more security versus the 8-byte key.</p>
+<p>Because the IV is only three bytes, the time needed to collect packets containing the necessary special IV values is modest.</p>
+<p>We outline the attack on the first secret byte, K[3]. The IV’s we are looking for have the form</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">⟨3,-1,X⟩</div>
+</div>
+</div></blockquote>
+<p>where -1 = 255 for 8-bit bytes; these are sometimes called <strong>weak IVs</strong>. One IV in 2<sup>16</sup> is of this form, but a more careful analysis (which we omit) can increase the usable fraction of IVs substantially.</p>
+<p>To see why these IVs are useful, we need to go back to the RC4 key-scheduling algorithm, <a class="reference internal" href="#rc4"><span class="std std-ref">26.7.4.1&nbsp;&nbsp;&nbsp;RC4</span></a>. We start with an example in which the first six bytes of the key is</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">K</span><span class="p">[]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="o">-</span><span class="mi">14</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The IV here is ⟨3,-1,5⟩.</p>
+<p>Recall that the array S is initialized with S[i] = i; this represents S = S<sub>0</sub>. At this point, I and J are also 0. We now run the following loop, introducing one transposition to S per iteration:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">I</span><span class="o">=</span><span class="mi">0</span> <span class="n">to</span> <span class="mi">255</span><span class="p">:</span>
+    <span class="n">J</span> <span class="o">=</span> <span class="n">J</span> <span class="o">+</span> <span class="n">S</span><span class="p">[</span><span class="n">I</span><span class="p">]</span> <span class="o">+</span> <span class="n">K</span><span class="p">[</span><span class="n">I</span> <span class="n">mod</span> <span class="n">keylength</span><span class="p">];</span>
+    <span class="n">swap</span> <span class="n">S</span><span class="p">[</span><span class="n">I</span><span class="p">]</span> <span class="ow">and</span> <span class="n">S</span><span class="p">[</span><span class="n">J</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The first value of <code class="docutils literal"><span class="pre">J</span></code>, when <code class="docutils literal"><span class="pre">I</span></code> = 0, is <code class="docutils literal"><span class="pre">K[0]</span></code> which is 3. After the first transposition, S is as follows, where the swapped values are in bold:</p>
+<img alt="_images/wep_crack_1.svg" src="_images/wep_crack_1.svg" /><p>For the next iteration, <code class="docutils literal"><span class="pre">I</span></code> is 1 and <code class="docutils literal"><span class="pre">J</span></code> is 3+1+(-1) = 3 again. After the swap, S is</p>
+<img alt="_images/wep_crack_2.svg" src="_images/wep_crack_2.svg" /><p>Next, <code class="docutils literal"><span class="pre">I</span></code> is 2 and <code class="docutils literal"><span class="pre">J</span></code> is 3+2+5 = 10. In general, if the IV were ⟨3,-1,X⟩, <code class="docutils literal"><span class="pre">J</span></code> would be 5+X.</p>
+<img alt="_images/wep_crack_3.svg" src="_images/wep_crack_3.svg" /><p>At this point, we have processed the three-byte IV; the next iteration involves the first secret byte of <code class="docutils literal"><span class="pre">K</span></code>. <code class="docutils literal"><span class="pre">I</span></code> is 3 and <code class="docutils literal"><span class="pre">J</span></code> becomes 10+1+<code class="docutils literal"><span class="pre">K[3]</span></code> = 15:</p>
+<img alt="_images/wep_crack_4.svg" src="_images/wep_crack_4.svg" /><p>Recall that the first byte returned in the keystream is <code class="docutils literal"><span class="pre">S[</span> <span class="pre">S[1]</span> <span class="pre">+</span> <span class="pre">S[S[1]]</span> <span class="pre">]</span></code>. At this point, that would be <code class="docutils literal"><span class="pre">S[0+3]</span></code> = 15.</p>
+<p>From this value, 15, and the IV ⟨3,-1,5⟩, the attacker can calculate, by repeating the process above, that <code class="docutils literal"><span class="pre">K[3]</span></code> = 4.</p>
+<p>If the IV were ⟨3,-1,X⟩, then, as noted above, in the <code class="docutils literal"><span class="pre">I</span></code>=2 step we would have <code class="docutils literal"><span class="pre">J</span></code> = 5+X, and then in the <code class="docutils literal"><span class="pre">I</span></code>=3 step we would have <code class="docutils literal"><span class="pre">J</span></code> = 6 + X + <code class="docutils literal"><span class="pre">K[3]</span></code>. If Y is the value of the first byte of the keystream, using <code class="docutils literal"><span class="pre">S[]</span></code> as of this point, then <code class="docutils literal"><span class="pre">K[3]</span></code> = Y − X − 6 (assuming that X is not -5 or -4, so that <code class="docutils literal"><span class="pre">S[0]</span></code> and <code class="docutils literal"><span class="pre">S[1]</span></code> are not changed in step 3).</p>
+<p><strong>If</strong> none of <code class="docutils literal"><span class="pre">S[0]</span></code>, <code class="docutils literal"><span class="pre">S[1]</span></code> and <code class="docutils literal"><span class="pre">S[3]]</span></code> are changed in the remaining 252 iterations, the value we predict here after three iterations – <em>eg</em> 15 –  would be the first byte of the actual keystream. Treating future selections of the value <code class="docutils literal"><span class="pre">J</span></code> as random, the probability that one iteration does <em>not</em> select <code class="docutils literal"><span class="pre">J</span></code> in the set {0,1,3} – and thus leaves these values alone – is 253/256. The probability that the remaining iterations do not change these values in <code class="docutils literal"><span class="pre">S[]</span></code> is thus about (253/256)<sup>252</sup> ≃ 5%</p>
+<p>A 5% success rate is not terribly impressive, on the face of it. But 5% of the time we identify <code class="docutils literal"><span class="pre">K[3]</span></code> correctly, and the other 95% of the time the (incorrect) values we calculate for <code class="docutils literal"><span class="pre">K[3]</span></code> are uniformly, randomly distributed in the range 0 to 255. With 60 guesses, we expect about three correct guesses. The other 57 are spread about with, most likely, no more than two guesses for any one value. If we look for the value guessed most often, it is likely to be the true value of <code class="docutils literal"><span class="pre">K[3]</span></code>; increasing the number of ⟨3,-1,X⟩ IVs will increase the certainty here.</p>
+<p>For the sake of completeness, in the next two iterations, <code class="docutils literal"><span class="pre">I</span></code> is 4 and 5 respectively, and <code class="docutils literal"><span class="pre">J</span></code> is 15+4+(-14) = 5 and 5+4+3=12 respectively. The corresponding contents of <code class="docutils literal"><span class="pre">S[]</span></code> are</p>
+<img alt="_images/wep_crack_5.svg" src="_images/wep_crack_5.svg" /><p>Now that we know <code class="docutils literal"><span class="pre">K[3]</span></code>, the next step is to find <code class="docutils literal"><span class="pre">K[4]</span></code>. Here, we search the traffic for IVs of the form ⟨4,-1,X⟩, but the general strategy above still works.</p>
+<p>The <a class="reference internal" href="bibliography.html#fms01" id="id46">[FMS01]</a> attack, as originally described, requires on average about 60 weak IVs for each secret key byte, and a weak IV turns up about every 2<sup>16</sup> packets. Each key byte, however, requires a different IV, so any one IV has one chance per key byte to be a weak IV. To guess a key thus requires 60×65536 ≃ 4 million packets.</p>
+<p>But we can do quite a bit better. In <a class="reference internal" href="bibliography.html#twp07" id="id47">[TWP07]</a>, the number of packets needed is only about 40,000 on average. At that point the attack is entirely practical.</p>
+<p>This vulnerability was used in the attack on TJX Corp mentioned in the opening section.</p>
+</div>
+</div>
+<div class="section" id="diffie-hellman-merkle-exchange">
+<span id="diffie-hellman"></span><span id="index-62"></span><h2>26.8&nbsp;&nbsp;&nbsp;Diffie-Hellman-Merkle Exchange<a class="headerlink" href="#diffie-hellman-merkle-exchange" title="Permalink to this headline">¶</a></h2>
+<p>How do two parties agree on a secret key K? They can meet face-to-face, but that can be expensive or even not possible. We would like to be able to encrypt, for example, online shopping transactions, which often occur at the spur of the moment.</p>
+<div class="sidebar">
+<p class="first sidebar-title">Diffie, Hellman and Merkle</p>
+<p class="last">Diffie and Hellman’s paper <a class="reference internal" href="bibliography.html#dh76" id="id48">[DH76]</a> appeared in 1976, but they reference Merkle’s later-published paper <a class="reference internal" href="bibliography.html#rm78" id="id49">[RM78]</a> as “submitted”. In <a class="reference internal" href="bibliography.html#mh04" id="id50">[MH04]</a>, Hellman suggested that the name of the key-exchange algorithm here should bear the names of all three contributors. The algorithm was apparently discovered in 1974 by <a class="reference external" href="http://en.wikipedia.org/wiki/Malcolm_J._Williamson">Malcolm Williamson</a> at <a class="reference external" href="http://www.gchq.gov.uk">GCHQ</a>, but Williamson’s work was classified.</p>
+</div>
+<p>One approach is to use public-key encryption, below, but that came two years later. The Diffie-Hellman-Merkle approach, from <a class="reference internal" href="bibliography.html#dh76" id="id51">[DH76]</a> and <a class="reference internal" href="bibliography.html#rm78" id="id52">[RM78]</a>, allows private key exchange without public keys.</p>
+<p>The goal here is for Alice and Bob to exchange information over a public network so that, at the end, Alice and Bob have determined a common key, and no eavesdropper can determine it without extraordinary computational effort.</p>
+<p>As a warmup, we begin with a simple example. Alice and Bob each choose a number; say Alice chooses 7 and Bob chooses 9. Alice sends to Bob the value A = 3<sup>7</sup> = 2187, and Bob sends to Alice the value B = 3<sup>9</sup> = 19683. Alice then computes B<sup>7</sup> = 3<sup>9×7</sup>, and Bob computes A<sup>7</sup> = 3<sup>7×9</sup>. If they each use 32-bit arithmetic, they have each arrived at 2111105451 (the exact value is 1144561273430837494885949696427).</p>
+<p>The catch here is that any intruder with a calculator can recover 7 from A and 9 from B, by factoring. But if we make the arithmetic a little more complicated, this becomes extremely difficult.</p>
+<p>In the actual protocol, Alice and Bob agree, publicly, on a large prime p (typically several hundred digits) and a small value g, discussed below. Alice then chooses a&lt;p, and sends to Bob the value A = g<sup>a</sup> mod p. Similarly, Bob chooses b&lt;p and sends to Alice the value B = g<sup>b</sup> mod p.</p>
+<p>As before, Alice and Bob now compute B<sup>a</sup> mod p and A<sup>b</sup> mod p, which both equal g<sup>a×b</sup> mod p. This becomes their shared secret, from which a key can be derived.</p>
+<p id="index-63">The question is whether an eavesdropper who knows A and B and g can compute a and b. This is the <strong>discrete logarithm problem</strong>, as in some mod-p sense a = log<sub>g</sub>(A). It is indeed believed to be computationally intractable, provided that the <em>order</em> of g – the smallest k&gt;0 such that g<sup>k</sup> = 1 modulo p, is large. In Diffie-Hellman-Merkle key exchange, g is a so-called <strong>primitive root</strong> modulo p, meaning that its order is p−1, the largest possible value. A naive attempt to compute a from A is to try each g<sup>i</sup> for i&lt;p  until one finds a match; this is much too slow to be practical.</p>
+<p id="index-64">There is some work involved in finding a suitable primitive root g given p, but that can be public, and is usually not <em>too</em> time-consuming; see the next section. Traditionally, reusing the same p and g was regarded as safe; in fact, popular (p,g) pairs for various lengths of p were published in <span class="target" id="index-65"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc2409.html"><strong>RFC 2409</strong></a> and <span class="target" id="index-66"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc3526.html"><strong>RFC 3526</strong></a>, and were (and still are) widely deployed. However, (p,g) reuse must be done with care; in particular, p must be large enough. Otherwise one may be vulnerable to the <strong>logjam</strong> attack described in <a class="reference internal" href="bibliography.html#abdghstvwz15" id="id53">[ABDGHSTVWZ15]</a>. For a fixed prime p, it turns out that relatively fast discrete-logarithm computation – that is, finding a from g<sup>a</sup>, modulo p – is possible if an attacker is able to pre-compute a very large table. For 512-bit primes, the average logarithm-calculation time in <a class="reference internal" href="bibliography.html#abdghstvwz15" id="id54">[ABDGHSTVWZ15]</a>, once the table was constructed, was 90 seconds. Time for calculation of the table itself took almost 10<sup>5</sup> core-hours, though that could be compressed into as little as one week with highly parallel hardware. By comparison, the authors were able to factor 512-bit RSA keys in about 5,000 core-hours; see <a class="reference internal" href="sec_crypto.html#factoring-times"><span class="std std-ref">26.1.2&nbsp;&nbsp;&nbsp;Factoring RSA Keys</span></a>.</p>
+<p>The authors of <a class="reference internal" href="bibliography.html#abdghstvwz15" id="id55">[ABDGHSTVWZ15]</a> conjecture that the <a class="reference external" href="https://www.nsa.gov/">NSA</a> has built such a table for some well-known (and commonly used) 1024-bit primes. However, for those with fewer computational resources, the logjam attack also includes strategies for forcing common server implementations to downgrade to the use of 512-bit primes using TLS implementation vulnerabilities; <em>cf</em> the POODLE attack (first sidebar at <span class="xref std std-ref">ssh and tls</span>).</p>
+<p id="index-67">The Diffie-Hellman-Merkle exchange is vulnerable to a <strong>man-in-the-middle attack</strong>, discussed in greater detail in <a class="reference internal" href="sec_crypto.html#trust"><span class="std std-ref">26.3&nbsp;&nbsp;&nbsp;Trust and the Man in the Middle</span></a>. If Mallory intercepts Alice’s g<sup>a</sup> and sends Bob his own g<sup>a’</sup>, and similarly intercepts Bob’s g<sup>b</sup> and replaces it with his own g<sup>b’</sup>, then the Alice–Mallory link will negotiate key g<sup>a×b’</sup> and the Mallory-Bob link will negotiate g<sup>a’×b</sup>. Mallory then remains in the middle, intercepting, decryping, re-encrypting and forwarding each message between Alice and Bob. The usual fix is for Alice and Bob to <em>sign</em> their g<sup>a</sup> and g<sup>b</sup>; see <a class="reference internal" href="sec_crypto.html#forward-secrecy"><span class="std std-ref">26.2&nbsp;&nbsp;&nbsp;Forward Secrecy</span></a>.</p>
+<div class="section" id="fast-arithmetic">
+<span id="arithmetic"></span><span id="index-68"></span><h3>26.8.1&nbsp;&nbsp;&nbsp;Fast Arithmetic<a class="headerlink" href="#fast-arithmetic" title="Permalink to this headline">¶</a></h3>
+<p>It is important to note that the basic arithmetic operations here – <em>eg</em> calculating g<sup>a</sup> mod p – can be done in <strong>polynomial</strong> time with respect to the number of binary digits in p, sometimes called the <strong>bit-length</strong> of p. This is not completely obvious, as the naive approach of multipying out g×g×…×g, a times, takes O(p) steps when a≃p, which is exponential with respect to the bit-length of p. The trick is to use repeated squaring: to compute g<sup>41</sup>, we note 41 = 101001 in binary, that is, 41 = 2<sup>5</sup> + 2<sup>3</sup> + 1, and so</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">g<sup>41</sup> = ((((g<sup>2</sup>)<sup>2</sup>)<sup>2</sup>)<sup>2</sup>)<sup>2</sup> × ((g<sup>2</sup>)<sup>2</sup>)<sup>2</sup> × g</div>
+</div>
+</div></blockquote>
+<p>A simple python3 implementation of this appears at <span class="xref std std-ref">an RSA key</span>.</p>
+<p id="index-69">It is also worth noting that even <em>finding</em> large primes is not obviously polynomial in the number of digits. We can, however, use fast <a class="reference external" href="http://en.wikipedia.org/wiki/Fermat_primality_test">probabilistic primality testing</a>, and note that the <a class="reference external" href="http://en.wikipedia.org/wiki/Prime_number_theorem">Prime Number Theorem</a> guarantees that the number of candidates we must test to find a prime near a given number n is O(log n).</p>
+<p>Finally, there is in general no fast algorithm for finding a primitive root g modulo p – a number such that g<sup>k</sup> = 1 mod p for k=p-1, but not for any smaller k. The straightforward approach involves factoring p-1, and in general factoring of large numbers is believed to be quite hard. However, finding primitive roots can be done for “special” primes, for example, primes p of the form p = 2q+1 for a second prime q. In this case, g&lt;p is a generator if g<sup>2</sup> ≠ 1 mod p and g<sup>q</sup> = -1 mod p. Such special primes are straightforward to find, usually by searching first for the prime q and then checking if 2q+1 is also prime. However, this process is often considered too slow to be performed on demand, as part of an interactive exchange; instead, p and g are calculated in advance.</p>
+</div>
+<div class="section" id="simultaneous-authentication-of-equals">
+<span id="sae"></span><span id="index-70"></span><h3>26.8.2&nbsp;&nbsp;&nbsp;Simultaneous Authentication of Equals<a class="headerlink" href="#simultaneous-authentication-of-equals" title="Permalink to this headline">¶</a></h3>
+<p>The Simultaneous Authentication of Equals protocol, or <strong>SAE</strong>, is an approach to <em>mutual</em> password authentication: each side has the password, and each side verifies to the other that it knows the password. Note that an exchange of passwords cannot achieve this. It can be compared to the WPA2 four-way handshake used in Wi-Fi, <a class="reference internal" href="wireless.html#wpa-four-way-handshake"><span class="std std-ref">4.2.5.1&nbsp;&nbsp;&nbsp;WPA2 Four-way handshake</span></a>; in fact, in the WPA3 standard SAE is partly replacing the four-way handshake. The SAE protocol was introduced in <a class="reference internal" href="bibliography.html#dh08" id="id57">[DH08]</a>; a later variant, known as Dragonfly, is described in <span class="target" id="index-71"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc7664.html"><strong>RFC 7664</strong></a>. The version used in WPA3 is defined in the IEEE standard 802.11-2016. All are essentially the same protocol, with later versions including various technical cryptographic refinements.</p>
+<p>A secondary outcome of SAE, beyond mutual authentication, is that each side generates a shared secret that can be used as an encryption key. In this sense, SAE acts as a key-exchange protocol; <em>cf</em> <a class="reference internal" href="#diffie-hellman"><span class="std std-ref">26.8&nbsp;&nbsp;&nbsp;Diffie-Hellman-Merkle Exchange</span></a>, and, in fact, parts of SAE strongly resemble Diffie-Hellman-Merkle key exchange.</p>
+<p>The SAE protocol will be presented here using arithmetic modulo a large prime number, although elliptic curves (sidebar at <a class="reference internal" href="sec_crypto.html#rsa"><span class="std std-ref">26.1&nbsp;&nbsp;&nbsp;RSA</span></a>) can also be used.</p>
+<p>Each side, Alice and Bob, initially knows a password, likely a string, and each side agrees on a large prime number p. Each side also agrees on a number g (known as the generator) such that the order of g modulo p – the smallest k&gt;0 such that g<sup>k</sup> = 1 modulo p – is large. For most purposes a primitive root modulo p would be sufficient, though <span class="target" id="index-72"></span><a class="rfc reference external" href="https://tools.ietf.org/html/rfc7664.html"><strong>RFC 7664</strong></a> (but not <a class="reference internal" href="bibliography.html#dh08" id="id58">[DH08]</a>) requires that the order of g modulo p be a large prime divisor q of p-1. (If p=2q+1 for prime q, then g can be the square of a primitive root modulo p.) The requirement that q be prime is not used in the analysis here.</p>
+<p>Each side initially determines, from the string-format password, a numeric value PW &lt; p. This starts with a hash of the password, modulo p, to create a seed value. PW is then calculated as seed<sup>(p−1)/q</sup> mod p. This ensures PW<sup>q</sup> mod p = 1.</p>
+<p>The authentication starts with each side choosing random values <code class="docutils literal"><span class="pre">rand</span></code> and <code class="docutils literal"><span class="pre">mask</span></code>, each less than the value of q. Alice’s values are <code class="docutils literal"><span class="pre">randA</span></code> and <code class="docutils literal"><span class="pre">maskA</span></code>, and likewise for Bob. Each side then computes the following:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal"><span class="pre">scal</span></code> = (<code class="docutils literal"><span class="pre">rand</span></code> + <code class="docutils literal"><span class="pre">mask</span></code>) mod q</div>
+<div class="line"><code class="docutils literal"><span class="pre">elem</span></code> = PW<sup>−mask</sup> mod p</div>
+</div>
+</div></blockquote>
+<p>The names here reflect the fact that <code class="docutils literal"><span class="pre">scal</span></code> is a scalar value, and <code class="docutils literal"><span class="pre">elem</span></code> is an element of the group generated by g, though for mod-p arithmetic this distinction is purely one of convention. The negative exponent in the second formula here refers to the multiplicative inverse mod p; PW<sup>−mask</sup> represents the (unique modulo p) number X such that X × PW<sup>mask</sup> mod p = 1.</p>
+<p>Let Alice’s <code class="docutils literal"><span class="pre">scal</span></code> and <code class="docutils literal"><span class="pre">elem</span></code> be denoted <code class="docutils literal"><span class="pre">scalA</span></code> and <code class="docutils literal"><span class="pre">elemA</span></code>, and Bob’s <code class="docutils literal"><span class="pre">scalB</span></code> and <code class="docutils literal"><span class="pre">elemB</span></code>. The first step of the protocol is for Alice and Bob to exchange their <code class="docutils literal"><span class="pre">scal</span></code> and <code class="docutils literal"><span class="pre">elem</span></code> values.</p>
+<p>One way to view this is that each side’s value of <code class="docutils literal"><span class="pre">rand</span></code> represents that side’s contribution to the key, and this value is hidden, or “masked”, with <code class="docutils literal"><span class="pre">mask</span></code>.</p>
+<p>Each side now computes a secret K as follows. Alice computes</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">K = (PW<sup>scalB</sup> × <code class="docutils literal"><span class="pre">elemB</span></code>)<sup>randA</sup> mod p</div>
+</div>
+</div></blockquote>
+<p>while Bob computes</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">K = (PW<sup>scalA</sup> × <code class="docutils literal"><span class="pre">elemA</span></code>)<sup>randB</sup> mod p</div>
+</div>
+</div></blockquote>
+<p>We now show these two values of K are in fact equal. Since <code class="docutils literal"><span class="pre">scal</span></code> = <code class="docutils literal"><span class="pre">rand+mask</span></code> mod q, we can find N so <code class="docutils literal"><span class="pre">scal</span></code> = <code class="docutils literal"><span class="pre">rand+mask+Nq</span></code> in ordinary integer arithmetic. We now start with Alice’s value of K:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">K = (PW<sup>scalB</sup> × elemB)<sup>randA</sup></div>
+<div class="line-block">
+<div class="line">= (PW<sup>(randB+maskB+Nq)</sup> × PW<sup>−maskB</sup>)<sup>randA</sup></div>
+<div class="line">= (PW<sup>randB</sup>)<sup>randA</sup> &nbsp; &nbsp; &nbsp; &nbsp;  (because PW<sup>q</sup> mod p = 1)</div>
+<div class="line">= PW<sup>randB × randA</sup></div>
+</div>
+</div>
+</div></blockquote>
+<p>This last value is the same for both Alice and Bob. For comparison with Diffie-Hellman-Merkle key exchange, note that there Alice and Bob both arrive at the same shared secret g<sup>a×b</sup>.</p>
+<p>The second, and final, step of the protocol involves an exchange of verification tokens. This is the password-verification step. Alice sends to Bob a value like the following, where Hash() is a suitable secure-hash function.</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">Hash(K⏜elemA⏜scalA⏜elemB⏜scalB)</div>
+</div>
+</div></blockquote>
+<p>Bob sends something similar. Alice and Bob have now each verified to the other that they knew the password. If Alice did not really know PW, and used an incorrect value instead, then she will get a different K, and Bob will know when the second-step tokens are exchanged.</p>
+<p>Perhaps more importantly, an attacker who eavesdrops on the Alice-Bob exchange obtains nothing of use; there is no known offline dictionary attack. In this, SAE is much more resistant to eavesdropping than, say, the WPA2 handshake used by Wi-Fi. The second SAE step is protected by a secure-hash function, and, for the first step, knowing <code class="docutils literal"><span class="pre">scal</span></code> and <code class="docutils literal"><span class="pre">elem</span></code> convey nothing about PW, in large part due to the difficulty of solving the discrete logarithm problem.</p>
+<p>The SAE protocol does require that Alice and Bob each keep a copy of the password cleartext, not a copy of the password hash. This seems unavoidable, given that Bob and Alice must each authenticate to one another.</p>
+</div>
+</div>
+<div class="section" id="exercises">
+<h2>26.9&nbsp;&nbsp;&nbsp;Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<p><em>Exercises are given fractional (floating point) numbers, to allow for interpolation of new exercises.</em></p>
+<p>1.0 Modify the netsploit.c program of <a class="reference internal" href="#the-exploit"><span class="std std-ref">26.2.2.3&nbsp;&nbsp;&nbsp;The exploit</span></a> so that the NOPslide is about 1024 bytes long, and the NOPslide and shellcode are now <em>above</em> the overwritten return address in memory.</p>
+<p>2.0 Disable ASLR on a Linux system by writing the appropriate value to /proc/sys/kernel/randomize_va_space. Now get the netsploit attack to work <em>without</em> having the attacked server print out a stack address. You <em>are</em> allowed beforehand to run a test copy of the server that prints its address.</p>
+<p>3.0 Below are a set of four possible TCP-segment reassembly rules. These rules (and more) appear in <a class="reference internal" href="bibliography.html#sp03" id="id59">[SP03]</a>. Recall that, once values for all positions j≤i are received, these values are acknowleged and released to the application; there must be some earlier “hole” for segments to be subject to reassembly at all.</p>
+<ol class="arabic simple">
+<li>Always accept the first value received for each position.</li>
+<li>Always accept the last value received for each position, up until the value is released to the application.</li>
+<li>[“BSD”] For each new segment, discard each position from that segment if that position was supplied by an earlier packet with a left edge less than or equal to that of the new packet. Values in any remaining positions replace any previously received values.</li>
+<li>[“Linux”] Same as the previous rule, except that we only discard positions that were supplied by an earlier packet with a left edge <em>strictly smaller</em> than that of the new packet.</li>
+</ol>
+<p>For each of the following two sets of packet arrivals, give the reassembled packet. Values in the same column have the same position. Reassembled packets will all begin with “daa” and “ebb” respectively.</p>
+<p>(a).</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>│ │a a a a a
+│ │    b b b b b b b
+│ │    c c c c
+│d│
+</pre></div>
+</div>
+<p>(b).</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>│ │    a a a a a
+│ │b b b b b
+│ │    c c c c c c
+│ │      d d d
+│e│
+</pre></div>
+</div>
+<p>4.0 Suppose a network intrusion-detection system is 10 hops from the attacker, but the target is 11 hops, behind one more router R. Outline a strategy of tweaking the TTL field so that the NIDS receives TCP stream “helpful” and the target receives “harmful”. Segments should either be disjoint or cover exactly the same range of bytes; you may assume that the target accepts the first segment for any given range of bytes.</p>
+<p>5.0 Suppose Alice encrypts blocks P1, P2 and P3 using CBC mode (<a class="reference internal" href="#cipher-modes"><span class="std std-ref">26.7.3&nbsp;&nbsp;&nbsp;Cipher Modes</span></a>). The initialization vector is C0. The encrypt and decrypt operations are E(P) = C and D(C) = P. We have</p>
+<ul class="simple">
+<li>C1 = E(C0 XOR P1)</li>
+<li>C2 = E(C1 XOR P2)</li>
+<li>C3 = E(C2 XOR P3)</li>
+</ul>
+<p>Suppose Mallory intercepts C2 in transit, and replaces it with C2’ = C2 XOR M; C1 and C3 are transmitted normally; that is, Bob receives [C1’,C2’,C3’] where C1’ = C1 and C3’ = C3. Bob now attempts to decrypt; C1’ decrypts normally to P1 while C2’ decrypts to gibberish.</p>
+<p>Show that C3’ decrypts to P3 XOR M. (This is sometimes used in attacks to flip a specific bit or byte, in cases where earlier gibberish does not matter.)</p>
+<p>6.0 Suppose Alice uses a block-based stream cipher (<a class="reference internal" href="#block-stream"><span class="std std-ref">26.7.5&nbsp;&nbsp;&nbsp;Block-cipher-based stream ciphers</span></a>); block i of the keystream is Ki and Ci = Ki XOR Pi. Alice sends C1, C2 and C3 as in the previous exercise, and Mallory again replaces C2 by C2 XOR M. What are the three plaintext blocks Bob deciphers?</p>
+<p>7.0 Show that if p and q are primes with p = 2q + 1, then g is a primitive root mod p if g≠1, g<sup>2</sup>≠1, and g<sup>q</sup>≠1. (This exercise requires familiarity with modular arithmetic and primitive roots.)</p>
+<p>8.0 Suppose we have a <em>short</em> message m, <em>eg</em> a bank PIN number. Alice wants to send message M to Bob that, without revealing m immediately, can be used later to verify that Alice knew m at the time M was sent. During this later verification, Alice may reveal m itself.</p>
+<p>(a). Suppose Alice simply sends M = hash(m). Explain how Bob can quickly recover m.</p>
+<p>(b). How can Alice construct M using a secure-hash function, avoiding the problem of (a)? Hint: as part of the later verification, Alice can supply additional information to Bob.</p>
+<p>9.0 In the example of <a class="reference internal" href="#wep-failure"><span class="std std-ref">26.7.7&nbsp;&nbsp;&nbsp;Wi-Fi WEP Encryption Failure</span></a>, suppose the IV is ⟨4,-1,5⟩ and the first two bytes of the key are ⟨10,20⟩. What is the first keystream byte <code class="docutils literal"><span class="pre">S[</span> <span class="pre">S[1]</span> <span class="pre">+</span> <span class="pre">S[S[1]]</span> <span class="pre">]</span></code>?</p>
+<p>10.0 Suppose Alice uses encryption exponent e=3 to three friends, Bob, Charlie and Deborah, with respective encryption moduli n<sub>B</sub>, n<sub>C</sub> and n<sub>D</sub>, all of which are relatively prime. Alice sends message m to each, encrypted as</p>
+<ul class="simple">
+<li>C<sub>B</sub> = m<sup>3</sup> mod n<sub>B</sub></li>
+<li>C<sub>C</sub> = m<sup>3</sup> mod n<sub>C</sub></li>
+<li>C<sub>D</sub> = m<sup>3</sup> mod n<sub>D</sub></li>
+</ul>
+<p>If Mallory intercepts all three encrypted messages, explain how he can efficiently decrypt m. Hint: the Chinese Remainder Theorem implies that Mallory can find C &lt; n<sub>B</sub>n<sub>C</sub>n<sub>D</sub> such that</p>
+<ul class="simple">
+<li>C = C<sub>B</sub>  mod n<sub>B</sub></li>
+<li>C = C<sub>C</sub>  mod n<sub>C</sub></li>
+<li>C = C<sub>D</sub>  mod n<sub>D</sub></li>
+</ul>
+<p>(One simple way to avoid this risk is for Alice to include a timestamp and the recipient’s name in each message, ensuring that she never sends exactly the same message twice.)</p>
+<p>11.0 Repeat the key-creation of <span class="xref std std-ref">an RSA key</span> using a 110-bit key. Extract the modulus from the key file, convert it to decimal, and attempt to factor it. Can you do the factoring in under a minute?</p>
+<p>12.0 Below are a series of public RSA keys and encrypted messages; the encrypted message is c and the modulus is n=pq. In each case, find the original message, using the methods of <a class="reference internal" href="sec_crypto.html#breaking-the-key"><span class="std std-ref">26.13&nbsp;&nbsp;&nbsp;Breaking the key</span></a>; you will have to factor n and then find d. For some keys, the Gnu/Linux <code class="docutils literal"><span class="pre">factor</span></code> command will be sufficient; for the larger keys consider <a class="reference external" href="http://sourceforge.net/projects/msieve/">msieve</a> or some other fast factorer.</p>
+<p>Each number below is in decimal. The encryption exponent e is always 65537; the encryption is c = power(message,e,n). Each message is an ASCII string; that is, after the numeric message is converted to a string, the byte values are each in the range 32-127. The following Python function may be useful in converting numeric messages to strings:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">int2ascii</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">n</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span> <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">int2ascii</span><span class="p">(</span><span class="n">n</span> <span class="o">//</span> <span class="mi">256</span><span class="p">)</span> <span class="o">+</span> <span class="nb">chr</span><span class="p">(</span><span class="n">n</span> <span class="o">%</span> <span class="mi">256</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line">(a) [64 bits] c=13467824835325843134</div>
+<div class="line-block">
+<div class="line">n=15733922878520524621</div>
+</div>
+</div>
+<div class="line-block">
+<div class="line">(b) [96 bits] c=8007751471156136764029275727</div>
+<div class="line-block">
+<div class="line">n=57644199986835279860947893727</div>
+</div>
+</div>
+<div class="line-block">
+<div class="line">(c) [104 bits] c=6642328489179330732282037747645</div>
+<div class="line-block">
+<div class="line">n=17058317327334907783258193953123</div>
+</div>
+</div>
+<div class="line-block">
+<div class="line">(d) [127 bits] c=95651949760509273124353927897611145475</div>
+<div class="line-block">
+<div class="line">n=122096824047754908887766043915630626757</div>
+<div class="line">Limit for Gnu/Linux <code class="docutils literal"><span class="pre">factor</span></code> without the <a class="reference external" href="https://gmplib.org/">GMP library</a></div>
+</div>
+</div>
+<div class="line-block">
+<div class="line">(e) [185 bits] c=14898070767615435522751082309577192810119252877170446296</div>
+<div class="line-block">
+<div class="line">n=36881105206579952723396854897336450502002018818436622611</div>
+</div>
+</div>
+<div class="line-block">
+<div class="line">(f) [210 bits] c=1030865591241775131254813948981782525587720826169501849049177362</div>
+<div class="line-block">
+<div class="line">n=1089313781487492651628882855744766776820791642308868127824231021</div>
+</div>
+</div>
+<div class="line-block">
+<div class="line">(g) [280 bits]</div>
+<div class="line">c=961792929180423930042975913300802531765775361218349440433358416557620430721970697783</div>
+<div class="line">n=1265365011260907658483984328995361695181000868013851878620685943648084220336740539017</div>
+</div>
+<div class="line-block">
+<div class="line">(h) [304 bits]</div>
+<div class="line">c=17860252858059565448950681133486824440185752167054796213786228492658586864179401029486173539</div>
+<div class="line-block">
+<div class="line">n=26294146550372428669569992924076340150116542153388301312743129088600749884420889043685502979</div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="sec_crypto.html" title="26   Public-Key Encryption"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="netmgmtb.html" title="25   Network Management and SNMP"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">An Introduction to Computer Networks, edition 1.9.12</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015, Peter L Dordal.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+    </div>
+  </body>
+</html>

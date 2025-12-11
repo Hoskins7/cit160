@@ -1,0 +1,885 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>3   Other LANs &mdash; An Introduction to Computer Networks, edition 1.8.03</title>
+    
+    <link rel="stylesheet" href="_static/csbnetbook.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.8.03',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/rightsidebar.js"></script>
+    <link rel="top" title="An Introduction to Computer Networks, edition 1.8.03" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="index.html">An Introduction to Computer Networks, edition 1.8.03</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">3&nbsp;&nbsp;&nbsp;Other LANs</a><ul>
+<li><a class="reference internal" href="#virtual-private-network">3.1&nbsp;&nbsp;&nbsp;Virtual Private Network</a></li>
+<li><a class="reference internal" href="#carrier-ethernet">3.2&nbsp;&nbsp;&nbsp;Carrier Ethernet</a></li>
+<li><a class="reference internal" href="#token-ring">3.3&nbsp;&nbsp;&nbsp;Token Ring</a></li>
+<li><a class="reference internal" href="#virtual-circuits">3.4&nbsp;&nbsp;&nbsp;Virtual Circuits</a></li>
+<li><a class="reference internal" href="#asynchronous-transfer-mode-atm">3.5&nbsp;&nbsp;&nbsp;Asynchronous Transfer Mode: ATM</a><ul>
+<li><a class="reference internal" href="#atm-segmentation-and-reassembly">3.5.1&nbsp;&nbsp;&nbsp;ATM Segmentation and Reassembly</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#wi-fi">3.6&nbsp;&nbsp;&nbsp;Wi-Fi</a><ul>
+<li><a class="reference internal" href="#multiple-spatial-streams">3.6.1&nbsp;&nbsp;&nbsp;Multiple Spatial Streams</a></li>
+<li><a class="reference internal" href="#wi-fi-and-collisions">3.6.2&nbsp;&nbsp;&nbsp;Wi-Fi and Collisions</a><ul>
+<li><a class="reference internal" href="#wi-fi-rts-cts">3.6.2.1&nbsp;&nbsp;&nbsp;Wi-Fi RTS/CTS</a></li>
+<li><a class="reference internal" href="#hidden-node-problem">3.6.2.2&nbsp;&nbsp;&nbsp;Hidden-Node Problem</a></li>
+<li><a class="reference internal" href="#wi-fi-fragmentation">3.6.2.3&nbsp;&nbsp;&nbsp;Wi-Fi Fragmentation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dynamic-rate-scaling">3.6.3&nbsp;&nbsp;&nbsp;Dynamic Rate Scaling</a></li>
+<li><a class="reference internal" href="#wi-fi-configurations">3.6.4&nbsp;&nbsp;&nbsp;Wi-Fi Configurations</a></li>
+<li><a class="reference internal" href="#wi-fi-roaming">3.6.5&nbsp;&nbsp;&nbsp;Wi-Fi Roaming</a></li>
+<li><a class="reference internal" href="#wi-fi-security">3.6.6&nbsp;&nbsp;&nbsp;Wi-Fi Security</a></li>
+<li><a class="reference internal" href="#wi-fi-polling-mode">3.6.7&nbsp;&nbsp;&nbsp;Wi-Fi Polling Mode</a></li>
+<li><a class="reference internal" href="#manets">3.6.8&nbsp;&nbsp;&nbsp;MANETs</a><ul>
+<li><a class="reference internal" href="#routing-in-manets">3.6.8.1&nbsp;&nbsp;&nbsp;Routing in MANETs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#wimax">3.7&nbsp;&nbsp;&nbsp;WiMAX</a></li>
+<li><a class="reference internal" href="#fixed-wireless">3.8&nbsp;&nbsp;&nbsp;Fixed Wireless</a><ul>
+<li><a class="reference internal" href="#terrestrial-wireless">3.8.1&nbsp;&nbsp;&nbsp;Terrestrial Wireless</a></li>
+<li><a class="reference internal" href="#satellite-internet">3.8.2&nbsp;&nbsp;&nbsp;Satellite Internet</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#epilog">3.9&nbsp;&nbsp;&nbsp;Epilog</a></li>
+<li><a class="reference internal" href="#exercises">3.10&nbsp;&nbsp;&nbsp;Exercises</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="other-lans">
+<span id="id1"></span><h1>3&nbsp;&nbsp;&nbsp;Other LANs<a class="headerlink" href="#other-lans" title="Permalink to this headline">¶</a></h1>
+<p>In the wired era, one could get along quite well with nothing but Ethernet and the occasional long-haul point-to-point link joining different sites. However, there are important alternatives out there. Some, like token ring, are mostly of historical importance; others, like virtual circuits, are of great conceptual importance but &#8211; so far &#8211; of only modest day-to-day significance.</p>
+<p>And then there is wireless. It would be difficult to imagine contemporary laptop networking, let alone mobile devices, without it. In both homes and offices, Wi-Fi connectivity is the norm. Mobile networking is ubiquitous. A return to being tethered by wires is almost unthinkable.</p>
+<div class="section" id="virtual-private-network">
+<span id="vpn"></span><span id="index-0"></span><h2>3.1&nbsp;&nbsp;&nbsp;Virtual Private Network<a class="headerlink" href="#virtual-private-network" title="Permalink to this headline">¶</a></h2>
+<p>Suppose you want to connect to your workplace network from home. Your workplace, however, has a security policy that does not allow &#8220;outside&#8221; IP addresses to access essential internal resources. How do you proceed, without leasing a dedicated telecommunications line to your workplace?</p>
+<p id="index-1">A virtual private network, or <strong>VPN</strong>, provides a solution; it supports creation of <strong>virtual links</strong> that join far-flung nodes via the Internet. Your home computer creates an ordinary Internet connection (TCP or UDP) to a workplace <strong>VPN server</strong> (IP-layer packet encapsulation can also be used, and avoids the timeout problems sometimes created by sending TCP packets within another TCP stream; see <a class="reference internal" href="ipv4.html#mobile-ip"><em>7.12&nbsp;&nbsp;&nbsp;Mobile IP</em></a>). Each end of the connection is associated with a software-created <strong>virtual network interface</strong>; each of the two virtual interfaces is assigned an IP address. When a packet is to be sent along the virtual link, it is actually encapsulated and sent along the original Internet connection to the VPN server, wending its way through the commodity Internet; this process is called <strong>tunneling</strong>. To all intents and purposes, the virtual link behaves like any other physical link.</p>
+<p>Tunneled packets are often encrypted as well as encapsulated, though that is a separate issue. One relatively easy-to-implement example of a tunneling mechanism is to treat a TCP home-workplace connection as a serial line and send packets over it back-to-back, using PPP with HDLC; see <a class="reference internal" href="links.html#hdlc"><em>4.1.5.1&nbsp;&nbsp;&nbsp;HDLC</em></a> and <span class="target" id="index-2"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc1661.html"><strong>RFC 1661</strong></a> (though this can lead to the above-mentioned TCP-in-TCP timeout problems).</p>
+<p>At the workplace side, the virtual network interface in the VPN server is attached to a router or switch; at the home user&#8217;s end, the virtual network interface can now be assigned an <em>internal</em> workplace IP address. The home computer is now, for all intents and purposes, part of the internal workplace network.</p>
+<p>In the diagram below, the user&#8217;s regular Internet connection is via hardware interface <tt class="docutils literal"><span class="pre">eth0</span></tt>. A connection is established to Site A&#8217;s VPN server; a virtual interface <tt class="docutils literal"><span class="pre">tun0</span></tt> is created on the user&#8217;s machine which appears to be a direct link to the VPN server. The <tt class="docutils literal"><span class="pre">tun0</span></tt> interface is assigned a Site-A IP address. Packets sent via the <tt class="docutils literal"><span class="pre">tun0</span></tt> interface in fact travel over the original connection via <tt class="docutils literal"><span class="pre">eth0</span></tt> and the Internet.</p>
+<img alt="_images/vpn.png" src="_images/vpn.png" />
+<p>After the VPN is set up, the home host&#8217;s <tt class="docutils literal"><span class="pre">tun0</span></tt> interface appears to be locally connected to Site A, and thus the home host is allowed to connect to the private area within Site A. The home host&#8217;s forwarding table will be configured so that traffic to Site A&#8217;s private addresses is routed via interface <tt class="docutils literal"><span class="pre">tun0</span></tt>.</p>
+<p>VPNs are also commonly used to connect entire remote offices to headquarters. In this case the remote-office end of the tunnel will be at that office&#8217;s local router, and the tunnel will carry traffic for all the workstations in the remote office.</p>
+<p id="index-3">To improve security, it is common for the residential (or remote-office) end of the VPN connection to use the VPN connection as the default route for all traffic <em>except</em> that needed to maintain the VPN itself. This may require a so-called <strong>host-specific</strong> forwarding-table entry at the residential end to allow the packets that carry the VPN tunnel traffic to be routed correctly via <tt class="docutils literal"><span class="pre">eth0</span></tt>. This routing strategy means that potential intruders cannot access the residential host &#8211; and thus the workplace internal network &#8211; through the original residential Internet access. A consequence is that if the home worker downloads a large file from a non-workplace site, it will travel first to the workplace, then back out to the Internet via the VPN connection, and finally arrive at the home.</p>
+</div>
+<div class="section" id="carrier-ethernet">
+<span id="index-4"></span><span id="id2"></span><h2>3.2&nbsp;&nbsp;&nbsp;Carrier Ethernet<a class="headerlink" href="#carrier-ethernet" title="Permalink to this headline">¶</a></h2>
+<p>Carrier Ethernet is a leased-line point-to-point link between two sites, where the subscriber interface at each end of the line looks like Ethernet (in some flavor). The physical path in between sites, however, need not have anything to do with Ethernet; it may be implemented however the carrier wishes. In particular, it will be (or at least appear to be) full-duplex, it will be collision-free, and its length may far exceed the maximum permitted by any IEEE Ethernet standard.</p>
+<p>Bandwidth can be purchased in whatever increments the carrier has implemented. The point of carrier Ethernet is to provide a layflooder of abstraction between the customers, who need only install a commodity Ethernet interface, and the provider, who can upgrade the link implementation at will without requiring change at the customer end.</p>
+<p>In a sense, carrier Ethernet is similar to the widespread practice of provisioning residential DSL and cable routers with an Ethernet interface for customer interconnection; again, the actual link technologies may not look anything like Ethernet, but the interface will.</p>
+<p>A carrier Ethernet connection looks like a virtual VPN link, but runs on top of the provider&#8217;s internal network rather than the Internet at large. Carrier Ethernet connections often provide the primary Internet connectivity for one endpoint, unlike Internet VPNs which assume both endpoints already have full Internet connectivity.</p>
+</div>
+<div class="section" id="token-ring">
+<span id="index-5"></span><span id="id3"></span><h2>3.3&nbsp;&nbsp;&nbsp;Token Ring<a class="headerlink" href="#token-ring" title="Permalink to this headline">¶</a></h2>
+<p>A significant part of the previous chapter was devoted to classic Ethernet&#8217;s collision mechanism for supporting shared media access. After that, it may come as a surprise that there is a simple multiple-access mechanism that is not only <strong>collision-free</strong>, but which supports <strong>fairness</strong> in the sense that if N stations wish to send then each will receive 1/N of the opportunities.</p>
+<p>That method is <strong>Token Ring</strong>. Actual implementations come in several forms, from Fiber-Distributed Data Interface (FDDI) to so-called &#8220;IBM Token Ring&#8221;. The central idea is that stations are connected in a ring:</p>
+<img alt="_images/tokenring.png" src="_images/tokenring.png" />
+<p>Packets will be transmitted in one direction (clockwise in the ring above). Stations in effect forward most packets around the ring, although they can also remove a packet. (It is perhaps more accurate to think of the forwarding as representing the default cable connectivity; <em>non</em>-forwarding represents the station&#8217;s momentarily breaking that connectivity.)</p>
+<p>When the network is idle, all stations agree to forward a special, small packet known as a <em>token</em>. When a station, say A, wishes to transmit, it must first wait for the token to arrive at A. Instead of forwarding the token, A then transmits its own packet; this travels around the network and is then removed by A. At that point (or in some cases at the point when A finishes transmitting its data packet) A then forwards the token.</p>
+<p>In a small ring network, the ring circumference may be a small fraction of one packet. Ring networks become &#8220;large&#8221; at the point when some packets may be entirely in transit on the ring. Slightly different solutions apply in each case. (It is also possible that the physical ring exists only within the token-ring switch, and that stations are connected to that switch using the usual point-to-point wiring.)</p>
+<p>If all stations have packets to send, then we will have something like the following:</p>
+<ul class="simple">
+<li>A waits for the token</li>
+<li>A sends a packet</li>
+<li>A sends the token to B</li>
+<li>B sends a packet</li>
+<li>B sends the token to C</li>
+<li>C sends a packet</li>
+<li>C sends the token to D</li>
+<li>...</li>
+</ul>
+<p>All stations get an equal number of chances to transmit, and no bandwidth is wasted on collisions. (A station constantly sending smaller packets will send the same number of packets as a station constantly sending larger packets, but the bandwidth will be smaller in proportion to the smaller packet size.)</p>
+<p>One problem with token ring is that when stations are powered off it is <em>essential</em> that the packets continue forwarding; this is usually addressed by having the default circuit configuration be to keep the loop closed. Another issue is that some station has to watch out in case the token disappears, or in case a duplicate token appears.</p>
+<p>Because of fairness and the lack of collisions, IBM Token Ring was once considered to be the premium LAN mechanism. As such, a premium price was charged (there was also the matter of licensing fees). But due to a combination of lower hardware costs and higher bitrates (even taking collisions into account), Ethernet eventually won out.</p>
+<p id="index-6">There was also a much earlier collision-free hybrid of 10 Mbps Ethernet and Token Ring known as <strong>Token Bus</strong>: an Ethernet physical network (often linear) was used with a token-ring-like protocol layer above that. Stations were physically connected to the (linear) Ethernet but were assigned identifiers that logically arranged them in a (virtual) ring. Each station had to wait for the token and only then could transmit a packet; after that it would send the token on to the next station in the virtual ring. As with &#8220;real&#8221; Token Ring, some mechanisms need to be in place to monitor for token loss.</p>
+<p>Token Bus Ethernet never caught on. The additional software complexity was no doubt part of the problem, but perhaps the real issue was that it was not necessary.</p>
+</div>
+<div class="section" id="virtual-circuits">
+<span id="index-7"></span><span id="id4"></span><h2>3.4&nbsp;&nbsp;&nbsp;Virtual Circuits<a class="headerlink" href="#virtual-circuits" title="Permalink to this headline">¶</a></h2>
+<p>Before we can get to our final LAN example, ATM, we need to detour briefly through virtual circuits.</p>
+<p>Virtual circuits are <a class="reference external" href="http://www.bartleby.com/119/1.html">The Road Not Taken</a> by IP.</p>
+<p>Virtual-circuit switching is an alternative to datagram switching, which was introduced in Chapter 1. In datagram switching, routers know the next_hop to each destination, and packets are addressed by <em>destination</em>. In virtual-circuit switching, routers know about end-to-end <em>connections</em>, and packets are &#8220;addressed&#8221; by a connection ID.</p>
+<p id="index-8">Before any packets can be sent, a connection needs to be established first. For that
+connection, the route is computed and then each link along the path is assigned a connection ID, traditionally called the <strong>VCI</strong>, for Virtual Circuit Identifier.
+In most cases, VCIs are only <em>locally</em> unique; that is, the same connection may use a different VCI on each link.
+The lack of global uniqueness makes VCI allocation much simpler. Although the VCI keeps changing along a path, the VCI can still be thought of as identifying the connection.
+To send a packet, the host marks the packet with the VCI assigned to the host&#8211;router1 link.</p>
+<p id="index-9">Packets arrive at (and depart from) switches via one of several <strong>ports</strong>, which we
+will assume are numbered beginning at 0. Switches maintain a <strong>connection table</strong> indexed by ⟨VCI,port⟩ pairs; unlike a forwarding table, the connection table has a record of every connection through that switch at that particular moment. As a packet arrives, its inbound
+VCI<sub>in</sub> and inbound port<sub>in</sub> are looked up in this table; this yields an outbound ⟨VCI<sub>out</sub>,port<sub>out</sub>⟩ pair. The VCI field of the packet is then <em>rewritten</em> to VCI<sub>out</sub>, and the packet is sent via port<sub>out</sub>.</p>
+<p>Note that typically there is no source address information included in the packet (although the sender can be identified from the connection, which can be identified from the VCI at any point along the connection). Packets are identified by connection, not destination. Any node along the path (including the endpoints) can in principle look up the connection and figure out the endpoints.</p>
+<p>Note also that each switch must rewrite the VCI. Datagram switches never rewrite addresses (though they do update hopcount/TTL fields). The advantage to this rewriting is that VCIs need be unique only for a given link, greatly simplifying the naming. Datagram switches also do not make use of a packet&#8217;s arrival interface.</p>
+<p>As an example, consider the network below. Switch ports are numbered 0,1,2,3. Two paths are drawn in, one from A to F in red and one from B to D in green; each link is labeled with its VCI number in the same color.</p>
+<div class="figure">
+<img alt="_images/virtualcircuit.png" src="_images/virtualcircuit.png" />
+</div>
+<p>We will construct virtual-circuit connections between</p>
+<ul class="simple">
+<li>A and F (shown above in red)</li>
+<li>A and E</li>
+<li>A and C</li>
+<li>B and D (shown above in green)</li>
+<li>A and F again (a separate connection)</li>
+</ul>
+<p>The following VCIs have been chosen for these connections. The choices are made more or less randomly here, but in accordance with the requirement that they be unique to each link. Because links are generally taken to be bidirectional, a VCI used from S1 to
+S3 cannot be reused from S3 to S1 until the first connection closes.</p>
+<ul class="simple">
+<li>A to F: A──4──S1──6──S2──4──S4──8──S5──5──F; this path goes from S1 to S4 via S2</li>
+<li>A to E: A──5──S1──6──S3──3──S4──8──E; this path goes, for no particular reason, from S1 to S4 via S3, the opposite corner of the square</li>
+<li>A to C: A──6──S1──7──S3──3──C</li>
+<li>B to D: B──4──S3──8──S1──7──S2──8──D</li>
+<li>A to F: A──7──S1──8──S2──5──S4──9──S5──2──F</li>
+</ul>
+<p>One may verify that on any one link no two different paths use the same VCI.</p>
+<p>We now construct the actual ⟨VCI,port⟩ tables for the switches S1-S4, from the above; the table for S5 is left as an exercise. Note that either the ⟨VCI<sub>in</sub>,port<sub>in</sub>⟩ or
+the ⟨VCI<sub>out</sub>,port<sub>out</sub>⟩ can be used as the key; we cannot have the same pair in both the in columns and the out columns. It may help to display the port numbers for each switch, as in the upper numbers in following diagram of the above red connection from A to F (lower numbers are the VCIs):</p>
+<img alt="_images/linear_circuit.png" src="_images/linear_circuit.png" />
+<p>Switch <strong>S1</strong>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="21%" />
+<col width="21%" />
+<col width="22%" />
+<col width="17%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">VCI<sub>in</sub></th>
+<th class="head">port<sub>in</sub></th>
+<th class="head">VCI<sub>out</sub></th>
+<th class="head">port<sub>out</sub></th>
+<th class="head">connection</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>4</td>
+<td>0</td>
+<td>6</td>
+<td>2</td>
+<td>A⟶F #1</td>
+</tr>
+<tr class="row-odd"><td>5</td>
+<td>0</td>
+<td>6</td>
+<td>1</td>
+<td>A⟶E</td>
+</tr>
+<tr class="row-even"><td>6</td>
+<td>0</td>
+<td>7</td>
+<td>1</td>
+<td>A⟶C</td>
+</tr>
+<tr class="row-odd"><td>8</td>
+<td>1</td>
+<td>7</td>
+<td>2</td>
+<td>B⟶D</td>
+</tr>
+<tr class="row-even"><td>7</td>
+<td>0</td>
+<td>8</td>
+<td>2</td>
+<td>A⟶F #2</td>
+</tr>
+</tbody>
+</table>
+<p>Switch <strong>S2</strong>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="21%" />
+<col width="21%" />
+<col width="22%" />
+<col width="17%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">VCI<sub>in</sub></th>
+<th class="head">port<sub>in</sub></th>
+<th class="head">VCI<sub>out</sub></th>
+<th class="head">port<sub>out</sub></th>
+<th class="head">connection</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>6</td>
+<td>0</td>
+<td>4</td>
+<td>1</td>
+<td>A⟶F #1</td>
+</tr>
+<tr class="row-odd"><td>7</td>
+<td>0</td>
+<td>8</td>
+<td>2</td>
+<td>B⟶D</td>
+</tr>
+<tr class="row-even"><td>8</td>
+<td>0</td>
+<td>5</td>
+<td>1</td>
+<td>A⟶F #2</td>
+</tr>
+</tbody>
+</table>
+<p>Switch <strong>S3</strong>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="21%" />
+<col width="21%" />
+<col width="22%" />
+<col width="17%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">VCI<sub>in</sub></th>
+<th class="head">port<sub>in</sub></th>
+<th class="head">VCI<sub>out</sub></th>
+<th class="head">port<sub>out</sub></th>
+<th class="head">connection</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>6</td>
+<td>3</td>
+<td>3</td>
+<td>2</td>
+<td>A⟶E</td>
+</tr>
+<tr class="row-odd"><td>7</td>
+<td>3</td>
+<td>3</td>
+<td>1</td>
+<td>A⟶C</td>
+</tr>
+<tr class="row-even"><td>4</td>
+<td>0</td>
+<td>8</td>
+<td>3</td>
+<td>B⟶D</td>
+</tr>
+</tbody>
+</table>
+<p>Switch <strong>S4</strong>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="21%" />
+<col width="21%" />
+<col width="22%" />
+<col width="17%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">VCI<sub>in</sub></th>
+<th class="head">port<sub>in</sub></th>
+<th class="head">VCI<sub>out</sub></th>
+<th class="head">port<sub>out</sub></th>
+<th class="head">connection</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>4</td>
+<td>3</td>
+<td>8</td>
+<td>2</td>
+<td>A⟶F #1</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td>0</td>
+<td>8</td>
+<td>1</td>
+<td>A⟶E</td>
+</tr>
+<tr class="row-even"><td>5</td>
+<td>3</td>
+<td>9</td>
+<td>2</td>
+<td>A⟶F #2</td>
+</tr>
+</tbody>
+</table>
+<p>The namespace for VCIs is small, and compact (<em>eg</em> contiguous).
+Typically the VCI and port bitfields can be concatenated to produce
+a ⟨VCI,Port⟩ composite value small enough that it is suitable for use as an array index. VCIs work best as <em>local</em> identifiers. IP addresses, on the other hand, need to be globally unique, and thus are often rather sparsely distributed.</p>
+<p>Virtual-circuit switching offers the following advantages:</p>
+<ul class="simple">
+<li>connections can get quality-of-service guarantees, because the switches are aware of connections and can reserve capacity at the time the connection is made</li>
+<li>headers are smaller, allowing faster throughput</li>
+<li>headers are small enough to allow efficient support for the very small packet sizes that are optimal for voice connections. ATM packets, for instance, have 48 bytes of data; see below.</li>
+</ul>
+<p>Datagram forwarding, on the other hand, offers these advantages:</p>
+<ul class="simple">
+<li>Routers have less state information to manage.</li>
+<li>Router crashes and partial connection state loss are not a problem.</li>
+<li>If a router or link is disabled, rerouting is easy and does not affect any connection state. (As mentioned in Chapter 1, this was Paul Baran&#8217;s primary concern in his 1962 paper introducing packet switching.)</li>
+<li>Per-connection billing is very difficult.</li>
+</ul>
+<p>The last point above may once have been quite important; in the era when the ARPANET was being developed, typical daytime long-distance rates were on the order of $1/minute. It is unlikely that early TCP/IP protocol development would have been as fertile as it was had participants needed to justify per-minute billing costs for every project.</p>
+<p>It is certainly possible to do virtual-circuit switching with globally unique VCIs &#8211; say the concatenation of source and destination IP addresses and port numbers. The IP-based RSVP protocol (<a class="reference internal" href="realtime.html#rsvp"><em>19.6&nbsp;&nbsp;&nbsp;RSVP</em></a>) does exactly this. However, the fast-lookup and small-header advantages of a compact namespace are then lost.</p>
+<p>Note that virtual-circuit switching does <em>not</em> suffer from the problem of idle channels still consuming resources, which is an issue with circuits using time-division multiplexing (<em>eg</em> shared T1 lines)</p>
+</div>
+<div class="section" id="asynchronous-transfer-mode-atm">
+<span id="atm"></span><span id="index-10"></span><h2>3.5&nbsp;&nbsp;&nbsp;Asynchronous Transfer Mode: ATM<a class="headerlink" href="#asynchronous-transfer-mode-atm" title="Permalink to this headline">¶</a></h2>
+<p>ATM is a network mechanism intended to accommodate real-time traffic as well as bulk data transfer. We present ATM here as a LAN layer, for which it is still sometimes used, but it was originally proposed as a replacement for the IP layer as well, and, to an extent, the Transport layer. These broader plans were not greeted with universal enthusiasm within the IETF. When used as a LAN layer, IP packets are transmitted over ATM as in <a class="reference internal" href="#atm-sar"><em>3.5.1&nbsp;&nbsp;&nbsp;ATM Segmentation and Reassembly</em></a>.</p>
+<p>A distinctive feature of ATM is its small packet size. ATM has its roots in the telephone industry, and was therefore particularly intended to support voice. A significant source of delay in voice traffic is the packet <strong>fill time</strong>: at DS0 speeds (64 Kbps), voice data accumulates at 8 bytes/ms. If we are sending 1KB packets, this means voice is delayed by about 1/8 second, meaning in turn that when one person stops speaking, the earliest they can hear the other&#8217;s response is 1/4 second later. Slightly smaller levels of voice delay can introduce an annoying echo. Smaller packets reduce the fill time and thus the delay: when voice is sent over IP (VoIP), one common method is to send 160 bytes every 20 ms.</p>
+<p>ATM took this small-packet strategy even further: packets have 48 bytes of data, plus 5 bytes of header. Such small packets are often called <em>cells</em>. To manage such a small header, virtual-circuit routing is a necessity. IP packets of such small size would likely consume more than 50% of the bandwidth on headers, if the LAN header were included.</p>
+<p>Aside from reduced voice fill-time, other benefits to small cells are reduced store-and-forward delay and minimal queuing delay, at least for high-priority traffic. Prioritizing traffic and giving precedence to high-priority traffic is standard, but high-priority traffic is never allowed to <em>interrupt</em> transmission already begun of a low-priority packet. If you have a high-priority voice cell, and someone else has a 1500-byte packet just started, your cell has to wait about 30 cell times, because 1500 bytes is about 30 cells. However, if their low-priority traffic is instead made up of 30 cells, you have only to wait for their first cell to finish; the delay is 1/30 as much.</p>
+<p>ATM also made the decision to require <strong>fixed-size</strong> cells. The penalty for one partially used cell among many is small. Having a fixed cell size simplifies hardware design, and, in theory, allows it easier to design for parallelism.</p>
+<p>Unfortunately, ATM also chose to mandate <strong>no cell reordering</strong>. This means cells can use a smaller sequence-number field, but also makes parallel switches much harder to build. A typical parallel switch design might involve forwarding incoming cells to any of several input queues; the queues would then handle the VCI lookups in parallel and forward the cells to the appropriate output queues. With such an architecture, avoiding reordering is difficult. It is not clear to what extent the no-reordering decision was related to the later decline of ATM in the marketplace.</p>
+<p id="index-11">ATM cells have 48 bytes of data and a 5-byte header. The header contains up to 28 bits of VCI information, three &#8220;type&#8221; bits, one <strong>cell-loss priority</strong>, or CLP, bit, and an 8-bit checksum over the header only. The VCI is divided into 8-12 bits of Virtual Path Identifier and 16 bits of Virtual Channel Identifier, the latter supposedly for customer use to separate out multiple connections between two endpoints. Forwarding is by full switching only, and there is no mechanism for physical (LAN) broadcast.</p>
+<div class="section" id="atm-segmentation-and-reassembly">
+<span id="atm-sar"></span><h3>3.5.1&nbsp;&nbsp;&nbsp;ATM Segmentation and Reassembly<a class="headerlink" href="#atm-segmentation-and-reassembly" title="Permalink to this headline">¶</a></h3>
+<p>Due to the small packet size, ATM defines its own mechanisms for segmentation and reassembly of larger packets. Thus, individual ATM links in an IP network are quite practical. These mechanisms are called <strong>ATM Adaptation Layers</strong>, and there are four of them: AALs 1, 2, 3/4 and 5 (AAL 3 and AAL 4 were once separate layers, which merged). AALs 1 and 2 are used only for voice-type traffic; we will not consider them further.</p>
+<p>The ATM segmentation-and-reassembly mechanism defined here is intended to apply only to large <em>data</em>; no cells are ever further subdivided. Furthermore, segmentation is always applied at the point where the data enters the network; reassembly is done at exit from the ATM path. IPv4 fragmentation, on the other hand, applies conceptually to IP packets, and may be performed by routers within the network.</p>
+<p>For AAL 3/4, we first define a high-level &#8220;wrapper&#8221; for an IP packet, called the CS-PDU (Convergence Sublayer - Protocol Data Unit). This prefixes 32 bits on the front and another 32 bits (plus padding) on the rear. We then chop this into as many 44-byte chunks as are needed; each chunk goes into a 48-byte ATM payload, along with the following 32 bits worth of additional header/trailer:</p>
+<ul class="simple">
+<li>2-bit <strong>type</strong> field:<ul>
+<li>10: begin new CS-PDU</li>
+<li>00: continue CS-PDU</li>
+<li>01: end of CS-PDU</li>
+<li>11: single-segment CS-PDU</li>
+</ul>
+</li>
+<li>4-bit sequence number, 0-15, good for catching up to 15 dropped cells</li>
+<li>10-bit MessageID field</li>
+<li>CRC-10 checksum.</li>
+</ul>
+<p>We now have a total of 9 bytes of header for 44 bytes of data; this is more than 20% overhead. This did not sit well with the IP-over-ATM community (such as it was), and so AAL 5 was developed.</p>
+<p>AAL 5 moved the checksum to the CS-PDU and increased it to 32 bits from 10 bits. The MID field was discarded, as no one used it, anyway (if you wanted to send several different types of messages, you simply created several virtual circuits). A bit from the ATM header was taken over and used to indicate:</p>
+<ul class="simple">
+<li>1: start of new CS-PDU</li>
+<li>0: continuation of an existing CS-PDU</li>
+</ul>
+<p>The CS-PDU is now chopped into 48-byte chunks, which are then used as the
+entire body of each ATM cell. With 5 bytes of header for 48 bytes of data, overhead is down to 10%. Errors are detected by the CS-PDU CRC-32. This also detects lost cells (impossible with a per-cell CRC!), as we no longer have any cell sequence number.</p>
+<p>For both AAL3/4 and AAL5, <strong>reassembly</strong> is simply a matter of stringing together consecutive cells <strong>in order of arrival</strong>, starting a new CS-PDU whenever the appropriate bits indicate this. For AAL3/4 the receiver has to strip off the 4-byte AAL3/4 headers; for AAL5 the receiver has to verify the CRC-32 checksum once all cells are received. Different cells from different virtual circuits can be jumbled together on the ATM &#8220;backbone&#8221;, but on any one virtual circuit the cells from one higher-level packet must be sent one right after the other.</p>
+<p>A typical IP packet divides into about 20 cells. For AAL 3/4, this means a total of 200 bits devoted to CRC codes, versus only 32 bits for AAL 5. It might seem that AAL 3/4 would be more reliable because of this, but, paradoxically, it was not! The reason for this is that errors are <em>rare</em>, and so we typically have one or at most two per CS-PDU. Suppose we have only a single error, <em>ie</em> a single cluster of corrupted bits small enough that it is likely confined to a single cell. In AAL 3/4 the CRC-10 checksum will fail to detect that error (that is, the checksum of the corrupted packet will by chance happen to equal the checksum of the original packet) with probability 1/2<sup>10</sup>. The AAL 5 CRC-32 checksum, however, will fail to detect the error with probability 1/2<sup>32</sup>. Even if there are enough errors that two cells are corrupted, the two CRC-10s together will fail to detect the error with probability 1/2<sup>20</sup>; the CRC-32 is better. AAL 3/4 is more reliable only when we have errors in at least four cells, at which point we might do better to switch to an error-<em>correcting</em> code.</p>
+<p>Moral: one checksum over the entire message is often better than multiple shorter checksums over parts of the message.
+.. comment radioland</p>
+<blockquote>
+<div>can&#8217;t detect collisions
+fading/multipath</div></blockquote>
+</div>
+</div>
+<div class="section" id="wi-fi">
+<span id="index-12"></span><span id="id5"></span><h2>3.6&nbsp;&nbsp;&nbsp;Wi-Fi<a class="headerlink" href="#wi-fi" title="Permalink to this headline">¶</a></h2>
+<p>Wi-Fi is a trademark denoting any of several IEEE wireless-networking protocols in the 802.11 family, specifically 802.11a, 802.11b, 802.11g, 802.11n, and 802.11ac. Like classic Ethernet, Wi-Fi must deal with <strong>collisions</strong>; unlike Ethernet, however, Wi-Fi is unable to detect collisions in progress, complicating the backoff and retransmission algorithms. Wi-Fi is designed to interoperate freely with Ethernet at the logical LAN layer; that is, Ethernet and  Wi-Fi traffic can be freely switched from the wired side to the wireless side.</p>
+<div class="sidebar" id="index-13">
+<p class="first sidebar-title">Band Width</p>
+<p class="last">To radio engineers, &#8220;band width&#8221; means the frequency range used by a signal, not data rate; in keeping with this we will in this section and <a class="reference internal" href="#wimax"><em>3.7&nbsp;&nbsp;&nbsp;WiMAX</em></a> use the term &#8220;data rate&#8221; instead of &#8220;bandwidth&#8221;. We will use the terms &#8220;channel width&#8221; or &#8220;width of the frequency band&#8221; for the frequency range. All else being equal, the data rate achievable with a radio signal is proportional to the channel width.</p>
+</div>
+<p id="index-14">Generally, Wi-Fi uses the 2.4 GHz <strong>ISM</strong> (Industrial, Scientific and Medical) band used also by microwave ovens, though 802.11a uses a 5 GHz band, 802.11n supports that as an option and the new 802.11ac has returned to using 5 GHz exclusively. The 5 GHz band has reduced ability to penetrate walls, often resulting in a lower effective range. Wi-Fi radio spectrum is usually <strong>unlicensed</strong>, meaning that no special permission is needed to transmit but also that others may be trying to use the same frequency band simultaneously; the availability of unlicensed channels in the 5 GHz band continues to evolve.</p>
+<p>The table below summarizes the different Wi-Fi versions. All bit rates assume a single spatial stream; channel widths are nominal.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="33%" />
+<col width="20%" />
+<col width="29%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">IEEE name</th>
+<th class="head">maximum bit rate</th>
+<th class="head">frequency</th>
+<th class="head">channel width</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>802.11a</td>
+<td>54 Mbps</td>
+<td>5 GHz</td>
+<td>20 MHz</td>
+</tr>
+<tr class="row-odd"><td>802.11b</td>
+<td>11 Mbps</td>
+<td>2.4 GHz</td>
+<td>20 MHz</td>
+</tr>
+<tr class="row-even"><td>802.11g</td>
+<td>54 Mbps</td>
+<td>2.4 GHz</td>
+<td>20 MHz</td>
+</tr>
+<tr class="row-odd"><td>802.11n</td>
+<td>65-150 Mbps</td>
+<td>2.4/5 GHz</td>
+<td>20-40 MHz</td>
+</tr>
+<tr class="row-even"><td>802.11ac</td>
+<td>78-867 Mbps</td>
+<td>5 GHz</td>
+<td>20-160 MHz</td>
+</tr>
+</tbody>
+</table>
+<p>The maximum bit rate is seldom achieved in practice. The <em>effective</em> bit rate must take into account, at a minimum, the time spent in the collision-handling mechanism. More significantly, all the Wi-Fi variants above use dynamic rate scaling, below; the bit rate is reduced up to tenfold (or more) in environments with higher error rates, which can be due to distance, obstructions, competing transmissions or radio noise. All this means that, as a practical matter, getting 150 Mbps out of 802.11n requires optimum circumstances; in particular, no competing senders and unimpeded line-of-sight transmission. 802.11n lower-end performance can be as little as 10 Mbps, though 40-100 Mbps (for a 40 MHz channel) may be more typical.</p>
+<p id="index-15">The 2.4 GHz ISM band is divided by international agreement into up to 14 officially designated channels, each about 5 MHz wide, though in the United States use may be limited to the first 11 channels. The 5 GHz band is similarly divided into 5 MHz channels. One Wi-Fi sender, however, needs several of these official channels; the typical 2.4 GHz 802.11g transmitter uses an actual frequency range of up to 22 MHz, or up to five channels. As a result, to avoid signal overlap Wi-Fi use in the 2.4 GHz band is often restricted to official channels 1, 6 and 11. The end result is that unrelated Wi-Fi transmitters can and do interact with and interfere with each other.</p>
+<p>The United States requires users of the 5 GHz band to avoid interfering with weather and military applications in the same frequency range. Once that is implemented, however, there are more 5 MHz channels at this frequency than in the 2.4 GHz ISM band, which is one of the reasons 802.11ac can run faster (below).</p>
+<p>Wi-Fi designers can improve speed through a variety of techniques, including</p>
+<ul class="simple">
+<li>improved radio modulation techniques</li>
+<li>improved error-correcting codes</li>
+<li>smaller guard intervals between symbols</li>
+<li>increasing the channel width</li>
+<li>allowing multiple spatial streams via multiple antennas</li>
+</ul>
+<p>The first two in this list seem by now to be largely tapped out; the third reduces the range but may increase the data rate by 11%.</p>
+<p>The largest speed increases are obtained by increasing the number of 5 MHz channels used. For example, the 65 Mbps bit rate above for 802.11n is for a nominal frequency range of 20 MHz, comparable to that of 802.11g. However, in areas with minimal competition from other signals, 802.11n supports using a 40 MHz frequency band; the bit rate then goes up to 135 Mbps (150 Mbps with a smaller guard interval). This amounts to using two of the three available 2.4 GHz Wi-Fi bands. Similarly, the wide range in 802.11ac bit rates reflects support for using channel widths ranging from 20 MHz up to 160 MHz (32 5-MHz official channels).</p>
+<p>For all the categories in the table above, additional bits are used for error-correcting codes. For 802.11g operating at 54 Mbps, for example, the actual raw bit rate is (4/3)×54 = 72 Mbps, sent in symbols consisting of six bits as a unit.</p>
+<div class="section" id="multiple-spatial-streams">
+<span id="index-16"></span><h3>3.6.1&nbsp;&nbsp;&nbsp;Multiple Spatial Streams<a class="headerlink" href="#multiple-spatial-streams" title="Permalink to this headline">¶</a></h3>
+<p>The latest innovation in improving Wi-Fi data rates is to support multiple spatial streams, through an antenna technique known as multiple-input-multiple output, or <strong>MIMO</strong>. To use N streams, both sender and receiver must have N antennas; all the antennas use the same frequency channels but each transmitter antenna sends a different data stream. While the antennas are each more-or-less omnidirectional, careful signal analysis at the receiver can in principle recover each data stream. In practice, overall data-rate improvement over a single antenna can be considerably less than N.</p>
+<p>The 802.11n standard allows for up to four spatial streams, for a theoretical maximum bit rate of 600 Mbps. 802.11ac allows for up to eight spatial streams, for an even-more-theoretical maximum of close to 7 Gbps. MIMO support is sometimes described with an A×B×C notation, <em>eg</em> 3×3×2, where A and B are the number of transmitting and receiving antennas and C ≤ min(A,B) is the number of spatial streams.</p>
+</div>
+<div class="section" id="wi-fi-and-collisions">
+<span id="wifi-and-collisions"></span><span id="index-17"></span><h3>3.6.2&nbsp;&nbsp;&nbsp;Wi-Fi and Collisions<a class="headerlink" href="#wi-fi-and-collisions" title="Permalink to this headline">¶</a></h3>
+<p>We looked extensively at the 10 Mbps Ethernet collision-handling mechanisms in <a class="reference internal" href="ethernet.html#classic-ethernet"><em>2.1&nbsp;&nbsp;&nbsp;10-Mbps Classic Ethernet</em></a>, only to conclude that with switches and full-duplex links, Ethernet collisions are rapidly becoming a thing of the past. Wi-Fi, however, has brought collisions back from obscurity. While there <em>is</em> a largely-collision-free mode for Wi-Fi operation (<a class="reference internal" href="#pcf"><em>3.6.7&nbsp;&nbsp;&nbsp;Wi-Fi Polling Mode</em></a>), it is not commonly used, and collision management has a significant impact on ordinary Wi-Fi performance.</p>
+<p id="index-18">Wi-Fi, like almost any other wireless protocol, simply cannot detect collisions in progress. This has to do with the relative signal strength of the remote signal at the local transmitter. Along a wire-based Ethernet the remote signal might be as weak as 1/100 of the transmitted signal but that 1% received signal is still detectable <em>during</em> transmission. However, with radio the remote signal might easily be as little as 1/100,000 of the transmitted signal, and it is simply overwhelmed during transmission. Thus, while the Ethernet algorithm was known as CSMA/CD, where CD stood for Collision Detection, Wi-Fi uses CSMA/<strong>CA</strong>, where CA stands for Collision <strong>Avoidance</strong>.</p>
+<p id="index-19">The basic collision-avoidance algorithm is as follows. There are three parameters applicable here (values are for 802.11b/g in the 2.4 GHz band); the value we call IFS is more formally known as DIFS (D for &#8220;distributed&#8221;; see <a class="reference internal" href="#pcf"><em>3.6.7&nbsp;&nbsp;&nbsp;Wi-Fi Polling Mode</em></a>).</p>
+<ul class="simple">
+<li>slot time: 20 µsec</li>
+<li>IFS, the &#8220;normal&#8221; InterFrame Spacing: 50 µsec</li>
+<li>SIFS, the <em>short</em> IFS: 10 µsec</li>
+</ul>
+<p>A sender wanting to send a new data packet waits the IFS time after first sensing the medium to see if it is idle. If no other traffic is seen in this interval, the station may then transmit immediately. However, if other traffic <em>is</em> sensed, the sender waits for the other traffic to finish and then for one IFS time after. If the station had to wait for other traffic, even briefly, it must then do an exponential backoff even for its first transmission attempt; other stations, after all, are likely also waiting, and avoiding an initial collision is strongly preferred.</p>
+<p>The initial backoff is to choose a random k&lt;2<sup>5</sup> = 32 (recall that classic Ethernet in effect chooses an initial backoff of k&lt;2<sup>0</sup> = 1; <em>ie</em> k=0). The prospective sender then waits k slot times. While waiting, the sender continues to monitor for other traffic; if any other transmission is detected, then the sender &#8220;suspends&#8221; the backoff-wait clock. The clock resumes when the other transmission has completed and one followup idle interval of length IFS has elapsed. Under this rule, the backoff-wait clock can expire only when the clock is running and therefore the medium is idle, at which point the transmission begins.</p>
+<p>If there is a collision, the station retries, after doubling the backoff range to 64, then 128, 256, 512, 1024 and again 1024. If these seven attempts all fail, the packet is discarded and the sender starts over.</p>
+<p>In one slot time, radio signals move 6,000 meters; the Wi-Fi slot time &#8211; unlike that for Ethernet &#8211; has nothing to do with the physical diameter of the network. As with Ethernet, though, the Wi-Fi slot time represents the fundamental unit for backoff intervals.</p>
+<p>Finally, we note that, unlike Ethernet collisions, Wi-Fi collisions are a local phenomenon: if A and B transmit simultaneously, a collision occurs at node C only if the signals of A and B are both strong enough at C to interfere with one another. It is possible that a collision occurs at station C midway between A and B, but not at station D that is close to A. We return to this in <a class="reference internal" href="#hidden"><em>3.6.2.2&nbsp;&nbsp;&nbsp;Hidden-Node Problem</em></a>.</p>
+<p id="index-20">Because Wi-Fi cannot detect collisions directly, the protocol adds <strong>link-layer ACK packets</strong> (unrelated to the later TCP ACK), at least for unicast transmission. Once a station has received a packet addressed to it, it waits for time SIFS and sends the ACK; at the instant when the end of the SIFS interval is reached, the receiver will be the only station authorized to send. Any other stations waiting the longer IFS period will see the ACK before the IFS time has elapsed and will thus not interfere with the ACK; similarly, any stations with a running backoff-wait clock will continue to have that clock suspended.</p>
+<div class="section" id="wi-fi-rts-cts">
+<span id="index-21"></span><h4>3.6.2.1&nbsp;&nbsp;&nbsp;Wi-Fi RTS/CTS<a class="headerlink" href="#wi-fi-rts-cts" title="Permalink to this headline">¶</a></h4>
+<p>Wi-Fi stations optionally also use a request-to-send/clear-to-send (<strong>RTS/CTS</strong>) protocol. Usually this is used only for larger packets; often, the RTS/CTS &#8220;threshold&#8221; (the size of the largest packet <em>not</em> sent using RTS/CTS) is set (as part of the Access Point configuration) to be the maximum packet size, effectively disabling this feature. The idea here is that a large packet that is involved in a collision represents a significant waste of potential throughput; for large packets, we should ask first.</p>
+<p>The RTS packet &#8211; which is small &#8211; is sent through the normal procedure outlined above; this packet includes the identity of the destination and the size of the data packet the station desires to transmit. The destination station then replies with CTS after the SIFS wait period, effectively preventing any other transmission after the RTS. The CTS packet also contains the data-packet size. The original sender then waits for SIFS after receiving the CTS, and sends the packet. If all other stations can hear both the RTS and CTS messages, then once the RTS and CTS are sent successfully no collisions should occur during packet transmission, again because the only idle times are of length SIFS and other stations should be waiting for time IFS.</p>
+</div>
+<div class="section" id="hidden-node-problem">
+<span id="hidden"></span><span id="index-22"></span><h4>3.6.2.2&nbsp;&nbsp;&nbsp;Hidden-Node Problem<a class="headerlink" href="#hidden-node-problem" title="Permalink to this headline">¶</a></h4>
+<p>Consider the diagram below. Each station has a 100-meter range. Stations A and B are 150 meters apart and so cannot hear one another at all; each is 75 meters from C. If A is transmitting and B senses the medium in preparation for its own transmission, as part of collision avoidance, then B will conclude that the medium is idle and will go ahead and send.</p>
+<img alt="_images/hidden_node_opaque.png" src="_images/hidden_node_opaque.png" />
+<p>However, C is within range of both A and B. If A and B transmit simultaneously, then from C&#8217;s perspective a collision occurs. C receives nothing usable. We will call this a <strong>hidden-node collision</strong> as the senders A and B are hidden from one another; the general scenario is known as the <strong>hidden-node problem</strong>.</p>
+<p>Note that node D receives only A&#8217;s signal, and so no collision occurs at D.</p>
+<p>The hidden-node problem can also occur if A and B cannot receive one another&#8217;s transmissions due to a physical obstruction such as a radio-impermeable wall:</p>
+<img alt="_images/hidden_node_wall.png" src="_images/hidden_node_wall.png" />
+<p>One of the rationales for the RTS/CTS protocol is the prevention of hidden-node collisions.
+Imagine that, instead of transmitting its data packet, A sends an RTS packet, and C responds with CTS. B has not heard the RTS packet from A, but <em>does</em> hear the CTS from C. A will begin transmitting after a SIFS interval, but B will not hear A&#8217;s transmission. However, B will still wait, because the CTS packet contained the data-packet size and thus, implicitly, the length of time all other stations should remain idle. Because RTS packets are quite short, they are much less likely to be involved in collisions themselves than data packets.</p>
+</div>
+<div class="section" id="wi-fi-fragmentation">
+<span id="wifi-fragmentation"></span><span id="index-23"></span><h4>3.6.2.3&nbsp;&nbsp;&nbsp;Wi-Fi Fragmentation<a class="headerlink" href="#wi-fi-fragmentation" title="Permalink to this headline">¶</a></h4>
+<p>Conceptually related to RTS/CTS is Wi-Fi <strong>fragmentation</strong>. If error rates or collision rates are high, a sender can send a large packet as multiple fragments, each receiving its own link-layer ACK. As we shall see in <a class="reference internal" href="packets.html#error-rates-and-packet-size"><em>5.3.1&nbsp;&nbsp;&nbsp;Error Rates and Packet Size</em></a>, if bit-error rates are high then sending several smaller packets often leads to fewer total transmitted bytes than sending the same data as one large packet.</p>
+<p>Wi-Fi packet fragments are reassembled by the receiving node, which may or may not be the final destination.</p>
+<p>As with the RTS/CTS threshold, the fragmentation threshold is often set to the size of the maximum packet. Adjusting the values of these thresholds is seldom necessary, though might be appropriate if monitoring revealed high collision or error rates. Unfortunately, it is essentially impossible for an individual station to distinguish between reception errors caused by collisions and reception errors caused by other forms of noise, and so it is hard to use reception statistics to distinguish between a need for RTS/CTS and a need for fragmentation.</p>
+</div>
+</div>
+<div class="section" id="dynamic-rate-scaling">
+<span id="rate-scaling"></span><span id="index-24"></span><h3>3.6.3&nbsp;&nbsp;&nbsp;Dynamic Rate Scaling<a class="headerlink" href="#dynamic-rate-scaling" title="Permalink to this headline">¶</a></h3>
+<p>Wi-Fi senders, if they detect transmission problems, are able to reduce their transmission bit rate in a process known as <strong>rate scaling</strong> or <strong>rate control</strong>. The idea is that lower bit rates will have fewer noise-related errors, and so as the error rate becomes unacceptably high &#8211; perhaps due to increased distance &#8211; the sender should fall back to a lower bit rate. For 802.11g, the standard rates are 54, 48, 36, 24, 18, 12, 9 and 6 Mbps. Senders attempt to find the transmission rate that maximizes throughput; for example, 36 Mbps with a packet loss rate of 25% has an effective throughput of 36 × 75% = 27 Mbps, and so is better than 24 Mbps with no losses.</p>
+<p>Senders may update their bit rate on a per-packet basis; senders may also choose different bit rates for different recipients. For example, if a sender sends a packet and receives no confirming link-layer ACK, the sender may fall back to the next lower bit rate. The actual bit-rate-selection algorithm lives in the particular Wi-Fi driver in use; different nodes in a network may use different algorithms.</p>
+<p>The earliest rate-scaling algorithm was Automatic Rate Fallback, or ARF, <a class="reference internal" href="bibliography.html#km97" id="id6">[KM97]</a>. The rate decreases after two consecutive transmission failures (that is, the link-layer ACK is not received), and increases after ten transmission successes.</p>
+<p>A significant problem for rate scaling is that a packet loss may be due either to low-level random noise (white noise, or thermal noise) or to a collision (which is also a form of noise, but less random); only in the first case is a lower transmission rate likely to be helpful. If a larger number of collisions is experienced, the longer packet-transmission times caused by the lower bit rate may <em>increase</em> the frequency of hidden-node collisions. In fact, a <em>higher</em> transmission rate (leading to shorter transmission times) may help; enabling the RTS/CTS protocol may also help.</p>
+<div class="sidebar">
+<p class="first sidebar-title">Signal Strength</p>
+<p class="last">Most Wi-Fi drivers report the received signal strength. Newer drivers use the IEEE Received Channel Power Indicator convention; the RCPI is an 8-bit integer proportional to the absolute power received by the antenna as measured in decibel-milliwatts (dBm). Wi-Fi values range from -10 dBm to -90 dBm and below. For comparison, the light from the star Polaris delivers about -97 dBm to one eye on a good night; Venus typically delivers about -73 dBm. A GPS satellite might deliver -127 dBm to your phone. (Inspired by <a class="reference external" href="http://en.wikipedia.org/wiki/DBm">Wikipedia on DBm</a>.)</p>
+</div>
+<p>A variety of newer rate-scaling algorithms have been proposed; see <a class="reference internal" href="bibliography.html#jb05" id="id7">[JB05]</a> for a summary. One, Receiver-Based Auto Rate (RBAR, <a class="reference internal" href="bibliography.html#hvb01" id="id8">[HVB01]</a>), attempts to incorporate  the <strong>signal-to-noise</strong> ratio into the calculation of the transmission rate. This avoids the confusion introduced by collisions. Unfortunately, while the signal-to-noise ratio has a strong theoretical correlation with the transmission <strong>bit-error rate</strong>, most Wi-Fi radios will report to the host system the <strong>received signal strength</strong>. This is not the same as the signal-to-noise ratio, which is harder to measure. As a result, the RBAR approach has not been quite as effective in practice as might be hoped.</p>
+<p>The Collision-Aware Rate Adaptation algorithm (CARA, <a class="reference internal" href="bibliography.html#kkcq06" id="id9">[KKCQ06]</a>) attempts (among other things) to infer that a packet was lost to a collision rather than noise if, after one SIFS interval following the end of the packet transmission, no link-layer ACK has been received <em>and</em> the channel is still busy. This will detect collisions, of course, only with <em>longer</em> packets.</p>
+<p>Because the actual data in a Wi-Fi packet may be sent at a rate not every participant is close enough to receive correctly, every Wi-Fi transmission begins with a brief preamble at the minimum bit rate. Link-layer ACKs, too, are sent at the minimum bit rate.</p>
+</div>
+<div class="section" id="wi-fi-configurations">
+<span id="wifi-configurations"></span><span id="index-25"></span><h3>3.6.4&nbsp;&nbsp;&nbsp;Wi-Fi Configurations<a class="headerlink" href="#wi-fi-configurations" title="Permalink to this headline">¶</a></h3>
+<p>There are two common Wi-Fi configurations: <strong>infrastructure</strong> and <strong>ad hoc</strong>. The latter includes individual Wi-Fi-equipped nodes communicating informally; for example, two laptops can set up an ad hoc connection to transfer data at a meeting. Ad hoc connections are often used for very simple networks <em>not</em> providing Internet connectivity. Complex ad hoc networks are, however, certainly possible; see <a class="reference internal" href="#manets"><em>3.6.8&nbsp;&nbsp;&nbsp;MANETs</em></a>.</p>
+<p>The more-common <strong>infrastructure</strong> configuration involves designated <strong>access points</strong> to which individual Wi-Fi stations must <strong>associate</strong> before general communication can begin. The association process &#8211; carried out by an exchange of special management packets &#8211;  may be restricted to stations with hardware (LAN) addresses on a predetermined list, or to stations with valid cryptographic credentials. Stations may regularly re-associate to their Access Point, especially if they wish to communicate some status update.</p>
+<div class="sidebar" id="index-26">
+<p class="first sidebar-title">Access Points</p>
+<p class="last">Generally, a Wi-Fi access point has special features; Wi-Fi-enabled &#8220;station&#8221; devices like phones and workstations do not act as access points. However, it may be possible to for a station device to become an access point if the access-point mode is supported by the underlying radio hardware and if suitable drivers can be found. Under linux, the <tt class="docutils literal"><span class="pre">hostapd</span></tt> package is one option.</p>
+</div>
+<p>Stations in an infrastructure network communicate directly <em>only</em> with their access point. If B and C share access point A, and B wishes to send a packet to C, then B first forwards the packet to A and A then forwards it to C. While this introduces a degree of inefficiency, it does mean that the access point and its associated nodes automatically act as a true LAN: every node can reach every other node. In an ad hoc network, by comparison, it is quite common for two nodes to be able to reach each other only by forwarding through an intermediate third node; this is in fact exactly the hidden-node scenario.</p>
+<p>Finally, Wi-Fi is by design completely interoperable with Ethernet; if station A is associated with access point AP, and AP also connects via (cabled) Ethernet to station B, then if A wants to send a packet to B it sends it using AP as the Wi-Fi destination but with B also included in  the header as the &#8220;actual&#8221; destination. Once it receives the packet by wireless, AP acts as an Ethernet switch and forwards the packet to B.</p>
+<p>While this forwarding is transparent to senders, the Ethernet and Wi-Fi LAN header formats are entirely different.</p>
+<img alt="_images/headers.png" src="_images/headers.png" />
+<p>The above diagram illustrates an Ethernet header and the Wi-Fi header for a typical data packet not using Wi-Fi quality-of-service features. The Ethernet type field usually moves to an IEEE Logical Link Control header in the Wi-Fi region labeled &#8220;data&#8221;. The receiver and transmitter addresses are the MAC addresses of the nodes receiving and transmitting the (unicast) packet; these may each be different from the ultimate destination and source addresses. In infrastructure mode one of the receiver or transmitter addresses is the access point; in typical situations either the receiver is the destination or the sender is the transmitter.</p>
+</div>
+<div class="section" id="wi-fi-roaming">
+<span id="index-27"></span><span id="id10"></span><h3>3.6.5&nbsp;&nbsp;&nbsp;Wi-Fi Roaming<a class="headerlink" href="#wi-fi-roaming" title="Permalink to this headline">¶</a></h3>
+<p>Wi-Fi access points are generally identified by their <strong>SSID</strong>, an administratively defined string such as &#8220;linksys&#8221; or &#8220;loyola&#8221;. These are periodically broadcast by the access point in special <strong>beacon</strong> packets (though for pseudo-security reasons beacon packets can be suppressed). Large installations can create &#8220;roaming&#8221; access among multiple access points by assigning all the access points the same SSID. An individual station will stay with the access point with which it originally associated until the signal strength falls below a certain level, at which point it will seek out other access points with the same SSID and with a stronger signal. In this way, a large area can be carpeted with multiple Wi-Fi access points, so as to look like one large Wi-Fi domain.</p>
+<p id="index-28">In order for this to work, traffic <em>to</em> wireless node B must find B&#8217;s current access point AP. This is done in much the same way as, in a wired Ethernet, traffic finds a laptop that has been unplugged, carried to a new building, and plugged in again. The <strong>distribution network</strong> is the underlying wired network (<em>eg</em> Ethernet) to which all the access points connect. If the distribution network is a switched Ethernet supporting the usual learning mechanism (<a class="reference internal" href="ethernet.html#ethernet-switches"><em>2.4&nbsp;&nbsp;&nbsp;Ethernet Switches</em></a>), then Wi-Fi location update is straightforward. Suppose B is a wireless node that has been exchanging packets via the distribution network with C (perhaps a router connecting B to the Internet). When B moves to a new access point, all it has to do is send any packet over the LAN to C, and the Ethernet switches involved will then learn the route through the switched Ethernet from C to B&#8217;s current AP, and thus to B.</p>
+<p>This process may leave other switches &#8211; not currently communicating with B &#8211; still holding in their forwarding tables the old location for B. This is not terribly serious, but can be avoided entirely if, after moving, B sends out an Ethernet broadcast packet.</p>
+<p>Ad hoc networks also have SSIDs; these are generated pseudorandomly at startup. Ad hoc networks have beacon packets as well; all nodes participate in the regular transmission of these via a distributed algorithm.</p>
+</div>
+<div class="section" id="wi-fi-security">
+<span id="wifi-security"></span><h3>3.6.6&nbsp;&nbsp;&nbsp;Wi-Fi Security<a class="headerlink" href="#wi-fi-security" title="Permalink to this headline">¶</a></h3>
+<p>Wi-Fi traffic is visible to anyone nearby with an appropriate receiver; this eavesdropping zone can be expanded by use of a larger antenna. Because of this, Wi-Fi security is important, and Wi-Fi supports several types of traffic encryption.</p>
+<p id="index-29">The original Wired-Equivalent Privacy, or <strong>WEP</strong>, encryption standard, contained a fatal (and now-classic) flaw. Bytes of the key could be could be &#8220;broken&#8221; &#8211; that is, guessed &#8211; sequentially. Knowing bytes 0 through i−1 would allow an attacker to guess byte i with a relatively small amount of data, and so on through the entire key. See <a class="reference internal" href="security.html#wep-failure"><em>21.6.8&nbsp;&nbsp;&nbsp;Wi-Fi WEP Encryption Failure</em></a> for details.</p>
+<p id="index-30">WEP has been replaced with Wi-Fi Protected Access, or <strong>WPA</strong>; the current version is WPA2. WPA2 encryption is believed to be quite secure, although there was a vulnerability in the associated Wi-Fi Protected Setup protocol.</p>
+<p id="index-31">Key management, however, can be a problem. Many smaller sites use &#8220;pre-shared key&#8221; mode, known as <strong>WPA-Personal</strong>, in which a single key is entered into the Access Point (ideally not over the air) and into each connecting station. The key is usually a hash of a somewhat longer passphrase. The use of a common key for multiple stations makes changing the key, or revoking the key for a particular user, difficult.</p>
+<p id="index-32">A more secure approach is <strong>WPA-Enterprise</strong>; this allows each station to have a separate key, and also for each station key to be recognized by all access points. It is part of the IEEE 802.1X security framework (technically so is WPA-Personal, though a much smaller part). In this model, the client node is known as the <strong>supplicant</strong>, the Access Point is known as the <strong>authenticator</strong>, and there is a third system involved known as the <strong>authentication server</strong>. One authentication server can support multiple access points.</p>
+<p id="index-33">To begin the association process, the supplicant contacts the authenticator using the Extensible Authentication Protocol, or <strong>EAP</strong>, with what amounts to a request to associate to that access point. EAP is a generic message framework meant to support multiple specific types of authentication; see  <span class="target" id="index-34"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc3748.html"><strong>RFC 3748</strong></a> and <span class="target" id="index-35"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc5247.html"><strong>RFC 5247</strong></a>. The EAP request is forwarded to an authentication server, which may exchange (via the authenticator) several challenge/response messages with the supplicant. EAP is usually used in conjunction with the RADIUS (Remote Authentication Dial-In User Service) protocol (<span class="target" id="index-36"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2865.html"><strong>RFC 2865</strong></a>), which is a specific (but flexible) authentication-server protocol. WPA-Enterprise is sometimes known as 802.1X mode, EAP mode or RADIUS mode.</p>
+<p>One peculiarity of EAP is that EAP communication takes place before the supplicant is given an IP address (in fact before the supplicant has completed associating itself to the access point); thus, a mechanism must be provided to support exchange of EAP packets between supplicant and authenticator. This mechanism is known as EAPOL, for EAP Over LAN. EAP messages between the authenticator and the authentication server, on the other hand, can travel via IP; in fact, sites may choose to have the authentication server hosted remotely.</p>
+<p>Once the authentication server (<em>eg</em> RADIUS server) is set up, specific per-user authentication methods can be entered. This can amount to ⟨username,password⟩ pairs, or some form of security certificate, or often both. The authentication server will generally allow different encryption protocols to be used for different supplicants, thus allowing for the possibility that there is not a common protocol supported by all stations.</p>
+<p>When this authentication strategy is used, the access point no longer needs to know anything about what authentication protocol is actually used; it is simply the middleman forwarding EAP packets between the supplicant and the authentication server. The access point allows the supplicant to associate into the network once it receives permission to do so from the authentication server.</p>
+<span class="target" id="index-37"></span></div>
+<div class="section" id="wi-fi-polling-mode">
+<span id="pcf"></span><h3>3.6.7&nbsp;&nbsp;&nbsp;Wi-Fi Polling Mode<a class="headerlink" href="#wi-fi-polling-mode" title="Permalink to this headline">¶</a></h3>
+<p>Wi-Fi also includes a &#8220;polled&#8221; mechanism, where one station (the Access Point) determines which stations are allowed to send. While it is not often used, it has the potential to greatly reduce collisions, or even eliminate them entirely. This mechanism is known as &#8220;Point Coordination Function&#8221;, or PCF, versus the collision-oriented mechanism which is then known as &#8220;Distributed Coordination Function&#8221;. The PCF name refers to the fact that in this mode it is the Access Point that is in charge of coordinating which stations get to send when.</p>
+<p>The PCF option offers the potential for regular traffic to receive improved throughput due to fewer collisions. However, it is often seen as intended for real-time Wi-Fi traffic, such as voice calls over Wi-Fi.</p>
+<p>The idea behind PCF is to schedule, at regular intervals, a contention-free period, or <strong>CFP</strong>. During this period, the Access Point may</p>
+<ul class="simple">
+<li>send Data packets to any receiver</li>
+<li>send <strong>Poll</strong> packets to any receiver, allowing that receiver to reply with its own data packet</li>
+<li>send a combination of the two above (not necessarily to the same receiver)</li>
+<li>send management packets, including a special packet marking the end of the CFP</li>
+</ul>
+<p>None of these operations can result in a collision (unless an unrelated but overlapping Wi-Fi domain is involved).</p>
+<p>Stations receiving data from the Access Point send the usual ACK after a SIFS interval. A data packet from the Access Point addressed to station B may also carry, piggybacked in the Wi-Fi header, a Poll request to another station C; this saves a transmission. Polled stations that send data will receive an ACK from the Access Point; this ACK may be combined in the same packet with the Poll request to the next station.</p>
+<p>At the end of the CFP, the regular &#8220;contention period&#8221; or CP resumes, with the usual CSMA/CA strategy. The time interval between the start times of consecutive CFP periods is typically 100 ms, short enough to allow some real-time traffic to be supported.</p>
+<p id="index-38">During the CFP, all stations normally wait only the Short IFS, SIFS, between transmissions. This works because normally there is only one station designated to respond: the Access Point or the polled station. However, if a station is polled and has nothing to send, the Access Point waits for time interval <strong>PIFS</strong> (PCF Inter-Frame Spacing), of length midway between SIFS and IFS above (our previous IFS should now really be known as DIFS, for DCF IFS). At the expiration of the PIFS, any non-Access-Point station that happens to be unaware of the CFP will continue to wait the full DIFS, and thus will not transmit. An example of such a CFP-unaware station might be one that is part of an entirely different but overlapping Wi-Fi network.</p>
+<p>The Access Point generally maintains a <strong>polling list</strong> of stations that wish to be polled during the CFP. Stations request inclusion on this list by an indication when they associate or (more likely) reassociate to the Access Point. A polled station with nothing to send simply remains quiet.</p>
+<p>PCF mode is not supported by many lower-end Wi-Fi routers, and often goes unused even when it is available. Note that PCF mode is collision-free, <em>so long as no other Wi-Fi access points are active and within range</em>. While the standard has some provisions for attempting to deal with the presence of other Wi-Fi networks, these provisions are somewhat imperfect; at a minimum, they are not always supported by other access points. The end result is that polling is not quite as useful as it might be.</p>
+</div>
+<div class="section" id="manets">
+<span id="index-39"></span><span id="id11"></span><h3>3.6.8&nbsp;&nbsp;&nbsp;MANETs<a class="headerlink" href="#manets" title="Permalink to this headline">¶</a></h3>
+<p>The MANET acronym stands for <strong>mobile ad hoc network</strong>; in practice, the term generally applies to ad hoc wireless networks of sufficient complexity that some internal routing mechanism is needed to enable full connectivity. The term <strong>mesh network</strong> is also used. While MANETs can use any wireless mechanism, we will assume here that Wi-Fi is used.</p>
+<p>MANET nodes communicate by radio signals with a finite range, as in the diagram below.</p>
+<img alt="_images/manet_color.png" src="_images/manet_color.png" />
+<p>Each node&#8217;s radio range is represented by a circle centered about that node. In general, two MANET nodes may be able to communicate only by relaying packets through intermediate nodes, as is the case for nodes A and G in the diagram above.</p>
+<p>In the field, the radio range of each node may not be very circular, due to among other things signal reflection and blocking from obstructions. An additional complication arises when the nodes (or even just obstructions) are moving in real time (hence the &#8220;mobile&#8221; of MANET); this means that a working route may stop working a short time later. For this reason, and others, routing within MANETs is a good deal more complex than routing in an Ethernet. A switched Ethernet, for example, is required to be loop-free, so there is never a choice among multiple alternative routes.</p>
+<p>Note that, without successful LAN-layer routing, a MANET does not have full node-to-node connectivity and thus does not meet the definition of a LAN given in <a class="reference internal" href="intro.html#lans"><em>1.9&nbsp;&nbsp;&nbsp;LANs and Ethernet</em></a>. With either LAN-layer or IP-layer routing, one or more MANET nodes may serve as gateways to the Internet.</p>
+<p>Note also that MANETs in general do not support broadcast, unless the forwarding of broadcast messages throughout the MANET is built in to the routing mechanism. This can complicate the assignment of IP addresses; the common IPv4 mechanism we will describe in <a class="reference internal" href="ipv4.html#dhcp"><em>7.9&nbsp;&nbsp;&nbsp;Dynamic Host Configuration Protocol (DHCP)</em></a> relies on broadcast and so usually needs some adaptation.</p>
+<p>Finally, we observe that while MANETs are of great theoretical interest, their practical impact has been modest; they are almost unknown, for example, in corporate environments. They appear most useful in emergency situations, rural settings, and settings where the conventional infrastructure network has failed or been disabled.</p>
+<div class="section" id="routing-in-manets">
+<h4>3.6.8.1&nbsp;&nbsp;&nbsp;Routing in MANETs<a class="headerlink" href="#routing-in-manets" title="Permalink to this headline">¶</a></h4>
+<p>Routing in MANETs can be done either at the LAN layer, using physical addresses, or at the IP layer with some minor bending (below) of the rules.</p>
+<p>Either way, nodes must find out about the existence of other nodes, and appropriate routes must then be selected. Route selection can use any of the mechanisms we describe later in <a class="reference internal" href="routing.html#routing-update"><em>9&nbsp;&nbsp;&nbsp;Routing-Update Algorithms</em></a>.</p>
+<p>Routing at the LAN layer is much like routing by Ethernet switches; each node will construct an appropriate forwarding table. Unlike Ethernet, however, there may be multiple paths to a destination, direct connectivity between any particular pair of nodes may come and go, and negotiation may be required even to determine which MANET nodes will serve as forwarders.</p>
+<p>Routing at the IP layer involves the same issues, but at least IP-layer routing-update algorithms have always been able to handle multiple paths. There are some minor issues, however. When we initially presented IP forwarding in <a class="reference internal" href="intro.html#ip-overview"><em>1.10&nbsp;&nbsp;&nbsp;IP - Internet Protocol</em></a>, we assumed that routers made their decisions by looking only at the network prefix of the address; if another node had the same network prefix it was assumed to be reachable directly via the LAN. This model usually fails badly in MANETs, where direct reachability has nothing to do with addresses. At least within the MANET, then, a modified forwarding algorithm must be used where <em>every</em> address is looked up in the forwarding table. One simple way to implement this is to have the forwarding tables contain only <strong>host-specific</strong> entries as were discussed in <a class="reference internal" href="#vpn"><em>3.1&nbsp;&nbsp;&nbsp;Virtual Private Network</em></a>.</p>
+<p>Multiple routing algorithms have been proposed for MANETs. Performance of a given algorithm may depend on the following factors:</p>
+<ul class="simple">
+<li>The size of the network</li>
+<li>Whether some nodes have agreed to serve as routers</li>
+<li>The degree of node mobility, especially of routing-node mobility if applicable</li>
+<li>Whether the nodes are under common administration, and thus may agree to defer their own transmission interests to the common good</li>
+<li>per-node storage and power availability</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="wimax">
+<span id="index-40"></span><span id="id12"></span><h2>3.7&nbsp;&nbsp;&nbsp;WiMAX<a class="headerlink" href="#wimax" title="Permalink to this headline">¶</a></h2>
+<p>WiMAX is a wireless network technology standardized by IEEE 802.16. It supports both stationary subscribers (802.16d) and mobile subscribers (802.16e). The stationary-subscriber version is often used to provide residential Internet connectivity, in both urban and rural areas. The mobile version is sometimes referred to as a &#8220;fourth generation&#8221; or 4G networking technology; its similar primary competitor is known as LTE. WiMAX is used in many mobile devices, from smartphones to traditional laptops with wireless cards installed.</p>
+<p>As in the sidebar at the start of <a class="reference internal" href="#wi-fi"><em>3.6&nbsp;&nbsp;&nbsp;Wi-Fi</em></a> we will use the term &#8220;data rate&#8221; for what is commonly called &#8220;bandwidth&#8221; to avoid confusion with the radio-specific meaning of the latter term.</p>
+<p>WiMAX can use unlicensed frequencies, like Wi-Fi, but its primary use is over licensed radio spectrum. WiMAX also supports a number of options for the width of its frequency band; the wider the band, the higher the data rate. Wider bands also allow the opportunity for multiple independent frequency channels. Downlink (base station to subscriber) data rates can be well over 100 Mbps (uplink rates are usually smaller).</p>
+<p id="index-41">Like Wi-Fi, WiMAX <strong>subscriber stations</strong> connect to a central access point, though the WiMAX standard prefers the term <strong>base station</strong> which we will use henceforth. Stationary-subscriber WiMAX, however, operates on a much larger scale. The coverage radius of a WiMAX base station can be tens of kilometers if larger antennas are provided, versus less (sometimes much less) than 100 meters for Wi-Fi; mobile-subscriber WiMAX might have a radius of one or two kilometers. Large-radius base stations are typically mounted in towers. Subscriber stations are not generally expected to be able to hear other stations; they interact only with the base station. As WiMAX distances increase, the data rate is reduced.</p>
+<p id="index-42">As with Wi-Fi, the central <strong>contention</strong> problem is how to schedule transmissions of subscriber stations so they do not overlap; that is, collide. The base station has no difficulty broadcasting transmissions to multiple different stations sequentially; it is the transmissions of those stations that must be coordinated. Once a station completes the <strong>network entry</strong> process to connect to a base station (below), it is assigned regular (though not necessarily periodic) transmission slots. These transmission slots may vary in size over time; the base station may regularly issue new transmission schedules.</p>
+<p>The centralized assignment of transmission intervals superficially resembles Wi-Fi PCF mode (<a class="reference internal" href="#pcf"><em>3.6.7&nbsp;&nbsp;&nbsp;Wi-Fi Polling Mode</em></a>); however, assignment is not done through polling, as propagation delays are too large (below). Instead, each WiMAX subscriber station is told in effect that it may transmit starting at an assigned time T and for an assigned length L. The station synchronizes its clock with that of the base station as part of the network entry process.</p>
+<p id="index-43">Because of the long distances involved, synchronization and transmission protocols must take account of speed-of-light delays. The round-trip delay across 30 km is 200 µsec which is ten times larger than the basic Wi-Fi SIFS interval; at 160 Mbps, this is the time needed to send 4 KB. If a station is to transmit so that its message arrives at the base station at a certain time, it must actually begin transmission early by an amount equal to the one-way station-to-base propagation delay; a special <strong>ranging</strong> mechanism allows stations to figure out this delay.</p>
+<p>A subscriber station begins the network-entry connection process to a base station by listening for the base station&#8217;s transmissions (which may be organized into multiple channels); these message streams contain regular management messages containing, among other things, information about available data rates in each direction.</p>
+<p id="index-44">Also included in the base station&#8217;s message stream is information about start times for <strong>ranging intervals</strong>. The station waits for one of these intervals and sends a &#8220;range-request&#8221; message to the base station. These ranging intervals are open to all stations attempting network entry, and if another station transmits at the same time there will be a collision. However, network entry is only done once (for a given base station) and so the likelihood of a collision in any one ranging interval is small. An Ethernet/Wi-Fi-like exponential-backoff process is used if a collision does occur. Ranging intervals are the only times when collisions can occur; afterwards, all station transmissions are scheduled by the base station.</p>
+<p>If there is no collision, the base station responds, and the station now knows the propagation delay and thus can determine when to transmit so that its data arrives at the base station exactly at a specified time. The station also determines its transmission signal strength from this ranging process.</p>
+<p id="index-45">Finally, and perhaps most importantly, the station receives from the base station its first timeslot for a <strong>scheduled</strong> transmission. These timeslot assignments are included in regular <strong>uplink-map</strong> packets broadcast by the base station. Each station&#8217;s timeslot includes both a start time and a total length; lengths are in the range of 2 to 20 ms. Future timeslots will be allocated as necessary by the base station, in future uplink-map packets. Scheduled timeslots may be periodic (as is would be appropriate for voice) or may occur at varying intervals. WiMAX stations may request any of several quality-of-service levels and the base station may take these requests into account when determining the schedule. The base station also creates a downlink schedule, but this does not need to be communicated to the subscriber stations; the base station simply uses it to decide what to broadcast when to the stations. When scheduling the timeslots, the base station may also take into account availability of multiple transmission channels and of directional antennas.</p>
+<p>Through the uplink-map schedules and individual ranging, each station transmits so that one transmission finishes arriving just before the next transmission begins arriving, as seen from the perspective of the base station. Only minimal &#8220;guard intervals&#8221; need be included between consecutive transmissions. Two (or more) consecutive transmissions may in fact be &#8220;in the air&#8221; simultaneously, as far-away stations need to begin transmitting early so their signals will arrive at the base station at the expected time. The following diagram illustrates this for stations separated by relatively large physical distances.</p>
+<div class="figure">
+<img alt="_images/wimax2.png" src="_images/wimax2.png" />
+</div>
+<p>Mobile stations will need to update their ranging information regularly, but this can be done through future scheduled transmissions. The distance to the base station is used not only for the mobile station&#8217;s transmission timing, but also to determine its power level; signals from each mobile station, no matter where located, should arrive at the base station with about the same power.</p>
+<p>When a station has data to send, it includes in its next scheduled transmission a request for a longer transmission interval; if the request is granted, the station may send the data (or at least some of the data) in its <em>next</em> scheduled transmission slot. When a station is done transmitting, its timeslot shrinks to the minimum, and may be scheduled less frequently as well, but it does not disappear. Stations without data to send remain connected to the base station by sending &#8220;empty&#8221; messages during these slots.</p>
+</div>
+<div class="section" id="fixed-wireless">
+<span id="index-46"></span><h2>3.8&nbsp;&nbsp;&nbsp;Fixed Wireless<a class="headerlink" href="#fixed-wireless" title="Permalink to this headline">¶</a></h2>
+<p>This category includes all wireless-service-provider systems where the subscriber&#8217;s location does not change. Often, but not always, the subscriber will have an outdoor antenna for improved reception and range. Fixed-wireless systems can involve relay through satellites, or can be <strong>terrestrial</strong>.</p>
+<div class="section" id="terrestrial-wireless">
+<span id="index-47"></span><h3>3.8.1&nbsp;&nbsp;&nbsp;Terrestrial Wireless<a class="headerlink" href="#terrestrial-wireless" title="Permalink to this headline">¶</a></h3>
+<p>Terrestrial wireless &#8211; also called terrestrial broadband or fixed-wireless broadband &#8211; involves direct (non-satellite) radio communication between subscribers and a central access point. Access points are usually tower-mounted and serve multiple subscribers, though single-subscriber point-to-point &#8220;microwave links&#8221; also exist. A multi-subscriber access point may serve an area with radius up to several tens of miles, depending on the technology, though more common ranges are under ten miles. WiMAX 802.16d is one form of terrestrial wireless, but there are several others. Frequencies may be either licensed or unlicensed. Unlicensed frequency bands are available at around 900 MHz, 2.4 GHz, and 5 GHz. Nominally all three bands require that line-of-sight transmission be used, though that requirement becomes stricter as the frequency increases. Lower frequencies tend to be better at &#8220;seeing&#8221; through trees and other obstructions.</p>
+<div class="sidebar">
+<p class="first sidebar-title">Trees vs Signal</p>
+<img alt="_images/me_in_tree_cropped_small.png" src="_images/me_in_tree_cropped_small.png" />
+<p class="last">Photo of the author attempting to improve his 2.4 GHz terrestrial-wireless signal via tree trimming.</p>
+</div>
+<p>Terrestrial fixed wireless was originally popularized for rural areas, where residential density is too low for economical cable connections. However, some fixed-wireless ISPs now operate in urban areas, often using WiMAX. One advantage of terrestrial fixed-wireless in remote areas is that the antennas covers a much smaller geographical area than a satellite, generally meaning that there is more data bandwidth available per user and the cost per megabyte is much lower.</p>
+<p>Outdoor subscriber antennas often use a parabolic dish to improve reception; sizes range from 10 to 50 cm in diameter. The size of the dish may depend on the distance to the central tower.</p>
+<span class="target" id="index-48"></span><p>While there are standardized fixed-wireless systems, such as WiMAX, there are also a number of proprietary alternatives, including systems from Trango and Canopy. Fixed-wireless systems might, in fact, be considered one of the last bastions of proprietary LAN protocols. This lack of standardization is due to a variety of factors; two primary ones are the relatively modest overall demand for this service and the the fact that most antennas need to be professionally installed by the ISP to ensure that they are &#8220;properly mounted, aligned, grounded and protected from lightning&#8221;.</p>
+</div>
+<div class="section" id="satellite-internet">
+<span id="index-49"></span><span id="id13"></span><h3>3.8.2&nbsp;&nbsp;&nbsp;Satellite Internet<a class="headerlink" href="#satellite-internet" title="Permalink to this headline">¶</a></h3>
+<p>An extreme case of fixed wireless is <strong>satellite Internet</strong>, in which signals pass through a satellite in geosynchronous orbit (35,786 km above the earth&#8217;s surface). Residential customers have parabolic antennas typically from 70 to 100 cm in diameter, larger than those used for terrestrial wireless but smaller than the dish antennas used at access points. Transmitter power is typically 1-2 watts, remarkably low for a signal that travels 35,786 km.</p>
+<p>The primary problem associated with satellite Internet is very long RTTs. The the speed-of-light round-trip propagation delay is about 500 ms to which must be added queuing delays for the often-backlogged access point (my own personal experience suggested that RTTs of close to 1,000 ms were the norm). These long delays affect real-time traffic such as VoIP and gaming, but as we shall see in <a class="reference internal" href="dynamics.html#satellite-link-tcp-problem"><em>14.11&nbsp;&nbsp;&nbsp;The Satellite-Link TCP Problem</em></a> bulk TCP transfers also perform poorly with very long RTTs. To provide partial compensation for the TCP issue, many satellite ISPs provide some sort of &#8220;acceleration&#8221; for bulk downloads: a web page, for example, would be downloaded rapidly by the access point and streamed to the satellite and back down to the user via a proprietary mechanism. Acceleration, however, cannot help interactive connections such as VPNs.</p>
+<p>Another common feature of satellite Internet is a low daily utilization cap, typically in the hundreds of megabytes. Utilization caps are directly tied to the cost of maintaining satellites, but also to the fact that one satellite covers a great deal of ground, and so its available capacity is shared by a large number of users.</p>
+</div>
+</div>
+<div class="section" id="epilog">
+<h2>3.9&nbsp;&nbsp;&nbsp;Epilog<a class="headerlink" href="#epilog" title="Permalink to this headline">¶</a></h2>
+<p>Along with a few niche protocols, we have focused primarily here on wireless and on virtual circuits. Wireless, of course, is enormously important: it is the enabler for mobile devices, and has largely replaced traditional Ethernet for home and office workstations.</p>
+<p>While it is sometimes tempting (in the IP world at least) to write off ATM as a niche technology, virtual circuits are a serious conceptual alternative to datagram forwarding. As we shall see in <a class="reference internal" href="realtime.html#quality-of-service"><em>19&nbsp;&nbsp;&nbsp;Quality of Service</em></a>, IP has problems handling real-time traffic, and virtual circuits offer a solution. The Internet has so far embraced only small steps towards virtual circuits (such as MPLS, <a class="reference internal" href="realtime.html#mpls"><em>19.12&nbsp;&nbsp;&nbsp;Multi-Protocol Label Switching (MPLS)</em></a>), but they remain a tantalizing strategy.</p>
+</div>
+<div class="section" id="exercises">
+<h2>3.10&nbsp;&nbsp;&nbsp;Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<p>1. Suppose remote host A uses a VPN connection to connect to host B, with IP address 200.0.0.7. A&#8217;s normal Internet connection is via device <tt class="docutils literal"><span class="pre">eth0</span></tt> with IP address 12.1.2.3; A&#8217;s VPN connection is via device <tt class="docutils literal"><span class="pre">ppp0</span></tt> with IP address 10.0.0.44. Whenever A wants to send a packet via <tt class="docutils literal"><span class="pre">ppp0</span></tt>, it is encapsulated and forwarded over the connection to B at 200.0.0.7.</p>
+<div class="line-block">
+<div class="line">(a). Suppose A&#8217;s IP forwarding table is set up so that all traffic to 200.0.0.7 uses <tt class="docutils literal"><span class="pre">eth0</span></tt> and all traffic to anywhere else uses <tt class="docutils literal"><span class="pre">ppp0</span></tt>. What happens if an intruder M attempts to open a connection to A at 12.1.2.3? What route will packets from A to M take?</div>
+<div class="line">(b). Suppose A&#8217;s IP forwarding table is (mis)configured so that <em>all</em> outbound traffic uses <tt class="docutils literal"><span class="pre">ppp0</span></tt>. Describe what will happen when A tries to send a packet.</div>
+</div>
+<p>2. Suppose remote host A wishes to use a TCP-based VPN connection to connect to host B, with IP address 200.0.0.7. However, the VPN software is not available for host A. Host A is, however, able to run that software on a virtual machine V <em>hosted by</em> A; A and V have respective IP addresses 10.0.0.1 and 10.0.0.2 on the virtual network connecting them. V reaches the outside world through network address translation (<a class="reference internal" href="intro.html#nat"><em>1.14&nbsp;&nbsp;&nbsp;Network Address Translation</em></a>), with A acting as V&#8217;s NAT router. When V runs the VPN software, it forwards packets addressed to B the usual way, through A using NAT. Traffic to any other destination it encapsulates over the VPN.</p>
+<p>Can A configure its IP forwarding table so that it can make use of the VPN? If not, why not? If so, how? (If you prefer, you may assume V is a physical host connecting to a second interface on A; A still acts as V&#8217;s NAT router.)</p>
+<p>3. Token Bus was a proprietary Ethernet-based network. It worked like Token Ring in that a small token packet was sent from one station to the next in agreed-upon order, and a station could transmit only when it had just received the token.</p>
+<div class="line-block">
+<div class="line">(a). If the data rate is 10 Mbps and the token is 64 bytes long (the 10-Mbps Ethernet minimum packet size), how long does it take on average to send a packet on an idle network with 40 stations? Ignore the propagation delay and the gap Ethernet requires between packets.</div>
+<div class="line">(b). Repeat part (a) assuming the tokens are only 16 bytes long.</div>
+<div class="line">(c). Sketch a protocol by which stations can sort themselves out to decide the order of token transmission; that is, an order of the stations S<sub>0</sub> ... S<sub>n-1</sub> where station S<sub>i</sub> sends the token to station S<sub>(i+1) mod n</sub>.</div>
+</div>
+<p>4. The IEEE 802.11 standard states &#8220;transmission of the ACK frame shall commence after a SIFS period, without regard to the busy/idle state of the medium&#8221;; that is, the ACK sender does not listen first for an idle network. Give a scenario in which the Wi-Fi ACK frame would fail to be delivered in the absence of this rule, but succeed with it. Hint: this is another example of the hidden-node problem, <a class="reference internal" href="#hidden"><em>3.6.2.2&nbsp;&nbsp;&nbsp;Hidden-Node Problem</em></a>.</p>
+<p>5. Suppose the average contention interval in a Wi-Fi network (802.11g) is 64 SlotTimes. The average packet size is 1 KB, and the data rate is 54 Mbps. At that data rate, it takes about (8×1000)/54 = 148 µsec to transmit a packet.</p>
+<div class="line-block">
+<div class="line">(a). How long is the average contention interval, in µsec?</div>
+<div class="line">(b). What fraction of the total potential bandwidth is lost to contention? (See <a class="reference internal" href="ethernet.html#analysis-of-classic-ethernet"><em>2.1.10&nbsp;&nbsp;&nbsp;Analysis of Classic Ethernet</em></a> for a similar example).</div>
+</div>
+<p>6. WiMAX subscriber stations are not expected to hear one another at all. For Wi-Fi non-access-point stations in an infrastructure (access-point) setting, on the other hand, listening to other non-access-point transmissions is encouraged.</p>
+<div class="line-block">
+<div class="line">(a). List some ways in which Wi-Fi non-access-point stations in an infrastructure (access-point) network do sometimes respond to packets sent by other non-access-point stations. The responses need not be in the form of transmissions.</div>
+<div class="line">(b). Explain why Wi-Fi stations cannot be <em>required</em> to respond as in part (a).</div>
+</div>
+<p>7. Suppose WiMAX subscriber stations can be moving, at speeds of up to 33 meters/sec (the maximum allowed under 802.16e).</p>
+<div class="line-block">
+<div class="line">(a). How much earlier (or later) can one subscriber packet arrive? Assume that the ranging process updates the station&#8217;s propagation delay once a minute. The speed of light is about 300 meters/µsec.</div>
+<div class="line">(b). With 5000 senders per second, how much time out of each second must be spent on &#8220;guard intervals&#8221; accommodating the early/late arrivals above? You will need to double the time from part (a), as the base station cannot tell whether the signal from a moving subscriber will arrive earlier or later.</div>
+</div>
+<p>8. <a class="reference internal" href="bibliography.html#sm90" id="id14">[SM90]</a> contained a proposal for sending IP packets over ATM as N cells as in AAL-5, followed by one cell containing the XOR of all the previous cells. This way, the receiver can recover from the loss of any one cell. Suppose N=20 here; with the SM90 mechanism, each packet would require 21 cells to transmit; that is, we always send 5% more. Suppose the <em>cell</em> loss-rate is p (presumably very small). If we send 20 cells without the SM90 mechanism, we have a probability of about 20p that any one cell will be lost, and we will have to retransmit the entire 20 again. This gives an average retransmission amount of about 20p extra packets. For what value of p do the with-SM90 and the without-SM90 approaches involve about the same total number of cell transmissions?</p>
+<p>9. In the example in <a class="reference internal" href="#virtual-circuits"><em>3.4&nbsp;&nbsp;&nbsp;Virtual Circuits</em></a>, give the VCI table for switch S5.</p>
+<p>10. Suppose we have the following network:</p>
+<div class="highlight-python"><div class="highlight"><pre>A───S1────────S2───B
+    │         │
+    │         │
+    │         │
+C───S3────────S4───D
+</pre></div>
+</div>
+<p>The virtual-circuit switching tables are below. Ports are identified by the node at the other end. Identify all the connections. Give the path for each connection and the VCI on each link of the path.</p>
+<p>Switch <strong>S1</strong>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="25%" />
+<col width="25%" />
+<col width="27%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">VCI<sub>in</sub></th>
+<th class="head">port<sub>in</sub></th>
+<th class="head">VCI<sub>out</sub></th>
+<th class="head">port<sub>out</sub></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1</td>
+<td>A</td>
+<td>2</td>
+<td>S3</td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td>A</td>
+<td>2</td>
+<td>S2</td>
+</tr>
+<tr class="row-even"><td>3</td>
+<td>A</td>
+<td>3</td>
+<td>S2</td>
+</tr>
+</tbody>
+</table>
+<p>Switch <strong>S2</strong>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="25%" />
+<col width="25%" />
+<col width="27%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">VCI<sub>in</sub></th>
+<th class="head">port<sub>in</sub></th>
+<th class="head">VCI<sub>out</sub></th>
+<th class="head">port<sub>out</sub></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>2</td>
+<td>S4</td>
+<td>1</td>
+<td>B</td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td>S1</td>
+<td>3</td>
+<td>S4</td>
+</tr>
+<tr class="row-even"><td>3</td>
+<td>S1</td>
+<td>4</td>
+<td>S4</td>
+</tr>
+</tbody>
+</table>
+<p>Switch <strong>S3</strong>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="25%" />
+<col width="25%" />
+<col width="27%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">VCI<sub>in</sub></th>
+<th class="head">port<sub>in</sub></th>
+<th class="head">VCI<sub>out</sub></th>
+<th class="head">port<sub>out</sub></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>2</td>
+<td>S1</td>
+<td>2</td>
+<td>S4</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td>S4</td>
+<td>2</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<p>Switch <strong>S4</strong>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="25%" />
+<col width="25%" />
+<col width="27%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">VCI<sub>in</sub></th>
+<th class="head">port<sub>in</sub></th>
+<th class="head">VCI<sub>out</sub></th>
+<th class="head">port<sub>out</sub></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>2</td>
+<td>S3</td>
+<td>2</td>
+<td>S2</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td>S2</td>
+<td>3</td>
+<td>S3</td>
+</tr>
+<tr class="row-even"><td>4</td>
+<td>S2</td>
+<td>1</td>
+<td>D</td>
+</tr>
+</tbody>
+</table>
+<p>11. Suppose we have the following network:</p>
+<div class="highlight-python"><div class="highlight"><pre>A───S1────────S2───B
+    │         │
+    │         │
+    │         │
+C───S3────────S4───D
+</pre></div>
+</div>
+<p>Give virtual-circuit switching tables for the following connections. Route via a shortest path.</p>
+<div class="line-block">
+<div class="line">(a). A&#8211;D</div>
+<div class="line">(b). C&#8211;B, via S4</div>
+<div class="line">(c). B&#8211;D</div>
+<div class="line">(d). A&#8211;D, via whichever of S2 or S3 was <em>not</em> used in part (a)</div>
+</div>
+<p>12. Below is a set of switches S1 through S4. Define VCI-table entries so the virtual circuit from A to B follows the path</p>
+<blockquote>
+<div>A ⟶ S1 ⟶ S2 ⟶ S4 ⟶ S3 ⟶ S1 ⟶ S2 ⟶ S4 ⟶ S3 ⟶ B</div></blockquote>
+<p>That is, each switch is visited <em>twice</em>.</p>
+<div class="highlight-python"><div class="highlight"><pre>A──S1─────S2
+   │      │
+   │      │
+B──S3─────S4
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="index.html">An Introduction to Computer Networks, edition 1.8.03</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2015, Peter L Dordal.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>
